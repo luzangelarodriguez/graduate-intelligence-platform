@@ -1,0 +1,1972 @@
+[
+  {
+    "source": "elempleo",
+    "url": "https://www.elempleo.com/co/ofertas-empleo/?trabajo=analista%20de%20datos",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 301,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%20de%20datos",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic,500italic|Kreon:400,700",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://cdn.permutive.com/models/v2/5d0bb38d-5d11-422f-9df7-9b1c3bded5d7-models.bin",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/x-binary",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/v2.0/geoip?include=geo&include=isp&include=ip_hash&k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "geo_info",
+        "isp_info"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://ib.adnxs.com/getuidj?gdpr=0",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "uid"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://5d0bb38d-5d11-422f-9df7-9b1c3bded5d7.prmutv.co/v2.0/pxid?k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "uid"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/ctx/v1/state?url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "cohorts",
+        "activations",
+        "contextual_data",
+        "requires_segmentation"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/recaptcha/api.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/ccm/collect?rcb=15&frm=0&ae=g&auid=1809339572.1779205760&en=page_view&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&scrsrc=www.googletagmanager.com&rnd=448728488.1779205761&navt=n&npa=0&ep.ads_data_redaction=0&gtm=45He65f1v9188067152za200zd9188067152xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938466~115938469~116701382~118131809&apve=1&apvf=f&apvc=1&tft=1779205760519&tfd=2756",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://cdn.id5-sync.com/api/1.0/id5-api.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript;charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/ctx/v1/segment?k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "cohorts",
+        "activations",
+        "contextual_data",
+        "gam",
+        "xandr",
+        "config"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/rmkt/collect/1010759038/?random=1779205760978&cv=11&fst=1779205760978&fmt=8&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&gcp=5",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/ccm/collect?rcb=11&frm=0&auid=1809339572.1779205760&dt=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&en=page_view&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&scrsrc=www.googletagmanager.com&rnd=448728488.1779205761&navt=n&npa=0&gtm=45be65f1v9130128364z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&apve=1&apvf=f&apvc=0&tids=AW-1010759038&tid=AW-1010759038&tft=1779205761038&tfd=3274",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/v1.0/state?fetch_unseen=false&k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/v2.0/identify?k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "user_id"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://sb.scorecardresearch.com/cs/6035169/beacon.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/ccm/form-data/1010759038?gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&rcb=11&npa=0&frm=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&ec_mode=a&em=tv.1",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/rmkt/collect/1010759038/?random=1779205761270&cv=11&fst=1779205761270&fmt=8&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&gcp=5",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/ccm/collect?rcb=11&frm=0&auid=1809339572.1779205760&dt=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&en=permutive&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&scrsrc=www.googletagmanager.com&rnd=448728488.1779205761&navt=n&npa=0&ep.cohorts=176556%2C181439%2C191607%2C194642%2C196905%2C198254%2C198256%2C210405%2C210406%2C212175%2C212288%2C225025%2C240458%2C246515%2C256981&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&apve=1&apvf=f&apvc=0&tids=AW-1010759038&tid=AW-1010759038&tft=1779205761298&tfd=3534",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/ccm/collect?rcb=11&frm=0&auid=1809339572.1779205760&dt=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&en=page_view&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&scrsrc=www.googletagmanager.com&rnd=448728488.1779205761&navt=n&npa=0&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&apve=1&apvf=f&apvc=0&tids=AW-1010759038&tid=AW-1010759038&tft=1779205761297&tfd=3534",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/rmkt/collect/1010759038/?random=1779205761286&cv=11&fst=1779205761286&fmt=8&bg=ffffff&guid=ON&async=1&en=permutive&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dpermutive%3Bcohorts%3D176556%2C181439%2C191607%2C194642%2C196905%2C198254%2C198256%2C210405%2C210406%2C212175%2C212288%2C225025%2C240458%2C246515%2C256981&gcp=5",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://sb.scorecardresearch.com/internal-cs/default/beacon.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-253X7LF7HE&gtm=45je65f1v9104522914z89188067152za20gzb9188067152zd9188067152&_p=1779205759830&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAGA&are=1&cid=976339508.1779205761&frm=0&pscdl=noapi&rcb=1&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=1&tag_exp=0~115938466~115938468&sid=1779205761&sct=1&seg=0&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%20de%20datos&dt=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&en=page_view&_fv=1&_nsi=1&_ss=1&up.user_type=&up.membership_type=&up.location_country=&tfd=3408",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/1010759038/?random=1779205761270&cv=11&fst=1779205761270&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=4",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/1010759038/?random=1779205760978&cv=11&fst=1779205760978&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=4",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/1010759038/?random=1779205761286&cv=11&fst=1779205761286&bg=ffffff&guid=ON&async=1&en=permutive&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dpermutive%3Bcohorts%3D176556%2C181439%2C191607%2C194642%2C196905%2C198254%2C198256%2C210405%2C210406%2C212175%2C212288%2C225025%2C240458%2C246515%2C256981&rfmt=3&fmt=4",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.elempleo.com/co/Home/Autocomplete",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/measurement/conversion?random=1779205761553&cv=11&tid=G-04GE8EQG8F&fst=1779205761553&fmt=8&en=session_start&gtm=45je65f1v879957007z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938466~115938469&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&gacid=976339508.1779205761&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&rcb=19",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-04GE8EQG8F&gtm=45je65f1v879957007z89188067152za20gzb9188067152zd9188067152&_p=1779205759830&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&ecid=530723672&_eu=AAAAAGAC&_prs=ok&are=1&cid=976339508.1779205761&ec_mode=a&frm=0&pscdl=noapi&rcb=19&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=1&tag_exp=0~115938466~115938469&sid=1779205761&sct=1&seg=0&dl=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%20de%20datos&dt=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&en=page_view&_fv=1&_ss=2&up.user_type=&up.membership_type=&up.location_country=&tfd=3839",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.id5-sync.com/analytics/1759/id5-api-js",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "sampling",
+        "ingestUrl",
+        "additionalCleanupRules"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/pagead/1p-user-list/1010759038/?random=1779205761270&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfYADCiJ5rNM-hwqFnU3qso7ESye_IpwwIs7QiyRBf97kN3-Cup3vgJR32uDwGb8fvsZ-gajTbRGlPifXelZ2q62albG4OMpKuMa28AtNA4pm5IrcACHllfrWGP2Jp-w_GlW7WxE5MmOILBCyTnfR8bKJhWm5w_cj9LJtqcUSBLCb0RHsQpOQIniH0kB3qLZRLbi3Xqfy8Nc4ACYR_ATkga55I2qXhJ4iIxtY7spd_Sr-qkOrjyIIuU9iaJsI3FRX0cmvPU0VgoyAsAxnMKrrUw&random=3351606007&rmt_tld=0&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/pagead/1p-user-list/1010759038/?random=1779205760978&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfaR1aMiiXeS72tq2j5Vmgi57zasaTxWGm4AVzIrLRh_YKUlGnCj2epv6BRps8kr_M46j69-NndUgiKt1Erm35s4CcP0fmCr2uBiTkfV_NXaThGXDesODzJ3suWFl2kkSEoGmo6PVoX9rXDKV77sY5Cf-MC6v_voNcd-1S4TehdCPmEf7moOPZ-IZaIlyU04_CP67g6uev1UrUH2YhczcwT3Mh_MdbRT3-QcNl6ipNA_NNsb0qkSuCFykKTrIeD2hUClpRpZka_EtW9ItETcn2A&random=2805650229&rmt_tld=0&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/pagead/1p-user-list/1010759038/?random=1779205761286&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=permutive&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dpermutive%3Bcohorts%3D176556%2C181439%2C191607%2C194642%2C196905%2C198254%2C198256%2C210405%2C210406%2C212175%2C212288%2C225025%2C240458%2C246515%2C256981&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfTEE-Mq_CLllHydiCh_eJSImSuP9UeHHlR1QELU8ABWpHuslb_U4C19TATwTNHATOJSNqMNmc8l5HaBls-AvDsTGtFmlGfw7I1lE6bWkXYEjGOtFgU44WkYrN8yJyDj8vsWREvYW7Dajz1RWUIFRKgv8WbANS08_qupvzALDGOFiRRkZM-cvWK5x4peexKlEvOHAILTDPO9DzSZ8JR6FHPyljDVUJsLiUtjMzASSfvxVC8wW96oiZ_Gx_zGwZMNTxMN6AmzeiehJNUN8oHX0eQ&random=720438317&rmt_tld=0&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.permutive.com/v2.0/batch/events?enrich=false&sdkp=true&k=f068aecf-95b3-423e-9e1c-8574f28e4323",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://sb.scorecardresearch.com/b?c1=2&c2=6035169&cs_fpcu=8a6cbd4f89a44a80a3f6f4da392096e7&cs_it=b1&cv=4.13.1%2B2508250908&ns__t=1779205761687&ns_c=UTF-8&cs_cfg=1101110&cs_ucfr=1&c7=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&c8=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&c9=",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://api.id5-sync.com/analytics/102/id5-api-js",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "sampling",
+        "ingestUrl",
+        "additionalCleanupRules"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://sb.scorecardresearch.com/b2?c1=2&c2=6035169&cs_fpcu=8a6cbd4f89a44a80a3f6f4da392096e7&cs_it=b1&cv=4.13.1%2B2508250908&ns__t=1779205761687&ns_c=UTF-8&cs_cfg=1101110&cs_ucfr=1&c7=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&c8=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&c9=",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 204,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com.co/pagead/1p-user-list/1010759038/?random=1779205760978&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364z89188067152za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfaR1aMiiXeS72tq2j5Vmgi57zasaTxWGm4AVzIrLRh_YKUlGnCj2epv6BRps8kr_M46j69-NndUgiKt1Erm35s4CcP0fmCr2uBiTkfV_NXaThGXDesODzJ3suWFl2kkSEoGmo6PVoX9rXDKV77sY5Cf-MC6v_voNcd-1S4TehdCPmEf7moOPZ-IZaIlyU04_CP67g6uev1UrUH2YhczcwT3Mh_MdbRT3-QcNl6ipNA_NNsb0qkSuCFykKTrIeD2hUClpRpZka_EtW9ItETcn2A&random=2805650229&rmt_tld=1&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com.co/pagead/1p-user-list/1010759038/?random=1779205761270&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfYADCiJ5rNM-hwqFnU3qso7ESye_IpwwIs7QiyRBf97kN3-Cup3vgJR32uDwGb8fvsZ-gajTbRGlPifXelZ2q62albG4OMpKuMa28AtNA4pm5IrcACHllfrWGP2Jp-w_GlW7WxE5MmOILBCyTnfR8bKJhWm5w_cj9LJtqcUSBLCb0RHsQpOQIniH0kB3qLZRLbi3Xqfy8Nc4ACYR_ATkga55I2qXhJ4iIxtY7spd_Sr-qkOrjyIIuU9iaJsI3FRX0cmvPU0VgoyAsAxnMKrrUw&random=3351606007&rmt_tld=1&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com.co/pagead/1p-user-list/1010759038/?random=1779205761286&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=permutive&gtm=45be65f1v9130128364za20gzb9188067152zd9188067152xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616986~115938466~115938468~116701382~118131809&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rcb=11&frm=0&tiba=Ofertas%20de%20trabajo%20de%20Analista%20de%20datos%20-%20Mayo%202026%20%7C%20elempleo.com%20Colombia&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1809339572.1779205760&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dpermutive%3Bcohorts%3D176556%2C181439%2C191607%2C194642%2C196905%2C198254%2C198256%2C210405%2C210406%2C212175%2C212288%2C225025%2C240458%2C246515%2C256981&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfTEE-Mq_CLllHydiCh_eJSImSuP9UeHHlR1QELU8ABWpHuslb_U4C19TATwTNHATOJSNqMNmc8l5HaBls-AvDsTGtFmlGfw7I1lE6bWkXYEjGOtFgU44WkYrN8yJyDj8vsWREvYW7Dajz1RWUIFRKgv8WbANS08_qupvzALDGOFiRRkZM-cvWK5x4peexKlEvOHAILTDPO9DzSZ8JR6FHPyljDVUJsLiUtjMzASSfvxVC8wW96oiZ_Gx_zGwZMNTxMN6AmzeiehJNUN8oHX0eQ&random=720438317&rmt_tld=1&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=5903882&time=1779205761905&li_adsId=4a00e228-11b8-41e3-8cfc-9e42a7b8fe4d&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&tm=gtmv2",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://px.ads.linkedin.com/wa/?medium=fetch&fmt=g",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://px.ads.linkedin.com/attribution_trigger?pid=5903882&time=1779205761905&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&tm=gtmv2",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": []
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://securepubads.g.doubleclick.net/gampad/ads?sfv=1-0-45&cust_params=permutive%3D256981%252Crts%26puid%3D4ae1ba1b-ed8e-41ec-8890-45763b6e0045%26ptime%3D1779205761957%26prmtvvid%3D26940520-a8e4-4531-82da-1f0a1ab55feb%26prmtvwid%3D5d0bb38d-5d11-422f-9df7-9b1c3bded5d7%26prmtvsdk%3Dweb%26prmtvctx%3Drts&pvsid=5536716417285733&correlator=2528314048994822&eid=31098502%2C95340253%2C95340255&output=ldjh&gdfp_req=1&vrg=202605140101&ptt=17&impl=fifs&iu_parts=49787872%2Cel_empleo%2Cofertas_empleo%2Cbanner_intermedio%2Cprimer_robapagina%2Cempleo_movil%2Crobapagina_top%2Csegundo_banner_intermedio%2Ctercer_banner_intermedio%2Ccuarto_banner_intermedio%2Csegundo_robapagina%2Ctercer_robapagina%2Ccuarto_robapagina&enc_prev_ius=%2F0%2F1%2F2%2F3%2C%2F0%2F1%2F2%2F4%2C%2F0%2F5%2F2%2F6%2C%2F0%2F1%2F2%2F7%2C%2F0%2F1%2F2%2F8%2C%2F0%2F1%2F2%2F9%2C%2F0%2F5%2F2%2F10%2C%2F0%2F5%2F2%2F11%2C%2F0%2F5%2F2%2F12&prev_iu_szs=728x90%2C300x300%7C300x600%7C300x250%7C1x1%2C300x100%2C728x90%2C728x90%2C728x90%2C300x100%2C300x100%2C300x100&ifi=1&dids=div-gpt-ad-1738683597523-0~div-gpt-ad-1676305476131-0~div-gpt-ad-1676305501318-0~div-gpt-ad-1738683954153-0~div-gpt-ad-1738683989293-0~div-gpt-ad-1738684027475-0~div-gpt-ad-1738685027131-0~div-gpt-ad-1738685192592-0~div-gpt-ad-1738685225065-0&adfs=~4267311849~~86459911~~~~~&sc=1&cookie_enabled=1&abxe=1&dt=1779205762023&lmt=1779205762&adxs=-9%2C70%2C-9%2C460%2C-9%2C-9%2C-9%2C-9%2C-9&adys=-9%2C2329%2C-9%2C418%2C-9%2C-9%2C-9%2C-9%2C-9&biw=1280&bih=720&scr_x=0&scr_y=0&btvi=-1%7C1%7C-1%7C0%7C-1%7C-1%7C-1%7C-1%7C-1&ucis=1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9&oid=2&u_his=2&u_h=720&u_w=1280&u_ah=720&u_aw=1280&u_cd=24&u_sd=1&u_tz=-300&dmc=8&bc=31&nvt=1&uach=WyJXaW5kb3dzIiwiMTAuMC4wIiwieDg2IiwiIiwiMTQ1LjAuNzYzMi42IixudWxsLDAsbnVsbCwiNjQiLFtbIk5vdDpBLUJyYW5kIiwiOTkuMC4wLjAiXSxbIkhlYWRsZXNzQ2hyb21lIiwiMTQ1LjAuNzYzMi42Il0sWyJDaHJvbWl1bSIsIjE0NS4wLjc2MzIuNiJdXSwwXQ..&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&vis=1&psz=0x-1%7C390x2324%7C0x-1%7C750x196%7C0x-1%7C0x-1%7C0x-1%7C0x-1%7C0x-1&msz=0x-1%7C360x250%7C0x-1%7C750x90%7C0x-1%7C0x-1%7C0x-1%7C0x-1%7C0x-1&fws=2%2C0%2C2%2C0%2C2%2C2%2C2%2C2%2C2&ohw=0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0&a3p=EhwKDWNyd2RjbnRybC5uZXQY4Ne1h-QzSABSAghkEh0KDmVzcC5jcml0ZW8uY29tGODXtYfkM0gAUgIIZBIhChJpbnRpbWF0ZW1lcmdlci5jb20Y4Ne1h-QzSABSAghkEhgKCXlhaG9vLmNvbRjg17WH5DNIAFICCGQSFwoIbXlnYXJ1SUQY4Ne1h-QzSABSAghkEh8KEGVzcC5wdWJtYXRpYy5jb20Y4Ne1h-QzSABSAghkEhQKBW9wZW54GODXtYfkM0gAUgIIZBImChdwZXJtdXRpdmUtc2VjdXJlLXNpZ25hbBjc17WH5DNIAFICCGQSFwoIcnRiaG91c2UY4Ne1h-QzSABSAghk&dlt=1779205759595&idt=2325&adks=1054950901%2C3320684209%2C2912113721%2C3195366982%2C871307909%2C1603572154%2C2917460361%2C976491637%2C2646320803&frm=20&eoidce=1",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "text/plain; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://cm.g.doubleclick.net/partnerpixels?url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=5903882&time=1779205761905&li_adsId=4a00e228-11b8-41e3-8cfc-9e42a7b8fe4d&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&tm=gtmv2&cookiesTest=true",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjstI2ZlI35p4WFvNH2aSwLOr04XKP3iPxTcorAwkbKnqvlCUoPvRKXaFGsaE3uGBP8b2emBx4FpPQEZztH6L1wv0UTyp5VtC8f_ykXMNrT7dXJCELmYqRSmYDpkDKe7b4lZ1jtNWuGjSqSo0MewHh69vpdDJIOpISlWY5du5qf08d8OBqbJ5MsBd5Tt55YHM8fRBjsbo9UkGQFMxt11HcxctLH2TIT0JFbIg4rxFxWWvG7nDp1ohM5WLXBcCRe38ic_ET4bWqlB6-0LxZqmGClnMxMADgr-RlV7JEiet0YQOTTx8H4zu-w0A7ylCm3J-ttn-DZAvPWzsbCam3AIx3evctVosEd9igEZe5qLvDJWy5Uf2D_C-uAqJHY2C4OLAM-btgcqJvXuh5H3E-5wnK1mXIIF-9rJHINiBW6l4XHe6Cj4WJg2Q3i61ONYLZCTutlRzQGJsccrHRmGS6MXLs2KbCWJ3vQ&sai=AMfl-YQav7sT9gZPr-ZQWOr358cVyEEWqyGwg8VnXveq7ll2o_L-DO-AnP2UghEDUFAd0lo5YaiOLOIlr0nFraq8AQY4geaku_dbWSrXqgpxqBJEwtpCzCYttb6HL5XML4VxiXcvc0i24tw-IkgV_ghbvMEcLLZVagUn9zhqCK5Gv08p_1TKE2Iw3kas8fQ2YQ3jYm8klIuIo-c0fKOxYdMerixJzln5b5CcdMFqb8FL-R6YsMglZza0NDqBSqhRv8JuYFWriGZUP91D-FyPUKHKrfy1tl0pFeQH-Yyvi6ijrHZbkXIwPgshhZW1_y3lHWEtC-751cwXCtOY0iU-vMWlQj_pIatuG6uJdQlF5w75RZWbziPGfR36PFQ&sig=Cg0ArKJSzKGm2PZpzm-9EAE&uach_m=%5BUACH%5D&adurl=",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsuiTvFuPRKa87sNpssGOePE__QwOVmG9B7cLkFM-OYJ50GqKonUCdu2eoC2brCz88Y8hugpK03lbe5oP_pVg3Zb2syTLDxHG7rurT83bFfOK0qLjeaBTksUitqrS_6f5yC2zj4UuKeXTohGAplvvcN2Pw48UNrJVaOMs7tfgo3Ze1uSUZ6966N8M5t05iWsqSbZApNpzhEGfVFDQCp880qTvaOJqBlcOnTbyX97L6_Dtucsh6KUxOXZ-_kpF3XViTWg646I71K3V5P6XSqNCFLUFjKZfsRi_zdCPZnNCLwKLsGy28vxV3dL3R-HhMK6Llnwb_qIiQGPGUWE5pr9_PW4l3pCv9VVmT9QXfbR7pnDUiXYSQKl5v5zkGV9vqSMzRQLkhlOJs_kuQUbuYmwid2IIp7lrSvtyrBcqlGvaRU7u4u-BOaudT-tliCBSSynZgB5y0RupibdjCx79MbhElOVDNyg3OU8q6z91H6t&sai=AMfl-YRtrnwsZpiWF3Tdu0prlNP5xfTkIVOnbOTXqWGVnGawe7SEid_bA_FY8GFENuPd9cs2qvwI2WT1_42L5YgI4jZkUkKHTPHnEPXnAdvu3rz_dz9hQPvE-J5DDlDhEBhALHf99oTEdUnZVvmxhgKQxdMimV6u1B5FlzlYk1uIlavmrUrK229A207qLJQEhO6FPDHswwtU5WP0SwIasHz58IaEC-nPUlHjPC7gyS_SjnmJllwD-gK8DDCKegCnXlZRHTKzPgC-zJRezbHVttW947FTtQxKKJyJ7OrVzbiolr14nl8gbxD62elJNM-RnSlRv_yXWEvxwcSD3fWz0Fy0cM1juydi1QU1ZCk8Pm3_e8K0ykzns6Njt8Q&sig=Cg0ArKJSzPF-5qMUAd9MEAE&uach_m=%5BUACH%5D&adurl=",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://c.go-mpulse.net/api/config.json?key=GX2B3-95CAQ-RN39Q-XG8GJ-FQ8PM&d=www.elempleo.com&t=5930686&v=1.720.0&sl=0&si=3dbda3f8-8910-4def-b685-2820be80bff0-tfajy6&plugins=AK,ConfigOverride,Continuity,PageParams,IFrameDelay,AutoXHR,SPA,History,Angular,Backbone,Ember,RT,CrossDomain,BW,PaintTiming,NavigationTiming,ResourceTiming,Memory,CACHE_RELOAD,Errors,TPAnalytics,UserTiming,Akamai,Early,EventTiming,LOGN&acao=&ak.ai=1107587",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 204,
+    "content_type": "application/json",
+    "sample": {
+      "json_error": "unreadable"
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LdrFFcUAAAAABbAYV_0RiIQFOICjNkz5iWnmsjW&co=aHR0cHM6Ly93d3cuZWxlbXBsZW8uY29tOjQ0Mw..&hl=es-419&v=Br0hYqpfWeFzYCAXLD4UuCIV&size=normal&anchor-ms=20000&execute-ms=30000&cb=th1a43wk8ola",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.linkedin.com/px/li_sync?redirect=https%3A%2F%2Fpx.ads.linkedin.com%2Fcollect%3Fv%3D2%26fmt%3Djs%26pid%3D5903882%26time%3D1779205761905%26li_adsId%3D4a00e228-11b8-41e3-8cfc-9e42a7b8fe4d%26url%3Dhttps%253A%252F%252Fwww.elempleo.com%252Fco%252Fofertas-empleo%252Ftrabajo-analista%252520de%252520datos%26tm%3Dgtmv2%26cookiesTest%3Dtrue%26liSync%3Dtrue",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://adapter.aivo.co/api/v1/f110b95c16a65eb913912b5787fe09a3/settings/u?host=https%253A%252F%252Fwww.elempleo.com%252Fco%252Fofertas-empleo%252Ftrabajo-analista%252520de%252520datos",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "ct",
+        "iv",
+        "s"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://oajs.openx.net/esp?url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rid=esp",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://fonts.googleapis.com/css?family=Open+Sans",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://fonts.googleapis.com/icon?family=Material+Icons",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://px.ads.linkedin.com/collect?v=2&fmt=js&pid=5903882&time=1779205761905&li_adsId=4a00e228-11b8-41e3-8cfc-9e42a7b8fe4d&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&tm=gtmv2&cookiesTest=true&liSync=true",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "application/javascript",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=reach&proto=CAlgAWACaAM%3D",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=colleague-executed&name=4",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://pagead2.googlesyndication.com/pagead/gen_204?id=av-js&type=fle-fetch-start2",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://tracking.mygaru.com/ident/?domain=www.elempleo.com&otp=0&ttems=396&i=myg-standalone&resource=script&type=script&conn_id=null&conn_req_num=null&dns=163.2&tcp=34.400000000000006&tls=39.5&ttfb=40.5&transfer=6.7&redirect=0&blocked=0&total=396&fromCache=false",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "text/plain; charset=utf-8, text/plain; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://oajs.openx.net/esp?url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos&rid=esp&cc=1",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "esp",
+        "i"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://ident.mygaru.com/v2/id?partner_id=abd6fad8-5220-4364-8fd1-052f78594be6",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "otp",
+        "ip",
+        "telco",
+        "carrier",
+        "mcc"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://esp.rtbhouse.com/encrypt",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "status",
+        "message",
+        "segments"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://tracking.mygaru.com/ident/?domain=www.elempleo.com&otp=Mj4xI%2Fw6rP6lT8NSXxMUtBKjFHanIiuy0Xg5BWbKNK4t2aFmt1I%2BDWVQOpa2kNFmdwQFG9B6OClYHIfxkwHu0%2FJMkG72mo%2FWBg%3D%3D&ttems=676&i=myg-standalone&resource=id&type=fetch&conn_id=null&conn_req_num=null&dns=0.3&tcp=176.5&tls=182.7&ttfb=192.1&transfer=0.2&redirect=0&blocked=0&total=552.9&fromCache=false",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "text/plain; charset=utf-8, text/plain; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/recaptcha/api2/webworker.js?hl=es-419&v=Br0hYqpfWeFzYCAXLD4UuCIV",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bcp.crwdcntrl.net/6/map?xcid=16589",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json;charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "pid",
+        "c",
+        "ids"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.gstatic.com/recaptcha/api2/logo_48.png",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/png",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsviYFOXU7BOKuUP1LOnN0mSo399oLYxU4LJ0PsaE3y4lCEmGt3aBBgUco-JZcmMtXkk67I3KoseVvhjEfaOk7L8kX1KBpp07kZGrgvwlhgAzwEycRU12kAorwZkbwGFQHg1nNOaIAibDdaMmXDPG3zbW0xyLWyZdpikOYPxrpkTBFsfdt2MoUIpLYYj3eRA0BoffSYMy3EaBRCYbNJC5V4SBp8dMsZGu1r6A2ymS-T7wpQtQpcXAM78_HfWlr3EMk3r6SorDQkhjLG570N6ubev4rQvIM1eDtqup-KOtqRFxDFHu_lwaNNWFOICdF7164j6Rr3ja-GbjaT0JhxbFq_oCfkOfXROGqXYU6sXo-BFd7_aZQ-rZ_ia84a4ZXsjpDSBu5KVPhJW2ZCHjQcb5eWyMmN8_OC6PpRyDjS0qxv9cO6EzvRsNEskwOgZIvmrMfzjIxJ5-iaBCNuWrm3iyeqSLH0VwLIM&sai=AMfl-YSxYJnLjvYtYgDG_aSt61mGeP3rkKIBl-syBpF1SBL2NZ4JNElcmUv-osRI4ShuV_GaCWLTe7qqkf0e9BCNlTIv89zikSdxRPGC99UASI7i_T58-YauSHEXN1DKFTtbi2XNUGVSsWWCOzTW9mFpe3AVojR95OcZDDG_oduJHq_CvMPUJJh7KEDrT96tIvDIdQMJP7ZukhHtT22ZRYtxasd1Y34CTHgOP57HSpd6v3CabL16-kW3DeRzreujzKr3GOQDGkmZNSWp4W1mzYd2qhvNbZQNBpYA5a0TYDFgxqOqJH2unmeKwycNv4_FTNSqzzV4e8E1pJawP9nyBPVlxUt6e4O79dVSq_jGgLdZ38UybP8OgRdPjcs&sig=Cg0ArKJSzKkpHMn_WdCwEAE&uach_m=%5BUACH%5D&dett=2&adurl=",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://sync6.im-apps.net/9001/pid?ref=null&page=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%20de%20datos",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "ppid",
+        "uid"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjst5HLMEJKXhUEkuwdR8-SLTposCuRjB-rxHUSSKye9oXb0v4hGPpgtwxMA775Tw00UFnZruxn4e1xgBYyWg_baiWaeEaF-0nTOcj4J9ksfOeuMdYpyZp34UsYe1JiN8Q-80YtrGadoDT-fql8W3mfwv5OnqpvxNLQYT5rqO4MLUAhhXRJq1wrSsNCcvpXG0iwoyJefMIPekQvx8OrkjMuOuGLYFZI-8wyZvbItcNsTMvE3U1IH6xRsgXknbInBgPbkfz6c5j3gVG9cMFMRqDOFJEYH6aeGDNtVVdQYxL7etwDPiR4dKkvJRgfSSAnKzaX6hHNGfOzMc2mPYdRA5m80ngJyMTXElcfIh3a0nXR8MFw-1YkhbTy0rAyN8FkD5Iwon4A4alQUyXnM1RTUV4pfZn_5_ObwOtXRjwBGNwq31uQos_UNgFKvCri-8fz9_9aXnYslO0h_aWUGxuFo4zhvjd0jJaKQWIspYAvkKbb4&sai=AMfl-YRoodzFbq3egu-rH_LtupdgJUoc8kyR6Kcn0hQRU6KYMmKL8DA8haqHqcis9T3UZWz7s8r_0gkCeTY6X-nTBkxk-I69_Z2zlzbjpkPwlPbCKZ9gtyB3SZCXx-DgAO_kSk9MpVxvxmS-WrUAhLoHeAPpJWZ-XIhrog11GcJ3YRUyC1kmof3a9RJ3_7ZB1c3xnYk6fIY9ihcr355_vxYUnRUUVxcMepmVfCXoA4ScY9RqVxmk8dbtOyhrSuKZIeXTRlqdtr95lGjn0JGtSmYraBwXa6zS8t9rx4lfcGwKjCX5bn7RiyxgGBbB11JFZ0JwEhSMrwSsBrX4ZCgtN4y1s0a8NuDY3L1cbK2Iq3Nz2CNnLblpVGt-B-c&sig=Cg0ArKJSzD-SyEVTkjuNEAE&uach_m=%5BUACH%5D&dett=2&adurl=",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/recaptcha/api2/bframe?hl=es-419&v=Br0hYqpfWeFzYCAXLD4UuCIV&k=6LdrFFcUAAAAABbAYV_0RiIQFOICjNkz5iWnmsjW&bft=0dAFcWeA5M-0xh3Ql5gm4a01c-Fq9FN0vqy9OZXX7uvXmecV86QpnbgrBZamrkhqH70HXbIuMCGx8l0HJfjAvhwuVa6qYPXNiYOA",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://ups.analytics.yahoo.com/ups/58813/fed?gpp_sid=-1&v=1&url=https%3A%2F%2Fwww.elempleo.com%2Fco%2Fofertas-empleo%2Ftrabajo-analista%2520de%2520datos",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 400,
+    "content_type": "application/json",
+    "sample": {
+      "json_error": "unreadable"
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://conversation-user.aivo.co/api/v1/users/0331227477f5bff94625cc4b81d0ca5c",
+    "method": "PUT",
+    "resource_type": "xhr",
+    "status": 201,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "X-Timezone",
+        "X-Timezone-Offset"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gpt&tv=m202605140101&st=env&sjk=5536716417285733",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json; charset=UTF-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "sodar_query_id",
+        "injector_basename",
+        "bg_hash_basename",
+        "bg_binary",
+        "rc_enable",
+        "bg_snapshot_delay_ms",
+        "is_gen_204"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bam.nr-data.net/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=6869&ck=0&s=4e7e4abb98e817a7&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=717d870d7b0b6aaf&af=err,spa,xhr,stn,ins&ap=246&be=1817&fe=4767&dc=1950&fsh=1&perf=%7B%22timing%22:%7B%22of%22:1779205757764,%22n%22:0,%22r%22:0,%22re%22:1130,%22f%22:1130,%22dn%22:1130,%22dne%22:1130,%22c%22:1130,%22s%22:1130,%22ce%22:1130,%22rq%22:1133,%22rp%22:1817,%22rpe%22:2116,%22di%22:3753,%22ds%22:3753,%22de%22:3767,%22dc%22:6574,%22l%22:6574,%22le%22:6584%7D,%22navigation%22:%7B%22rc%22:1%7D%7D&fp=3004&fcp=3004",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "stn",
+        "err",
+        "ins",
+        "spa",
+        "sr",
+        "srs",
+        "st",
+        "sts",
+        "log",
+        "logapi",
+        "app"
+      ]
+    }
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bam.nr-data.net/events/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=7229&ck=0&s=4e7e4abb98e817a7&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=717d870d7b0b6aaf",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bam.nr-data.net/events/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=7233&ck=0&s=4e7e4abb98e817a7&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=717d870d7b0b6aaf",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bam.nr-data.net/browser/logs?browser_monitoring_key=ae648b7581",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://bam.nr-data.net/jserrors/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=7231&ck=0&s=4e7e4abb98e817a7&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=717d870d7b0b6aaf&pve=1",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "elempleo",
+    "url": "https://www.google.com/recaptcha/api2/aframe",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.magneto365.com/co/empleos?search=analista%20de%20datos",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 308,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.magneto365.com/co/trabajos/buscar?search=analista%20de%20datos",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "text/x-component",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/155cae559bbd1a77-s.p.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/be7d54e7071a244c.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/53cd5806e83d6e69.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/6d664cce900333ee-s.p.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/056c0d4f6ac5580a.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/4de1fea1a954a5b6-s.p.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/55c20a7790588da9-s.p.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/e15612d50533747b.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/1470da505766924c.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/7ff6869a1704182a-s.p.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/baa7969b546cafce.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/53c3dac261b559c7.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/css/827e1642ed326c93.css",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/lato-v24-latin-700.d5eb20bc.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/media/lato-v24-latin-regular.b7ffde23.woff2",
+    "method": "GET",
+    "resource_type": "font",
+    "status": 200,
+    "content_type": "font/woff2",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/webpack-2a2d0c611bda3cec.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/main-app-b91586b22be1d9a8.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/87c73c54-30ea4a08d92a82e9.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/2130-0fe602802512c952.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/8315-006de9e1ed6a2f9b.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/9959-5a7433d54db52823.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/990a3170-072a088e0d46d0cf.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/3482-3fa2cc7c3f4f1e74.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/2201-de5aea88f7544293.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/3970-54f6e8667791e401.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/5826-93b316ea54491b36.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/app/layout-313a018b62a3b36d.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/6438-429021f4d0c559df.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/7bf36345-b6e8bc9f3cd48e2a.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/300-e3aba97579832e88.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/6653-adb47773bc38d409.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/4781-cfc5c7d41022146e.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/4315-e951a4301820c5eb.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/7261-99d24c914b7bf423.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/6369-fc0c7446fbadd90a.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/904-2947bd900a5eb66b.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/1583-43c0a73cb73e6b9c.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/5123-c129b6551cea96e0.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/1549-7b86c0e452af65cb.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/7584-60e53e22ae414b05.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/a3b941e7-ad6062b2af93ef61.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/app/not-found-94e431933c7d66f8.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/app/trabajos/(landings)/layout-64bd3fd76cffb7a3.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/3675-ebce4bc897ab0600.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/4073-de150f5ad1af35c9.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/6476-b0c91366446c0b95.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/2086-d1060e1ca0b35d53.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/4742-cb69509150edd6aa.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/app/error-c6a1e640b45f1ba2.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/2849449d-c38a95878425ce41.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/5791-62bacda2104d8ae8.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/app/trabajos/search/%5B%5B...filters%5D%5D/page-d30af3fbdbc56fdf.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/1308-bf268a04a1f4cb06.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://static.magneto365.com/jobs/co/_next/static/chunks/3555.eb6d283f6364e85c.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.youtube.com/iframe_api",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/ccm/collect?rcb=11&frm=0&ae=g&auid=1378842543.1779205775&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=page_view&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar&scrsrc=www.googletagmanager.com&rnd=2079427550.1779205775&navt=n&npa=0&ep.ads_data_redaction=0&gtm=45He65f1v835615087za200zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938469~118131810~118228215&apve=1&apvf=f&apvc=1&tft=1779205774826&tfd=3415",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/seo/v1/mega-menu/by-sector",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/seo/v1/mega-menu/by-company",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/jobs/v1/public/locations?term=all&country_id=47",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/jobs/v1/vacancies/ia/suggested?id=923641",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 401,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "httpCode",
+        "message",
+        "errors"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/sign-up/v1/countries/active",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "rows",
+        "current"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/sign-up/v2/candidate/applications/count",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 401,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "httpCode",
+        "message",
+        "errors"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/seo/v1/mega-menu/by-occupation",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://api.magneto365.com/seo/v1/mega-menu/by-location",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "list",
+      "keys": []
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/measurement/conversion?random=1779205776081&cv=11&tid=G-9PWQ09HSKM&fst=1779205776081&fmt=8&en=select_item&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938469~118128923~118694324&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&gacid=219189666.1779205776&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&rcb=7",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/measurement/conversion?random=1779205776094&cv=11&tid=G-9PWQ09HSKM&fst=1779205776094&fmt=8&en=select_item&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938469~118128923~118694324&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&gacid=219189666.1779205776&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&rcb=7",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-9PWQ09HSKM&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087&_p=1779205774689&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&ecid=1566785803&_eu=AAAAAGAC&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=1&tag_exp=0~115938465~115938469~118128923~118694324&sid=1779205776&sct=1&seg=0&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=4635",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-9PWQ09HSKM&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087&_p=1779205774689&gcd=13l3l3l3l1l1&npa=0&dma=0&ecid=1566785803&_eu=IAAAAGQC&_prs=ok&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=4&tag_exp=0~115938465~115938469~118128923~118694324&sid=1779205776&sct=1&seg=0&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=select_item&_c=1&pr1=id67698c7a-71b9-4c92-8cb2-59106e002b5f~nmAsesor%20Comercial%20(televentas)~brConfidencial~vaBogot%C3%A1%2C%20D.C.~pr1750905~k0currency~v0COP~qt1~caVentas~c2Call%20center%2C%20tele%20mercadeo%2C%20BPO%20y%20afines~c3~c4~c5~lnOfertas%20de%20empleo%20en%20Colombia~liofertas-de-empleo-en-colombia~lp1&ep.section=Vitrina-Search&_et=1&tfd=4687",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-9PWQ09HSKM&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087&_p=1779205774689&gcd=13l3l3l3l1l1&npa=0&dma=0&ecid=1566785803&_eu=IAAAAGQC&_prs=ok&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=3&tag_exp=0~115938465~115938469~118128923~118694324&sid=1779205776&sct=1&seg=0&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=select_item&_c=1&pr1=id67698c7a-71b9-4c92-8cb2-59106e002b5f~nmAsesor%20Comercial%20(televentas)~brConfidencial~vaBogot%C3%A1%2C%20D.C.~pr1750905~k0currency~v0COP~qt1~caVentas~c2Call%20center%2C%20tele%20mercadeo%2C%20BPO%20y%20afines~c3~c4~c5~lnOfertas%20de%20empleo%20en%20Colombia~liofertas-de-empleo-en-colombia~lp1&ep.section=Vitrina-Search&_et=1&tfd=4682",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-9PWQ09HSKM&gtm=45je65f1v888594695z8835615087za20gzb835615087zd835615087&_p=1779205774689&gcd=13l3l3l3l1l1&npa=0&dma=0&ecid=1566785803&_eu=AAAAAGQC&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=2&tag_exp=0~115938465~115938469~118128923~118694324&sid=1779205776&sct=1&seg=0&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&_tu=CA&tfd=4681",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/ccm/collect?rcb=15&frm=0&auid=1378842543.1779205775&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=page_view&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar&scrsrc=www.googletagmanager.com&rnd=2079427550.1779205775&navt=n&npa=0&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&apve=1&apvf=f&apvc=0&tids=AW-766245462&tid=AW-766245462&tft=1779205776247&tfd=4835",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/rmkt/collect/766245462/?random=1779205776206&cv=11&fst=1779205776206&fmt=8&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&gcp=5",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/ccm/collect?rcb=15&frm=0&ae=g&auid=1378842543.1779205775&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar&scrsrc=www.googletagmanager.com&rnd=2079427550.1779205775&navt=n&npa=0&_tu=CA&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&apve=1&apvf=f&apvc=0&tids=AW-766245462&tid=AW-766245462&tft=1779205776247&tfd=4835",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/rmkt/collect/766245462/?random=1779205776242&cv=11&fst=1779205776242&fmt=8&bg=ffffff&guid=ON&async=1&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&_tu=CA&gcp=5",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-7W7ZTPHS9L&gtm=45je65f1v9196186391za20gzb835615087zd835615087&_p=1779205774689&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAE&ae=a&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&_s=1&tag_exp=0~115938465~115938468&sid=1779205776&sct=1&seg=0&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=view_search_results&_fv=1&_ss=1&ep.search_term=analista%20de%20datos&tfd=4866",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.youtube.com/s/player/55b1ff8b/www-widgetapi.vflset/www-widgetapi.js",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/766245462/?random=1779205776206&cv=11&fst=1779205776206&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=4",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/766245462/?random=1779205776242&cv=11&fst=1779205776242&bg=ffffff&guid=ON&async=1&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&_tu=CA&rfmt=3&fmt=4",
+    "method": "GET",
+    "resource_type": "script",
+    "status": 200,
+    "content_type": "text/javascript; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://ct.pinterest.com/user/?event=pagevisit&ed=%7B%22np%22%3A%22gtm%22%2C%22gtm_version%22%3A%22legacy%22%7D&tid=2612692515593&cb=1779205777130&dep=5%2CEVENT_TAGS_ABSENT",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "aemEnabled",
+        "aemFnLnEnabled",
+        "aemPhEnabled",
+        "aemGeEnabled",
+        "aemDbEnabled",
+        "aemLocEnabled",
+        "aemExternalIdEnabled",
+        "ctEpikIframeEnabled",
+        "chromeNewUserAgentEnabled",
+        "isEu",
+        "isUtilizingAdvertiser1pEnabled",
+        "mdFrequency",
+        "piaaEndPoint",
+        "noCodeCapiDomains"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://ct.pinterest.com/user/?tid=2612692515593&pd=%7B%22np%22%3A%22gtm%22%2C%22gtm_version%22%3A%22legacy%22%7D&cb=1779205777128&dep=2%2CPAGE_LOAD",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "aemEnabled",
+        "aemFnLnEnabled",
+        "aemPhEnabled",
+        "aemGeEnabled",
+        "aemDbEnabled",
+        "aemLocEnabled",
+        "aemExternalIdEnabled",
+        "ctEpikIframeEnabled",
+        "chromeNewUserAgentEnabled",
+        "isEu",
+        "isUtilizingAdvertiser1pEnabled",
+        "mdFrequency",
+        "piaaEndPoint",
+        "noCodeCapiDomains"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://ct.pinterest.com/v3/?tid=2612692515593&pd=%7B%22np%22%3A%22gtm%22%2C%22gtm_version%22%3A%22legacy%22%7D&event=init&ad=%7B%22loc%22%3A%22https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos%22%2C%22ref%22%3A%22%22%2C%22if%22%3Afalse%2C%22sh%22%3A720%2C%22sw%22%3A1280%2C%22mh%22%3A%22948ee93e%22%2C%22is_eu%22%3Atrue%2C%22architecture%22%3A%22x86%22%2C%22bitness%22%3A%2264%22%2C%22brands%22%3A%5B%7B%22brand%22%3A%22Not%3AA-Brand%22%2C%22version%22%3A%2299%22%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22145%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22145%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Windows%22%2C%22platformVersion%22%3A%2210.0.0%22%2C%22uaFullVersion%22%3A%22145.0.7632.6%22%2C%22ecm_enabled%22%3Afalse%7D&cb=1779205777130",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.twitter.com/1/i/adsct?bci=4&dv=America%2FBogota%26es-CO%26Google%20Inc.%26Win32%26255%261280%26720%268%2624%261280%26720%260%26na&eci=3&event=%7B%7D&event_id=05dfeaeb-03e0-4b05-a97d-ec27705c56c9&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6eea253a-2914-4a16-b528-865fe34264be&pt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&tw_document_href=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&tw_iframe_status=0&tw_pid_src=1&twpid=tw.1779205777031.140911965363726157&txn_id=okygu&type=javascript&version=2.3.53",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif;charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://ct.pinterest.com/v3/?event=pagevisit&ed=%7B%22np%22%3A%22gtm%22%2C%22gtm_version%22%3A%22legacy%22%7D&tid=2612692515593&cb=1779205777457&dep=5%2CEVENT_TAGS_ABSENT&pd=%7B%22np%22%3A%22gtm%22%2C%22gtm_version%22%3A%22legacy%22%7D&ad=%7B%22loc%22%3A%22https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos%22%2C%22ref%22%3A%22%22%2C%22if%22%3Afalse%2C%22sh%22%3A720%2C%22sw%22%3A1280%2C%22mh%22%3A%22948ee93e%22%2C%22is_eu%22%3Atrue%2C%22architecture%22%3A%22x86%22%2C%22bitness%22%3A%2264%22%2C%22brands%22%3A%5B%7B%22brand%22%3A%22Not%3AA-Brand%22%2C%22version%22%3A%2299%22%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22145%22%7D%2C%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22145%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Windows%22%2C%22platformVersion%22%3A%2210.0.0%22%2C%22uaFullVersion%22%3A%22145.0.7632.6%22%2C%22ecm_enabled%22%3Afalse%7D",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://t.co/1/i/adsct?bci=4&dv=America%2FBogota%26es-CO%26Google%20Inc.%26Win32%26255%261280%26720%268%2624%261280%26720%260%26na&eci=3&event=%7B%7D&event_id=05dfeaeb-03e0-4b05-a97d-ec27705c56c9&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6eea253a-2914-4a16-b528-865fe34264be&pt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&tw_document_href=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&tw_iframe_status=0&tw_pid_src=1&twpid=tw.1779205777031.140911965363726157&txn_id=okygu&type=javascript&version=2.3.53",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif;charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/pagead/1p-user-list/766245462/?random=1779205776206&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfY9TRIIScCZfbMj6kMNa8mjpCwz_AD3_-HwKoT5rSlSwXf_cBv5AvGsfjV5IQy7sGQ_j_VGlnLOckoK7uFXr6nddZs4CnWEUCB3cW9uGXbPvePTAmM3urCVvp6QpJAAE2EM4uJBSS0lfI_8oEpX_zm17LD8gkcC3EzIfdVmTYntZDDXLicW5YeN3KZiS-rL0Y06KGHt293Jf2vFE0k7moTFbNhFz6BjYpyvH4hbGRWrwOJV2QnT6dmJOfk-wmUG0nhW0tFwO_731Ads93axJ0Q&random=1375488616&rmt_tld=0&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com/pagead/1p-user-list/766245462/?random=1779205776242&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&_tu=CA&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfSblQzDIW-wjvRQUuIGP5fzmIOMumKX4-kL7uTjd-fv6_vo-lseNUwq3w1xCmUlh-58cDDpZjS6zIEr1WtL5SLmfBDWa_NNzVD1aiO_1ik5DTHityLeNgQH6uuAIJ2Ox1QGMHj02ux65FkDtXXFoZWnYeWEKGI3x8krYGcfblRONCRQylVmktm1Aa6s6EEhmoMA60I2SF-Llbil-WbTXZSDJee3dgfdOvbC6TYedNVRGNNUBNt73riS348F7BQV8AN3skgBrx56xc70U1nX5pA&random=272308233&rmt_tld=0&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://bat.bing.com/action/0?ti=27022307&Ver=2&mid=f2405bae-ed00-48fd-9ad9-b06dbed4c355&bo=1&sid=56caed90539a11f1beaafd7c2e40193e&vid=56cb2310539a11f1a2b23b44b6d6837a&vids=1&msclkid=N&uach=pv%3D10.0.0&pi=0&lg=es-CO&sw=1280&sh=720&sc=24&nwd=1&tl=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&p=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&r=&lt=1965&evt=pageLoad&sv=2&cdb=AQAQ&rn=535609",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 204,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com.co/pagead/1p-user-list/766245462/?random=1779205776206&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&data=event%3Dgtag.config&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfY9TRIIScCZfbMj6kMNa8mjpCwz_AD3_-HwKoT5rSlSwXf_cBv5AvGsfjV5IQy7sGQ_j_VGlnLOckoK7uFXr6nddZs4CnWEUCB3cW9uGXbPvePTAmM3urCVvp6QpJAAE2EM4uJBSS0lfI_8oEpX_zm17LD8gkcC3EzIfdVmTYntZDDXLicW5YeN3KZiS-rL0Y06KGHt293Jf2vFE0k7moTFbNhFz6BjYpyvH4hbGRWrwOJV2QnT6dmJOfk-wmUG0nhW0tFwO_731Ads93axJ0Q&random=1375488616&rmt_tld=1&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google.com.co/pagead/1p-user-list/766245462/?random=1779205776242&cv=11&fst=1779202800000&bg=ffffff&guid=ON&async=1&gtm=45be65f1v868584376z8835615087za20gzb835615087zd835615087xea&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115616985~115938465~115938469~118128923~118131810&u_w=1280&u_h=720&url=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&rcb=15&frm=0&tiba=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1378842543.1779205775&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uamb=0&uam=&uap=Windows&uapv=10.0.0&uaw=0&_tu=CA&rfmt=3&fmt=3&is_vtc=1&cid=CAQS1AEABaugfSblQzDIW-wjvRQUuIGP5fzmIOMumKX4-kL7uTjd-fv6_vo-lseNUwq3w1xCmUlh-58cDDpZjS6zIEr1WtL5SLmfBDWa_NNzVD1aiO_1ik5DTHityLeNgQH6uuAIJ2Ox1QGMHj02ux65FkDtXXFoZWnYeWEKGI3x8krYGcfblRONCRQylVmktm1Aa6s6EEhmoMA60I2SF-Llbil-WbTXZSDJee3dgfdOvbC6TYedNVRGNNUBNt73riS348F7BQV8AN3skgBrx56xc70U1nX5pA&random=272308233&rmt_tld=1&ipr=y",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/gif",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://tr.snapchat.com/p?pid=b1c2f902-2eed-4a42-952b-3daf0d23443d&ev=PAGE_VIEW&intg=gtm&pids=b1c2f902-2eed-4a42-952b-3daf0d23443d&u_c1=ea4fdfb1-2b1c-472a-b83d-c2885f0163f5&cdid=%40-5ce37e10-6ebd-49e0-a0fa-7808da2a1d05&u_sclid=cb079186-935a-4adb-a0fa-4d5f3f7c0064&u_scsid=84b0eac9-89c1-45f6-a0bc-112013f2799f&gat=G-7W7ZTPHS9L%2CAW-766245462%2CG-9PWQ09HSKM%2CGTM-MSRRDFX&gac=1cc4c1c3&bg=false&bt=1d53c387&d_a=x86&d_bvs=%5B%2C%7B%22brand%22%3A%22Not%3AA-Brand%22%2C%22version%22%3A%2299.0.0.0%22%7D%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22145.0.7632.6%22%7D%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22145.0.7632.6%22%7D%5D&d_os=10.0.0&d_ot=Windows&df=true&huah=true&m_dcl=1965&m_fcps=1960&m_pi=1965&m_pl=0&m_pv=2&m_rd=5992&m_sh=720&m_sl=5981&m_sw=1280&pl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&trackId=6e400344-c4e7-453d-b5a5-11060fc5827f&ts=1779205777404&v=3.56.1-2604231811",
+    "method": "GET",
+    "resource_type": "image",
+    "status": 200,
+    "content_type": "image/png",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://sr-client-cfg.amplitude.com/config/94051037b29196d8ac3b06879dfbdc0c?config_group=browser",
+    "method": "GET",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "configs"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.tiktok.com/api/v2/pixel",
+    "method": "POST",
+    "resource_type": "ping",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://analytics.tiktok.com/api/v2/pixel/act",
+    "method": "POST",
+    "resource_type": "ping",
+    "status": 200,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://y.clarity.ms/collect",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 204,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "magneto",
+    "url": "https://api2.amplitude.com/2/httpapi",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "code",
+        "server_upload_time",
+        "payload_size_bytes",
+        "events_ingested"
+      ]
+    }
+  },
+  {
+    "source": "magneto",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-7W7ZTPHS9L&gtm=45je65f1v9196186391z8835615087za20gzb835615087zd835615087&_p=1779205774689&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=219189666.1779205776&frm=0&pscdl=noapi&rcb=7&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&_s=2&tag_exp=0~115938465~115938468&sid=1779205776&sct=1&seg=1&dl=https%3A%2F%2Fwww.magneto365.com%2Fco%2Ftrabajos%2Fbuscar%3Fsearch%3Danalista%2520de%2520datos&dt=Post%C3%BAlate%20a%20las%20ofertas%20de%20empleo%20en%20Colombia%20%7C%20Magneto&en=page_view&_et=25&tfd=9899",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://torre.ai/search/jobs?q=analista%20de%20datos&location=Colombia",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 302,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://torre.ai/login?intent=search:search-jobs&next=/search/jobs?q=analista%2520de%2520datos%26location=Colombia",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 303,
+    "content_type": "",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://accounts.torre.ai/openid/authorize?scope=openid+profile+email&response_type=code&redirect_uri=https%3A%2F%2Ftorre.ai%2Fcallback%3Fclient_name%3Dstarrgate&state=RzdJT9dFIB5gFwgypZFiI5to8ZSF9KZxfNneFLLzALk&intent=search%3Asearch-jobs&client_id=541493",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 302,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://accounts.torre.ai/email/?next=/openid/authorize%3Fscope%3Dopenid%2Bprofile%2Bemail%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Ftorre.ai%252Fcallback%253Fclient_name%253Dstarrgate%26state%3DRzdJT9dFIB5gFwgypZFiI5to8ZSF9KZxfNneFLLzALk%26intent%3Dsearch%253Asearch-jobs%26client_id%3D541493",
+    "method": "GET",
+    "resource_type": "document",
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://fonts.googleapis.com/css?family=Muli:400,600,700|Roboto",
+    "method": "GET",
+    "resource_type": "stylesheet",
+    "status": 200,
+    "content_type": "text/css; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=2142178230&t=pageview&_s=1&dl=https%3A%2F%2Faccounts.torre.ai%2Femail%2F%3Fnext%3D%2Fopenid%2Fauthorize%253Fscope%253Dopenid%252Bprofile%252Bemail%2526response_type%253Dcode%2526redirect_uri%253Dhttps%25253A%25252F%25252Ftorre.ai%25252Fcallback%25253Fclient_name%25253Dstarrgate%2526state%253DRzdJT9dFIB5gFwgypZFiI5to8ZSF9KZxfNneFLLzALk%2526intent%253Dsearch%25253Asearch-jobs%2526client_id%253D541493&ul=es-co&dt=Torre%20cuentas%20%7C%20Torre&sr=1280x720&vp=1280x720&_u=IEBAAEABAAAAACAAI~&jid=1150209498&gjid=2118659466&cid=535637449.1779205787&tid=UA-133869121-3&_gid=1146469896.1779205787&_r=1&_slc=1&z=1008415359",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://edge.fullstory.com/s/settings/M61CJ/v1/web",
+    "method": "GET",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "AjaxWatches",
+        "BehaviorSignalSettings",
+        "Domains",
+        "ElementBlocks",
+        "ElementDeferreds",
+        "ElementKeeps",
+        "ElementWatches",
+        "OrgSettings",
+        "UrlKeeps"
+      ]
+    }
+  },
+  {
+    "source": "torre",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-EPLN8PHYZM&gtm=45je65f1h1v873404348za20g&_p=1779205786997&gcd=13l3l3l3l2l1&npa=0&dma=0&_eu=ABAI&are=1&cid=535637449.1779205787&frm=0&pscdl=noapi&rcb=11&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&_s=1&tag_exp=0~115938465~115938468&dl=https%3A%2F%2Faccounts.torre.ai%2Femail%2F%3Fnext%3D%2Fopenid%2Fauthorize%253Fscope%253Dopenid%252Bprofile%252Bemail%2526response_type%253Dcode%2526redirect_uri%253Dhttps%25253A%25252F%25252Ftorre.ai%25252Fcallback%25253Fclient_name%25253Dstarrgate%2526state%253DRzdJT9dFIB5gFwgypZFiI5to8ZSF9KZxfNneFLLzALk%2526intent%253Dsearch%25253Asearch-jobs%2526client_id%253D541493&dt=Torre%20cuentas%20%7C%20Torre&sid=1779205787&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&tfd=4232",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://rs.fullstory.com/rec/page",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 202,
+    "content_type": "text/plain; charset=utf-8",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://analytics.google.com/g/collect?v=2&tid=G-M22M74QTC9&gtm=45je65f1v9131072527za20g&_p=1779205786997&_gaz=1&gcd=13l3l3l3l2l1&npa=0&dma=0&_eu=ABAIAGAC&are=1&cid=535637449.1779205787&frm=0&pscdl=noapi&rcb=11&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B99.0.0.0%7CHeadlessChrome%3B145.0.7632.6%7CChromium%3B145.0.7632.6&uam=&uamb=0&uap=Windows&uapv=10.0.0&uaw=0&ul=es-co&gaf=2&_s=1&tag_exp=0~115938465~115938468&dl=https%3A%2F%2Faccounts.torre.ai%2Femail%2F%3Fnext%3D%2Fopenid%2Fauthorize%253Fscope%253Dopenid%252Bprofile%252Bemail%2526response_type%253Dcode%2526redirect_uri%253Dhttps%25253A%25252F%25252Ftorre.ai%25252Fcallback%25253Fclient_name%25253Dstarrgate%2526state%253DRzdJT9dFIB5gFwgypZFiI5to8ZSF9KZxfNneFLLzALk%2526intent%253Dsearch%25253Asearch-jobs%2526client_id%253D541493&dt=Torre%20cuentas%20%7C%20Torre&sid=1779205787&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&tfd=4325",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 204,
+    "content_type": "text/plain",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://sp.torre.co/com.snowplowanalytics.snowplow/tp2",
+    "method": "POST",
+    "resource_type": "xhr",
+    "status": 200,
+    "content_type": "text/plain; charset=UTF-8",
+    "sample": {}
+  },
+  {
+    "source": "torre",
+    "url": "https://o188050.ingest.us.sentry.io/api/4508445586620416/envelope/?sentry_version=7&sentry_key=e2b7b756ad94a418c64ce23e835efd48&sentry_client=sentry.javascript.browser%2F8.55.2",
+    "method": "POST",
+    "resource_type": "fetch",
+    "status": 200,
+    "content_type": "application/json",
+    "sample": {
+      "json_type": "dict",
+      "keys": [
+        "id"
+      ]
+    }
+  }
+]

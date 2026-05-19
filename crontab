@@ -1,0 +1,11 @@
+﻿SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+CRON_TZ=America/Bogota
+DB_HOST=host.docker.internal
+DB_NAME=unir_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_PORT=5433
+SCRAPER_TENANT=all
+
+0 2 * * * root cd /app && /usr/local/bin/python /app/scraper.py --tenant $SCRAPER_TENANT >> /var/log/logs.log 2>&1

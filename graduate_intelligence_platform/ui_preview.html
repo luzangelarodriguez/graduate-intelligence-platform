@@ -1,0 +1,1519 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Graduate Intelligence & Employability Platform - Vista previa</title>
+    <style>
+      :root{
+      --bg:#f8f4ef; --bg2:#f1e8df; --panel:rgba(255,255,255,.92); --line:rgba(184,31,45,.14);
+      --text:#1f1b19; --muted:#6a625d; --accent:#b81f2d; --accent2:#f2b233; --accent3:#17324d;
+      --shadow:0 24px 64px rgba(70,35,25,.12); --radius-xl:28px;
+      font-family:"Aptos","Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;color:var(--text);min-height:100vh;background:
+      radial-gradient(circle at top left, rgba(184,31,45,.12), transparent 28%),
+      radial-gradient(circle at top right, rgba(242,178,51,.14), transparent 24%),
+      linear-gradient(180deg,var(--bg) 0%,var(--bg2) 38%,#fbfaf8 100%);
+    }
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;
+      background-image:linear-gradient(rgba(184,31,45,.03) 1px, transparent 1px),linear-gradient(90deg, rgba(184,31,45,.03) 1px, transparent 1px);
+      background-size:56px 56px;opacity:.18;mask-image:linear-gradient(180deg, rgba(0,0,0,.92), transparent 100%);
+    }
+    .shell{width:min(1440px, calc(100% - 28px));margin:0 auto;padding:18px 0 36px;position:relative}
+    .ambient{position:fixed;filter:blur(60px);opacity:.12;pointer-events:none;border-radius:50%}
+    .a{top:-140px;left:-120px;width:460px;height:460px;background:radial-gradient(circle, rgba(97,208,196,.8), transparent 62%)}
+    .b{top:140px;right:-180px;width:460px;height:460px;background:radial-gradient(circle, rgba(137,184,255,.7), transparent 60%)}
+    .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;margin-bottom:16px;padding-top:4px;position:relative}
+    .eyebrow{display:inline-flex;width:fit-content;padding:7px 12px;border-radius:999px;border:1px solid rgba(97,208,196,.22);background:rgba(97,208,196,.08);color:#d4fff7;text-transform:uppercase;letter-spacing:.1em;font-size:.73rem}
+    h1{margin:16px 0 12px;font-size:clamp(2rem,4vw,4rem);line-height:.95;letter-spacing:-.045em;max-width:12ch}
+    .lede{max-width:62ch;margin:12px 0 0;color:var(--muted);line-height:1.7;font-size:1rem}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .metric-note{margin-top:14px;color:var(--muted);line-height:1.6}
+    .btn{border-radius:999px;border:1px solid rgba(255,255,255,.12);padding:11px 16px;background:rgba(255,255,255,.04);color:var(--text);text-decoration:none}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04111e;font-weight:700;border-color:transparent}
+    .panel{background:linear-gradient(180deg,var(--panel),rgba(15,27,45,.95));border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius-xl)}
+    .hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr);gap:18px;padding:18px;margin-bottom:16px}
+    .hero-copy{padding:14px}
+    .hero-copy h2{margin:0;font-size:clamp(2rem,4vw,3.4rem);line-height:.98;max-width:11ch}
+    .hero-copy p{color:var(--muted);line-height:1.7;max-width:60ch}
+    .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .metric-card{padding:16px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.035)}
+    .metric-card span{display:block;color:var(--muted);font-size:.84rem;letter-spacing:.02em;margin-bottom:8px}
+    .metric-card strong{display:block;font-size:2rem;letter-spacing:-.05em}
+    .layout{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+    .span-12{grid-column:1/-1}.span-8{grid-column:1/9}.span-4{grid-column:9/-1}.span-6{grid-column:span 6}
+    .section{padding:18px}
+    .section h3{margin:0 0 8px;font-size:1.4rem;letter-spacing:-.02em}
+    .section p.sub{margin:0 0 16px;color:var(--muted);line-height:1.55}
+    .cards-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .mini-card,.info-card,.scenario-card,.result-block,.program-detail,.analysis-match-card{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:18px;padding:16px}
+    .mini-card{cursor:pointer;transition:transform 160ms ease,border-color 160ms ease,background 160ms ease}
+    .mini-card:hover,.mini-card:focus-visible{transform:translateY(-2px);border-color:rgba(97,208,196,.32);background:rgba(255,255,255,.05);outline:none}
+    .mini-card.active{border-color:rgba(97,208,196,.52);background:linear-gradient(180deg, rgba(97,208,196,.12), rgba(255,255,255,.03))}
+    .program-detail{display:grid;gap:16px}
+    .analysis-match-card{display:grid;gap:10px}
+    .detail-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .micro-label{color:#9fd2ff;text-transform:uppercase;letter-spacing:.08em;font-size:.73rem;margin-bottom:6px}
+    .row-between{display:flex;align-items:start;justify-content:space-between;gap:12px}
+    .score-pill{min-width:66px;text-align:center;border-radius:14px;background:rgba(97,208,196,.12);border:1px solid rgba(97,208,196,.26);padding:10px 12px;font-weight:700}
+    .bar-list{display:grid;gap:12px}.skill-radar-row{display:grid;gap:8px}.bar-row{display:grid;grid-template-columns:190px minmax(0,1fr) 48px;gap:10px;align-items:center}
+    .bar-track{position:relative;height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+    .bar-fill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 24px rgba(97,208,196,.2)}
+    .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .chip.subtle{background:rgba(255,255,255,.03);color:var(--muted)}
+    .skill-links{margin-top:0}
+    .chip{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);font-size:.8rem}
+    .feed{display:grid;gap:10px}.feed-item{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+    .feed-item.good{border-left:4px solid #7be5ac}.feed-item.warn{border-left:4px solid #f0b96b}.feed-item.info{border-left:4px solid #89b8ff}
+    .table-wrap{overflow-x:auto;border-radius:18px;border:1px solid var(--line)}table{width:100%;min-width:960px;border-collapse:collapse;background:rgba(255,255,255,.02)}th,td{padding:13px 14px;border-bottom:1px solid rgba(163,186,214,.12);vertical-align:top;text-align:left;font-size:.94rem}th{background:rgba(255,255,255,.04);color:#d8e8f8;font-weight:700}
+    .status{display:inline-flex;padding:7px 10px;border-radius:999px;font-size:.78rem;border:1px solid transparent}
+    .status.employed,.status.promoted{background:rgba(123,229,172,.12);border-color:rgba(123,229,172,.24);color:#d3ffe6}.status.seeking{background:rgba(240,185,107,.12);border-color:rgba(240,185,107,.24);color:#ffe4b7}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 18px}
+    .tab{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);border-radius:999px;padding:11px 16px}
+    .tab.active{background:rgba(97,208,196,.14);border-color:rgba(97,208,196,.28)}
+    .two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .stack{display:grid;gap:18px}.stack-small{display:grid;gap:12px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.full-span{grid-column:1/-1}
+    .actions-row{display:flex;flex-wrap:wrap;gap:10px;grid-column:1/-1;margin-top:2px}
+    .field{display:grid;gap:8px}.field span{color:#d8e8f8;font-size:.9rem}
+    .field input,.field select,.field textarea{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--text);padding:12px 13px}
+    .field textarea{min-height:120px;resize:vertical}
+    .primary-btn,.secondary-btn,.ghost-btn,.text-btn{border-radius:999px;border:1px solid rgba(255,255,255,.12);padding:11px 16px;transition:transform 160ms ease,background 160ms ease,border-color 160ms ease}
+    .primary-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04111e;font-weight:700;border-color:transparent}.secondary-btn,.ghost-btn,.text-btn{background:rgba(255,255,255,.04);color:var(--text)}
+    .notice{padding:14px 16px;border-radius:16px;margin-bottom:16px;border:1px solid rgba(97,208,196,.18);background:rgba(97,208,196,.08)}
+    .footer{margin-top:18px;padding:18px 4px 0;color:var(--muted);font-size:.88rem;line-height:1.6}
+    .muted{color:var(--muted)}
+    @media (max-width: 1160px){
+      .topbar,.hero,.two-col,.cards-3,.layout{grid-template-columns:1fr}
+      .catalog-toolbar{grid-template-columns:1fr}
+      .span-8,.span-4,.span-6,.span-12{grid-column:1/-1}
+      .hero-actions{justify-content:flex-start}
+      .bar-row{grid-template-columns:1fr}
+    }
+
+    .eyebrow{
+      border:1px solid rgba(184,31,45,.18);
+      background:rgba(184,31,45,.06);
+      color:#8f1622;
+    }
+    .btn.primary,.primary-btn{
+      background:linear-gradient(135deg,#b81f2d,#8f1622);
+      color:#fff;
+    }
+    .btn,.tab,.chip,.metric-card,.mini-card,.info-card,.scenario-card,.result-block,.program-detail,.analysis-match-card,.feed-item,.table-wrap,table,.field input,.field select,.field textarea{
+      border-color:rgba(184,31,45,.14);
+    }
+    .tab.active,.mini-card.active,.catalog-card.active{
+      background:rgba(184,31,45,.08);
+      border-color:rgba(184,31,45,.28);
+    }
+    .catalog-toolbar{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+      margin-top:12px;
+    }
+    .catalog-toolbar .search-field,
+    .catalog-toolbar .catalog-actions{
+      grid-column:1/-1;
+    }
+    .catalog-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:2px;
+    }
+    .catalog-summary.compact{
+      margin-top:10px;
+    }
+    .mini-card:hover,.mini-card:focus-visible,.btn:hover,.primary-btn:hover,.secondary-btn:hover,.ghost-btn:hover,.text-btn:hover,.catalog-card:hover,.catalog-card:focus-visible{
+      border-color:rgba(184,31,45,.28);
+      background:rgba(184,31,45,.04);
+    }
+    .score-pill,.level-pill.specialization,.status.employed,.status.promoted,.notice{
+      background:rgba(184,31,45,.08);
+      border-color:rgba(184,31,45,.16);
+    }
+    .level-pill.pregrado,.feed-item.info{
+      background:rgba(23,50,77,.08);
+    }
+    .feed-item.good{border-left:4px solid #b81f2d}
+    .feed-item.warn{border-left:4px solid #f2b233}
+    .bar-fill,.bar-fill.inverse{background:linear-gradient(90deg,#b81f2d,#f2b233)}
+    .field input,.field select,.field textarea{background:rgba(255,255,255,.94)}
+    .field input:focus,.field select:focus,.field textarea:focus{
+      border-color:rgba(184,31,45,.48);
+      box-shadow:0 0 0 4px rgba(184,31,45,.1);
+    }
+    .chip.subtle{background:rgba(184,31,45,.04)}
+    .scenario-card.accent{
+      background:linear-gradient(180deg, rgba(184,31,45,.08), rgba(242,178,51,.04));
+      border-color:rgba(184,31,45,.2);
+    }
+    .panel,.metric-card,.mini-card,.info-card,.result-block,.scenario-card,.program-detail,.analysis-match-card,.catalog-card,.feed-item,.table-wrap,table{
+      background:rgba(255,255,255,.98);
+    }
+    .catalog-card:hover,.catalog-card:focus-visible{background:rgba(184,31,45,.04)}
+    .level-pill.specialization,.score-pill,.status.employed,.status.promoted,.notice,.loading{
+      background:rgba(184,31,45,.09);
+    }
+    .level-pill.pregrado,.feed-item.info{background:rgba(23,50,77,.09)}
+    .catalog-action{padding-inline:14px}
+    .simulation-summary{
+      border:1px solid rgba(184,31,45,.14);border-radius:18px;padding:16px;
+      background:rgba(184,31,45,.04);
+    }
+    .recommendation-summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+    .recommendation-grid{display:grid;gap:14px}
+    .recommendation-card{
+      border:1px solid rgba(184,31,45,.14);border-radius:18px;padding:16px;
+      background:rgba(255,255,255,.98);
+    }
+    .urgency-pill{
+      display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;
+      border:1px solid transparent;font-size:.78rem;text-transform:capitalize;
+    }
+    .urgency-pill.alta{background:rgba(184,31,45,.1);border-color:rgba(184,31,45,.22);color:#8f1622}
+    .urgency-pill.media{background:rgba(242,178,51,.12);border-color:rgba(242,178,51,.22);color:#8a5d00}
+    .urgency-pill.baja{background:rgba(23,50,77,.08);border-color:rgba(23,50,77,.16);color:#17324d}
+    .topbar.institutional{align-items:start}
+    .brand-lockup{display:flex;align-items:flex-start;gap:16px}
+    .brand-mark{
+      width:68px;height:56px;border-radius:16px;
+      background:linear-gradient(135deg,#b81f2d,#8f1622);
+      color:#fff;display:grid;place-items:center;
+      font-size:.92rem;font-weight:800;letter-spacing:.16em;
+      box-shadow:0 16px 30px rgba(184,31,45,.2);flex:0 0 auto;
+    }
+    .brand-copy{display:grid;gap:6px}
+    .brand-meta{
+      color:#8f1622;text-transform:uppercase;letter-spacing:.14em;
+      font-size:.76rem;font-weight:700;
+    }
+    .topbar h1{color:#191716}
+    .hero{border-top:3px solid rgba(184,31,45,.08)}
+    .hero-copy h2{color:#191716}
+    .topbar.institutional .hero-actions{padding-top:8px}
+    .metric-note{max-width:72ch}
+  </style>
+</head>
+<body>
+  <div class="ambient a"></div>
+  <div class="ambient b"></div>
+  <main class="shell">
+    <div class="topbar institutional">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">UNIR</div>
+        <div class="brand-copy">
+          <div class="brand-meta">Fundación UNIR Colombia</div>
+          <div class="eyebrow">Observatorio de egresados</div>
+          <h1>Convierte la trayectoria de los egresados en decisiones curriculares.</h1>
+          <p class="lede">Seguimiento continuo, detección de eventos, comparación con el mercado laboral y simulación curricular para educación superior.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a class="btn" href="#dashboard">Tablero</a>
+        <a class="btn" href="#catalogo">Catálogo UNIR</a>
+        <a class="btn" href="#capture">Captura</a>
+        <a class="btn" href="#market">Mercado</a>
+        <a class="btn" href="#simulate">Simulador</a>
+      </div>
+    </div>
+
+    <section class="hero panel">
+      <div class="hero-copy">
+        <div class="eyebrow">Reporte ejecutivo</div>
+        <h2>Seguimiento y pertinencia académica en una sola vista.</h2>
+        <p>Consolida información de egresados, vacantes y currículo para apoyar decisiones del comité académico y de empleabilidad.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="#capture">Registrar egresado</a>
+          <a class="btn secondary" href="#simulate">Simular currículo</a>
+        </div>
+      </div>
+      <div class="stats-grid" id="summary-cards">
+        <article class="metric-card"><span>EAS</span><strong>--</strong></article>
+        <article class="metric-card"><span>Índice de brecha</span><strong>--</strong></article>
+        <article class="metric-card"><span>Tasa de éxito</span><strong>--</strong></article>
+        <article class="metric-card"><span>Tiempo para ascenso</span><strong>--</strong></article>
+      </div>
+      <p class="metric-note">EAS significa Employability Alignment Score: combina cobertura curricular frente al mercado, éxito ponderado de egresados y velocidad de promoción.</p>
+    </section>
+
+    <section class="panel section" id="catalogo">
+      <h3>Catálogo UNIR completo</h3>
+      <p class="sub">Los programas oficiales organizados por área, nivel y palabras clave. El número visible en cada tarjeta corresponde a créditos académicos. Haz clic en la tarjeta o usa el botón para seleccionarla.</p>
+      <form class="catalog-toolbar" id="catalog-filter-form">
+        <label class="field search-field"><span>Buscar programa</span><input id="program-query" list="program-suggestions" placeholder="Inteligencia Artificial, Derecho, Marketing..." /></label>
+        <datalist id="program-suggestions"></datalist>
+        <label class="field"><span>Facultad</span><select id="program-faculty"></select></label>
+        <label class="field"><span>Área</span><select id="program-area"></select></label>
+        <label class="field"><span>Nivel</span><select id="program-level"></select></label>
+        <label class="field"><span>Modalidad</span><select id="program-modality"></select></label>
+        <div class="actions-row catalog-actions">
+          <button id="apply-filters-btn" class="primary-btn" type="submit">Filtrar programas</button>
+          <button id="clear-filters-btn" class="secondary-btn" type="button">Limpiar filtros</button>
+        </div>
+      </form>
+      <div class="chip-row" id="catalog-summary" style="margin-top:16px"></div>
+      <div class="chip-row" id="catalog-quality" style="margin-top:10px"></div>
+      <section class="panel section" id="selected-program-panel" style="margin-top:16px">
+        <h3>Programa seleccionado</h3>
+        <p class="sub">Haz clic en una tarjeta para ver cómo conecta con las skills del mercado laboral.</p>
+        <div id="selected-program-detail" class="program-detail"></div>
+        <div id="selected-market-evidence" class="stack-small" style="margin-top:14px; display:none"></div>
+      </section>
+      <section class="panel section" id="recommendation-module" style="margin-top:16px">
+        <h3>Motor de recomendación automática</h3>
+        <p class="sub">Se genera solo con el currículo, el mercado laboral y los egresados.</p>
+        <div id="recommendation-content"></div>
+      </section>
+      <div class="stack" id="catalog-groups" style="margin-top:16px"></div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="catalogo">Catálogo UNIR</button>
+      <button class="tab" data-tab="dashboard">Tablero ejecutivo</button>
+      <button class="tab" data-tab="capture">Captura</button>
+      <button class="tab" data-tab="market">Mercado</button>
+      <button class="tab" data-tab="simulate">Simulador</button>
+    </nav>
+
+    <div id="dashboard" class="stack">
+      <section class="panel section">
+        <h3>Programas con mayor alineación</h3>
+        <p class="sub">Usa el puntaje para priorizar acciones curriculares.</p>
+        <div class="cards-3" id="program-cards"></div>
+      </section>
+      <div class="two-col">
+        <section class="panel section">
+          <h3>Skills emergentes del mercado</h3>
+          <p class="sub">Skills más frecuentes en señales del mercado laboral.</p>
+          <div class="bar-list" id="market-skills"></div>
+        </section>
+        <section class="panel section">
+          <h3>Flujo de eventos</h3>
+          <p class="sub">Promociones, cambios de empresa y adopción de skills detectadas.</p>
+          <div class="feed" id="event-feed"></div>
+        </section>
+      </div>
+      <section class="panel section">
+        <h3>Portafolio de egresados</h3>
+        <p class="sub">Lista operativa con disparadores rápidos de microencuestas.</p>
+        <div class="table-wrap">
+          <table id="graduate-table">
+            <thead>
+              <tr><th>Nombre</th><th>Cargo</th><th>Empresa</th><th>Sector</th><th>Estado</th><th>Skills</th><th>Acciones</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div id="capture" class="layout" style="margin-top:18px">
+      <section class="panel section span-12">
+        <h3>Registrar egresado</h3>
+        <p class="sub">Captura híbrida con consentimiento opcional para LinkedIn y normalización de skills.</p>
+        <form class="form-grid" id="graduate-form">
+          <label class="field"><span>Nombre completo</span><input id="graduate-name" placeholder="Nombre del egresado" /></label>
+          <label class="field"><span>Programa</span><select id="program-select-capture"></select></label>
+          <label class="field"><span>Cargo actual</span><input id="graduate-role" placeholder="Analista de datos" /></label>
+          <label class="field"><span>Empresa</span><input id="graduate-company" placeholder="Nombre de la empresa" /></label>
+          <label class="field"><span>Sector</span><input id="graduate-sector" placeholder="Comercio, tecnología, educación..." /></label>
+          <label class="field"><span>Rango salarial</span><input id="graduate-salary" placeholder="4-6M COP" /></label>
+          <label class="field full-span"><span>Skills</span><textarea id="graduate-skills" placeholder="SQL, Power BI, Python"></textarea></label>
+          <label class="field full-span"><span>URL de LinkedIn</span><input id="graduate-linkedin" placeholder="https://linkedin.com/in/..." /></label>
+          <div class="actions-row">
+            <button id="save-graduate-btn" class="primary-btn" type="submit">Guardar egresado</button>
+            <button id="reset-graduate-btn" class="secondary-btn" type="button">Restablecer</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="market" class="layout" style="margin-top:18px">
+      <section class="panel section span-6">
+        <h3>Radar del mercado laboral</h3>
+        <p class="sub">Compara las skills demandadas por las vacantes con el currículo actual.</p>
+        <div class="bar-list" id="market-radar"></div>
+      </section>
+      <section class="panel section span-6">
+        <h3>Analizar texto de vacante</h3>
+        <p class="sub">Pega una oferta de Indeed o Glassdoor para extraer skills y programas objetivo.</p>
+        <textarea id="job-text" class="field" style="min-height:180px;width:100%" placeholder="Pega una oferta laboral aquí..."></textarea>
+        <div class="cta-row"><button id="analyze-btn" class="primary-btn">Analizar vacante</button></div>
+        <div class="two-col" id="analysis-result" style="margin-top:16px"></div>
+      </section>
+      <section class="panel section span-12">
+        <h3>Ofertas analizadas</h3>
+        <p class="sub">Cada tarjeta muestra una vacante real con las skills extraídas desde el texto completo.</p>
+        <div class="cards-3" id="job-offers"></div>
+      </section>
+      <section class="panel section span-12">
+        <h3>Relación skill ↔ oferta</h3>
+        <p class="sub">Cada skill muestra los cargos e industrias donde aparece, con frecuencia observada en vacantes reales.</p>
+        <div class="cards-3" id="skill-offer-index"></div>
+      </section>
+    </div>
+
+    <div id="simulate" class="layout" style="margin-top:18px">
+      <section class="panel section span-6">
+        <h3>Simulador de impacto</h3>
+        <p class="sub">Modifica skills curriculares y estima el impacto en EAS antes de cambiar el plan.</p>
+        <div class="form-grid">
+          <label class="field full-span"><span>Programa</span><select id="program-select-simulate"></select></label>
+          <label class="field full-span"><span>Agregar skills</span><input id="add-skills" value="Prompt Engineering, Learning Analytics" /></label>
+          <label class="field full-span"><span>Eliminar skills</span><input id="remove-skills" placeholder="Tema obsoleto, módulo redundante" /></label>
+        </div>
+        <div class="cta-row"><button id="simulate-btn" class="primary-btn">Ejecutar simulación</button></div>
+      </section>
+      <section class="panel section span-6">
+        <h3>Resultado del escenario</h3>
+        <p class="sub">Vista antes / después para comités estratégicos.</p>
+        <div class="scenario-grid" id="scenario-output" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px"></div>
+      </section>
+    </div>
+
+    <footer class="footer">Vista previa creada para la demo funcional. El backend en vivo está disponible en http://127.0.0.1:8010/docs</footer>
+  </main>
+
+  <script src="ui_bootstrap.js"></script>
+  <script>
+    const apiBase = 'http://127.0.0.1:8010';
+    let bootstrap = null;
+    let programQueryDraft = '';
+    let programFacultyDraft = 'Todas';
+    let programAreaDraft = 'Todas';
+    let programLevelDraft = 'Todos';
+    let programModalityDraft = 'Todas';
+    let programQuery = '';
+    let programFaculty = 'Todas';
+    let programAreaFilter = 'Todas';
+    let programLevel = 'Todos';
+    let programModality = 'Todas';
+    let selectedProgramId = 1;
+    let marketEvidenceOpen = false;
+
+    const $ = (sel) => document.querySelector(sel);
+    const escapeHtml = (value) => String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+    const normalizeSkillKey = (value) => String(value ?? '').trim().toLowerCase();
+    function unique(values) {
+      return [...new Set(values.filter(Boolean))];
+    }
+    function programArea(faculty) {
+      const normalized = normalizeSkillKey(faculty);
+      if (normalized.includes('econom')) return 'Negocios';
+      if (normalized.includes('ingenier')) return 'Tecnología';
+      if (normalized.includes('educaci')) return 'Educación';
+      if (normalized.includes('salud')) return 'Salud';
+      if (normalized.includes('derecho')) return 'Derecho';
+      return faculty;
+    }
+    function programSearchBlob(program) {
+      return [
+        program.name,
+        program.faculty,
+        programArea(program.faculty),
+        program.level,
+        program.delivery_mode,
+        program.description,
+        ...(program.curriculum_skills || []),
+        ...(program.curriculum_topics || []),
+      ].join(' ').toLowerCase();
+    }
+
+    function toneForEvent(type) {
+      if (type === 'promotion') return 'good';
+      if (type === 'company_change') return 'info';
+      return 'warn';
+    }
+
+    function barRow(label, value, suffix='') {
+      return `
+        <div class="bar-row">
+          <span>${escapeHtml(label)}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(6, Math.min(100, value))}%"></div></div>
+          <span>${Math.round(value)}${suffix}</span>
+        </div>`;
+    }
+
+    function getSelectedProgram() {
+      if (!bootstrap) return null;
+      return bootstrap.programs.find((program) => program.id === selectedProgramId) || bootstrap.programs[0] || null;
+    }
+
+    function getProgramMarketReport(programId) {
+      return bootstrap?.program_market_reports?.[String(programId)] || null;
+    }
+
+    function selectProgram(programId) {
+      selectedProgramId = Number(programId);
+      renderCatalog();
+      renderSelectedProgram();
+      renderProgramaSelect();
+    }
+
+    function computeProgramMatch(program) {
+      const report = getProgramMarketReport(program?.id);
+      if (!report || report.insufficient_data) {
+        return { matched: [], missing: [], score: 0, report };
+      }
+      const marketSkills = unique((report.top_skills || []).map((item) => item.skill));
+      const curriculum = new Set((program?.curriculum_skills || []).map(normalizeSkillKey));
+      const matched = marketSkills.filter((skill) => curriculum.has(normalizeSkillKey(skill)));
+      const missing = marketSkills.filter((skill) => !curriculum.has(normalizeSkillKey(skill)));
+      const score = marketSkills.length ? Math.round((matched.length / marketSkills.length) * 100) : 0;
+      return { matched, missing, score, report };
+    }
+
+    function setActiveTab(tabId) {
+      document.querySelectorAll('.tabs .tab').forEach((button) => {
+        button.classList.toggle('active', button.dataset.tab === tabId);
+      });
+      ['catalogo', 'dashboard', 'capture', 'market', 'simulate'].forEach((sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.style.display = sectionId === tabId ? '' : 'none';
+        }
+      });
+      if (tabId === 'catalogo') {
+        document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        document.getElementById(tabId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function splitList(value) {
+      return String(value || '')
+        .split(/[\n,;/|]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function localSkillCatalog() {
+      return (bootstrap?.skill_catalog || []).map((skill) => ({
+        name: skill.name,
+        category: skill.category,
+        aliases: skill.aliases || [],
+      }));
+    }
+
+    function extractSkillsFromText(text) {
+      const normalized = String(text || '').toLowerCase();
+      const found = [];
+      const seen = new Set();
+      localSkillCatalog().forEach((skill) => {
+        [skill.name, ...(skill.aliases || [])].forEach((alias) => {
+          const aliasNorm = normalizeSkillKey(alias);
+          if (aliasNorm && new RegExp(`\\b${aliasNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(normalized)) {
+            if (!seen.has(skill.name)) {
+              seen.add(skill.name);
+              found.push({ name: skill.name, category: skill.category });
+            }
+          }
+        });
+      });
+      return found;
+    }
+
+    function weightedOverlap(source, target) {
+      const sourceSet = new Set(source.map(normalizeSkillKey));
+      const targetSet = new Set(target.map(normalizeSkillKey));
+      const matched = target.filter((item) => sourceSet.has(normalizeSkillKey(item)));
+      const missing = target.filter((item) => !sourceSet.has(normalizeSkillKey(item)));
+      const union = new Set([...sourceSet, ...targetSet]);
+      const score = union.size ? Math.round((new Set(matched.map(normalizeSkillKey)).size / union.size) * 100) : 0;
+      return { matched, missing, score };
+    }
+
+    function monthsBetween(startIso, endIso) {
+      if (!startIso) return null;
+      const start = new Date(startIso);
+      const end = new Date(endIso || new Date().toISOString());
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+      return Math.round(((end - start) / 1000 / 60 / 60 / 24) / 30 * 10) / 10;
+    }
+
+    function localSuccessRate(graduates) {
+      if (!graduates.length) return 0;
+      const weights = {
+        promoted: 1,
+        employed: 0.95,
+        'self employed': 0.9,
+        freelance: 0.9,
+        studying: 0.65,
+        seeking: 0.25,
+        unemployed: 0.1,
+        inactive: 0.05,
+      };
+      const total = graduates.reduce((sum, grad) => sum + (weights[normalizeSkillKey(grad.employment_status)] ?? 0.4), 0);
+      return Math.round((total / graduates.length) * 100);
+    }
+
+    function localProgramAlignment(program) {
+      const curriculum = program.curriculum_skills || [];
+      const report = getProgramMarketReport(program.id);
+      if (!report || report.insufficient_data) {
+        const graduates = (bootstrap?.graduates || []).filter((grad) => grad.program_id === program.id);
+        const success = localSuccessRate(graduates);
+        const promotionMonths = (() => {
+          const values = graduates
+            .map((graduate) => {
+              const promoted = (bootstrap?.events || [])
+                .filter((event) => event.graduate_id === graduate.id && normalizeSkillKey(event.type) === 'promotion')
+                .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+              if (!promoted.length) return null;
+              return monthsBetween(graduate.hire_date, promoted[0].created_at);
+            })
+            .filter((value) => typeof value === 'number');
+          if (!values.length) return null;
+          return Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10;
+        })();
+        const promotionScore = promotionMonths == null ? 0.5 : Math.max(0, 1 - Math.min(promotionMonths / 36, 1));
+        const eas = Math.max(0, Math.min(100, Math.round((0.35 * success) + (0.15 * (promotionScore * 100)))));
+        return {
+          program_id: program.id,
+          program_name: program.name,
+          faculty: program.faculty,
+          eas,
+          skill_gap_index: 100,
+          market_coverage: 0,
+          graduate_success_rate: success,
+          time_to_promotion: promotionMonths,
+          emerging_skills: [],
+          curriculum_skills: curriculum,
+          relevant_job_count: 0,
+          last_updated_at: null,
+          insufficient_data: true,
+          message: 'No hay suficientes vacantes relevantes para estimar skills de mercado.',
+        };
+      }
+      const marketSkills = (report.top_skills || []).map((item) => item.skill);
+      const marketKeys = new Set(marketSkills.map(normalizeSkillKey));
+      const matchedMarket = curriculum.filter((skill) => marketKeys.has(normalizeSkillKey(skill)));
+      const coverage = marketSkills.length ? Math.round((matchedMarket.length / marketSkills.length) * 100) : 0;
+      const missing = marketSkills.filter((skill) => !curriculum.some((curr) => normalizeSkillKey(curr) === normalizeSkillKey(skill)));
+      const graduates = (bootstrap?.graduates || []).filter((grad) => grad.program_id === program.id);
+      const success = localSuccessRate(graduates);
+      const promotionMonths = (() => {
+        const values = graduates
+          .map((graduate) => {
+            const promoted = (bootstrap?.events || [])
+              .filter((event) => event.graduate_id === graduate.id && normalizeSkillKey(event.type) === 'promotion')
+              .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+            if (!promoted.length) return null;
+            return monthsBetween(graduate.hire_date, promoted[0].created_at);
+          })
+          .filter((value) => typeof value === 'number');
+        if (!values.length) return null;
+        return Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10;
+      })();
+      const promotionScore = promotionMonths == null ? 0.5 : Math.max(0, 1 - Math.min(promotionMonths / 36, 1));
+      const eas = Math.max(0, Math.min(100, Math.round((0.5 * coverage) + (0.3 * success) + (0.2 * (promotionScore * 100)))));
+      return {
+        program_id: program.id,
+        program_name: program.name,
+        faculty: program.faculty,
+        eas,
+        skill_gap_index: Math.max(0, Math.min(100, 100 - coverage)),
+        market_coverage: coverage,
+        graduate_success_rate: success,
+        time_to_promotion: promotionMonths,
+        emerging_skills: missing.slice(0, 5),
+        curriculum_skills: curriculum,
+        relevant_job_count: report.relevant_job_count || 0,
+        last_updated_at: report.last_updated_at || null,
+        insufficient_data: false,
+        message: report.message || '',
+      };
+    }
+
+    function simulateLocally(programId, addSkills, removeSkills) {
+      const program = bootstrap.programs.find((item) => item.id === programId) || bootstrap.programs[0];
+      const before = localProgramAlignment(program);
+      const removeSet = new Set(removeSkills.map(normalizeSkillKey));
+      const updated = (program.curriculum_skills || []).filter((skill) => !removeSet.has(normalizeSkillKey(skill)));
+      const existing = new Set(updated.map(normalizeSkillKey));
+      addSkills.forEach((skill) => {
+        if (!existing.has(normalizeSkillKey(skill))) {
+          updated.push(skill);
+          existing.add(normalizeSkillKey(skill));
+        }
+      });
+      const simulated = { ...program, curriculum_skills: updated };
+      const after = localProgramAlignment(simulated);
+      return {
+        program_id: program.id,
+        program_name: program.name,
+        before,
+        after,
+        delta_eas: after.eas - before.eas,
+        delta_gap_index: after.skill_gap_index - before.skill_gap_index,
+        updated_curriculum_skills: updated,
+      };
+    }
+
+    function unique(values) {
+      return [...new Set(values.filter(Boolean))];
+    }
+
+    function canonicalSkill(value) {
+      const normalized = normalizeSkillKey(value);
+      for (const skill of localSkillCatalog()) {
+        if (normalizeSkillKey(skill.name) === normalized) {
+          return skill.name;
+        }
+        if ((skill.aliases || []).some((alias) => normalizeSkillKey(alias) === normalized)) {
+          return skill.name;
+        }
+      }
+      return String(value || '').trim();
+    }
+
+    function countMarketSkills() {
+      const counts = {};
+      (bootstrap?.jobs || []).forEach((job) => {
+        extractSkillsFromText(`${job.title} ${job.description}`).forEach((skill) => {
+          counts[skill.name] = (counts[skill.name] || 0) + 1;
+        });
+      });
+      return counts;
+    }
+
+    function countGraduateSkills(graduates) {
+      const counts = {};
+      (graduates || []).forEach((graduate) => {
+        (graduate.skills || []).map((skill) => canonicalSkill(skill)).forEach((skill) => {
+          counts[skill] = (counts[skill] || 0) + 1;
+        });
+      });
+      return counts;
+    }
+
+    function localRecommendationModule(program) {
+      const curriculum = unique((program.curriculum_skills || []).map((skill) => canonicalSkill(skill)));
+      const curriculumKeys = new Set(curriculum.map(normalizeSkillKey));
+      const report = getProgramMarketReport(program.id);
+      if (!report || report.insufficient_data) {
+        return {
+          program_id: program.id,
+          program_name: program.name,
+          faculty: program.faculty,
+          curriculum_skills: curriculum,
+          items: [],
+          high_urgency_count: 0,
+          message: 'No hay suficientes vacantes relevantes para estimar skills de mercado.',
+          market_report: report,
+        };
+      }
+      const marketCounts = Object.fromEntries((report.top_skills || []).map((item) => [item.skill, item.count]));
+      const marketMax = Math.max(...Object.values(marketCounts), 1);
+      const linkedGraduates = (bootstrap?.graduates || []).filter((graduate) => graduate.program_id === program.id);
+      const successfulLinked = linkedGraduates.filter((graduate) => ['promoted', 'employed', 'self employed', 'freelance'].includes(normalizeSkillKey(graduate.employment_status)));
+      const graduateCounts = countGraduateSkills(linkedGraduates);
+      const successfulCounts = countGraduateSkills(successfulLinked);
+      const graduateMax = Math.max(...Object.values(graduateCounts), 1);
+      const candidates = [];
+      const seen = new Set();
+      [...(report.top_skills || []).map((item) => item.skill), ...Object.entries(graduateCounts).sort((a, b) => b[1] - a[1]).map(([skill]) => skill)].forEach((skill) => {
+        const key = normalizeSkillKey(skill);
+        if (!key || curriculumKeys.has(key) || seen.has(key)) return;
+        seen.add(key);
+        candidates.push(skill);
+      });
+      const base = localProgramAlignment(program);
+      const items = candidates.map((skill) => {
+        const marketDemand = marketCounts[skill] || 0;
+        const marketTrend = (report.top_skills || []).find((item) => normalizeSkillKey(item.skill) === normalizeSkillKey(skill))?.trend || 0;
+        const graduateSignal = successfulCounts[skill] || graduateCounts[skill] || 0;
+        const demandScore = marketDemand / marketMax;
+        const graduateScore = graduateSignal / graduateMax;
+        const impactEas = Math.max(0, Number((demandScore * 6 + graduateScore * 2 + Math.max(marketTrend, 0) / 80).toFixed(1)));
+        const impactScore = Math.min(Math.max(impactEas / 10, 0), 1);
+        const priorityScore = Number(((impactScore * 0.5 + demandScore * 0.3 + graduateScore * 0.2) * 100).toFixed(1));
+        const urgency = impactEas >= 6 || marketDemand >= 4 || (marketDemand >= 3 && graduateSignal >= 2)
+          ? 'alta'
+          : impactEas >= 3 || marketDemand >= 2 || graduateSignal >= 2
+            ? 'media'
+            : 'baja';
+        const evidenceBits = [];
+        if (marketDemand) evidenceBits.push(`aparece en ${marketDemand} vacantes`);
+        if (graduateSignal) evidenceBits.push(`la usan ${graduateSignal} egresados del programa`);
+        const afterGap = Math.max(0, Math.round(base.skill_gap_index - impactEas));
+        const justification = `${evidenceBits.length ? evidenceBits.join(', ') : 'Tiene señales de adopción en la base analizada'}. Al incorporarla, el EAS sube ${impactEas.toFixed(1)} puntos y la brecha baja de ${base.skill_gap_index}% a ${afterGap}%.`;
+        return {
+          skill,
+          priority_score: priorityScore,
+          impact_eas: impactEas,
+          urgency,
+          justification,
+          market_demand: marketDemand,
+          graduate_signal: graduateSignal,
+          before_eas: base.eas,
+          after_eas: Math.min(100, Math.round(base.eas + impactEas)),
+          before_gap: base.skill_gap_index,
+          after_gap: afterGap,
+          updated_curriculum_skills: unique([...base.curriculum_skills, skill]),
+        };
+      }).sort((a, b) => b.priority_score - a.priority_score || b.impact_eas - a.impact_eas || b.market_demand - a.market_demand || a.skill.localeCompare(b.skill));
+      return {
+        program_id: program.id,
+        program_name: program.name,
+        faculty: program.faculty,
+        curriculum_skills: curriculum,
+        items: items.slice(0, 6),
+        high_urgency_count: items.filter((item) => item.urgency === 'alta').length,
+        message: `Se evaluaron ${items.length} skills faltantes y se priorizaron las ${Math.min(6, items.length)} de mayor impacto.`,
+        market_report: report,
+      };
+    }
+
+    async function loadBootstrap() {
+      try {
+        const res = await fetch(`${apiBase}/api/bootstrap`);
+        if (!res.ok) {
+          throw new Error(`No se pudo cargar el backend (${res.status})`);
+        }
+        bootstrap = await res.json();
+      } catch (error) {
+        if (window.__GI_BOOTSTRAP__) {
+          bootstrap = window.__GI_BOOTSTRAP__;
+        } else {
+          throw error;
+        }
+      }
+      renderCatalogFilters();
+      renderSummary();
+      renderCatalog();
+      renderSelectedProgram();
+      renderRecommendations();
+      renderProgramas();
+      renderMercado();
+      renderJobOffers();
+      renderSkillOfferIndex();
+      renderEvents();
+      renderGraduates();
+      renderProgramaSelect();
+      setActiveTab('catalogo');
+    }
+
+    function renderCatalogFilters() {
+      const facultySelect = $('#program-faculty');
+      const areaSelect = $('#program-area');
+      const levelSelect = $('#program-level');
+      const modalitySelect = $('#program-modality');
+      const faculties = ['Todas', ...Array.from(new Set(bootstrap.programs.map((program) => program.faculty))).sort()];
+      const areas = ['Todas', ...Array.from(new Set(bootstrap.programs.map((program) => programArea(program.faculty)))).sort()];
+      const levels = ['Todos', ...Array.from(new Set(bootstrap.programs.map((program) => program.level))).sort()];
+      const modalities = ['Todas', ...Array.from(new Set(bootstrap.programs.map((program) => program.delivery_mode))).sort()];
+      facultySelect.innerHTML = faculties.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      areaSelect.innerHTML = areas.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      levelSelect.innerHTML = levels.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      modalitySelect.innerHTML = modalities.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join('');
+      facultySelect.value = programFacultyDraft;
+      areaSelect.value = programAreaDraft;
+      levelSelect.value = programLevelDraft;
+      modalitySelect.value = programModalityDraft;
+      $('#program-query').value = programQueryDraft;
+      $('#program-suggestions').innerHTML = unique(bootstrap.programs.flatMap((program) => [
+        program.name,
+        program.faculty,
+        programArea(program.faculty),
+        program.level,
+        program.delivery_mode,
+        ...(program.curriculum_skills || []),
+        ...(program.curriculum_topics || []),
+      ])).sort((a, b) => a.localeCompare(b, 'es')).slice(0, 40).map((item) => `<option value="${escapeHtml(item)}"></option>`).join('');
+    }
+
+    function renderCatalog() {
+      const summary = $('#catalog-summary');
+      const quality = $('#catalog-quality');
+      const groups = $('#catalog-groups');
+      const query = programQuery.trim().toLowerCase();
+      const filtered = bootstrap.programs.filter((program) => {
+        const matchesFaculty = programFaculty === 'Todas' || program.faculty === programFaculty;
+        const matchesArea = programAreaFilter === 'Todas' || programArea(program.faculty) === programAreaFilter;
+        const matchesLevel = programLevel === 'Todos' || program.level === programLevel;
+        const matchesModality = programModality === 'Todas' || program.delivery_mode === programModality;
+        const matchesQuery = !query || programSearchBlob(program).includes(query);
+        return matchesFaculty && matchesArea && matchesLevel && matchesModality && matchesQuery;
+      });
+      if (filtered.length && !filtered.some((program) => program.id === selectedProgramId)) {
+        selectedProgramId = filtered[0].id;
+        renderProgramaSelect();
+      }
+      summary.innerHTML = `
+        <span class="chip">${filtered.length} programas visibles</span>
+        <span class="chip">${bootstrap.programs.length} programas en total</span>
+        <span class="chip">Fuente: UNIR Colombia</span>
+        <span class="chip">Facultad: ${escapeHtml(programFaculty)}</span>
+        <span class="chip">Área activa: ${escapeHtml(programAreaFilter)}</span>
+        <span class="chip">Nivel: ${escapeHtml(programLevel)}</span>
+        <span class="chip">Modalidad: ${escapeHtml(programModality)}</span>
+        ${programQuery ? `<span class="chip">Búsqueda: ${escapeHtml(programQuery)}</span>` : ''}
+      `;
+      if (bootstrap.data_quality) {
+        quality.innerHTML = `
+          <span class="chip">Duplicación ${bootstrap.data_quality.duplicate_rate}%</span>
+          <span class="chip">Diversidad skills ${Number(bootstrap.data_quality.skill_diversity).toFixed(1)}%</span>
+          <span class="chip">Cobertura temporal ${Number(bootstrap.data_quality.recency_coverage).toFixed(1)}%</span>
+          <span class="chip">Diversidad fuentes ${Number(bootstrap.data_quality.source_diversity).toFixed(1)}%</span>
+        `;
+      } else {
+        quality.innerHTML = '';
+      }
+      const grouped = filtered.reduce((acc, program) => {
+        (acc[program.faculty] ||= []).push(program);
+        return acc;
+      }, {});
+      const orderedGroups = Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0], 'es'));
+      if (!orderedGroups.length) {
+        groups.innerHTML = `
+          <div class="simulation-summary">
+            <strong>No hay programas con esos filtros.</strong>
+            <p class="muted">Prueba limpiando filtros o buscando otro nombre, facultad, área o modalidad.</p>
+          </div>
+        `;
+        renderSelectedProgram();
+        return;
+      }
+      groups.innerHTML = orderedGroups.map(([faculty, list]) => `
+        <section class="stack-small">
+          <div class="row-between">
+            <h3>${escapeHtml(faculty)}</h3>
+            <span class="chip">${list.length} programas</span>
+          </div>
+          <div class="cards-3">
+            ${list.map((program) => `
+              <article class="mini-card ${program.id === selectedProgramId ? 'active' : ''}" data-program-id="${program.id}" tabindex="0">
+                <div class="row-between">
+                  <div>
+                    <div class="micro-label">${escapeHtml(program.level)}</div>
+                    <h3>${escapeHtml(program.name)}</h3>
+                  </div>
+                  <div class="score-pill">${program.credits ? `${program.credits} créditos académicos` : 'Créditos N/D'}</div>
+                </div>
+                <p>${escapeHtml(program.description)}</p>
+                <div class="chip-row">
+                  <span class="chip">Área ${escapeHtml(programArea(program.faculty))}</span>
+                  <span class="chip">${escapeHtml(program.faculty)}</span>
+                  <span class="chip">${escapeHtml(program.delivery_mode)}</span>
+                  <span class="chip">${program.curriculum_skills.length} skills</span>
+                </div>
+                <div class="chip-row">${(program.curriculum_skills || []).slice(0, 5).map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('')}</div>
+                <div class="actions-row">
+                  <button class="secondary-btn catalog-action" type="button" data-select-program="${program.id}">Seleccionar programa</button>
+                  <button class="text-btn catalog-action" type="button" data-open-simulator="${program.id}">Abrir simulador</button>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `).join('');
+      groups.querySelectorAll('[data-program-id]').forEach((card) => {
+        const activate = () => {
+          selectProgram(Number(card.dataset.programId));
+        };
+        card.addEventListener('click', activate);
+        card.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        });
+      });
+      groups.querySelectorAll('[data-select-program]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          selectProgram(Number(button.getAttribute('data-select-program')));
+        });
+      });
+      groups.querySelectorAll('[data-open-simulator]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const programId = Number(button.getAttribute('data-open-simulator'));
+          selectProgram(programId);
+          $('#program-select-simulate').value = String(programId);
+          setActiveTab('simulate');
+        });
+      });
+      renderSelectedProgram();
+    }
+
+    function renderSummary() {
+      const s = bootstrap.summary;
+      const cards = $('#summary-cards');
+      cards.innerHTML = `
+        <article class="metric-card"><span>EAS</span><strong>${s.employability_alignment_score}%</strong></article>
+        <article class="metric-card"><span>Índice de brecha</span><strong>${s.skill_gap_index}%</strong></article>
+        <article class="metric-card"><span>Tasa de éxito ponderada</span><strong>${s.graduate_success_rate}%</strong></article>
+        <article class="metric-card"><span>Tiempo para ascenso</span><strong>${s.time_to_promotion ?? 'N/D'}</strong></article>`;
+    }
+
+    function renderSelectedProgram() {
+      const target = $('#selected-program-detail');
+      const program = getSelectedProgram();
+      if (!target || !program) {
+        return;
+      }
+      const report = getProgramMarketReport(program.id);
+      const match = computeProgramMatch(program);
+      const matchedChips = match.matched.length
+        ? match.matched.slice(0, 8).map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('')
+        : '<span class="muted">Todavía no hay coincidencias visibles.</span>';
+      const missingChips = match.missing.length
+        ? match.missing.slice(0, 6).map((skill) => `<span class="chip subtle">${escapeHtml(skill)}</span>`).join('')
+        : '<span class="muted">El programa cubre todo el radar actual.</span>';
+      target.innerHTML = `
+        <article class="program-detail">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">${escapeHtml(program.level)}</div>
+              <h3>${escapeHtml(program.name)}</h3>
+              <p class="sub" style="margin-bottom:0">${escapeHtml(program.description)}</p>
+            </div>
+          <div class="score-pill">Alineación ${match.score}%</div>
+          </div>
+          <div class="chip-row">
+            <span class="chip">Área ${escapeHtml(programArea(program.faculty))}</span>
+            <span class="chip">${escapeHtml(program.faculty)}</span>
+            <span class="chip">${escapeHtml(program.delivery_mode)}</span>
+            <span class="chip">${program.curriculum_skills.length} skills curriculares</span>
+            <span class="chip">${program.credits} créditos</span>
+            <span class="chip">Vacantes relevantes ${report?.relevant_job_count ?? 0}</span>
+            <span class="chip">Actualizado ${report?.last_updated_at ? new Date(report.last_updated_at).toLocaleString('es-CO') : 'N/D'}</span>
+          </div>
+          ${report?.insufficient_data ? `
+            <div class="simulation-summary">
+              <strong>No hay suficientes vacantes relevantes para estimar skills de mercado.</strong>
+              <p class="muted">${escapeHtml(report.message || 'No hay datos suficientes para este programa.')}</p>
+            </div>
+          ` : ''}
+          <div class="detail-columns">
+            <div>
+              <strong>Skills del programa</strong>
+              <div class="chip-row">${program.curriculum_skills.slice(0, 8).map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('')}</div>
+            </div>
+            <div>
+              <strong>Skills del mercado que sí cubre</strong>
+              <div class="chip-row">${matchedChips}</div>
+              <strong>Skills del mercado que faltan</strong>
+              <div class="chip-row">${missingChips}</div>
+            </div>
+          </div>
+          <div class="cta-row">
+            <button class="secondary-btn" type="button" id="toggle-market-evidence-btn">${marketEvidenceOpen ? 'Ocultar ofertas analizadas' : 'Ver ofertas analizadas'}</button>
+            <button class="primary-btn" type="button" id="refresh-market-btn">Recalcular skills de mercado</button>
+            <button class="secondary-btn" type="button" id="open-simulator-btn">Abrir simulador con este programa</button>
+          </div>
+        </article>
+      `;
+      $('#toggle-market-evidence-btn').addEventListener('click', () => {
+        marketEvidenceOpen = !marketEvidenceOpen;
+        renderSelectedProgram();
+      });
+    $('#refresh-market-btn').addEventListener('click', async () => {
+        try {
+          const response = await fetch(`${apiBase}/api/programs/${program.id}/market/recompute`, { method: 'POST' });
+          if (!response.ok) {
+            throw new Error('No se pudo recalcular el mercado del programa.');
+          }
+          await loadBootstrap();
+        } catch (error) {
+          alert(error instanceof Error ? error.message : 'No se pudo recalcular el mercado del programa.');
+        }
+      });
+      $('#open-simulator-btn').addEventListener('click', () => {
+        $('#program-select-simulate').value = String(program.id);
+        setActiveTab('simulate');
+      });
+      if (marketEvidenceOpen) {
+        const evidenceTarget = document.getElementById('selected-market-evidence');
+        if (evidenceTarget) {
+          evidenceTarget.style.display = 'grid';
+          const jobTitles = unique((report?.relevant_jobs || []).map((job) => job.title)).slice(0, 6);
+          const sectors = unique((report?.relevant_jobs || []).map((job) => job.industry)).slice(0, 6);
+          const evidenceJobs = (report?.relevant_jobs || []).map((job) => `
+            <article class="analysis-match-card">
+              <div class="row-between">
+                <div>
+                  <div class="micro-label">${escapeHtml(job.industry)}</div>
+                  <strong>${escapeHtml(job.title)}</strong>
+                </div>
+                <div class="score-pill">${job.relevance_score}</div>
+              </div>
+              <p class="muted">${escapeHtml(job.company)} · ${escapeHtml(job.location)} · ${escapeHtml(job.source)}</p>
+              <div class="chip-row">${(job.extracted_skills || []).slice(0, 6).map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('')}</div>
+              <p class="muted">${escapeHtml(job.relevance_reason)}</p>
+            </article>
+          `).join('');
+          evidenceTarget.innerHTML = `
+            <div class="stack-small">
+              <div class="catalog-summary compact">
+                <span class="chip">Coincidencia ${match.score}%</span>
+                <span class="chip">Procesadas ${report?.processed_job_count ?? 0} vacantes</span>
+                <span class="chip">Relevantes ${report?.relevant_job_count ?? 0}</span>
+                <span class="chip">Dominio ${escapeHtml(report?.domain || 'N/D')}</span>
+              </div>
+              <div class="chip-row">
+                ${jobTitles.map((title) => `<span class="chip subtle">${escapeHtml(title)}</span>`).join('')}
+              </div>
+              <div class="chip-row">
+                ${sectors.map((sector) => `<span class="chip">${escapeHtml(sector)}</span>`).join('')}
+              </div>
+              <div class="chip-row">
+                ${(report?.top_skills || []).slice(0, 6).map((item) => `<span class="chip">${escapeHtml(item.skill)} · ${item.share.toFixed(1)}%</span>`).join('')}
+              </div>
+              ${evidenceJobs || '<div class="simulation-summary"><strong>No hay vacantes relevantes para mostrar.</strong></div>'}
+            </div>
+          `;
+        }
+      } else {
+        const evidenceTarget = document.getElementById('selected-market-evidence');
+        if (evidenceTarget) {
+          evidenceTarget.style.display = 'none';
+          evidenceTarget.innerHTML = '';
+        }
+      }
+      renderRecommendations();
+    }
+
+    function renderRecommendations() {
+      const target = $('#recommendation-content');
+      const program = getSelectedProgram();
+      if (!target || !program) {
+        return;
+      }
+      const module = localRecommendationModule(program);
+      target.innerHTML = module.items.length ? `
+        <div class="recommendation-summary">
+          <span class="chip">Skills priorizadas: ${module.items.length}</span>
+          <span class="chip">Urgencia alta: ${module.high_urgency_count}</span>
+          <span class="chip">Se ejecuta automáticamente</span>
+        </div>
+        <div class="recommendation-grid">
+          ${module.items.map((item, index) => `
+            <article class="recommendation-card">
+              <div class="row-between">
+                <div>
+                  <div class="micro-label">Prioridad ${index + 1}</div>
+                  <h3>${escapeHtml(item.skill)}</h3>
+                </div>
+                <span class="urgency-pill ${escapeHtml(item.urgency)}">Urgencia ${escapeHtml(item.urgency)}</span>
+              </div>
+              <p class="muted">${escapeHtml(item.justification)}</p>
+              <div class="chip-row">
+                <span class="chip">Impacto EAS +${Number(item.impact_eas).toFixed(1)} pts</span>
+                <span class="chip">Demanda mercado: ${item.market_demand}</span>
+                <span class="chip">Señal egresados: ${item.graduate_signal}</span>
+              </div>
+              <div class="chip-row">
+                <span class="chip subtle">Antes ${item.before_eas}%</span>
+                <span class="chip subtle">Después ${item.after_eas}%</span>
+                <span class="chip subtle">Brecha ${item.after_gap}%</span>
+              </div>
+              <div class="actions-row">
+                <button class="secondary-btn catalog-action" type="button" data-recommend-skill="${escapeHtml(item.skill)}">Probar en simulador</button>
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      ` : `
+        <div class="simulation-summary">
+          <strong>No hay brechas visibles.</strong>
+          <p class="muted">${escapeHtml(module.message)}</p>
+        </div>
+      `;
+      target.querySelectorAll('[data-recommend-skill]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const skill = button.getAttribute('data-recommend-skill');
+          const current = splitList($('#add-skills').value);
+          const next = unique([skill, ...current]).join(', ');
+          $('#add-skills').value = next;
+          $('#program-select-simulate').value = String(program.id);
+          setActiveTab('simulate');
+        });
+      });
+    }
+
+    function renderProgramas() {
+      const wrap = $('#program-cards');
+      const trends = bootstrap.summary.top_trending_skills || [];
+      const trendCard = trends.length ? `
+        <article class="mini-card">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">Señales recientes</div>
+              <h3>Skills con movimiento</h3>
+            </div>
+            <div class="score-pill">${bootstrap.data_quality ? Math.round(bootstrap.data_quality.skill_diversity) : 0}%</div>
+          </div>
+          <p>Frecuencia, recencia y diversidad de fuentes para evitar una vista estática del mercado.</p>
+          <div class="chip-row">${trends.slice(0, 6).map((item) => `<span class="chip">${escapeHtml(item.skill)} · ${item.trend >= 0 ? '+' : ''}${Number(item.trend).toFixed(1)}</span>`).join('')}</div>
+        </article>
+      ` : '';
+      wrap.innerHTML = `${trendCard}${bootstrap.summary.top_programs.map((program) => `
+        <article class="mini-card">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">${escapeHtml(program.faculty)}</div>
+              <h3>${escapeHtml(program.program_name)}</h3>
+            </div>
+            <div class="score-pill">${program.eas}%</div>
+          </div>
+          <div class="bar-list">
+            ${barRow('Cobertura de mercado', program.market_coverage, '%')}
+            ${barRow('Tasa de éxito ponderada', program.graduate_success_rate, '%')}
+            ${barRow('Índice de brecha', program.skill_gap_index, '%')}
+          </div>
+          <div class="chip-row">${program.emerging_skills.slice(0, 3).map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('')}</div>
+        </article>
+      `).join('')}`;
+    }
+
+    function renderMercado() {
+      const market = $('#market-radar');
+      const combinedSkills = unique([
+        ...(bootstrap.summary.top_trending_skills || []).map((item) => item.skill),
+        ...(bootstrap.market_skills || []).map((item) => item.skill),
+      ]);
+      const skillIndex = {};
+      combinedSkills.forEach((skill) => {
+        skillIndex[skill] = [];
+      });
+      bootstrap.programs.forEach((program) => {
+        (program.curriculum_skills || []).forEach((skill) => {
+          const marketSkill = combinedSkills.find((item) => normalizeSkillKey(item) === normalizeSkillKey(skill));
+          if (!marketSkill) {
+            return;
+          }
+          const bucket = skillIndex[marketSkill];
+          if (bucket.length < 3 && !bucket.includes(program.name)) {
+            bucket.push(program.name);
+          }
+        });
+      });
+      market.innerHTML = combinedSkills.map((skill) => {
+        const trend = (bootstrap.summary.top_trending_skills || []).find((item) => normalizeSkillKey(item.skill) === normalizeSkillKey(skill));
+        const countItem = (bootstrap.market_skills || []).find((item) => normalizeSkillKey(item.skill) === normalizeSkillKey(skill));
+        const value = Math.max(10, Math.min(100, (countItem ? countItem.count * 20 : 10) + (trend ? Math.min(20, Math.max(-10, trend.trend / 5)) : 0)));
+        return `
+        <div class="skill-radar-row">
+          ${barRow(skill, value, '')}
+          ${skillIndex[skill].length ? `<div class="chip-row skill-links">${skillIndex[skill].map((program) => `<span class="chip subtle">${escapeHtml(program)}</span>`).join('')}</div>` : ''}
+        </div>
+      `;
+      }).join('');
+    }
+
+    function renderJobOffers() {
+      const target = $('#job-offers');
+      if (!target) return;
+      const offers = bootstrap.job_offers || [];
+      target.innerHTML = offers.map((offer) => `
+        <article class="mini-card">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">${escapeHtml(offer.industry || 'Mercado')}</div>
+              <h3>${escapeHtml(offer.job_title || offer.title || 'Oferta analizada')}</h3>
+            </div>
+            <div class="score-pill">${(offer.skills_detected || []).length}</div>
+          </div>
+          <p class="muted">${escapeHtml(offer.company || 'N/D')} · ${escapeHtml(offer.location || 'N/D')} · ${escapeHtml(offer.source || 'N/D')} · ${escapeHtml(offer.date || offer.posted_at || 'N/D')}</p>
+          <div class="chip-row">
+            ${(offer.skills_detected || []).slice(0, 6).map((relation) => `<span class="chip">${escapeHtml(relation.skill_name)}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderSkillOfferIndex() {
+      const target = $('#skill-offer-index');
+      if (!target) return;
+      const entries = Object.values(bootstrap.skill_offer_index || {});
+      target.innerHTML = entries.slice(0, 9).map((item) => `
+        <article class="mini-card">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">${escapeHtml(item.skill_name)}</div>
+              <h3>${item.frequency} vacantes</h3>
+            </div>
+            <div class="score-pill">${item.frequency}</div>
+          </div>
+          <div class="chip-row">
+            ${(item.job_titles || []).slice(0, 4).map((title) => `<span class="chip subtle">${escapeHtml(title)}</span>`).join('')}
+          </div>
+          <div class="chip-row">
+            ${(item.industry || []).slice(0, 4).map((industry) => `<span class="chip">${escapeHtml(industry)}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderEvents() {
+      const feed = $('#event-feed');
+      feed.innerHTML = bootstrap.events.map((event) => `
+        <article class="feed-item ${toneForEvent(event.type)}">
+          <div class="row-between">
+            <div>
+              <div class="micro-label">${escapeHtml(event.title)}</div>
+              <strong>${escapeHtml(event.detail)}</strong>
+            </div>
+            <span class="time-pill">${escapeHtml(event.created_at)}</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderGraduates() {
+      const tbody = $('#graduate-table tbody');
+      tbody.innerHTML = bootstrap.graduates.map((graduate) => `
+        <tr>
+          <td>${escapeHtml(graduate.full_name)}</td>
+          <td>${escapeHtml(graduate.current_role)}</td>
+          <td>${escapeHtml(graduate.company)}</td>
+          <td>${escapeHtml(graduate.sector)}</td>
+          <td><span class="status ${escapeHtml(graduate.employment_status)}">${escapeHtml(graduate.employment_status)}</span></td>
+          <td>${escapeHtml(graduate.skills.slice(0, 4).join(', '))}</td>
+          <td><button class="text-btn" data-graduate-id="${graduate.id}">Enviar microencuesta</button></td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-graduate-id]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const graduate = bootstrap.graduates.find((item) => item.id === Number(button.dataset.graduateId));
+          alert(`Microencuesta generada para ${graduate ? graduate.full_name : 'el egresado seleccionado'}.`);
+        });
+      });
+    }
+
+    function renderProgramaSelect() {
+      const options = bootstrap.programs.map((program) => `<option value="${program.id}">${escapeHtml(program.name)} | ${escapeHtml(program.faculty)} | ${escapeHtml(program.delivery_mode)} | ${program.credits} créditos</option>`).join('');
+      $('#program-select-capture').innerHTML = options;
+      $('#program-select-simulate').innerHTML = options;
+      $('#program-select-capture').value = String(selectedProgramId);
+      $('#program-select-simulate').value = String(selectedProgramId);
+    }
+
+    function renderAnalysis(result) {
+      const target = $('#analysis-result');
+      target.innerHTML = `
+        <article class="result-block">
+          <strong>Skills inferidas</strong>
+          <div class="chip-row">${(result.inferred_skills || []).map((item) => `<span class="chip">${escapeHtml(item.name)}</span>`).join('')}</div>
+        </article>
+        <div class="stack-small">
+          <strong>Mejores programas</strong>
+          ${(result.program_matches || []).map((item) => `
+            <article class="analysis-match-card">
+              <div class="row-between">
+                <div>
+                  <div class="micro-label">${escapeHtml(item.faculty)}</div>
+                  <strong>${escapeHtml(item.program_name)}</strong>
+                </div>
+                <div class="score-pill">${item.score}%</div>
+              </div>
+              <div class="chip-row">${item.matched.length ? item.matched.map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join('') : '<span class="muted">Sin coincidencias directas.</span>'}</div>
+              <div class="chip-row">${item.missing.length ? item.missing.slice(0, 5).map((skill) => `<span class="chip subtle">${escapeHtml(skill)}</span>`).join('') : '<span class="muted">Cubre todas las skills extraídas.</span>'}</div>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSimulation(result) {
+      const target = $('#scenario-output');
+      const contextBanner = result.insufficient_data ? `
+        <div class="simulation-summary" style="grid-column:1/-1">
+          <strong>No hay suficientes vacantes relevantes para estimar el escenario de mercado.</strong>
+          <p class="muted">${escapeHtml(result.message || 'No hay datos suficientes para este programa.')}</p>
+        </div>
+      ` : '';
+      target.innerHTML = `
+        ${contextBanner}
+        <div class="simulation-summary" style="grid-column:1/-1">
+          <strong>Lectura rápida</strong>
+          <p class="muted">Este escenario ${result.delta_eas > 0 ? 'mejora' : result.delta_eas < 0 ? 'reduce' : 'mantiene'} el EAS en ${Math.abs(result.delta_eas)} puntos y ${result.delta_gap_index < 0 ? 'reduce la brecha' : result.delta_gap_index > 0 ? 'amplía la brecha' : 'mantiene la brecha'} en ${Math.abs(result.delta_gap_index)} puntos.</p>
+          <div class="chip-row">
+            <span class="chip">Antes = situación actual</span>
+            <span class="chip">Después = escenario propuesto</span>
+            <span class="chip">Delta = cambio neto</span>
+          </div>
+        </div>
+        <article class="scenario-card">
+          <span class="micro-label">Antes</span>
+          <h3>EAS ${result.before.eas}%</h3>
+          <p>Cobertura ${result.before.market_coverage}% | Brecha ${result.before.skill_gap_index}%</p>
+        </article>
+        <article class="scenario-card" style="border-color:rgba(184,31,45,.2);background:linear-gradient(180deg, rgba(184,31,45,.08), rgba(242,178,51,.04))">
+          <span class="micro-label">Después</span>
+          <h3>EAS ${result.after.eas}%</h3>
+          <p>Cobertura ${result.after.market_coverage}% | Brecha ${result.after.skill_gap_index}%</p>
+        </article>
+        <article class="scenario-card">
+          <span class="micro-label">Delta</span>
+          <h3>${result.delta_eas >= 0 ? '+' : ''}${result.delta_eas} pts</h3>
+          <p>Cambio en brecha ${result.delta_gap_index >= 0 ? '+' : ''}${result.delta_gap_index} pts</p>
+        </article>
+      `;
+    }
+
+    function applyProgramFilters() {
+      programQuery = programQueryDraft;
+      programFaculty = programFacultyDraft;
+      programAreaFilter = programAreaDraft;
+      programLevel = programLevelDraft;
+      programModality = programModalityDraft;
+      renderCatalog();
+    }
+
+    function clearProgramFilters() {
+      programQueryDraft = '';
+      programFacultyDraft = 'Todas';
+      programAreaDraft = 'Todas';
+      programLevelDraft = 'Todos';
+      programModalityDraft = 'Todas';
+      applyProgramFilters();
+      renderCatalogFilters();
+    }
+
+    $('#catalog-filter-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      applyProgramFilters();
+    });
+
+    $('#clear-filters-btn').addEventListener('click', () => {
+      clearProgramFilters();
+    });
+
+    $('#program-query').addEventListener('input', (event) => {
+      programQueryDraft = event.target.value;
+      programQuery = event.target.value;
+    });
+
+    $('#program-faculty').addEventListener('change', (event) => {
+      programFacultyDraft = event.target.value;
+      programFaculty = event.target.value;
+    });
+
+    $('#program-area').addEventListener('change', (event) => {
+      programAreaDraft = event.target.value;
+      programAreaFilter = event.target.value;
+    });
+
+    $('#program-level').addEventListener('change', (event) => {
+      programLevelDraft = event.target.value;
+      programLevel = event.target.value;
+    });
+
+    $('#program-modality').addEventListener('change', (event) => {
+      programModalityDraft = event.target.value;
+      programModality = event.target.value;
+    });
+
+    document.querySelectorAll('.tabs .tab').forEach((button) => {
+      button.addEventListener('click', () => {
+        setActiveTab(button.dataset.tab);
+      });
+    });
+
+    $('#program-select-capture').addEventListener('change', (event) => {
+      selectProgram(Number(event.target.value));
+    });
+
+    $('#program-select-simulate').addEventListener('change', (event) => {
+      selectProgram(Number(event.target.value));
+    });
+
+    $('#graduate-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const programId = Number($('#program-select-capture').value);
+      const graduate = {
+        id: Math.max(0, ...bootstrap.graduates.map((item) => Number(item.id) || 0)) + 1,
+        full_name: $('#graduate-name').value.trim() || 'Sin nombre',
+        program_id: programId,
+        current_role: $('#graduate-role').value.trim(),
+        company: $('#graduate-company').value.trim(),
+        sector: $('#graduate-sector').value.trim(),
+        skills: splitList($('#graduate-skills').value),
+        employment_status: 'employed',
+        salary_band: $('#graduate-salary').value.trim(),
+        linkedin_url: $('#graduate-linkedin').value.trim(),
+        linkedin_connected: Boolean($('#graduate-linkedin').value.trim()),
+        consent_given: true,
+        hire_date: new Date().toISOString(),
+        last_promotion_at: null,
+        updated_at: new Date().toISOString(),
+        next_survey_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 180).toISOString(),
+      };
+      bootstrap.graduates.unshift(graduate);
+      bootstrap.summary.graduate_count = bootstrap.graduates.length;
+      renderGraduates();
+      $('#graduate-form').reset();
+      $('#program-select-capture').value = String(programId);
+      alert(`Egresado guardado: ${graduate.full_name}`);
+    });
+
+    $('#reset-graduate-btn').addEventListener('click', () => {
+      $('#graduate-form').reset();
+      $('#program-select-capture').value = String(selectedProgramId);
+    });
+
+    $('#analyze-btn').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/api/match/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: $('#job-text').value }),
+        });
+        if (!response.ok) {
+          throw new Error('No se pudo analizar la vacante.');
+        }
+        const result = await response.json();
+        renderAnalysis(result);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'No se pudo analizar la vacante.');
+      }
+    });
+
+    $('#simulate-btn').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${apiBase}/api/simulate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            program_id: Number($('#program-select-simulate').value),
+            add_skills: splitList($('#add-skills').value),
+            remove_skills: splitList($('#remove-skills').value),
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('No se pudo ejecutar la simulación.');
+        }
+        const result = await response.json();
+        renderSimulation(result);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'No se pudo ejecutar la simulación.');
+      }
+    });
+
+    loadBootstrap().catch((error) => {
+      document.body.insertAdjacentHTML('afterbegin', `<div class="shell"><section class="panel section"><h3>Vista previa no disponible</h3><p>${escapeHtml(error.message)}</p><p>Verifica que el backend esté corriendo en <strong>http://127.0.0.1:8010</strong> y recarga la página.</p></section></div>`);
+    });
+  </script>
+</body>
+</html>
+
+
+
+

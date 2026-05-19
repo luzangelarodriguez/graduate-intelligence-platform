@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.venv_software/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs and runtime files
+logs/*.log
+logs/*.txt
+*.log
+*.err.log
+*.out.log
+*.err.txt
+*.out.txt
+
+# Local databases and generated datasets
+*.sqlite
+*.sqlite3
+*.db
+data/raw/
+data/processed/
+data/ml/*.jsonl
+archive/outputs/
+
+# Vendored dependencies
+vendor/
+selenium_deps/
+graduate_intelligence_platform/backend/vendor/
+graduate_intelligence_platform/backend/deps/
+node_modules/
+*.tsbuildinfo
+
+# Frontend builds
+dist/
+build/
+.vite/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

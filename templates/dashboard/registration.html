@@ -1,0 +1,468 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Onboarding alumni | Career intelligence UNIR</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="page-top">
+      <div class="brand">
+        <div class="brand__mark">unir</div>
+        <div class="brand__copy">
+          <strong>Fundación Universitaria Internacional de La Rioja</strong>
+          <span>Career intelligence para alumni</span>
+        </div>
+      </div>
+      <a href="{{ url_for('dashboard') }}">Volver al observatorio</a>
+    </div>
+
+    <div class="hero-strip">
+      <div class="hero-copy">
+        <div class="eyebrow">Onboarding profesional</div>
+        <h1>Crea tu perfil profesional</h1>
+        <p>Esto nos permitirá recomendarte oportunidades personalizadas, programas afines y brechas concretas para crecer con más claridad.</p>
+      </div>
+    </div>
+
+    <section class="wizard-card">
+      {% if preview %}
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <strong>Perfil completado</strong>
+            <span>Vista ejecutiva inicial</span>
+          </div>
+        </div>
+        <div class="result-stage">
+          {% if success %}
+            <div class="notice ok">{{ success }}</div>
+          {% endif %}
+          <div class="diagnostic-head">
+            <article class="diagnostic-card">
+              <div class="section-kicker">Tu diagnóstico inicial</div>
+              <h2>Entiende tu situación y actúa con claridad.</h2>
+              <p>{{ preview.diagnostic_copy }}</p>
+            </article>
+            <article class="metric-card">
+              <small>% de alineación</small>
+              <strong>{{ '%.2f'|format(preview.match) }}%</strong>
+              <span>{{ preview.alignment_summary }}</span>
+            </article>
+          </div>
+
+          <article class="focus-card">
+            <div class="section-kicker">Tu siguiente mejor paso</div>
+            <h3>{{ preview.next_step.title }}</h3>
+            <div class="focus-grid">
+              <div class="focus-block">
+                <strong>Recomendación</strong>
+                <p>{{ preview.next_step.summary }}</p>
+              </div>
+              <div class="focus-block">
+                <strong>Por qué importa</strong>
+                <span>{{ preview.next_step.impact }}</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="route-card">
+            <div class="section-kicker">Ruta recomendada para ti</div>
+            <h3>Una secuencia simple para avanzar sin perder foco.</h3>
+            <div class="route-flow">
+              {% for step in preview.route_steps %}
+                <div class="route-step">
+                  <strong>{{ loop.index }}</strong>
+                  <h4>{{ step.title }}</h4>
+                  <p>{{ step.description }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          </article>
+
+          <div class="result-grid">
+            <article class="result-card" id="skills-brecha">
+              <div class="result-card__head">
+                <div>
+                  <h3>Skills que te faltan</h3>
+                  <p>Prioriza las brechas con mayor impacto en tu acceso al mercado.</p>
+                </div>
+              </div>
+              <ul>
+                {% for skill in preview.missing_skills %}
+                  <li class="result-skill">
+                    <div class="item-topline">
+                      <strong>{{ skill.nombre }}</strong>
+                      <span class="badge {{ 'priority' if skill.priority_tone == 'high' else 'medium' }}">{{ skill.priority_label }}</span>
+                    </div>
+                    <span>Se repite en {{ skill.conteo }} vacantes relacionadas.</span>
+                  </li>
+                {% endfor %}
+                {% if not preview.missing_skills %}
+                  <li class="result-skill">
+                    <div class="item-topline">
+                      <strong>Sin brechas críticas visibles</strong>
+                      <span class="badge high">Positivo</span>
+                    </div>
+                    <span>Tu perfil ya cubre bien la señal principal del mercado observado.</span>
+                  </li>
+                {% endif %}
+              </ul>
+            </article>
+
+            <article class="result-card" id="empleos-sugeridos">
+              <div class="result-card__head">
+                <div>
+                  <h3>Empleos sugeridos</h3>
+                  <p>Revisa primero los roles con mejor encaje para tu perfil actual.</p>
+                </div>
+              </div>
+              <ul>
+                {% for job in preview.jobs %}
+                  <li class="result-job">
+                    <div class="item-topline">
+                      <strong>{{ job.titulo }}</strong>
+                      <span class="badge {{ 'high' if job.match_tone == 'good' else 'medium' }}">{{ job.match_label }}</span>
+                    </div>
+                    <span>{{ job.empresa }} · Match {{ '%.0f'|format(job.match) }}%</span>
+                    {% if job.url %}
+                      <a href="{{ job.url }}" target="_blank" rel="noopener">Ver vacante</a>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+                {% if not preview.jobs %}
+                  <li class="result-job">
+                    <div class="item-topline">
+                      <strong>Sin vacantes activas fuertes</strong>
+                      <span class="badge medium">Pendiente</span>
+                    </div>
+                    <span>Aún no vemos oportunidades con encaje suficiente para priorizar aquí.</span>
+                  </li>
+                {% endif %}
+              </ul>
+            </article>
+
+            <article class="result-card" id="programas-complementarios">
+              <div class="result-card__head">
+                <div>
+                  <h3>Programas complementarios</h3>
+                  <p>Solo aparecen si veo relevancia real con tu perfil y tus intereses.</p>
+                </div>
+              </div>
+              <ul>
+                {% for program in preview.programs %}
+                  <li class="result-program">
+                    <div class="item-topline">
+                      <strong>{{ program.nombre }}</strong>
+                      <span class="badge {{ 'high' if program.relevance_tone == 'good' else 'medium' }}">{{ program.relevance_label }}</span>
+                    </div>
+                    <span>{{ program.reason }}</span>
+                    <span>Match de mercado {{ '%.0f'|format(program.match) }}%</span>
+                  </li>
+                {% endfor %}
+                {% if not preview.programs %}
+                  <li class="result-program">
+                    <div class="item-topline">
+                      <strong>Sin programas complementarios suficientemente cercanos</strong>
+                      <span class="badge medium">Filtro activo</span>
+                    </div>
+                    <span>Prefiero no sugerirte programas si no veo relación clara con tu perfil e intereses.</span>
+                  </li>
+                {% endif %}
+              </ul>
+            </article>
+          </div>
+
+          <article class="action-card">
+            <div class="section-kicker">Qué puedes hacer ahora</div>
+            <h3>Elige tu siguiente acción.</h3>
+            <div class="action-row">
+              {% for action in preview.actions %}
+                <a class="action-button {{ action.tone }}" href="{{ action.href }}">{{ action.label }}</a>
+              {% endfor %}
+            </div>
+          </article>
+
+          <article class="follow-card" id="seguimiento">
+            <div class="section-kicker">Activa tu seguimiento</div>
+            <h3>Mantén visible tu evolución.</h3>
+            <p class="follow-copy">Recibe alertas, actualiza tu perfil cuando cambie tu experiencia y vuelve a medir tu alineación con el tiempo.</p>
+            <div class="follow-row">
+              {% for item in preview.follow_up_actions %}
+                <a class="follow-button" href="{{ item.href }}">{{ item.label }}</a>
+              {% endfor %}
+            </div>
+          </article>
+        </div>
+      {% else %}
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <strong id="progressTitle">Paso 1 de 5</strong>
+            <span>Perfil profesional para matching inteligente</span>
+          </div>
+          <div class="step-track" id="stepTrack">
+            <div class="step-item is-active" data-track-step="1"><span>1</span>Datos</div>
+            <div class="step-item" data-track-step="2"><span>2</span>Perfil</div>
+            <div class="step-item" data-track-step="3"><span>3</span>Skills</div>
+            <div class="step-item" data-track-step="4"><span>4</span>Intereses</div>
+            <div class="step-item" data-track-step="5"><span>5</span>Objetivo</div>
+          </div>
+        </div>
+
+        {% if errors %}
+          <div class="notice error">
+            {% for error in errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('registro') }}" id="registrationWizard" novalidate>
+          <input type="hidden" name="ia_nombre" value="Alia">
+          <div class="wizard-body">
+            <section class="wizard-panel" data-step="1">
+              <div class="panel-main">
+                <div>
+                  <h2>Crea tu perfil profesional</h2>
+                  <p>Esto nos permitirá recomendarte oportunidades personalizadas.</p>
+                </div>
+                <div class="form-grid">
+                  <label class="span-2">Nombre completo
+                    <input name="nombre_completo" data-required="1" autocomplete="name" value="{{ form.get('nombre_completo', '') }}" placeholder="Escribe tu nombre y apellidos">
+                  </label>
+                  <label class="span-2">Email
+                    <input type="email" name="email" data-required="1" autocomplete="email" value="{{ form.get('email', '') }}" placeholder="nombre@correo.com">
+                  </label>
+                  <label>Programa de egreso
+                    <select name="especializacion_id" data-required="1">
+                      <option value="">Selecciona un programa</option>
+                      {% for programa in programas %}
+                        {% set pid = programa.especializacion_id|string %}
+                        <option value="{{ pid }}" {% if form.get('especializacion_id', '') == pid %}selected{% endif %}>{{ programa.nombre_especializacion }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                  <label>Año de graduación
+                    <select name="anio_graduacion" data-required="1">
+                      <option value="">Selecciona el año</option>
+                      {% for year in graduation_years %}
+                        {% set year_label = year|string %}
+                        <option value="{{ year_label }}" {% if form.get('anio_graduacion', '') == year_label %}selected{% endif %}>{{ year_label }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <aside class="panel-aside">
+                <div class="aside-badge">01</div>
+                <strong>Base académica</strong>
+                <ul>
+                  <li>Identificamos tu programa y contexto de egreso.</li>
+                  <li>Esto ordena las recomendaciones desde el primer minuto.</li>
+                  <li>Solo te pedimos lo mínimo para empezar bien.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <section class="wizard-panel" data-step="2">
+              <div class="panel-main">
+                <div>
+                  <h2>Cuéntanos sobre tu experiencia</h2>
+                  <p>Entender tu momento profesional nos ayuda a filtrar oportunidades con más criterio.</p>
+                </div>
+                <div class="form-grid">
+                  <label class="span-2">Cargo actual
+                    <input name="cargo_actual" data-required="1" value="{{ form.get('cargo_actual', '') }}" placeholder="Ej: Analista de datos, Líder comercial, Developer">
+                  </label>
+                  <label>Nivel
+                    <select name="nivel_experiencia" data-required="1">
+                      {% set nivel = form.get('nivel_experiencia', '') %}
+                      <option value="">Selecciona nivel</option>
+                      <option value="Junior" {% if nivel == 'Junior' %}selected{% endif %}>Junior</option>
+                      <option value="Semi Senior" {% if nivel == 'Semi Senior' %}selected{% endif %}>Semi Senior</option>
+                      <option value="Senior" {% if nivel == 'Senior' %}selected{% endif %}>Senior</option>
+                    </select>
+                  </label>
+                  <label>Área
+                    <select name="area_actual" data-required="1">
+                      <option value="">Selecciona área</option>
+                      {% for option in area_options %}
+                        <option value="{{ option }}" {% if form.get('area_actual', '') == option %}selected{% endif %}>{{ option }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                  <label class="span-2">Años de experiencia
+                    <select name="anios_experiencia" data-required="1">
+                      {% set exp = form.get('anios_experiencia', '') %}
+                      <option value="">Selecciona experiencia</option>
+                      {% for option in experience_options %}
+                        <option value="{{ option }}" {% if exp == option %}selected{% endif %}>{{ option }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <aside class="panel-aside">
+                <div class="aside-badge">02</div>
+                <strong>Lectura de trayectoria</strong>
+                <ul>
+                  <li>Combinamos seniority, área y experiencia para priorizar matches.</li>
+                  <li>Evita recomendaciones demasiado junior o demasiado lejanas.</li>
+                  <li>Nos ayuda a entender tu momento, no solo tu título.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <section class="wizard-panel" data-step="3">
+              <div class="panel-main">
+                <div>
+                  <h2>Selecciona tus habilidades</h2>
+                  <p>Agrega las habilidades que hoy forman parte de tu perfil y cuéntanos qué herramientas usas en tu día a día.</p>
+                </div>
+                <div class="form-grid">
+                  <label class="span-2">Habilidades
+                    <div class="tag-picker" data-picker data-target="skills_actuales" data-options='{{ skill_suggestions|tojson }}'>
+                      <input type="hidden" name="skills_actuales" value="{{ form.get('skills_actuales', '') }}" data-required="1">
+                      <div class="tag-picker__selected"></div>
+                      <input class="tag-input" type="text" placeholder="Busca y agrega habilidades como SQL, Power BI o Python">
+                      <div class="suggestions"></div>
+                    </div>
+                  </label>
+                  <label class="span-2">¿Qué herramientas usas en tu día a día?
+                    <textarea name="herramientas_dia_dia" data-required="1" placeholder="Ej: Excel, CRM, Power BI, Jira, Python, SAP">{{ form.get('herramientas_dia_dia', '') }}</textarea>
+                  </label>
+                </div>
+              </div>
+              <aside class="panel-aside">
+                <div class="aside-badge">03</div>
+                <strong>Mapa de skills</strong>
+                <ul>
+                  <li>Este paso es clave para detectar brechas frente al mercado.</li>
+                  <li>Las tags son compactas para que puedas revisar rápido.</li>
+                  <li>Menos ruido, más señal útil para Alia.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <section class="wizard-panel" data-step="4">
+              <div class="panel-main">
+                <div>
+                  <h2>¿Hacia dónde quieres crecer?</h2>
+                  <p>Define los roles y áreas que te interesan para orientar mejor las oportunidades y recomendaciones académicas.</p>
+                </div>
+                <div class="form-grid">
+                  <label class="span-2">Roles de interés
+                    <div class="tag-picker" data-picker data-target="roles_interes" data-options='{{ role_options|tojson }}'>
+                      <input type="hidden" name="roles_interes" value="{{ form.get('roles_interes', '') }}" data-required="1">
+                      <div class="tag-picker__selected"></div>
+                      <input class="tag-input" type="text" placeholder="Ej: Analista de datos, Business Intelligence">
+                      <div class="suggestions"></div>
+                    </div>
+                  </label>
+                  <label class="span-2">Áreas de interés
+                    <div class="tag-picker" data-picker data-target="areas_interes" data-options='{{ area_options|tojson }}'>
+                      <input type="hidden" name="areas_interes" value="{{ form.get('areas_interes', '') }}" data-required="1">
+                      <div class="tag-picker__selected"></div>
+                      <input class="tag-input" type="text" placeholder="Ej: Datos, Negocios, Tecnología">
+                      <div class="suggestions"></div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <aside class="panel-aside">
+                <div class="aside-badge">04</div>
+                <strong>Señal de interés</strong>
+                <ul>
+                  <li>Esto evita matches genéricos y abre rutas más coherentes.</li>
+                  <li>También mejora la sugerencia de programas complementarios.</li>
+                  <li>Puedes pensar en el siguiente rol, no solo en el actual.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <section class="wizard-panel" data-step="5">
+              <div class="panel-main">
+                <div>
+                  <h2>¿Cuál es tu objetivo?</h2>
+                  <p>Elige la meta principal para que la plataforma priorice el tipo de ayuda correcta desde el inicio.</p>
+                </div>
+
+                <div>
+                  <label>Objetivo principal</label>
+                  <div class="segmented-grid">
+                    {% for option in goal_options %}
+                      <label class="segmented-card">
+                        <input type="radio" name="objetivo_laboral" value="{{ option }}" data-required="1" {% if form.get('objetivo_laboral', '') == option %}checked{% endif %}>
+                        <strong>{{ option }}</strong>
+                        <span>
+                          {% if option == 'Encontrar empleo' %}
+                            Priorizaremos vacantes activas y fit inmediato.
+                          {% elif option == 'Cambiar de rol' %}
+                            Buscaremos rutas de transición y skills faltantes.
+                          {% elif option == 'Mejorar perfil profesional' %}
+                            Enfocaremos la lectura en fortalezas y brechas.
+                          {% else %}
+                            Activaremos sugerencias académicas de siguiente nivel.
+                          {% endif %}
+                        </span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div>
+                  <label>Disponibilidad</label>
+                  <div class="select-grid">
+                    {% for option in availability_options %}
+                      <label class="choice-card">
+                        <input type="radio" name="disponibilidad" value="{{ option }}" data-required="1" {% if form.get('disponibilidad', '') == option %}checked{% endif %}>
+                        <strong>{{ option }}</strong>
+                        <span>
+                          {% if option == 'Activamente buscando empleo' %}
+                            Mostraremos primero oportunidades listas para aplicar.
+                          {% elif option == 'Abierto a oportunidades' %}
+                            Priorizaremos señales del mercado y crecimiento.
+                          {% else %}
+                            Enfocaremos la recomendación en preparación estratégica.
+                          {% endif %}
+                        </span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <aside class="panel-aside">
+                <div class="aside-badge">05</div>
+                <strong>Decisión de carrera</strong>
+                <ul>
+                  <li>La meta principal cambia el tono de todas las sugerencias.</li>
+                  <li>Con esto activamos la primera vista de valor inmediata.</li>
+                  <li>El resultado final ya sale con empleos, brechas y programas.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <div class="button-row">
+              <div class="button-row__status" id="stepStatus">Comienza con tus datos básicos.</div>
+              <div class="button-actions">
+                <button type="button" class="button-ghost" id="backButton">Atrás</button>
+                <button type="button" class="button-primary" id="nextButton">Continuar</button>
+                <button type="submit" class="button-primary" id="submitButton">Finalizar perfil</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      {% endif %}
+    </section>
+  </div>
+
+  {% if not preview %}
+  <script>
+    window.registrationWizardConfig = { initialStep: {{ initial_step|int }} };
+  </script>
+  <script src="{{ url_for('static', filename='js/registration.js') }}"></script>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,408 @@
+[
+  {
+    "source": "computrabajo",
+    "reliability_score": 0.36,
+    "success_rate": 0.0,
+    "blocked_auth_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.0,
+    "evidence_quality": 0.1,
+    "semantic_density": 0.0,
+    "extraction_completeness": 0.0,
+    "source_stability": 1.0,
+    "raw_runs": 0,
+    "raw_jobs": 0,
+    "silver_jobs": 0,
+    "gold_jobs": 0,
+    "freshness_score": 0.0,
+    "freshness_label": "no_recent_runs",
+    "contamination_rate": 0.0,
+    "access_strategy": "scraping",
+    "access_risk_level": "medium",
+    "sla": {
+      "source": "computrabajo",
+      "uptime": 0.0,
+      "response_stability": 1.0,
+      "schema_stability": 1.0,
+      "auth_volatility": 0.0,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 0,
+          "completed": 0,
+          "blocked_auth": 0,
+          "errors": 0
+        },
+        "registry": {
+          "response_types": 0,
+          "auth_endpoints": 0,
+          "endpoints": 0
+        }
+      }
+    },
+    "access": {
+      "source": "computrabajo",
+      "access_strategy": "scraping",
+      "primary_endpoint": null,
+      "auth_required": false,
+      "partnership_required": false,
+      "licensed_required": false,
+      "recommended_action": "mantener scraper controlado con discovery API recurrente",
+      "risk_level": "medium",
+      "metadata": {
+        "blocked_auth_rate": 0.0,
+        "best_endpoint": null
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1,
+      "confidence_avg": 0.0,
+      "skill_density": 0.0,
+      "description_quality": 0.0,
+      "contamination_rate": 0.0
+    },
+    "gold_readiness": false,
+    "source_tier": "Experimental",
+    "notes": "programar nueva corrida o revisar scheduler"
+  },
+  {
+    "source": "elempleo",
+    "reliability_score": 0.152,
+    "success_rate": 0.375,
+    "blocked_auth_rate": 1.0,
+    "timeout_rate": 1.0,
+    "duplication_rate": 0.1316,
+    "evidence_quality": 0.1,
+    "semantic_density": 0.0,
+    "extraction_completeness": 0.0,
+    "source_stability": 0.1667,
+    "raw_runs": 2,
+    "raw_jobs": 38,
+    "silver_jobs": 0,
+    "gold_jobs": 0,
+    "freshness_score": 0.9972,
+    "freshness_label": "fresh",
+    "contamination_rate": 0.0,
+    "access_strategy": "partnership",
+    "access_risk_level": "high",
+    "sla": {
+      "source": "elempleo",
+      "uptime": 0.0,
+      "response_stability": 0.1667,
+      "schema_stability": 0.938,
+      "auth_volatility": 0.0062,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 2,
+          "completed": 0,
+          "blocked_auth": 2,
+          "errors": 10
+        },
+        "registry": {
+          "response_types": 30,
+          "auth_endpoints": 1,
+          "endpoints": 484
+        }
+      }
+    },
+    "access": {
+      "source": "elempleo",
+      "access_strategy": "partnership",
+      "primary_endpoint": "https://bam.nr-data.net/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=6495&ck=0&s=c476db29141b9e28&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=56089b5e9a272120&af=err,spa,xhr,stn,ins&ap=372&be=1328&fe=4921&dc=2026&fsh=1&perf=%7B%22timing%22:%7B%22of%22:1779208097714,%22n%22:0,%22f%22:0,%22dn%22:5,%22dne%22:308,%22c%22:308,%22s%22:448,%22ce%22:595,%22rq%22:595,%22rp%22:1329,%22rpe%22:1616,%22di%22:3337,%22ds%22:3338,%22de%22:3354,%22dc%22:6239,%22l%22:6239,%22le%22:6249%7D,%22navigation%22:%7B%7D%7D&fp=2368&fcp=2368",
+      "auth_required": false,
+      "partnership_required": true,
+      "licensed_required": true,
+      "recommended_action": "buscar convenio o mecanismo autorizado; evitar dependencia DOM",
+      "risk_level": "high",
+      "metadata": {
+        "blocked_auth_rate": 1.0,
+        "best_endpoint": {
+          "endpoint": "https://bam.nr-data.net/1/ae648b7581?a=1072387833&v=1.314.0&to=Y1dRZ0sCWxdRB0ZYXVodfmV6TGcBQxFeRXhbUHxVXwZHF3MLXEVAW15fVktMfApUAUo%3D&rst=6495&ck=0&s=c476db29141b9e28&ref=https://www.elempleo.com/co/ofertas-empleo/trabajo-analista%2520de%2520datos&ptid=56089b5e9a272120&af=err,spa,xhr,stn,ins&ap=372&be=1328&fe=4921&dc=2026&fsh=1&perf=%7B%22timing%22:%7B%22of%22:1779208097714,%22n%22:0,%22f%22:0,%22dn%22:5,%22dne%22:308,%22c%22:308,%22s%22:448,%22ce%22:595,%22rq%22:595,%22rp%22:1329,%22rpe%22:1616,%22di%22:3337,%22ds%22:3338,%22de%22:3354,%22dc%22:6239,%22l%22:6239,%22le%22:6249%7D,%22navigation%22:%7B%7D%7D&fp=2368&fcp=2368",
+          "method": "POST",
+          "auth_required": false,
+          "rank_score": "0.2060"
+        }
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1,
+      "confidence_avg": 0.0,
+      "skill_density": 0.0,
+      "description_quality": 0.0,
+      "contamination_rate": 0.0
+    },
+    "gold_readiness": false,
+    "source_tier": "Experimental",
+    "notes": "resolver acceso autorizado antes de promocionar fuente"
+  },
+  {
+    "source": "magneto",
+    "reliability_score": 0.36,
+    "success_rate": 0.0,
+    "blocked_auth_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.0,
+    "evidence_quality": 0.1,
+    "semantic_density": 0.0,
+    "extraction_completeness": 0.0,
+    "source_stability": 1.0,
+    "raw_runs": 0,
+    "raw_jobs": 0,
+    "silver_jobs": 0,
+    "gold_jobs": 0,
+    "freshness_score": 0.0,
+    "freshness_label": "no_recent_runs",
+    "contamination_rate": 0.0,
+    "access_strategy": "scraping",
+    "access_risk_level": "medium",
+    "sla": {
+      "source": "magneto",
+      "uptime": 0.0,
+      "response_stability": 1.0,
+      "schema_stability": 0.9606,
+      "auth_volatility": 0.0056,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 0,
+          "completed": 0,
+          "blocked_auth": 0,
+          "errors": 0
+        },
+        "registry": {
+          "response_types": 14,
+          "auth_endpoints": 2,
+          "endpoints": 355
+        }
+      }
+    },
+    "access": {
+      "source": "magneto",
+      "access_strategy": "scraping",
+      "primary_endpoint": "https://api.magneto365.com/jobs/v1/public/locations?term=all&country_id=47",
+      "auth_required": false,
+      "partnership_required": false,
+      "licensed_required": false,
+      "recommended_action": "mantener scraper controlado con discovery API recurrente",
+      "risk_level": "medium",
+      "metadata": {
+        "blocked_auth_rate": 0.0,
+        "best_endpoint": {
+          "endpoint": "https://api.magneto365.com/jobs/v1/public/locations?term=all&country_id=47",
+          "method": "GET",
+          "auth_required": false,
+          "rank_score": "0.3025"
+        }
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1,
+      "confidence_avg": 0.0,
+      "skill_density": 0.0,
+      "description_quality": 0.0,
+      "contamination_rate": 0.0
+    },
+    "gold_readiness": false,
+    "source_tier": "Experimental",
+    "notes": "programar nueva corrida o revisar scheduler"
+  },
+  {
+    "source": "magneto_api",
+    "reliability_score": 0.6342,
+    "success_rate": 1.0,
+    "blocked_auth_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.0,
+    "evidence_quality": 0.1329,
+    "semantic_density": 0.0377,
+    "extraction_completeness": 0.0263,
+    "source_stability": 0.2,
+    "raw_runs": 2,
+    "raw_jobs": 213,
+    "silver_jobs": 114,
+    "gold_jobs": 0,
+    "freshness_score": 0.9953,
+    "freshness_label": "fresh",
+    "contamination_rate": 0.8684,
+    "access_strategy": "scraping",
+    "access_risk_level": "medium",
+    "sla": {
+      "source": "magneto_api",
+      "uptime": 1.0,
+      "response_stability": 0.2,
+      "schema_stability": 1.0,
+      "auth_volatility": 0.0,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 2,
+          "completed": 2,
+          "blocked_auth": 0,
+          "errors": 8
+        },
+        "registry": {
+          "response_types": 0,
+          "auth_endpoints": 0,
+          "endpoints": 0
+        }
+      }
+    },
+    "access": {
+      "source": "magneto_api",
+      "access_strategy": "scraping",
+      "primary_endpoint": null,
+      "auth_required": false,
+      "partnership_required": false,
+      "licensed_required": false,
+      "recommended_action": "mantener scraper controlado con discovery API recurrente",
+      "risk_level": "medium",
+      "metadata": {
+        "blocked_auth_rate": 0.0,
+        "best_endpoint": null
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1329,
+      "confidence_avg": 0.2582,
+      "skill_density": 0.0033,
+      "description_quality": 0.0137,
+      "contamination_rate": 0.8684
+    },
+    "gold_readiness": false,
+    "source_tier": "Bronze",
+    "notes": "ajustar normalizacion y filtros anti-contaminacion"
+  },
+  {
+    "source": "servicio_publico_empleo",
+    "reliability_score": 0.511,
+    "success_rate": 0.75,
+    "blocked_auth_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.1754,
+    "evidence_quality": 0.1,
+    "semantic_density": 0.0,
+    "extraction_completeness": 0.0,
+    "source_stability": 1.0,
+    "raw_runs": 0,
+    "raw_jobs": 28,
+    "silver_jobs": 0,
+    "gold_jobs": 0,
+    "freshness_score": 0.0,
+    "freshness_label": "no_recent_runs",
+    "contamination_rate": 0.0,
+    "access_strategy": "scraping",
+    "access_risk_level": "medium",
+    "sla": {
+      "source": "servicio_publico_empleo",
+      "uptime": 0.0,
+      "response_stability": 1.0,
+      "schema_stability": 1.0,
+      "auth_volatility": 0.0,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 0,
+          "completed": 0,
+          "blocked_auth": 0,
+          "errors": 0
+        },
+        "registry": {
+          "response_types": 0,
+          "auth_endpoints": 0,
+          "endpoints": 0
+        }
+      }
+    },
+    "access": {
+      "source": "servicio_publico_empleo",
+      "access_strategy": "scraping",
+      "primary_endpoint": null,
+      "auth_required": false,
+      "partnership_required": false,
+      "licensed_required": false,
+      "recommended_action": "mantener scraper controlado con discovery API recurrente",
+      "risk_level": "medium",
+      "metadata": {
+        "blocked_auth_rate": 0.0,
+        "best_endpoint": null
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1,
+      "confidence_avg": 0.0,
+      "skill_density": 0.0,
+      "description_quality": 0.0,
+      "contamination_rate": 0.0
+    },
+    "gold_readiness": false,
+    "source_tier": "Bronze",
+    "notes": "programar nueva corrida o revisar scheduler"
+  },
+  {
+    "source": "spe",
+    "reliability_score": 0.36,
+    "success_rate": 0.0,
+    "blocked_auth_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.0,
+    "evidence_quality": 0.1,
+    "semantic_density": 0.0,
+    "extraction_completeness": 0.0,
+    "source_stability": 1.0,
+    "raw_runs": 0,
+    "raw_jobs": 0,
+    "silver_jobs": 0,
+    "gold_jobs": 0,
+    "freshness_score": 0.0,
+    "freshness_label": "no_recent_runs",
+    "contamination_rate": 0.0,
+    "access_strategy": "scraping",
+    "access_risk_level": "medium",
+    "sla": {
+      "source": "spe",
+      "uptime": 0.0,
+      "response_stability": 1.0,
+      "schema_stability": 1.0,
+      "auth_volatility": 0.0,
+      "window_days": 30,
+      "metadata": {
+        "runs": {
+          "total": 0,
+          "completed": 0,
+          "blocked_auth": 0,
+          "errors": 0
+        },
+        "registry": {
+          "response_types": 0,
+          "auth_endpoints": 0,
+          "endpoints": 0
+        }
+      }
+    },
+    "access": {
+      "source": "spe",
+      "access_strategy": "scraping",
+      "primary_endpoint": null,
+      "auth_required": false,
+      "partnership_required": false,
+      "licensed_required": false,
+      "recommended_action": "mantener scraper controlado con discovery API recurrente",
+      "risk_level": "medium",
+      "metadata": {
+        "blocked_auth_rate": 0.0,
+        "best_endpoint": null
+      }
+    },
+    "evidence": {
+      "evidence_quality": 0.1,
+      "confidence_avg": 0.0,
+      "skill_density": 0.0,
+      "description_quality": 0.0,
+      "contamination_rate": 0.0
+    },
+    "gold_readiness": false,
+    "source_tier": "Experimental",
+    "notes": "programar nueva corrida o revisar scheduler"
+  }
+]

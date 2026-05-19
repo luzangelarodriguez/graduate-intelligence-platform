@@ -1,0 +1,215 @@
+{
+  "endpoint": "https://api.magneto365.com/jobs/v1/public/locations?term=analista+de+datos&country_id=47",
+  "payload": [
+    {
+      "id": "DP797",
+      "label": "Norte de Santander, Colombia",
+      "type": "DEPARTMENT",
+      "field": "department_id",
+      "slugifyLabel": "loc-norte-de-santander-co"
+    },
+    {
+      "id": "DP805",
+      "label": "Valle del Cauca, Colombia",
+      "type": "DEPARTMENT",
+      "field": "department_id",
+      "slugifyLabel": "loc-valle-del-cauca-co"
+    },
+    {
+      "id": "CT49982",
+      "label": "Abrego, Norte de Santander, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-abrego-norte-de-santander"
+    },
+    {
+      "id": "CT17405",
+      "label": "Agua de Dios, Cundinamarca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-agua-de-dios-cundinamarca"
+    },
+    {
+      "id": "CT50006",
+      "label": "Alcalá, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-alcala-valle-del-cauca"
+    },
+    {
+      "id": "CT17052",
+      "label": "Altos del Rosario, Bolivar, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-altos-del-rosario-bolivar"
+    },
+    {
+      "id": "CT50007",
+      "label": "Andalucía, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-andalucia-valle-del-cauca"
+    },
+    {
+      "id": "CT49939",
+      "label": "Anserma, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-anserma-valle-del-cauca"
+    },
+    {
+      "id": "CT50008",
+      "label": "Ansermanuevo, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-ansermanuevo-valle-del-cauca"
+    },
+    {
+      "id": "CT49965",
+      "label": "Arboledas, Norte de Santander, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-arboledas-norte-de-santander"
+    },
+    {
+      "id": "CT50009",
+      "label": "Argelia, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-argelia-valle-del-cauca"
+    },
+    {
+      "id": "CT17594",
+      "label": "Barranca de Upía, Meta, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-barranca-de-upia-meta"
+    },
+    {
+      "id": "CT17056",
+      "label": "Barranco de Loba, Bolivar, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-barranco-de-loba-bolivar"
+    },
+    {
+      "id": "CT58189",
+      "label": "Belén de Bajirá, Choco, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-belen-de-bajira-choco"
+    },
+    {
+      "id": "CT17713",
+      "label": "Belén de Umbría, Risaralda, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-belen-de-umbria-risaralda"
+    },
+    {
+      "id": "CT17247",
+      "label": "Belén de los Andaquies, Caqueta, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-belen-de-los-andaquies-caqueta"
+    },
+    {
+      "id": "CT49998",
+      "label": "Bochalema, Norte de Santander, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-bochalema-norte-de-santander"
+    },
+    {
+      "id": "CT50010",
+      "label": "Bolívar, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-bolivar-valle-del-cauca"
+    },
+    {
+      "id": "CT49978",
+      "label": "Bucarasica, Norte de Santander, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-bucarasica-norte-de-santander"
+    },
+    {
+      "id": "CT50011",
+      "label": "Buenaventura, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-buenaventura-valle-del-cauca"
+    },
+    {
+      "id": "CT50012",
+      "label": "Bugalagrande, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-bugalagrande-valle-del-cauca"
+    },
+    {
+      "id": "CT49983",
+      "label": "Cachirá, Norte de Santander, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-cachira-norte-de-santander"
+    },
+    {
+      "id": "CT50013",
+      "label": "Caicedonia, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-caicedonia-valle-del-cauca"
+    },
+    {
+      "id": "CT49941",
+      "label": "Cali, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-cali-valle-del-cauca"
+    },
+    {
+      "id": "CT58196",
+      "label": "Calima, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-calima-valle-del-cauca"
+    },
+    {
+      "id": "CT17029",
+      "label": "Campo de la Cruz, Atlantico, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-campo-de-la-cruz-atlantico"
+    },
+    {
+      "id": "CT50015",
+      "label": "Candelaria, Valle del Cauca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-candelaria-valle-del-cauca"
+    },
+    {
+      "id": "CT17843",
+      "label": "Carmen de Apicalá, Tolima, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-carmen-de-apicala-tolima"
+    },
+    {
+      "id": "CT17418",
+      "label": "Carmen de Carupa, Cundinamarca, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-carmen-de-carupa-cundinamarca"
+    },
+    {
+      "id": "CT17355",
+      "label": "Carmen del Darien, Choco, Colombia",
+      "type": "CITY",
+      "field": "city_id",
+      "slugifyLabel": "loc-carmen-del-darien-choco"
+    }
+  ]
+}

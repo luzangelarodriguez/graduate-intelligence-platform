@@ -1,0 +1,8 @@
+{
+    "fastapi_pid":  29052,
+    "vite_pid":  26552,
+    "health":  "http://127.0.0.1:8010/api/health",
+    "fastapi_url":  "http://127.0.0.1:8010",
+    "frontend_url":  "http://127.0.0.1:5173",
+    "updated_at":  "2026-05-15T11:20:00"
+}

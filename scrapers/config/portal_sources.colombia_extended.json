@@ -1,0 +1,86 @@
+{
+  "sources": [
+    {
+      "type": "portal",
+      "name": "Elempleo Colombia",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Elempleo Bogota",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co/ofertas-empleo/bogota",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Bogota",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-bogota",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Colombia",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-colombia",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Empleos",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empleos",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Manpower",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empresas/manpower/empleos",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Indeed Colombia",
+      "kind": "indeed",
+      "url": "https://co.indeed.com/jobs?l=colombia&q=Job+colombia",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Indeed Bogota",
+      "kind": "indeed",
+      "url": "https://co.indeed.com/Empleos-en-Colombia-bogota",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Jooble Bogota",
+      "kind": "jooble",
+      "url": "https://co.jooble.org/trabajo/Bogot%C3%A1%2C-D.C.",
+      "render_mode": "auto",
+      "max_pages": 3
+    },
+    {
+      "type": "portal",
+      "name": "Jooble Colombia",
+      "kind": "jooble",
+      "url": "https://co.jooble.org/jdp/-5502178053395883607",
+      "render_mode": "auto",
+      "max_pages": 3
+    }
+  ],
+  "output_dir": "job_extraction_output_public",
+  "db_path": "job_extraction_output_public/job_extraction.sqlite3"
+}

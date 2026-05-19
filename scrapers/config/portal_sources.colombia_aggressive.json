@@ -1,0 +1,123 @@
+{
+  "sources": [
+    {
+      "type": "portal",
+      "name": "Elempleo Colombia",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co/ofertas-empleo",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Elempleo Bogota",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co/ofertas-empleo/bogota",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Elempleo Medellin",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co/ofertas-empleo/medellin",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Colombia",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-colombia",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Bogota",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-bogota",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Medellin",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-medellin",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Empleos",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empleos",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Bogota",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empleos?location=bogota",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Medellin",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empleos?location=medellin",
+      "render_mode": "auto",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Bumeran Colombia",
+      "kind": "bumeran",
+      "url": "https://www.bumeran.com.co/empleos",
+      "render_mode": "browser",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Bumeran Bogota",
+      "kind": "bumeran",
+      "url": "https://www.bumeran.com.co/empleos/bogota",
+      "render_mode": "browser",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Trabajando Colombia",
+      "kind": "trabajando",
+      "url": "https://www.trabajando.com.co/empleos",
+      "render_mode": "browser",
+      "max_pages": 12,
+      "aggressive": true
+    },
+    {
+      "type": "portal",
+      "name": "Trabajando Bogota",
+      "kind": "trabajando",
+      "url": "https://www.trabajando.com.co/empleos/bogota",
+      "render_mode": "browser",
+      "max_pages": 12,
+      "aggressive": true
+    }
+  ],
+  "output_dir": "job_extraction_output_public_aggressive",
+  "db_path": "job_extraction_output_public_aggressive/job_extraction.sqlite3"
+}

@@ -1,0 +1,34 @@
+{
+  "sources": [
+    {
+      "type": "portal",
+      "name": "Elempleo Bogota",
+      "kind": "elempleo",
+      "url": "https://www.elempleo.com/co/ofertas-empleo/bogota",
+      "render_mode": "auto"
+    },
+    {
+      "type": "portal",
+      "name": "Computrabajo Banco de Bogota",
+      "kind": "computrabajo",
+      "url": "https://co.computrabajo.com/trabajo-de-banco-de-bogota",
+      "render_mode": "auto"
+    },
+    {
+      "type": "portal",
+      "name": "Magneto Manpower",
+      "kind": "magneto",
+      "url": "https://www.magneto365.com/co/empresas/manpower/empleos",
+      "render_mode": "auto"
+    },
+    {
+      "type": "portal",
+      "name": "LinkedIn Teleperformance",
+      "kind": "linkedin",
+      "url": "https://ba.linkedin.com/company/teleperformance/jobs",
+      "render_mode": "auto"
+    }
+  ],
+  "output_dir": "job_extraction_output",
+  "db_path": "job_extraction_output/job_extraction.sqlite3"
+}

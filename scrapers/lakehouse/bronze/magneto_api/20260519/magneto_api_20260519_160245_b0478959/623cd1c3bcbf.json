@@ -1,0 +1,277 @@
+{
+  "endpoint": "https://api.magneto365.com/seo/v1/mega-menu/by-sector",
+  "payload": [
+    {
+      "_id": "co-vacantes-en-ventas",
+      "slug": "vacantes-en-ventas",
+      "h1": "Trabajos en Ventas",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-ventas.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074734/ventas.jpg",
+      "counter": 50974
+    },
+    {
+      "_id": "co-vacantes-en-servicio-al-cliente-afines",
+      "slug": "vacantes-en-servicio-al-cliente-afines",
+      "h1": "Trabajos en Servicio al cliente y afines",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-servicio-cliente.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074713/servicio-al-cliente-afines.jpg",
+      "counter": 39796
+    },
+    {
+      "_id": "co-vacantes-en-administracion-oficina",
+      "slug": "vacantes-en-administracion-oficina",
+      "h1": "Trabajos en Administración y oficina",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-administracion-oficina.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074333/administracion-oficina.jpg",
+      "counter": 30787
+    },
+    {
+      "_id": "co-vacantes-en-bodega-logistica-transporte",
+      "slug": "vacantes-en-bodega-logistica-transporte",
+      "h1": "Trabajos en Bodega, logística y transporte",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-bodega-logistica.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074413/bodega-logistica-y-transporte-scaled.jpg",
+      "counter": 19702
+    },
+    {
+      "_id": "co-vacantes-en-produccion-operarios-maquinaria",
+      "slug": "vacantes-en-produccion-operarios-maquinaria",
+      "h1": "Trabajos en Producción, Operarios y Maquinaria",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-produccion-operarios.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074644/produccion-operarios-maquinaria.jpg",
+      "counter": 17614
+    },
+    {
+      "_id": "co-vacantes-en-mercadeo-publicidad",
+      "slug": "vacantes-en-mercadeo-publicidad",
+      "h1": "Trabajos en Mercadeo y Publicidad",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-mercadeo-publicidad.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074642/mercadeo-publicidad.jpg",
+      "counter": 16315
+    },
+    {
+      "_id": "co-vacantes-en-otros-sectores",
+      "slug": "vacantes-en-otros-sectores",
+      "h1": "Trabajos en otros sectores",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-administracion-oficina.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074604/hoteleria-turismo-scaled.jpg",
+      "counter": 13852
+    },
+    {
+      "_id": "co-vacantes-en-mantenimiento-reparaciones",
+      "slug": "vacantes-en-mantenimiento-reparaciones",
+      "h1": "Trabajos en Mantenimiento y reparaciones",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-mantenimiento-reparaciones.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074619/mantenimiento-reparaciones.jpg",
+      "counter": 13830
+    },
+    {
+      "_id": "co-vacantes-en-deporte-recreacion",
+      "slug": "vacantes-en-deporte-recreacion",
+      "h1": "Trabajos en Deporte y recreación",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-deporte-recreacion.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074507/deporte-recreacion.jpg",
+      "counter": 11262
+    },
+    {
+      "_id": "co-vacantes-en-call-center-telemercadeo",
+      "slug": "vacantes-en-call-center-telemercadeo",
+      "h1": "Trabajos en Call Center, Telemercadeo",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-call-center.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074427/call-center-telemercadeo-scaled.jpg",
+      "counter": 10668
+    },
+    {
+      "_id": "co-vacantes-en-servicios-generales-aseo-seguridad",
+      "slug": "vacantes-en-servicios-generales-aseo-seguridad",
+      "h1": "Trabajos en Servicios generales, aseo y seguridad",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-servicios-generales.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074716/servicios-generales-aseo-seguridad.jpg",
+      "counter": 10497
+    },
+    {
+      "_id": "co-vacantes-en-gastronomia-bebidas-alimentos",
+      "slug": "vacantes-en-gastronomia-bebidas-alimentos",
+      "h1": "Trabajos en Gastronomía, Bebidas/Alimentos",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-gastronomia.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074537/gastronomia-bebidas-alimentos.jpg",
+      "counter": 7775
+    },
+    {
+      "_id": "co-vacantes-en-contabilidad-finanzas-impuestos",
+      "slug": "vacantes-en-contabilidad-finanzas-impuestos",
+      "h1": "Trabajos en Contabilidad, Finanzas, Impuestos",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-contabilidad-finanzas.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074504/contabilidad-finanzas-impuestos.jpg",
+      "counter": 6077
+    },
+    {
+      "_id": "co-vacantes-en-medicina-sector-salud",
+      "slug": "vacantes-en-medicina-sector-salud",
+      "h1": "Trabajos en Medicina, sector de la salud y ciencias",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-medicina-salud.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074638/medicina-sector-de-la-salud-y-ciencias-scaled.jpg",
+      "counter": 4462
+    },
+    {
+      "_id": "co-vacantes-en-construccion-infrasestructura",
+      "slug": "vacantes-en-construccion-infrasestructura",
+      "h1": "Trabajos en Construcción e infraestructura",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-construccion.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074500/construccion-e-infraestructura-scaled.jpg",
+      "counter": 4083
+    },
+    {
+      "_id": "co-vacantes-en-software-informatica-telecomunicaciones",
+      "slug": "vacantes-en-software-informatica-telecomunicaciones",
+      "h1": "Trabajos en Software, Informática y Telecomunicaciones",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-software.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074729/software-informatica-y-telecomunicaciones-scaled.jpg",
+      "counter": 3200
+    },
+    {
+      "_id": "co-vacantes-en-ingenierias",
+      "slug": "vacantes-en-ingenierias",
+      "h1": "Trabajos en Ingenierías",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-ingenierias.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074613/ingenierias.jpg",
+      "counter": 2911
+    },
+    {
+      "_id": "co-vacantes-en-hoteleria-turismo",
+      "slug": "vacantes-en-hoteleria-turismo",
+      "h1": "Trabajos en Hotelería y turismo",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-hoteleria.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074604/hoteleria-turismo-scaled.jpg",
+      "counter": 2610
+    },
+    {
+      "_id": "co-vacantes-en-recursos-humanos",
+      "slug": "vacantes-en-recursos-humanos",
+      "h1": "Trabajos en Recursos Humanos",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-recursos-humanos.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074646/recursos-humanos.jpg",
+      "counter": 2426
+    },
+    {
+      "_id": "co-vacantes-en-direccion-gerencia",
+      "slug": "vacantes-en-direccion-gerencia",
+      "h1": "Trabajos en Dirección y gerencia",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-direccion-gerencia.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074512/direccion-gerencia.jpg",
+      "counter": 1791
+    },
+    {
+      "_id": "co-vacantes-en-mecanica-sector-automotriz",
+      "slug": "vacantes-en-mecanica-sector-automotriz",
+      "h1": "Trabajos en Mecánica y sector automotriz",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-mecanica-automotriz.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074621/mecanica-sector-automotriz.jpg",
+      "counter": 1763
+    },
+    {
+      "_id": "co-vacantes-en-compras-comercio-exterior",
+      "slug": "vacantes-en-compras-comercio-exterior",
+      "h1": "Trabajos en Compras y comercio exterior",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-compras-comercio.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074429/compras-comercio-exterior.jpg",
+      "counter": 1294
+    },
+    {
+      "_id": "co-vacantes-en-investigacion-calidad",
+      "slug": "vacantes-en-investigacion-calidad",
+      "h1": "Trabajos en Investigación y calidad",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-investigacion-calidad.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074617/investigacion-calidad.jpg",
+      "counter": 974
+    },
+    {
+      "_id": "co-vacantes-en-docencia-educacion-licenciaturas",
+      "slug": "vacantes-en-docencia-educacion-licenciaturas",
+      "h1": "Trabajos en Docencia, educación, licenciatura",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-docencia-educacion.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074520/docencia-educacion-licenciatura.jpg",
+      "counter": 734
+    },
+    {
+      "_id": "co-vacantes-en-economia-estadistica-matematicas",
+      "slug": "vacantes-en-economia-estadistica-matematicas",
+      "h1": "Trabajos en Economía, estadística, matemáticas y afines",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-economia.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27075621/economia-estadisticas-matematicas.jpg",
+      "counter": 732
+    },
+    {
+      "_id": "co-vacantes-en-inversiones-mercado-bursatil",
+      "slug": "vacantes-en-inversiones-mercado-bursatil",
+      "h1": "Trabajos en Inversiones y mercado bursátil",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-inversiones-mercadeo.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074615/inversiones-mercado-bursatil.jpg",
+      "counter": 677
+    },
+    {
+      "_id": "co-vacantes-en-comunicacion-periodismo",
+      "slug": "vacantes-en-comunicacion-periodismo",
+      "h1": "Trabajos en Comunicación y periodismo",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-comunicacion-periodismo.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074448/comunicacion-y-periodismo-scaled.jpg",
+      "counter": 460
+    },
+    {
+      "_id": "co-vacantes-en-diseno-arquitectura-artes-graficas",
+      "slug": "vacantes-en-diseno-arquitectura-artes-graficas",
+      "h1": "Trabajos en Diseño, arquitectura, artes gráficas",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-diseno-arquitectura.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074515/diseno-arquitectura-artes-graficas.jpg",
+      "counter": 448
+    },
+    {
+      "_id": "co-vacantes-en-zoologia-veterinario-sector-agroindustrial",
+      "slug": "vacantes-en-zoologia-veterinario-sector-agroindustrial",
+      "h1": "Trabajos en Zoología, veterinario y sector agroindustrial",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-zoologia.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074736/zoologia-veterinario-sector-agroindustrial.jpg",
+      "counter": 335
+    },
+    {
+      "_id": "co-vacantes-en-transportador-energia",
+      "slug": "vacantes-en-transportador-energia",
+      "h1": "Trabajos en Transportador de energía",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-transportador-energia.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074731/transportador-energia.jpg",
+      "counter": 322
+    },
+    {
+      "_id": "co-vacantes-en-sector-gobierno-ong-politica",
+      "slug": "vacantes-en-sector-gobierno-ong-politica",
+      "h1": "Trabajos en Política, ONG, sector gobierno y fundaciones",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-politica-gobierno.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074710/sector-gobierno-politica-scaled.jpg",
+      "counter": 292
+    },
+    {
+      "_id": "co-vacantes-en-derecho-asesoria",
+      "slug": "vacantes-en-derecho-asesoria",
+      "h1": "Trabajos en Derecho, asesoría y afines",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-derecho.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074510/derecho-asesoria.jpg",
+      "counter": 234
+    },
+    {
+      "_id": "co-vacantes-en-industria-aviacion",
+      "slug": "vacantes-en-industria-aviacion",
+      "h1": "Trabajos en Industria de la aviación y afines",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-aviacion.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074611/industria-aviacion.jpg",
+      "counter": 197
+    },
+    {
+      "_id": "co-vacantes-en-idiomas-traduccion",
+      "slug": "vacantes-en-idiomas-traduccion",
+      "h1": "Trabajos en Idiomas y traducción",
+      "iconUrl": "https://static.magneto365.com/meta/sector/sector-idiomas-traduccion.svg",
+      "imageUrl": "https://static.magneto365.com/wordpress/2025/05/27074608/idiomas-traduccion.jpg",
+      "counter": 166
+    }
+  ]
+}

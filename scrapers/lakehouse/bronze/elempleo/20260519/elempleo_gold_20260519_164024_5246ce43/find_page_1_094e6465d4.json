@@ -1,0 +1,12 @@
+{
+  "endpoint": "https://www.elempleo.com/co/api/joboffers/findbyfilter",
+  "request": {
+    "searchText": "sostenibilidad ESG eficiencia energetica",
+    "page": 1,
+    "rows": 5
+  },
+  "status_code": 401,
+  "response": {
+    "message": "Authorization has been denied for this request."
+  }
+}

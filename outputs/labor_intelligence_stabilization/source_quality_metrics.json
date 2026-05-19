@@ -1,0 +1,44 @@
+[
+  {
+    "source": "computrabajo",
+    "success_rate": 0.0,
+    "relevance_rate": 0.0,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.0,
+    "extraction_date": "2026-05-19",
+    "raw_jobs": 0,
+    "normalized_jobs": 0,
+    "relevant_jobs": 0,
+    "timeout_count": 0,
+    "error_count": 0,
+    "notes": "computed_from_labor_engine_validation_phase_1"
+  },
+  {
+    "source": "elempleo",
+    "success_rate": 0.375,
+    "relevance_rate": 0.4474,
+    "timeout_rate": 1.0,
+    "duplication_rate": 0.1316,
+    "extraction_date": "2026-05-19",
+    "raw_jobs": 38,
+    "normalized_jobs": 38,
+    "relevant_jobs": 17,
+    "timeout_count": 8,
+    "error_count": 8,
+    "notes": "computed_from_labor_engine_validation_phase_1"
+  },
+  {
+    "source": "servicio_publico_empleo",
+    "success_rate": 0.75,
+    "relevance_rate": 0.1667,
+    "timeout_rate": 0.0,
+    "duplication_rate": 0.1754,
+    "extraction_date": "2026-05-19",
+    "raw_jobs": 28,
+    "normalized_jobs": 6,
+    "relevant_jobs": 1,
+    "timeout_count": 0,
+    "error_count": 0,
+    "notes": "computed_from_labor_engine_validation_phase_1"
+  }
+]

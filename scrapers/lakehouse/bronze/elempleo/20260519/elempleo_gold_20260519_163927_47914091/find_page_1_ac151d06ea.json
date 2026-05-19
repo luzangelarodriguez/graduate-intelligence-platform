@@ -1,0 +1,14 @@
+{
+  "endpoint": "https://www.elempleo.com/co/api/joboffers/findbyfilter",
+  "request": {
+    "filtros": {
+      "trabajo": "analista de datos"
+    },
+    "pagina": 1,
+    "tamanoPagina": 10
+  },
+  "status_code": 401,
+  "response": {
+    "message": "Authorization has been denied for this request."
+  }
+}

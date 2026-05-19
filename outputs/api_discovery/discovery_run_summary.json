@@ -1,0 +1,43 @@
+{
+  "stamp": "20260519_162554",
+  "results": [
+    {
+      "command": [
+        "C:\\Users\\SoporteTI\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scrapers/discovery/bundle_inspector.py",
+        "--sources",
+        "magneto",
+        "elempleo",
+        "--max-bundles",
+        "8",
+        "--output",
+        "outputs/api_discovery/bundle_findings_20260519_162554.json",
+        "--run-id",
+        "bundle_inspector_20260519_162554",
+        "--write-db"
+      ],
+      "returncode": 0,
+      "stdout": "{\"findings\": 679, \"errors\": 0, \"output\": \"outputs/api_discovery/bundle_findings_20260519_162554.json\", \"run_id\": \"bundle_inspector_20260519_162554\"}",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\SoporteTI\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scrapers/discovery/xhr_capture.py",
+        "--sources",
+        "magneto",
+        "elempleo",
+        "--wait-ms",
+        "6000",
+        "--output",
+        "outputs/api_discovery/xhr_capture_20260519_162554.json",
+        "--run-id",
+        "xhr_capture_20260519_162554",
+        "--write-db"
+      ],
+      "returncode": 0,
+      "stdout": "{\"hits\": 221, \"output\": \"outputs/api_discovery/xhr_capture_20260519_162554.json\", \"run_id\": \"xhr_capture_20260519_162554\"}",
+      "stderr": ""
+    }
+  ]
+}

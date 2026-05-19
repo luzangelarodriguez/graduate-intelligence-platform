@@ -1,0 +1,84 @@
+{
+  "raw_jobs": [
+    {
+      "portal": "servicio_publico_empleo",
+      "titulo": "Inicio",
+      "titulo_normalizado": "inicio",
+      "empresa": "",
+      "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+      "modalidad": "",
+      "salario": "",
+      "descripcion": "Registre sus vacantes Home / Registre sus Vacantes Servicio Público de Empleo Registre sus vacantes La Red de Prestadores de la Unidad del Servicio Público de Empleo es un aliado estratégico de las empresas al apoyar a sus oficinas de talento humano para encontrar los perfiles idóneos, remitiendo candidatos competentes que cumplan los requerimientos para ocupar un puesto de trabajo. Lo anterior, le permite al sector empresarial reducir costos en sus procesos de selección de personal. Registre sus vacantes Prestadores públicos En prestadores públicos (SENA, cajas y alcaldías) accede GRATIS a registro de empresa, vacantes y preselección de candidatos. Ver más información Prestadores privados Encuentre servicios especializados de preselección y remisión de talento humano. “Las tarifas varían de acuerdo al prestador”. Ver más información Bolsa de universidades En las bolsas de empleo universitarias, registre su empresa y sus vacantes y acceda a perfiles de egresados, estudiantes y afiliados. Ver más información",
+      "seniority": "mid",
+      "sector": "",
+      "dominio": "gestion_humana",
+      "fecha_publicacion": null,
+      "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/",
+      "portal_origen": "servicio_publico_empleo",
+      "timestamp_extraccion": "2026-05-19T15:06:57.824073+00:00",
+      "skills": [],
+      "skill_matches": [],
+      "hash_contenido": "0a2bca21ecfe5363efa4d4d102927173e60547e641d76cdfd9ec0a2d40f1d2ed"
+    }
+  ],
+  "normalized_jobs": [
+    {
+      "portal": "servicio_publico_empleo",
+      "titulo": "Inicio",
+      "titulo_normalizado": "inicio",
+      "empresa": "",
+      "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+      "modalidad": "",
+      "salario": "",
+      "descripcion": "Registre sus vacantes Home / Registre sus Vacantes Servicio Público de Empleo Registre sus vacantes La Red de Prestadores de la Unidad del Servicio Público de Empleo es un aliado estratégico de las empresas al apoyar a sus oficinas de talento humano para encontrar los perfiles idóneos, remitiendo candidatos competentes que cumplan los requerimientos para ocupar un puesto de trabajo. Lo anterior, le permite al sector empresarial reducir costos en sus procesos de selección de personal. Registre sus vacantes Prestadores públicos En prestadores públicos (SENA, cajas y alcaldías) accede GRATIS a registro de empresa, vacantes y preselección de candidatos. Ver más información Prestadores privados Encuentre servicios especializados de preselección y remisión de talento humano. “Las tarifas varían de acuerdo al prestador”. Ver más información Bolsa de universidades En las bolsas de empleo universitarias, registre su empresa y sus vacantes y acceda a perfiles de egresados, estudiantes y afiliados. Ver más información",
+      "seniority": "mid",
+      "sector": "",
+      "dominio": "gestion_humana",
+      "fecha_publicacion": null,
+      "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/",
+      "embedding": null,
+      "timestamp_extraccion": "2026-05-19T15:06:57.824073+00:00",
+      "skill_matches": [],
+      "rejected_skill_matches": [],
+      "score_disciplinar": 0.778,
+      "skills": [],
+      "skills_rechazadas": [],
+      "hash_contenido": "0a2bca21ecfe5363efa4d4d102927173e60547e641d76cdfd9ec0a2d40f1d2ed",
+      "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1"
+    }
+  ],
+  "summary": {
+    "domain": "gestion_humana",
+    "query": "recursos humanos talento humano compensacion seleccion bienestar organizacional",
+    "expected_domains": [
+      "gestion_humana",
+      "management"
+    ],
+    "raw_jobs": 1,
+    "normalized_jobs": 1,
+    "duplicates_removed": 0,
+    "precision_observed_pct": 100.0,
+    "avg_disciplinary_score": 0.778,
+    "assigned_domains": {
+      "gestion_humana": 1
+    },
+    "source_counts": {
+      "servicio_publico_empleo": 1
+    },
+    "top_accepted_skills": [],
+    "top_rejected_skills": [],
+    "contaminations": [],
+    "sample_jobs": [
+      {
+        "portal": "servicio_publico_empleo",
+        "titulo": "Inicio",
+        "empresa": "",
+        "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+        "dominio": "gestion_humana",
+        "skills": [],
+        "skills_rechazadas": [],
+        "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+      }
+    ]
+  }
+}

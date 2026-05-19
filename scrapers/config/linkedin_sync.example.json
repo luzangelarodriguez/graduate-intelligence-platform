@@ -1,0 +1,7 @@
+{
+  "company_apply_url": "https://careers.example.com/apply",
+  "integration_context": "urn:li:organization:123456",
+  "company_urn": "urn:li:company:123456",
+  "contract_urn": "urn:li:contract:123456",
+  "poster_email": "talent@example.com"
+}

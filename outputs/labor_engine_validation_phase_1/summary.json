@@ -1,0 +1,731 @@
+{
+  "results": [
+    {
+      "domain": "ambiental_energia",
+      "query": "sostenibilidad ESG eficiencia energetica huella de carbono ISO 14001 energias renovables",
+      "expected_domains": [
+        "ambiental",
+        "energia"
+      ],
+      "raw_jobs": 17,
+      "normalized_jobs": 11,
+      "duplicates_removed": 6,
+      "precision_observed_pct": 63.64,
+      "avg_disciplinary_score": 0.744,
+      "assigned_domains": {
+        "gestion_humana": 1,
+        "energia": 4,
+        "ambiental": 3,
+        "management": 3
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1,
+        "elempleo": 10
+      },
+      "top_accepted_skills": [
+        [
+          "eficiencia energetica",
+          1
+        ],
+        [
+          "sostenibilidad",
+          1
+        ],
+        [
+          "esg",
+          1
+        ],
+        [
+          "transicion energetica",
+          1
+        ]
+      ],
+      "top_rejected_skills": [],
+      "contaminations": [
+        {
+          "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1",
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "dominio": "gestion_humana",
+          "skills": []
+        },
+        {
+          "id": "elempleo:6138fef4933d5ee2858c9b7e",
+          "portal": "elempleo",
+          "titulo": "Technical writer senior (gobernanza ti & normas iso) - bilingüe / analista de procesos y calidad ti",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:78d4fd4d69850bf176d99bbc",
+          "portal": "elempleo",
+          "titulo": "¿listo(a) para dejar huella y no solo cumplir metas? (md)",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:90e07a223324e64b6415eff7",
+          "portal": "elempleo",
+          "titulo": "¿listo(a) para dejar huella y no solo cumplir metas? (bg)",
+          "dominio": "management",
+          "skills": []
+        }
+      ],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Ingeniero comercial de eficiencia energética",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "energia",
+          "skills": [
+            "eficiencia energetica"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/ingeniero-comercial-de-eficiencia-energetica-1886685058"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Director técnico energía",
+          "empresa": "MANPOWER",
+          "ciudad": "",
+          "dominio": "energia",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/director-tecnico-energia-1886709065"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista calidad - iso 9001 2015, 14001,45001",
+          "empresa": "Aseocolba S. A.",
+          "ciudad": "",
+          "dominio": "ambiental",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-calidad-iso-9001-2015-1400145001-1886664272"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista de sostenibilidad y ambiente- bogotà",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "ambiental",
+          "skills": [
+            "sostenibilidad"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-de-sostenibilidad-y-ambiente-bogota-1886708539"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista esg y clima junior",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "ambiental",
+          "skills": [
+            "esg"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-esg-y-clima-junior-1886684147"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Asesor comercial - sector energía",
+          "empresa": "MICHAEL PAGE INTERNATIONAL",
+          "ciudad": "",
+          "dominio": "energia",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/asesor-comercial-sector-energia-1886611508"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Technical writer senior (gobernanza ti & normas iso) - bilingüe / analista de procesos y calidad ti",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/technical-writer-senior-gobernanza-ti-normas-iso-bilingue-analista-de-procesos-y-calidad-ti-1886692790"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Docente de especialización gerencia para la transición energética (tiempo completo)",
+          "empresa": "CUN",
+          "ciudad": "",
+          "dominio": "energia",
+          "skills": [
+            "transicion energetica"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/docente-de-especializacion-gerencia-para-la-transicion-energetica-tiempo-completo-1886695344"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "¿listo(a) para dejar huella y no solo cumplir metas? (md)",
+          "empresa": "EDITORA TKE LEARNING COLOMBIA SAS",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/listoa-para-dejar-huella-y-no-solo-cumplir-metas-md-1886705800"
+        }
+      ]
+    },
+    {
+      "domain": "datos_analitica",
+      "query": "analista de datos power bi sql python big data visual analytics",
+      "expected_domains": [
+        "analitica",
+        "ti"
+      ],
+      "raw_jobs": 1,
+      "normalized_jobs": 1,
+      "duplicates_removed": 0,
+      "precision_observed_pct": 0.0,
+      "avg_disciplinary_score": 0.778,
+      "assigned_domains": {
+        "gestion_humana": 1
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1
+      },
+      "top_accepted_skills": [],
+      "top_rejected_skills": [],
+      "contaminations": [
+        {
+          "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1",
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "dominio": "gestion_humana",
+          "skills": []
+        }
+      ],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        }
+      ]
+    },
+    {
+      "domain": "ciberseguridad",
+      "query": "seguridad informatica ciberseguridad SOC ISO 27001 ethical hacking",
+      "expected_domains": [
+        "cybersecurity",
+        "ti"
+      ],
+      "raw_jobs": 1,
+      "normalized_jobs": 1,
+      "duplicates_removed": 0,
+      "precision_observed_pct": 0.0,
+      "avg_disciplinary_score": 0.778,
+      "assigned_domains": {
+        "gestion_humana": 1
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1
+      },
+      "top_accepted_skills": [],
+      "top_rejected_skills": [],
+      "contaminations": [
+        {
+          "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1",
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "dominio": "gestion_humana",
+          "skills": []
+        }
+      ],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        }
+      ]
+    },
+    {
+      "domain": "gestion_humana",
+      "query": "recursos humanos talento humano compensacion seleccion bienestar organizacional",
+      "expected_domains": [
+        "gestion_humana",
+        "management"
+      ],
+      "raw_jobs": 1,
+      "normalized_jobs": 1,
+      "duplicates_removed": 0,
+      "precision_observed_pct": 100.0,
+      "avg_disciplinary_score": 0.778,
+      "assigned_domains": {
+        "gestion_humana": 1
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1
+      },
+      "top_accepted_skills": [],
+      "top_rejected_skills": [],
+      "contaminations": [],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        }
+      ]
+    },
+    {
+      "domain": "derecho_digital",
+      "query": "derecho digital proteccion de datos habeas data compliance legaltech",
+      "expected_domains": [
+        "legal",
+        "legal-tech"
+      ],
+      "raw_jobs": 17,
+      "normalized_jobs": 14,
+      "duplicates_removed": 3,
+      "precision_observed_pct": 28.57,
+      "avg_disciplinary_score": 0.917,
+      "assigned_domains": {
+        "gestion_humana": 1,
+        "legal-tech": 3,
+        "legal": 1,
+        "cybersecurity": 9
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1,
+        "elempleo": 13
+      },
+      "top_accepted_skills": [
+        [
+          "derecho digital",
+          2
+        ],
+        [
+          "proteccion de datos",
+          2
+        ],
+        [
+          "compliance",
+          1
+        ]
+      ],
+      "top_rejected_skills": [],
+      "contaminations": [
+        {
+          "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1",
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "dominio": "gestion_humana",
+          "skills": []
+        },
+        {
+          "id": "elempleo:61e67ae14bedf6897f51efea",
+          "portal": "elempleo",
+          "titulo": "Analista de ciberseguridad",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:cb525b831d4fb93ff2c83498",
+          "portal": "elempleo",
+          "titulo": "Administrador de ciberseguridad / microsoft defender",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:9c9b810dfb0834c0f85036d2",
+          "portal": "elempleo",
+          "titulo": "Analista de seguridad informatica",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:8440f9bc1184663f715cf6e1",
+          "portal": "elempleo",
+          "titulo": "Administrador de ciberseguridad / vulnerabilidad",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:d32d96ecdfe3968a1d69ccf5",
+          "portal": "elempleo",
+          "titulo": "Analista de ciberseguridad",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:eb7bb191d6a24f2f7b714cda",
+          "portal": "elempleo",
+          "titulo": "Jefe de ciberseguridad ti",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:84750c5ebdf5c4d7e6db160a",
+          "portal": "elempleo",
+          "titulo": "Analista de seguridad de la información y ciberseguridad",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:5c87ac62efb83c2873a6b217",
+          "portal": "elempleo",
+          "titulo": "Analista de ciberseguridad",
+          "dominio": "cybersecurity",
+          "skills": []
+        },
+        {
+          "id": "elempleo:c14de03db966735d7e6247cb",
+          "portal": "elempleo",
+          "titulo": "Director de seguridad informatica",
+          "dominio": "cybersecurity",
+          "skills": []
+        }
+      ],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista de protección de datos y derecho digital bilingüe",
+          "empresa": "ADECCO COLOMBIA S A",
+          "ciudad": "",
+          "dominio": "legal-tech",
+          "skills": [
+            "derecho digital",
+            "proteccion de datos"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-de-proteccion-de-datos-y-derecho-digital-bilingue-1886690430"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Profesional de habeas data (abogado)",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "legal-tech",
+          "skills": [
+            "proteccion de datos"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/profesional-de-habeas-data-abogado-1886688927"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Docente hora cátedra derecho digital, legaltech o transformación digital",
+          "empresa": "FUCS",
+          "ciudad": "",
+          "dominio": "legal-tech",
+          "skills": [
+            "derecho digital"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/docente-hora-catedra-derecho-digital-legaltech-o-transformacion-digital-1886683881"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Abogado compliance",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "legal",
+          "skills": [
+            "compliance"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/abogado-compliance-1886688929"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista de ciberseguridad",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "cybersecurity",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-de-ciberseguridad-1886689409"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Administrador de ciberseguridad / microsoft defender",
+          "empresa": "TIVIT COLOMBIA SAS",
+          "ciudad": "",
+          "dominio": "cybersecurity",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/administrador-de-ciberseguridad-microsoft-defender-1886710137"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista de seguridad informatica",
+          "empresa": "Universidad Cooperativa de Colombia",
+          "ciudad": "",
+          "dominio": "cybersecurity",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-de-seguridad-informatica-1886709733"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Administrador de ciberseguridad / vulnerabilidad",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "cybersecurity",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/administrador-de-ciberseguridad-vulnerabilidad-1886698473"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Analista de ciberseguridad",
+          "empresa": "ENTELGY COLOMBIA S.A.S",
+          "ciudad": "",
+          "dominio": "cybersecurity",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/analista-de-ciberseguridad-1886707224"
+        }
+      ]
+    },
+    {
+      "domain": "educacion",
+      "query": "educacion inclusiva orientacion familiar pedagogia TIC educativas",
+      "expected_domains": [
+        "educacion"
+      ],
+      "raw_jobs": 17,
+      "normalized_jobs": 16,
+      "duplicates_removed": 1,
+      "precision_observed_pct": 37.5,
+      "avg_disciplinary_score": 0.644,
+      "assigned_domains": {
+        "gestion_humana": 2,
+        "management": 6,
+        "educacion": 6,
+        "ti": 2
+      },
+      "source_counts": {
+        "servicio_publico_empleo": 1,
+        "elempleo": 15
+      },
+      "top_accepted_skills": [
+        [
+          "diseno curricular",
+          1
+        ]
+      ],
+      "top_rejected_skills": [],
+      "contaminations": [
+        {
+          "id": "servicio_publico_empleo:0a2bca21ecfe5363efa4d4d1",
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "dominio": "gestion_humana",
+          "skills": []
+        },
+        {
+          "id": "elempleo:0620fa364d45e1bca114e1e2",
+          "portal": "elempleo",
+          "titulo": "Líder de modalidades educativas con el uso de tic",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:a99f5ea3eeca049012b1d3d0",
+          "portal": "elempleo",
+          "titulo": "Psicologa educativa",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:e696aefbd396928aa675a9fd",
+          "portal": "elempleo",
+          "titulo": "Lider de formación y desarrollo / profesional de formación, bienestar y desarrollo",
+          "dominio": "gestion_humana",
+          "skills": []
+        },
+        {
+          "id": "elempleo:cf7cb17136d93f727ab6905f",
+          "portal": "elempleo",
+          "titulo": "Director de formacion en seguros",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:07d48ac5720b56c2908ed348",
+          "portal": "elempleo",
+          "titulo": "Auxiliar de entrenamiento / formación / capacitación comercial",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:15542ce47956db12f6e08280",
+          "portal": "elempleo",
+          "titulo": "Analista de formación y desarrollo",
+          "dominio": "ti",
+          "skills": []
+        },
+        {
+          "id": "elempleo:d0a69e524118efda84cfa3e6",
+          "portal": "elempleo",
+          "titulo": "Analista de formación",
+          "dominio": "management",
+          "skills": []
+        },
+        {
+          "id": "elempleo:31d8c20781dad8f4826474a8",
+          "portal": "elempleo",
+          "titulo": "Profesional en desarrollo y formación de personal",
+          "dominio": "ti",
+          "skills": []
+        },
+        {
+          "id": "elempleo:d2ea82ef7ed054be04f6fcb4",
+          "portal": "elempleo",
+          "titulo": "Director de formacion comercial",
+          "dominio": "management",
+          "skills": []
+        }
+      ],
+      "sample_jobs": [
+        {
+          "portal": "servicio_publico_empleo",
+          "titulo": "Inicio",
+          "empresa": "",
+          "ciudad": "Search Inicio Open Inicio Sobre el SPE Open Sobre el SPE Transparencia e información Open Transparencia e información Atención a la ciudadanía Open Atención a la ciudadanía Participa Open Participa Busca empleo Open Busca empleo Normativa Open Normativa Prensa Open Prensa",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.serviciodeempleo.gov.co/registro-de-vacantes/"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Líder de modalidades educativas con el uso de tic",
+          "empresa": "FUNDACIÓN UNIVERSITARIA NAVARRA",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/lider-de-modalidades-educativas-con-el-uso-de-tic-1886697176"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Psicologa educativa",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/psicologa-educativa-1886580901"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Lider de formación y desarrollo / profesional de formación, bienestar y desarrollo",
+          "empresa": "MANPOWER",
+          "ciudad": "",
+          "dominio": "gestion_humana",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/lider-de-formacion-y-desarrollo-profesional-de-formacion-bienestar-y-desarrollo-1886708643"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Enfermera con formación en pedagogía infantil - cali",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "educacion",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/enfermera-con-formacion-en-pedagogia-infantil-cali-1886700623"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Profesional en pedagogía o en educación -dirección campus virtual",
+          "empresa": "UNIVERSIDAD SANTO TOMAS",
+          "ciudad": "",
+          "dominio": "educacion",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/profesional-en-pedagogia-o-en-educacion-direccion-campus-virtual-1886706790"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Profesional de aprendizaje -máster en educación conocimiento en pedagogía y currículo",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "educacion",
+          "skills": [
+            "diseno curricular"
+          ],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/profesional-de-aprendizaje-master-en-educacion-conocimiento-en-pedagogia-y-curriculo-1886689975"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Rector(a) de institución de educación superior",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "educacion",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/rectora-de-institucion-de-educacion-superior-1886707574"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Director de formacion en seguros",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/director-de-formacion-en-seguros-1886710467"
+        },
+        {
+          "portal": "elempleo",
+          "titulo": "Auxiliar de entrenamiento / formación / capacitación comercial",
+          "empresa": "Empresa confidencial",
+          "ciudad": "",
+          "dominio": "management",
+          "skills": [],
+          "skills_rechazadas": [],
+          "url": "https://www.elempleo.com/co/ofertas-trabajo/auxiliar-de-entrenamiento-formacion-capacitacion-comercial-1886705033"
+        }
+      ]
+    }
+  ],
+  "source_errors": {}
+}

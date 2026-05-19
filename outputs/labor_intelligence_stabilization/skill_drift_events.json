@@ -1,0 +1,26 @@
+[
+  {
+    "skill_normalized": "derecho digital",
+    "skill_domain": "legal-tech",
+    "current_count": 2,
+    "baseline_count": 1,
+    "growth_rate": 1.0,
+    "detection_date": "2026-05-19",
+    "status": "growth",
+    "evidence": {
+      "source": "labor_engine_validation_phase_1"
+    }
+  },
+  {
+    "skill_normalized": "proteccion de datos",
+    "skill_domain": "legal-tech",
+    "current_count": 2,
+    "baseline_count": 1,
+    "growth_rate": 1.0,
+    "detection_date": "2026-05-19",
+    "status": "growth",
+    "evidence": {
+      "source": "labor_engine_validation_phase_1"
+    }
+  }
+]

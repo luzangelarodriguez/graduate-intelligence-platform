@@ -1,0 +1,2 @@
+"""Bronze raw payload persistence."""
+

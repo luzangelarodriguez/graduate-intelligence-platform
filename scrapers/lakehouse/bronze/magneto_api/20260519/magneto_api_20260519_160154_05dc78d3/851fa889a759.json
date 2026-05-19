@@ -1,0 +1,7 @@
+{
+  "endpoint": "https://api.magneto365.com/jobs/v1/vacancies?search=analista+de+datos&country_id=47&page=1&per_page=20",
+  "payload": {
+    "non_json_response": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /jobs/v1/vacancies</pre>\n</body>\n</html>\n",
+    "content_type": "text/html; charset=utf-8"
+  }
+}

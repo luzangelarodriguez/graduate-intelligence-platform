@@ -1,0 +1,25 @@
+<aside class="sidebar">
+  <div class="sidebar__brand">
+    <div class="brand-mark">unir</div>
+    <div class="brand-copy">
+      <strong>Observatorio de especializaciones</strong>
+      <span>Fundación Universitaria Internacional de La Rioja</span>
+    </div>
+  </div>
+  <div class="sidebar__section">
+    <div class="sidebar__label">Navegación</div>
+    <div class="sidebar__menu">
+      <a class="{% if active == 'dashboard' %}active{% endif %}" href="{{ dashboard_url }}"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Resumen general</span></a>
+      <a class="{% if active == 'program' %}active{% endif %}" href="#resumen"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Resumen ejecutivo</span></a>
+      <a href="#alineacion"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Alineación</span></a>
+      <a href="#mercado-laboral"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Mercado laboral</span></a>
+      <a href="#empleos"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Empleos</span></a>
+      <a href="#brechas"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Brechas</span></a>
+      <a href="#recomendaciones"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Recomendaciones</span></a>
+      <a href="{{ url_for('registro') }}"><span class="sidebar-link__icon"></span><span class="sidebar-link__label">Registro estudiante</span></a>
+    </div>
+  </div>
+  <div class="sidebar__extra">
+    {{ sidebar_extra|safe }}
+  </div>
+</aside>

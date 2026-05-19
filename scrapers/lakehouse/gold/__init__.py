@@ -1,0 +1,2 @@
+"""Gold validated labor evidence."""
+
