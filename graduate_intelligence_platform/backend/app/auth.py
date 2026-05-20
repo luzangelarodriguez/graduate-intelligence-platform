@@ -15,7 +15,7 @@ from backend.repositories.base import cursor, fetch_one
 
 from .schemas import AuthLoginIn, AuthRegisterIn, LogoutIn, RefreshTokenIn, TokenPair, UserPublic
 
-DB_NAME = os.getenv("DB_NAME", "cliente_a_db")
+DB_NAME = os.getenv("DB_NAME")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("AUTH_SECRET_KEY", "dev-insecure-change-me"))
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))

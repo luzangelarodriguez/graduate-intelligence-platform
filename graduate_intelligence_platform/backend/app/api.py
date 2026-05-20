@@ -16,7 +16,7 @@ from .auth import require_current_user
 
 router = APIRouter()
 
-DB_NAME = os.getenv("DB_NAME", "cliente_a_db")
+DB_NAME = os.getenv("DB_NAME")
 MAX_LIMIT = 100
 
 AREA_KEYWORDS_BY_KEY = {
