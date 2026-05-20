@@ -1,10 +1,9 @@
-import { BarChart3, GraduationCap, ShieldCheck, UserRoundCheck } from 'lucide-react';
+import { BarChart3, GraduationCap, UserRoundCheck } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const items = [
   { to: '/', label: 'Observatorio', icon: BarChart3 },
   { to: '/programas', label: 'Inteligencia curricular', icon: GraduationCap },
-  { to: '/gobernanza-fuentes', label: 'Gobernanza de fuentes', icon: ShieldCheck },
   { to: '/registro', label: 'Egresados', icon: UserRoundCheck },
 ];
 

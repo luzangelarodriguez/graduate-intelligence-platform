@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 const navItems = [
   { to: '/', label: 'Observatorio' },
   { to: '/programas', label: 'Inteligencia curricular' },
-  { to: '/gobernanza-fuentes', label: 'Gobernanza de fuentes' },
   { to: '/registro', label: 'Egresados' },
 ];
 

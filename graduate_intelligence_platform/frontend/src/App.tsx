@@ -8,7 +8,6 @@ import { AlumniOnboardingPage } from './pages/AlumniOnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { ProgramsPage } from './pages/ProgramsPage';
-import { SourceGovernancePage } from './pages/SourceGovernancePage';
 
 export default function App() {
   return (
@@ -20,7 +19,6 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route index element={<DashboardPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
-              <Route path="/gobernanza-fuentes" element={<SourceGovernancePage />} />
               <Route path="/registro" element={<AlumniOnboardingPage />} />
             </Route>
           </Route>

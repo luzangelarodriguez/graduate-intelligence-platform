@@ -20,30 +20,6 @@ export interface DashboardKpisResponse {
   source: string;
 }
 
-export type SourceTier = 'Gold' | 'Silver' | 'Bronze' | 'Experimental';
-
-export interface SourceGovernanceRow {
-  source: string;
-  source_tier: SourceTier;
-  reliability_score: number;
-  freshness_score: number;
-  freshness_label: string;
-  contamination_rate: number;
-  blocked_auth_rate: number;
-  semantic_density: number;
-  evidence_quality: number;
-  extraction_completeness: number;
-  source_stability: number;
-  access_strategy: 'API' | 'scraping' | 'partnership' | 'licensed' | 'blocked_auth' | string;
-  access_risk_level: 'low' | 'medium' | 'high' | string;
-  gold_readiness: boolean;
-  raw_runs: number;
-  raw_jobs: number;
-  silver_jobs: number;
-  gold_jobs: number;
-  notes: string;
-}
-
 export interface ProgramDashboardKpis {
   alignment_score: number;
   missing_critical_skills: number;

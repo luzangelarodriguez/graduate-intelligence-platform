@@ -386,10 +386,6 @@ def build_dashboard(*, sources: list[str] | None = None, write_db: bool = False)
     json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     md_path.write_text(render_markdown(rows), encoding="utf-8")
     html_path.write_text(render_html(rows), encoding="utf-8")
-    frontend_public = ROOT_DIR / "graduate_intelligence_platform" / "frontend" / "public"
-    frontend_json_path = frontend_public / "source_governance_dashboard.json"
-    if frontend_public.exists():
-        frontend_json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     if write_db:
         persist_governance(rows)
     return {
@@ -397,7 +393,6 @@ def build_dashboard(*, sources: list[str] | None = None, write_db: bool = False)
         "json": str(json_path),
         "markdown": str(md_path),
         "html": str(html_path),
-        "frontend_json": str(frontend_json_path) if frontend_public.exists() else None,
         "write_db": write_db,
     }
 

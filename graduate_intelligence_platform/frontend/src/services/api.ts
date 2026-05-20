@@ -14,7 +14,6 @@ import type {
   RelatedUniversityProgram,
   RegisterPayload,
   RecommendationProgram,
-  SourceGovernanceRow,
   TokenPair,
 } from '../types/api';
 
@@ -162,14 +161,4 @@ export async function getJobRecommendations(programId: number, limit = 8) {
 export async function registerAlumni(payload: AlumniRegistrationPayload) {
   const { data } = await apiClient.post<AlumniRegistrationResponse>('/api/alumni/register', payload);
   return data;
-}
-
-export async function getSourceGovernanceDashboard() {
-  const response = await fetch(`/source_governance_dashboard.json?ts=${Date.now()}`, {
-    headers: { Accept: 'application/json' },
-  });
-  if (!response.ok) {
-    throw new Error('No fue posible cargar la gobernanza de fuentes.');
-  }
-  return (await response.json()) as SourceGovernanceRow[];
 }
