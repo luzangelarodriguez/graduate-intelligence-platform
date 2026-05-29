@@ -80,3 +80,29 @@ def test_semantic_search_endpoint(monkeypatch):
     payload = response.json()
     assert payload["entity_type"] == "role"
     assert payload["items"][0]["title"] == "Analytics Engineer"
+
+
+def test_observatory_status_endpoint(monkeypatch):
+    monkeypatch.setattr(
+        services,
+        "get_observatory_status",
+        lambda: {
+            "status": "partial_observatory",
+            "observatory_tables": {
+                "observatory_metrics": False,
+                "curriculum_gap_observatory": False,
+                "recommendation_observatory": False,
+            },
+            "missing_tables": [
+                "observatory_metrics",
+                "curriculum_gap_observatory",
+                "recommendation_observatory",
+            ],
+            "completion_percentage": 0.5,
+        },
+    )
+    response = client.get("/observatory-status")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "partial_observatory"
+    assert payload["completion_percentage"] == 0.5

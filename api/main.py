@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.contracts import HealthResponse, PaginatedResponse, SearchResponse
+from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, SearchResponse
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api import services
 
@@ -75,9 +75,12 @@ def health() -> dict[str, Any]:
 
 @app.get("/readiness", response_model=HealthResponse, tags=["system"])
 def readiness() -> dict[str, Any]:
-    snapshot = services.get_health_snapshot()
-    snapshot["status"] = "ready" if snapshot["database"] == "connected" and snapshot["checks"].get("jobs_table") else "degraded"
-    return snapshot
+    return services.get_readiness_snapshot()
+
+
+@app.get("/observatory-status", response_model=ObservatoryStatusResponse, tags=["system"])
+def observatory_status() -> dict[str, Any]:
+    return services.get_observatory_status()
 
 
 @app.get("/liveness", tags=["system"])
