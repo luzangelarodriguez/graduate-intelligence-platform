@@ -1,0 +1,1345 @@
+{
+  "run_id": "functional_ai_validation_f3d90e49fc",
+  "input_dir": "storage\\microcurriculos",
+  "summary": {
+    "documents_processed": 6,
+    "unique_document_hashes": 1,
+    "precision_approx": 1.0,
+    "recall_approx": 0.6667,
+    "domain_contamination_rate": 0.0,
+    "recommendation_coherence_score": 1.0,
+    "taxonomy_coverage": 0.9524,
+    "contextual_understanding_score": 0.9238,
+    "recommendation_quality_score": 1.0,
+    "domain_accuracy_heuristic": 1.0,
+    "readiness_for_university_pilot": "medio",
+    "missing_taxonomies": [
+      "innovacion"
+    ],
+    "contamination_events": [],
+    "overclassification_count": 0,
+    "underclassification_count": 0
+  },
+  "results": [
+    {
+      "file": "storage\\microcurriculos\\20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 1,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_0237dbeedc32",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 8.919
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 9.001,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    },
+    {
+      "file": "storage\\microcurriculos\\20260520_183929_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 2,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\20260520_183929_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\20260520_183929_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_a405b005b084",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 8.848
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 8.933,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    },
+    {
+      "file": "storage\\microcurriculos\\20260520_184116_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 3,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\20260520_184116_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\20260520_184116_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_9c3fd67f5628",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 8.517
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 8.609,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    },
+    {
+      "file": "storage\\microcurriculos\\20260520_184335_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 4,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\20260520_184335_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\20260520_184335_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_aa8c123b1b64",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 8.749
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 8.848,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    },
+    {
+      "file": "storage\\microcurriculos\\20260520_184649_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 5,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\20260520_184649_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\20260520_184649_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_fc78f50f2008",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 9.335
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 9.429,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    },
+    {
+      "file": "storage\\microcurriculos\\Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+      "file_hash": "2d37515dd9551380ccdf1eef6e17e1183f3d95ac17555f7ed155915f51d79b90",
+      "duplicate_index": 6,
+      "duplicate_count": 6,
+      "analysis": {
+        "programa": "Especialización en Ingeniería de Software",
+        "asignaturas": [
+          {
+            "nombre": "Direccion y gestion de proyectos",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "Computacion en la nube",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          },
+          {
+            "nombre": "DevOps",
+            "semestre": "",
+            "creditos": "",
+            "contenidos": [],
+            "metodologias": []
+          }
+        ],
+        "skills": [
+          "google cloud",
+          "mariadb",
+          "sql",
+          ".net",
+          "agile",
+          "devops",
+          "scrum",
+          "java",
+          "javascript",
+          "php",
+          "android",
+          "api",
+          "backend",
+          "cloud",
+          "android studio",
+          "eclipse",
+          "ide",
+          "netbeans",
+          "liderazgo",
+          "trabajo en equipo"
+        ],
+        "platforms": [
+          ".net"
+        ],
+        "competencias": [],
+        "missing_market_skills": [
+          "docker",
+          "python",
+          "react",
+          "rest api"
+        ],
+        "recommendations": [
+          {
+            "title": "Incorporar docker",
+            "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "docker",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar python",
+            "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "python",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar react",
+            "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "react",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Incorporar rest api",
+            "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+            "confidence": 0.7,
+            "evidence": {
+              "skill": "rest api",
+              "domain": "ti",
+              "demand_count": 1,
+              "evidence_jobs": []
+            }
+          },
+          {
+            "title": "Revisar tecnologias con baja senal laboral",
+            "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+            "confidence": 0.68,
+            "evidence": {
+              "skills": [
+                ".net",
+                "agile",
+                "android",
+                "android studio",
+                "api",
+                "backend",
+                "cloud",
+                "eclipse"
+              ],
+              "domain": "ti"
+            }
+          }
+        ],
+        "scores": {
+          "pertinencia_curricular": 0.4152,
+          "cobertura_skills_mercado": 0.4286,
+          "modernizacion_tecnologica": 1.0,
+          "alineacion_laboral": 0.5536,
+          "riesgo_obsolescencia": 0.75,
+          "recommendations_count": 5
+        },
+        "diagnostics": {
+          "source_document": "storage\\microcurriculos\\Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "stored_path": "storage\\microcurriculos\\Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+          "microcurriculo_id": null,
+          "run_id": "micro_9f81690bc9ac",
+          "page_count": 21,
+          "chars_by_page": [
+            4008,
+            2492,
+            2406,
+            1989,
+            3887,
+            1989,
+            2630,
+            1802,
+            1462,
+            2825,
+            3283,
+            934,
+            3019,
+            1318,
+            3421,
+            1760,
+            1128,
+            3259,
+            2140,
+            2118,
+            278
+          ],
+          "extraction_probe": "pdfplumber",
+          "extraction_method": "pdfplumber",
+          "clean_text_chars": 47715,
+          "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+          "domain": "ti",
+          "confidence": 0.86,
+          "confidence_level": "high",
+          "processing_seconds": 8.606
+        }
+      },
+      "validation": {
+        "expected_domain": "ti",
+        "domain_ok": true,
+        "precision_approx": 1.0,
+        "recall_approx": 0.6667,
+        "domain_contamination_rate": 0.0,
+        "taxonomy_coverage": 0.9524,
+        "contextual_understanding_score": 0.9238,
+        "expected_skills_present_in_text": [
+          "cloud",
+          "devops"
+        ],
+        "expected_skills_detected": [
+          "cloud",
+          "devops"
+        ],
+        "important_missing_skills": [
+          "innovacion"
+        ],
+        "possible_false_positives": [],
+        "contamination_events": [],
+        "forbidden_skill_hits": [],
+        "overclassification": false,
+        "underclassification": false,
+        "ambiguous_skills": [
+          "agile",
+          "ide",
+          "scrum"
+        ],
+        "recommendation_quality": {
+          "recommendation_count": 5,
+          "incoherent_recommendations": [],
+          "generic_recommendations": [],
+          "modernity_score": 1.0,
+          "explainability_score": 1.0,
+          "market_alignment_score": 1.0,
+          "coherence_score": 1.0,
+          "quality_score": 1.0
+        }
+      },
+      "raw": {
+        "clean_text_chars": 47715,
+        "processing_seconds": 8.725,
+        "pages": 21,
+        "extraction_probe": "pdfplumber"
+      }
+    }
+  ]
+}

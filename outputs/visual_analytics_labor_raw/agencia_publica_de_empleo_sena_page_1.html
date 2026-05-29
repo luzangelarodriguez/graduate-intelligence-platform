@@ -1,0 +1,448 @@
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<!-- CSS Bootstrap -->
+
+<link href="/spe-web/static/bootstrap/css/bootstrap.min.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet" media="screen">
+
+
+<link href="/spe-web/static/bootstrap/css/bootstrap-select.min.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet" media="screen">
+
+<!-- CSS Parsley -->
+
+<link href="/spe-web/static/css/parsley.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+<!-- CSS FuncionCompetenciaLaboral -->
+
+<link href="/spe-web/static/css/funcionCompetenciaLaboral.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS loading -->
+
+<link href="/spe-web/static/css/loading.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS bancoInstructores -->
+
+<link href="/spe-web/static/css/bancoInstructores.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Estilos Datatable -->
+
+<link href="/spe-web/static/css/dataTableStyle.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Mensaje Confirmación-->
+
+<link href="/spe-web/static/css/mensajeConfirmacionStyle.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Estilos tooltip -->
+
+<link href="/spe-web/static/css/tooltip.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Estilos resumen fragment - menú vertica -->
+
+<link href="/spe-web/static/css/estilos-resumen-fragment.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Estilos Mensajes Informativos -->
+
+<link href="/spe-web/static/css/estilo-mensaje-informativo.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!--START CSS Estilos banco de instructores -->
+	
+	<link href="/spe-web/static/css/empresa/resumen-style.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+	
+	
+	<link href="/spe-web/static/css/banin/banin-nav.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+<!--END CSS Estilos banco de instructores -->
+
+<!-- CSS Estilos edit basicos -->
+
+<link href="/spe-web/static/css/edit-basicos.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS estilos banco de instructores-->
+
+<link href="/spe-web/static/css/banin/banin-style.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Custom -->
+
+<link href="/spe-web/static/css/custom.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet" media="screen">
+
+<!-- CSS Typeahead Bootstrap -->
+
+<link href="/spe-web/static/css/typeahead/typeahead.js-bootstrap.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet" media="screen">
+
+<!-- CSS icomoon -->
+
+<link href="/spe-web/static/css/icomoon/style.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- CSS Estilos cambiar clave -->
+
+<link href="/spe-web/static/css/cambiar-clave.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet">
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT DE JQUERY -->
+
+<script src="/spe-web/static/js/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" type="text/javascript"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT DE JQUERY UI -->
+
+<script src="/spe-web/static/js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" type="text/javascript"></script>
+
+<!-- CSS JQUERY UI -->
+
+<link href="/spe-web/static/js/jquery-ui-1.10.3.custom/css/ui-lightness/jquery-ui-1.10.3.custom.css;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" rel="stylesheet" media="screen">
+
+<!-- LOADING JAVASCRIPT -->
+
+<script src="/spe-web/static/js/loading.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" type="text/javascript"></script>
+
+<!-- TÍTULO DE LA PÁGINA -->
+<title>Sena APE</title>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="/js/html5shiv.js"></script>
+<script src="/js/respond.min.js"></script>
+<![endif]-->
+<script>
+	var urlbase = '/spe-web/spe';
+</script>
+
+
+
+</head>
+<body>
+	
+	<div id="content-load">
+	    <div id="load">
+	    	<img src="/spe-web/static/css/img/loading.gif" alt="loading"/>
+	    </div>
+	</div>
+	<div class="container-fluid">
+		<header id="heading" style="background: url('/spe-web/static/css/img/header/pixel-cabezote.png') repeat-x">
+		<div id="container" style="display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 15px;">
+
+    		<!-- Contenedor izquierdo -->
+    		<div id="heading-fragment-1">
+        		<div style="width: 200px; height: 120px; background: url('/spe-web/static/css/img/header/left-cabezote.png') no-repeat; background-size: 174px 84px;"></div>
+    	</div>
+
+    		<!-- Contenedor del medio -->
+    		<div id="heading-fragment-7">
+        		<div style="width: 335px; height: 120px; background: url('/spe-web/static/css/img/header/middle-cabezote.png') no-repeat; background-size: 324px 78px;"></div>
+    	</div>
+
+    		<!-- Contenedor derecho -->
+    		<div id= "heading-fragment-4">
+        		<div style="width: 200px; height: 120px; background: url('/spe-web/static/css/img/header/right-cabezote.png') no-repeat; background-size: 174px 84px;"></div>
+    	</div>
+
+	</div>
+
+		</header>
+		<div class="navbar">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="btn btn-navbar" data-target=".navbar-responsive-collapse"
+						data-toggle="collapse"><span class="icon-th"></span></a>
+					<ul class="nav">
+						
+						
+						<li><a href="https://ape.sena.edu.co/Paginas/Inicio.aspx"><i class="icon-circle-arrow-left"></i>
+								Ir al portal</a></li>
+						
+						<li><a href="/spe-web/;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"><i class="icon-home"></i> Inicio</a></li>
+					</ul>
+
+					<div class="nav-collapse navbar-responsive-collapse in collapse"
+						style="height: auto;" id="insertMenuHere"></div>
+
+
+
+					<!-- Menú para usuarios -->
+					
+				</div>
+			</div>
+		</div>
+		<div id="help-modal" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<span class="label">Visor de ayuda en línea</span>
+			</div>
+			<div class="modal-body">
+				<p>No se encuentra el archivo de ayuda.</p>
+			</div>
+		</div>
+		
+		<div id="wait-modal" class="modal hide fade"  style="z-index: 1999">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header modal-heder-style">
+				   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				   		<span aria-hidden="true">&times;</span>
+				   </button>
+			  </div>
+		      <div class="modal-body modal-body-style">
+		      	<div class="container-boxs-modal">
+		      		<div class="box-icon">
+		      			<div class="loadingGif"><img src="/spe-web/static/css/img/loading.gif" alt="Funny image"/></div>
+			      	</div>
+			        <div class="box-menssage">
+						<h3>Por favor espere...</h3>
+						<p>
+							El sistema se encuentra procesando su solicitud. Si el proceso toma
+							más de <b>tres</b> minutos cierre esta pequeña ventana y vuelva a
+							intentar.
+						</p>      	
+			        </div>
+			        <div class="box-buttons">
+			        </div>
+		      	</div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<div id="information-modal" class="modal hide fade" style="z-index: 1999; text-align: center;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h3><span class="icon-info-sign"> </span> &nbsp;Información</h3>
+			</div>
+			<div class="modal-body" id="modalTextInformation" style="text-align: justify;">
+				<p>				
+				</p>
+			</div>
+		</div>
+		<div id="error-modal" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<span class="label">Error</span>
+			</div>
+			<div class="modal-body">
+				<p>Hubo un error al procesar su solicitud, por favor intente
+					nuevamente.</p>
+			</div>
+		</div>
+		
+		
+		
+		
+		<div class="clearfix"></div>
+		<div class="wrapper">
+
+
+
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span4 offset2">
+			<div class="well well-large">
+				<h2>Ingreso al sistema</h2>
+				
+				<form name='f' action="/spe-web/j_spring_security_check;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"
+					method='POST'>
+					<label for="tipousuario">Tipo de usuario</label><label><input
+						type="radio" name="tipousuario" value="1" /> Empresa</label> <label><input
+						type="radio" name="tipousuario" value="0" checked="checked" />
+						Persona</label> <label for="username">No. de documento</label> <input
+						id="username" type='text' name='j_username' value=''
+						class="input-block-level" tabindex="1"> <label for="password">Contraseña</label>
+					<input id="password" type='password' name='j_password' value=''
+						class="input-block-level" autocomplete="off" tabindex="2">
+					
+					<div class="pull-right">
+						<a href="/spe-web/spe/usuarioClave/reestablecerClave;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" tabindex="4"><span>Olvidé mi
+								contraseña</span></a>
+					</div>
+					<button id="entrar" class="btn btn-success" tabindex="3">Entrar</button>
+					<script type="text/javascript">
+					<!--
+						$(document)
+								.ready(
+										function() {
+											$("#entrar")
+													.click(
+															function() {
+																var tipo = $(
+																		"input[name=tipousuario]:checked")
+																		.val();
+																if (tipo == 0) {
+																	if ($(
+																			"#username")
+																			.val()
+																			.indexOf(
+																					"E") > -1) {
+																		$(
+																				"#username")
+																				.val(
+																						$(
+																								"#username")
+																								.val()
+																								.substring(
+																										1));
+																	}
+																} else if (tipo == 1) {
+																	if ($(
+																			"#username")
+																			.val()
+																			.indexOf(
+																					"E") == -1) {
+																		$(
+																				"#username")
+																				.val(
+																						"E"
+																								+ $(
+																										"#username")
+																										.val());
+																	}
+																}
+															});
+										});
+						-->
+					</script>
+				</form>
+			</div>
+		</div>
+		<div class="span4">
+			<div class="well well-large">
+				<h2>¿Aún no tiene usuario?</h2>
+				<p>Un usuario le permitirá acceder a la Agencia Pública de
+					Empleo ya sea para buscar empleo o para publicar vacantes. El
+					proceso de inscripción es muy simple y es gratis.</p>
+				<a href='/spe-web/spe/registro;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396' class="btn btn-primary">¡Regístrese
+					ahora!</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		$("#username").focus();
+	});
+//-->
+</script>
+
+
+
+
+
+
+
+
+<div class="well" id="footerWell">
+	<div class="text-center">
+		<p>Agencia Pública de Empleo- SENA © Copyright. Derechos
+			reservados. República de Colombia</p>
+		<p>Este es un servicio gratuito e indiscriminado. Recuerde que es
+			un bien público, por favor haga un buen uso del mismo y promuévalo.</p>
+	</div>
+</div>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT DE BOOTSTRAP 2.3 -->
+
+<script src="/spe-web/static/bootstrap/js/bootstrap.min.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT DE BOOTSTRAP 2.3 -->
+
+<script src="/spe-web/static/bootstrap/js/bootstrap-select.min.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT HOGAN -->
+
+<script src="/spe-web/static/js/hogan-2.0.0.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT DE TYPEAHEAD (AUTOCOMPLETE) -->
+
+<script src="/spe-web/static/js/typeahead.min.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396" type="text/javascript"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT CON LOS MENSAJES PERSONALIZADOS PARA PARSLEY -->
+
+<script src="/spe-web/static/js/parsley/messages.es.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"></script>
+
+<!-- LOCALIZACIÓN DEL JAVASCRIPT PARA PARSLEY -->
+
+<script src="/spe-web/static/js/parsley/parsley.min.js;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396"></script>
+
+
+
+
+
+
+<script>
+	function wait() {
+		$("#wait-modal").modal({
+			show : true,
+			backdrop : true
+		});
+		return true;
+	}
+
+	function closeWait() {
+		$("#wait-modal").modal('hide');
+		return true;
+	}
+
+	function goBack() {
+		window.history.back();
+		return false;
+	}
+
+	$(document)
+			.ready(
+					function() {
+						$('.popover-marker').popover();
+						$.get("/spe-web/spe/getmenu;jsessionid=N5hk5kFgEHVzcfzv6z-rjP1tS-veAt2xX5Hmb5ggJYJVDiqb6V6-!2078872396", function(data) {
+							$("#insertMenuHere").html(data);
+						});
+						$(".hasDatepicker").attr('placeholder', 'dd-MM-yyyy');
+						$('.readOnlyDel').attr("data-type", "dateIso");
+						$(".lengthChecked")
+								.keyup(
+										function(e) {
+											max = $(this).attr('data-length');
+											if (max == null)
+												max = 1024;
+											text = $(this).val();
+											len = text.length;
+											div = $(this).parent();
+											if (div.hasClass('counterWrapper') == false) {
+												div = $(this)
+														.wrap(
+																'<div class="counterWrapper"></div>')
+														.parent();
+											}
+											span = $("span", div);
+											if (span == null
+													|| span.length == 0) {
+												span = $('<span class="badge pull-right" style="position:relative; top: -30px; right: 5px "></span>');
+												div.append(span);
+											}
+											//$(this).focus();
+											if (len > max) {
+												span
+														.addClass("badge-important");
+											} else {
+												span
+														.removeClass("badge-important");
+											}
+											span.text(len + " / " + max);
+										});
+						$(".lengthChecked").keyup();
+					});
+</script>
+</div>
+</div>
+</body>
+</html>

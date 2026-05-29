@@ -506,7 +506,7 @@ def persist_silver_jobs(jobs: list[dict[str, Any]]) -> None:
 def publish_canonical_and_gold(jobs: list[dict[str, Any]], *, auto_validate: bool, min_relevance: float) -> int:
     if not jobs:
         return 0
-    publishable = [job for job in jobs if job["relevance_scores"]["overall_score"] >= min_relevance]
+    publishable = gold_publishable_jobs(jobs, min_relevance=min_relevance)
     if not publishable:
         return 0
     with get_connection() as conn, conn.cursor() as cur:
@@ -596,6 +596,10 @@ def publish_canonical_and_gold(jobs: list[dict[str, Any]], *, auto_validate: boo
             ],
         )
     return len(publishable)
+
+
+def gold_publishable_jobs(jobs: list[dict[str, Any]], *, min_relevance: float) -> list[dict[str, Any]]:
+    return [job for job in jobs if float(job.get("relevance_scores", {}).get("overall_score") or 0) >= min_relevance]
 
 
 def persist_lineage(jobs: list[dict[str, Any]], kpi_name: str = "labor_intelligence_evidence") -> None:

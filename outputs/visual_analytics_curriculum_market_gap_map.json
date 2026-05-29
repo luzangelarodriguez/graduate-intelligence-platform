@@ -1,0 +1,891 @@
+{
+  "specialization_id": "visual-analytics-big-data",
+  "specialization_name": "Especialización en Visual Analytics y Big Data",
+  "covered_skills": [
+    {
+      "skill": "Python",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "covered",
+      "evidence_weight": 0.8,
+      "evidence_sources": {
+        "portal_taxonomy": 8
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "KPIs",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "covered",
+      "evidence_weight": 0.8,
+      "evidence_sources": {
+        "portal_taxonomy": 8
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "KPIs",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "SQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "covered",
+      "evidence_weight": 0.6,
+      "evidence_sources": {
+        "portal_taxonomy": 6
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "data governance",
+      "cluster_name": "Data Governance",
+      "coverage_status": "covered",
+      "evidence_weight": 0.5,
+      "evidence_sources": {
+        "portal_taxonomy": 5
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "data governance",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "Power BI",
+      "cluster_name": "BI & Visualization",
+      "coverage_status": "covered",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "Power BI",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "ETL",
+      "cluster_name": "Data Engineering",
+      "coverage_status": "covered",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "BI",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "covered",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "BI",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "machine learning",
+      "cluster_name": "AI Analytics",
+      "coverage_status": "covered",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "Tableau",
+      "cluster_name": "BI & Visualization",
+      "coverage_status": "covered",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "Spark",
+      "cluster_name": "Data Engineering",
+      "coverage_status": "covered",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "Spark",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "Hadoop",
+      "cluster_name": "Data Engineering",
+      "coverage_status": "covered",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "Hadoop",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "AI",
+      "cluster_name": "AI Analytics",
+      "coverage_status": "covered",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "visualizacion analitica",
+      "cluster_name": "BI & Visualization",
+      "coverage_status": "covered",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.845,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    },
+    {
+      "skill": "estadistica",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "covered",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.82,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Mantener la evidencia curricular y documentar productos evaluables asociados.",
+      "reason": "Skill presente directamente en microcurriculos o perfil curricular."
+    }
+  ],
+  "partial_skills": [
+    {
+      "skill": "APIs",
+      "cluster_name": "Software/Data Platform",
+      "coverage_status": "partial",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.75,
+      "matched_curriculum_skill": "KPIs",
+      "roles": [],
+      "recommendation": "Profundizar APIs mediante actividades aplicadas vinculadas a Software/Data Platform.",
+      "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "PL/SQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.81,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar PL/SQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "NoSQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.81,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar NoSQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "MySQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.81,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    }
+  ],
+  "missing_skills": [],
+  "emerging_skills": [],
+  "irrelevant_skills": [
+    {
+      "skill": "comunicacion",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.5,
+      "evidence_sources": {
+        "portal_taxonomy": 5
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Azure",
+      "cluster_name": "Cloud Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "Spark",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "AWS",
+      "cluster_name": "Cloud Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "reporting",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "trabajo en equipo",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "resolucion de problemas",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Oracle",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "data governance",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Agile",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "pensamiento analitico",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "liderazgo",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "ingles",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Redis",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "PostgreSQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "ITIL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "RAG",
+      "cluster_name": "GenAI Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "LLM",
+      "cluster_name": "GenAI Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "GCP",
+      "cluster_name": "Cloud Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "KPIs",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "executive reporting",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Qlik",
+      "cluster_name": "BI & Visualization",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Copilot BI",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "BI",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "scikit-learn",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "pandas",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "gestion de stakeholders",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Scrum",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "SSIS",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "SQL Server",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "MongoDB",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "MLflow",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Kanban",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "Kafka",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "ELT",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    }
+  ],
+  "occupational_clusters": [
+    {
+      "cluster_name": "Enterprise Analytics",
+      "skills": [
+        "Python",
+        "SQL",
+        "comunicacion",
+        "trabajo en equipo",
+        "resolucion de problemas",
+        "Oracle",
+        "Agile",
+        "pensamiento analitico",
+        "liderazgo",
+        "ingles",
+        "Redis",
+        "PostgreSQL",
+        "ITIL",
+        "scikit-learn",
+        "pandas",
+        "gestion de stakeholders",
+        "estadistica",
+        "Scrum",
+        "SSIS",
+        "SQL Server",
+        "PL/SQL",
+        "NoSQL",
+        "MySQL",
+        "MongoDB",
+        "MLflow",
+        "Kanban",
+        "Kafka",
+        "ELT"
+      ],
+      "total_weight": 5.9,
+      "evidence_count": 59,
+      "dominant_sources": {
+        "portal_taxonomy": 59
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": true
+    },
+    {
+      "cluster_name": "Reporting & KPI",
+      "skills": [
+        "KPIs",
+        "reporting",
+        "BI",
+        "executive reporting",
+        "Copilot BI"
+      ],
+      "total_weight": 1.8,
+      "evidence_count": 18,
+      "dominant_sources": {
+        "portal_taxonomy": 18
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": true
+    },
+    {
+      "cluster_name": "Cloud Analytics",
+      "skills": [
+        "Azure",
+        "AWS",
+        "GCP"
+      ],
+      "total_weight": 0.9,
+      "evidence_count": 9,
+      "dominant_sources": {
+        "portal_taxonomy": 9
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "BI & Visualization",
+      "skills": [
+        "Power BI",
+        "Tableau",
+        "visualizacion analitica",
+        "Qlik"
+      ],
+      "total_weight": 0.8,
+      "evidence_count": 8,
+      "dominant_sources": {
+        "portal_taxonomy": 8
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "Data Engineering",
+      "skills": [
+        "ETL",
+        "Spark",
+        "Hadoop"
+      ],
+      "total_weight": 0.8,
+      "evidence_count": 8,
+      "dominant_sources": {
+        "portal_taxonomy": 8
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "Data Governance",
+      "skills": [
+        "data governance"
+      ],
+      "total_weight": 0.5,
+      "evidence_count": 5,
+      "dominant_sources": {
+        "portal_taxonomy": 5
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "AI Analytics",
+      "skills": [
+        "machine learning",
+        "AI"
+      ],
+      "total_weight": 0.4,
+      "evidence_count": 4,
+      "dominant_sources": {
+        "portal_taxonomy": 4
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "Software/Data Platform",
+      "skills": [
+        "APIs"
+      ],
+      "total_weight": 0.3,
+      "evidence_count": 3,
+      "dominant_sources": {
+        "portal_taxonomy": 3
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    },
+    {
+      "cluster_name": "GenAI Analytics",
+      "skills": [
+        "RAG",
+        "LLM"
+      ],
+      "total_weight": 0.2,
+      "evidence_count": 2,
+      "dominant_sources": {
+        "portal_taxonomy": 2
+      },
+      "representative_roles": [],
+      "is_strong_market_signal": false
+    }
+  ],
+  "recommended_curriculum_updates": [
+    {
+      "skill": "APIs",
+      "cluster_name": "Software/Data Platform",
+      "priority": "media",
+      "action": "Profundizar APIs mediante actividades aplicadas vinculadas a Software/Data Platform.",
+      "evidence_weight": 0.3,
+      "roles": []
+    },
+    {
+      "skill": "PL/SQL",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar PL/SQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    },
+    {
+      "skill": "NoSQL",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar NoSQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    },
+    {
+      "skill": "MySQL",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    }
+  ]
+}

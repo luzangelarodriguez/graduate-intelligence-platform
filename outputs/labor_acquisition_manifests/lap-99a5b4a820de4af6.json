@@ -1,0 +1,71 @@
+{
+  "correlation_id": "lap-99a5b4a820de4af6",
+  "sources": [
+    "linkedin",
+    "elempleo",
+    "ticjob"
+  ],
+  "execute_network": true,
+  "max_jobs": 50,
+  "max_pages": 3,
+  "persist": true,
+  "quality_review": true,
+  "started_at": 1779985326.3579853,
+  "checkpoints": {
+    "source:linkedin": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "linkedin",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:elempleo": {
+      "results": 6,
+      "errors": 1,
+      "circuit": {
+        "source_name": "elempleo",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:ticjob": {
+      "results": 56,
+      "errors": 1,
+      "circuit": {
+        "source_name": "ticjob",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 66,
+      "occupational_clusters": 9,
+      "covered_skills": 15,
+      "missing_skills": 5,
+      "emerging_skills": 6,
+      "market_skills": 66,
+      "warehouse_verification": {
+        "jobs_count": 0,
+        "jobs_by_source": [],
+        "top_skills": [],
+        "jobs_by_seniority": [],
+        "jobs_by_modality": [],
+        "recent_companies": []
+      },
+      "analytics_reports": {
+        "top_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\top_skills.md",
+        "source_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\source_distribution.md",
+        "salary_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\salary_distribution.md",
+        "emerging_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skills.md",
+        "labor_market_summary.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_summary.md"
+      }
+    }
+  },
+  "finished_at": 1779985435.0737162,
+  "cancelled": false
+}

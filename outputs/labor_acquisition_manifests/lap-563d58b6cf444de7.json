@@ -1,0 +1,56 @@
+{
+  "correlation_id": "lap-563d58b6cf444de7",
+  "sources": [
+    "linkedin",
+    "elempleo",
+    "ticjob"
+  ],
+  "execute_network": false,
+  "max_jobs": 20,
+  "max_pages": 2,
+  "persist": false,
+  "quality_review": false,
+  "started_at": 1779983864.6287978,
+  "checkpoints": {
+    "source:linkedin": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "linkedin",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:elempleo": {
+      "results": 0,
+      "errors": 2,
+      "circuit": {
+        "source_name": "elempleo",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:ticjob": {
+      "results": 0,
+      "errors": 3,
+      "circuit": {
+        "source_name": "ticjob",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 49,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 49
+    }
+  },
+  "finished_at": 1779983867.7311087,
+  "cancelled": false
+}

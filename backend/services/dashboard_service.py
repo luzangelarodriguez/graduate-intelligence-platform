@@ -9,7 +9,7 @@ from backend.services.normalization_service import normalize_program_row, normal
 
 def ml_program_metric_map(*, db_name: str | None = None) -> dict[int, dict[str, Any]]:
     relation = matches_repository.match_relation_name(db_name=db_name)
-    if relation != "vw_latest_ml_program_job_matches":
+    if relation not in {"vw_latest_ml_program_job_matches", "vw_labor_program_job_matches"}:
         return {}
     metrics: dict[int, dict[str, Any]] = {}
     for row in matches_repository.fetch_ml_program_metric_rows(relation, db_name=db_name):

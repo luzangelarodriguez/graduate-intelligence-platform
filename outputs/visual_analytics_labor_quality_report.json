@@ -1,0 +1,51 @@
+{
+  "run_id": "visual-analytics-20260526152121-0825c11c",
+  "sources_configured": 9,
+  "jobs_extracted": 0,
+  "jobs_discarded": 4,
+  "duplicates": 0,
+  "gold_jobs": 0,
+  "quality_score": 0.15,
+  "publishable": false,
+  "errors": [
+    {
+      "source": "LinkedIn",
+      "error_type": "restricted_manual",
+      "error_message": "Puede requerir autenticacion y aplica restricciones anti-scraping."
+    },
+    {
+      "source": "Servicio Publico de Empleo",
+      "error_type": "SSLError",
+      "error_message": "HTTPSConnectionPool(host='www.serviciodeempleo.gov.co', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+    },
+    {
+      "source": "Servicio Publico de Empleo",
+      "error_type": "SSLError",
+      "error_message": "HTTPSConnectionPool(host='www.serviciodeempleo.gov.co', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+    }
+  ],
+  "discard_reasons": [
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title"
+    }
+  ],
+  "top_skills": [],
+  "top_roles": []
+}

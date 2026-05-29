@@ -1,0 +1,689 @@
+{
+  "run_id": "va-connectors-20260526161121",
+  "execute_network": true,
+  "persist_requested": false,
+  "persisted": false,
+  "final_quality_score": 0.5725,
+  "quality_threshold": 0.75,
+  "publishable": false,
+  "jobs_extracted": 6,
+  "jobs_discarded": 90,
+  "duplicates": 0,
+  "source_stats": {
+    "Ticjob": {
+      "raw": 50,
+      "accepted": 3,
+      "discarded": 47,
+      "errors": 0
+    },
+    "Elempleo": {
+      "raw": 6,
+      "accepted": 3,
+      "discarded": 3,
+      "errors": 0
+    },
+    "Hireline": {
+      "raw": 0,
+      "accepted": 0,
+      "discarded": 0,
+      "errors": 0
+    },
+    "Buscador de Empleo": {
+      "raw": 0,
+      "accepted": 0,
+      "discarded": 0,
+      "errors": 1
+    },
+    "Mi Futuro Empleo": {
+      "raw": 0,
+      "accepted": 0,
+      "discarded": 0,
+      "errors": 0
+    },
+    "FindJobIT": {
+      "raw": 40,
+      "accepted": 0,
+      "discarded": 40,
+      "errors": 0
+    }
+  },
+  "discard_reasons": [
+    {
+      "source": "Ticjob",
+      "title": "Desarrollador Backend .NET Senior (hibrido) Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5875",
+      "contextual_score": "0.3909"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Desarrollador Backend .NET Senior (hibrido) Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5875",
+      "contextual_score": "0.3909"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Desarrollador Backend .NET Senior (hibrido) Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5750",
+      "contextual_score": "0.3909"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3442",
+      "contextual_score": "0.1796"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3317",
+      "contextual_score": "0.1796"
+    },
+    {
+      "source": "Ticjob",
+      "title": "SETI S.A.S.",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3442",
+      "contextual_score": "0.1796"
+    },
+    {
+      "source": "Ticjob",
+      "title": "SETI S.A.S.",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3317",
+      "contextual_score": "0.1796"
+    },
+    {
+      "source": "Ticjob",
+      "title": "26/05/2026 A convenir Bogotá",
+      "reason": "missing_or_short_description",
+      "score": "0.1375",
+      "contextual_score": "0.0249"
+    },
+    {
+      "source": "Ticjob",
+      "title": "26/05/2026",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0232"
+    },
+    {
+      "source": "Ticjob",
+      "title": "A convenir",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0239"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Bogotá",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0242"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Administrador de Aplicaciones (Oracle / WebLogic / Middleware) 100% Remoto",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4808",
+      "contextual_score": "0.3689"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Administrador de Aplicaciones (Oracle / WebLogic / Middleware) 100% Remoto",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4808",
+      "contextual_score": "0.3689"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Administrador de Aplicaciones (Oracle / WebLogic / Middleware) 100% Remoto",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4683",
+      "contextual_score": "0.3689"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.1708",
+      "contextual_score": "0.1030"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.1583",
+      "contextual_score": "0.1030"
+    },
+    {
+      "source": "Ticjob",
+      "title": "UNIVERSITAS XXI SOLUCIONES Y TECNOLOGIA PARA LA UNIVERSIDAD DE COLOMBIA SAS",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1708",
+      "contextual_score": "0.1030"
+    },
+    {
+      "source": "Ticjob",
+      "title": "UNIVERSITAS XXI SOLUCIONES Y TECNOLOGIA PARA LA UNIVERSIDAD DE COLOMBIA SAS",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1583",
+      "contextual_score": "0.1030"
+    },
+    {
+      "source": "Ticjob",
+      "title": "21/05/2026 A convenir Remoto",
+      "reason": "missing_or_short_description",
+      "score": "0.1375",
+      "contextual_score": "0.0235"
+    },
+    {
+      "source": "Ticjob",
+      "title": "21/05/2026",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0232"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Remoto",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0237"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Técnico de Soporte",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4108",
+      "contextual_score": "0.2880"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Técnico de Soporte",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4108",
+      "contextual_score": "0.2880"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Técnico de Soporte",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3983",
+      "contextual_score": "0.2880"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "irrelevant_support_helpdesk",
+      "score": "0.1375",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "irrelevant_support_helpdesk",
+      "score": "0.1250",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Soluciones en Bases de Datos",
+      "reason": "irrelevant_support_helpdesk",
+      "score": "0.1375",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Soluciones en Bases de Datos",
+      "reason": "irrelevant_support_helpdesk",
+      "score": "0.1250",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "Ticjob",
+      "title": "21/05/2026 A convenir Bogotá",
+      "reason": "missing_or_short_description",
+      "score": "0.1375",
+      "contextual_score": "0.0249"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3775",
+      "contextual_score": "0.2075"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3650",
+      "contextual_score": "0.2075"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Venta Equipos SAS",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3775",
+      "contextual_score": "0.2075"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Venta Equipos SAS",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3650",
+      "contextual_score": "0.2075"
+    },
+    {
+      "source": "Ticjob",
+      "title": "20/05/2026 3,000,000 - 3,500,000 Bogotá",
+      "reason": "missing_or_short_description",
+      "score": "0.1375",
+      "contextual_score": "0.0241"
+    },
+    {
+      "source": "Ticjob",
+      "title": "20/05/2026",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0232"
+    },
+    {
+      "source": "Ticjob",
+      "title": "3,000,000 - 3,500,000",
+      "reason": "missing_or_short_description",
+      "score": "0.1250",
+      "contextual_score": "0.0240"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Especialista IA Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5542",
+      "contextual_score": "0.3269"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Especialista IA Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5542",
+      "contextual_score": "0.3269"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Especialista IA Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.5417",
+      "contextual_score": "0.3269"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3808",
+      "contextual_score": "0.2290"
+    },
+    {
+      "source": "Ticjob",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.3683",
+      "contextual_score": "0.2290"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Indra Colombia LTDA",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3808",
+      "contextual_score": "0.2290"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Indra Colombia LTDA",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.3683",
+      "contextual_score": "0.2290"
+    },
+    {
+      "source": "Ticjob",
+      "title": "20/05/2026 A convenir Bogotá",
+      "reason": "missing_or_short_description",
+      "score": "0.1375",
+      "contextual_score": "0.0249"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Analista Funcional de Procesos de Software Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4142",
+      "contextual_score": "0.2789"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Analista Funcional de Procesos de Software Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4142",
+      "contextual_score": "0.2789"
+    },
+    {
+      "source": "Ticjob",
+      "title": "Analista Funcional de Procesos de Software Híbrido",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.4017",
+      "contextual_score": "0.2789"
+    },
+    {
+      "source": "Elempleo",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.1375",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "Elempleo",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.1375",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "Elempleo",
+      "title": "",
+      "reason": "missing_title",
+      "score": "0.1375",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingenierio de software",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0248"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingenierio de software",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0248"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Tester Pruebas de seguridad",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0259"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Tester Pruebas de seguridad",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0259"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Monitoreo",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Monitoreo",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero NOC",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero NOC",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Sistemas",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0268"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Sistemas",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0268"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero Cloud",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero Cloud",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de redes e infraestructura",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de redes e infraestructura",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Confiabilidad de Servicio TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0260"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Confiabilidad de Servicio TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0260"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Base de Datos",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1558",
+      "contextual_score": "0.0731"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Base de Datos",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1558",
+      "contextual_score": "0.0731"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero de Observabilidad y Monitoreo TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero de Observabilidad y Monitoreo TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingenierio de software",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0248"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Tester Pruebas de seguridad",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0259"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Monitoreo",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero NOC",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Sistemas",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0268"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero Cloud",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de redes e infraestructura",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Confiabilidad de Servicio TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0260"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Base de Datos",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1558",
+      "contextual_score": "0.0731"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero de Observabilidad y Monitoreo TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingenierio de software",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0248"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Tester Pruebas de seguridad",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0259"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Monitoreo",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero NOC",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Sistemas",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0268"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero Cloud",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0245"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de redes e infraestructura",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Confiabilidad de Servicio TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0260"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Analista de Base de Datos",
+      "reason": "below_job_relevance_threshold",
+      "score": "0.1558",
+      "contextual_score": "0.0731"
+    },
+    {
+      "source": "FindJobIT",
+      "title": "Ingeniero de Observabilidad y Monitoreo TI",
+      "reason": "outside_visual_analytics_scope",
+      "score": "0.1225",
+      "contextual_score": "0.0000"
+    }
+  ],
+  "errors": [
+    {
+      "source": "Buscador de Empleo",
+      "error_type": "ConnectionError",
+      "error_message": "HTTPSConnectionPool(host='www.buscadordeempleo.gov.co', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.buscadordeempleo.gov.co', port=443): Failed to resolve 'www.buscadordeempleo.gov.co' ([Errno 11001] getaddrinfo failed)\"))"
+    }
+  ]
+}

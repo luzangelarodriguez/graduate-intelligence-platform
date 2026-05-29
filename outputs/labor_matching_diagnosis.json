@@ -1,0 +1,186 @@
+{
+  "generated_at": "2026-05-25T13:02:57",
+  "core_counts": {
+    "especializaciones": 52,
+    "skills": 179,
+    "especializacion_skills": 250
+  },
+  "labor_table_counts": {
+    "empleos": 119,
+    "empleo_skills": 199,
+    "job_offers": null,
+    "labor_jobs": null,
+    "labor_market_gold": null,
+    "canonical_jobs": 0,
+    "silver_normalized_jobs": 0,
+    "gold_validated_jobs": 0,
+    "ml_program_job_matches": 559,
+    "labor_program_skill_matches": 777,
+    "vw_match_empleo_especializacion_positivo": null,
+    "vw_latest_ml_program_job_matches": 167,
+    "vw_labor_program_job_matches": 605
+  },
+  "labor_skill_summary": {
+    "total_rows": 199,
+    "jobs_with_skills": 108,
+    "distinct_skill_ids": 22,
+    "rows_without_skill_id": 0,
+    "distinct_normalized_names": 1
+  },
+  "view_match_counts": {
+    "vw_labor_program_job_matches": {
+      "rows": 605,
+      "programs_with_matches": 41,
+      "related_jobs": 108,
+      "avg_match": "52.78"
+    },
+    "vw_latest_ml_program_job_matches": {
+      "rows": 167,
+      "programs_with_matches": 15,
+      "related_jobs": 108,
+      "avg_match": "48.92"
+    },
+    "vw_match_empleo_especializacion_positivo": null
+  },
+  "programs_with_zero_jobs": [
+    {
+      "id": 26,
+      "nombre": "especialización en administración y gerencia de la salud",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 19,
+      "nombre": "especialización en derecho digital",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 18,
+      "nombre": "especialización en derechos humanos",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 99,
+      "nombre": "Especialización en Derechos Humanos",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 24,
+      "nombre": "especialización en educación inclusiva",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 21,
+      "nombre": "especialización en educación y orientación familiar",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 3,
+      "nombre": "especialización en gerencia financiera",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 10,
+      "nombre": "especialización en ingeniería de software",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 20,
+      "nombre": "especialización en neuropsicología y educación",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 106,
+      "nombre": "Especialización en Pedagogía y Docencia",
+      "total_empleos_relacionados": 0
+    },
+    {
+      "id": 22,
+      "nombre": "especialización en tic para la enseñanza",
+      "total_empleos_relacionados": 0
+    }
+  ],
+  "top_10_curricular_skills_without_labor_match": [
+    {
+      "id": 1,
+      "nombre": "gestion de calidad",
+      "programas": 18
+    },
+    {
+      "id": 8,
+      "nombre": "analitica de datos",
+      "programas": 6
+    },
+    {
+      "id": 2,
+      "nombre": "sostenibilidad",
+      "programas": 6
+    },
+    {
+      "id": 13,
+      "nombre": "talento humano",
+      "programas": 6
+    },
+    {
+      "id": 59,
+      "nombre": "inclusion educativa",
+      "programas": 5
+    },
+    {
+      "id": 53,
+      "nombre": "pedagogia",
+      "programas": 5
+    },
+    {
+      "id": 17,
+      "nombre": "transformacion digital",
+      "programas": 5
+    },
+    {
+      "id": 69,
+      "nombre": "gestion educativa",
+      "programas": 4
+    },
+    {
+      "id": 562,
+      "nombre": "liderazgo",
+      "programas": 4
+    },
+    {
+      "id": 57,
+      "nombre": "derechos humanos",
+      "programas": 3
+    }
+  ],
+  "sample_programs": {
+    "Visual Analytics y Big Data": [
+      {
+        "id": 13,
+        "nombre": "especialización en visual analytics y big data",
+        "total_empleos_relacionados": 62,
+        "promedio_match_mercado": "46.51"
+      },
+      {
+        "id": 94,
+        "nombre": "Especialización en Visual Analytics y Big Data",
+        "total_empleos_relacionados": 72,
+        "promedio_match_mercado": "66.98"
+      }
+    ],
+    "Inteligencia Artificial Aplicada": [],
+    "Dirección y Gestión de Tecnologías de la Información": [
+      {
+        "id": 15,
+        "nombre": "especialización en dirección y gestión de tecnologías de la información",
+        "total_empleos_relacionados": 2,
+        "promedio_match_mercado": "43.33"
+      },
+      {
+        "id": 96,
+        "nombre": "Especialización en Dirección y Gestión de Tecnologías de la Información",
+        "total_empleos_relacionados": 7,
+        "promedio_match_mercado": "59.05"
+      }
+    ]
+  },
+  "likely_causes": []
+}

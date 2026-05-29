@@ -1,0 +1,15 @@
+[
+  {
+    "cluster_name": "Reporting & KPI",
+    "skills": [
+      "Copilot BI"
+    ],
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "dominant_sources": {
+      "portal_taxonomy": 1
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  }
+]

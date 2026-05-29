@@ -1,0 +1,2287 @@
+document_name,section,original_text,action,rewritten_text,reason,market_signal,confidence
+aprendizaje automatico.docx,DESCRIPCIÓN DE LA ASIGNATURA,"Esta El aprendizaje automático es una rama de la inteligencia artificial que simula la forma en la que las personas aprenden en base a ejemplos y situaciones observadas. Los mecanismos de aprendizaje permiten que los sistemas cognitivos puedan operar y actuar en situaciones no contempladas previamente en su programación inicial. Es decir, el aprendizaje se considera una auto programación que permite incorporar en tiempo de ejecución nuevas reglas de actuación derivadas de la experiencia de interacción con el entorno. Las técnicas de aprendizaje automático se pueden considerar meta algoritmos que usan los datos de entrada como fuente de conocimiento para construir algoritmos de control o de extracción de conocimiento. El aprendizaje automático se puede dividir en aprendizaje supervisado, técnicas de agrupación y técnicas de detección de anomalías. El aprendizaje supervisado «aprende» a generalizar sobre datos no observados previamente en base a observaciones de ejemplos similares que se han realizado en la fase de entrenamiento o training. Las técnicas de agrupación «agrupan» los datos de acuerdo a medidas de similitud. Finalmente, las técnicas de detección de anomalías se basan en detectar los comportamientos que se salen de lo habitual.",actualizar,"Esta El aprendizaje automático es una rama de la inteligencia artificial que simula la forma en la que las personas aprenden en base a ejemplos y situaciones observadas. Los mecanismos de aprendizaje permiten que los sistemas cognitivos puedan operar y actuar en situaciones no contempladas previamente en su programación inicial. Es decir, el aprendizaje se considera una auto programación que permite incorporar en tiempo de ejecución nuevas reglas de actuación derivadas de la experiencia de interacción con el entorno. Las técnicas de aprendizaje automático se pueden considerar meta algoritmos que usan los datos de entrada como fuente de conocimiento para construir algoritmos de control o de extracción de conocimiento. El aprendizaje automático se puede dividir en aprendizaje supervisado, técnicas de agrupación y técnicas de detección de anomalías. El aprendizaje supervisado «aprende» a generalizar sobre datos no observados previamente en base a observaciones de ejemplos similares que se han realizado en la fase de entrenamiento o training. Las técnicas de agrupación «agrupan» los datos de acuerdo a medidas de similitud. Finalmente, las técnicas de detección de anomalías se basan en detectar los comportamientos que se salen de lo habitual.
+Se orienta la asignatura hacia modelos predictivos aplicados, validación, interpretación y uso responsable de técnicas de inteligencia artificial.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+aprendizaje automatico.docx,RESULTADOS DE APRENDIZAJE,"*Resultados de aprendizaje tomados del Documento maestro que se encuentra vigente.
+Elaborar un software que permita hacer la clasificación de datos utilizando una función matemática y que permita diferenciar dichos datos en categorías.",profundizar,"*Resultados de aprendizaje tomados del Documento maestro que se encuentra vigente.
+Elaborar un software que permita hacer la clasificación de datos utilizando una función matemática y que permita diferenciar dichos datos en categorías.
+Aplicar modelos predictivos con Python o R considerando preparación de datos, entrenamiento, validación e interpretación de resultados.
+Evaluar la pertinencia y límites de modelos de machine learning en escenarios de analítica institucional y empresarial.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+aprendizaje automatico.docx,CONTENIDO TEMÁTICO,"Tema 1. Introducción al aprendizaje automático
+Aprendizaje supervisado: problemas de regresión
+Aprendizaje supervisado: problemas de clasificación
+Conjuntos de entrenamiento, test y validación cruzada
+Técnicas de agrupamiento
+Técnicas de detección de anomalías
+Tema 2. Evaluación de algoritmos de regresión
+Algoritmos de regresión
+Métricas de error
+Visualización de los errores
+Tema 3. Evaluación de algoritmos de clasificación
+Algoritmos de clasificación
+Métricas de evaluación: matriz de confusión
+Métricas de evaluación: curvas ROC, AUC
+Tema 4. Aprendizaje supervisado: clasificación con Naive
+Bayes
+Teorema de Bayes
+Tablas de probabilidad condicionada
+Independencia condicional en el clasificador Naive Bayes
+Clasificador Naive Bayes
+Clasificador Naive Bayes con variables numéricas
+Tema 5. Aprendizaje supervisado: regresión y clasificación
+con árboles de decisión
+Introducción a los árboles de decisión
+Best split: entropía, Gini index, ganancia de información
+Poda de los árboles
+Árboles para clasificación
+Árboles vs. modelos lineales
+Tema 6.Aprendizaje supervisado: regresión y clasificación
+con random forests
+Explotando la diversidad: bagging y selección de variables
+Interpretación del out-of-bag error
+Evolución del número de árboles e importancia de variables
+Referencias bibliográficas
+Tema 7. Combinación de clasificadores: bootstrapping,
+bagging y boosting
+Introducción
+Técnica de bootstrapping
+Método bagging
+Método boosting
+Tema 8. Aprendizaje supervisado: regresión y clasificación
+con máquinas de vector de soporte
+Introducción las máquinas de vector de soporte:
+hiperplanos
+Separando por hiperplanos
+Maximal-margin classifier
+Soft margin
+Kernel trick
+Referencias bibliográficas
+Tema 9. Aprendizaje supervisado: regresión y clasificación
+con redes de neuronas
+Neuronas artificiales
+Arquitectura de una red de neuronas: capas, funciones de
+activación
+Algoritmo de entrenamiento: backpropagation
+Tema 10.Técnicas de aprendizaje no supervisado:
+agrupamiento
+Introducción al aprendizaje no supervisado
+Algoritmo de k-medias
+Agrupamiento jerárquico
+Tema 11.Técnicas de detección de anomalías
+Introducción a la detección de anomalías
+Aplicación de aprendizaje automático a la detección de
+Anomalías
+Tema 12.Aprendizaje por refuerzo y control
+Introducción al aprendizaje por refuerzo
+Algoritmos de aprendizaje por refuerzo
+Tema 13.Parametrización automática y optimización de
+algoritmos
+Concepto de hiper-parámetros
+Búsqueda cartesiana de hiper-parámetros
+Búsqueda aleatoria de hiper-parámetros
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Actividad 1. Caso Grupal: Detección de anomalías y técnicas de agrupamiento | Investigación aplicada a un proyecto
+Actividad 2. Laboratorio: Árboles y random forest para regresión y clasificación | Investigación aplicada a un proyecto
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad práctica | 25%
+Evaluación continua  | Actividad práctica | 25%
+Evaluación continua  | Test | 10%
+Evaluación final | Examen final en línea, de acuerdo con los parámetros establecidos | 40%",profundizar,"Tema 1. Introducción al aprendizaje automático
+Aprendizaje supervisado: problemas de regresión
+Aprendizaje supervisado: problemas de clasificación
+Conjuntos de entrenamiento, test y validación cruzada
+Técnicas de agrupamiento
+Técnicas de detección de anomalías
+Tema 2. Evaluación de algoritmos de regresión
+Algoritmos de regresión
+Métricas de error
+Visualización de los errores
+Tema 3. Evaluación de algoritmos de clasificación
+Algoritmos de clasificación
+Métricas de evaluación: matriz de confusión
+Métricas de evaluación: curvas ROC, AUC
+Tema 4. Aprendizaje supervisado: clasificación con Naive
+Bayes
+Teorema de Bayes
+Tablas de probabilidad condicionada
+Independencia condicional en el clasificador Naive Bayes
+Clasificador Naive Bayes
+Clasificador Naive Bayes con variables numéricas
+Tema 5. Aprendizaje supervisado: regresión y clasificación
+con árboles de decisión
+Introducción a los árboles de decisión
+Best split: entropía, Gini index, ganancia de información
+Poda de los árboles
+Árboles para clasificación
+Árboles vs. modelos lineales
+Tema 6.Aprendizaje supervisado: regresión y clasificación
+con random forests
+Explotando la diversidad: bagging y selección de variables
+Interpretación del out-of-bag error
+Evolución del número de árboles e importancia de variables
+Referencias bibliográficas
+Tema 7. Combinación de clasificadores: bootstrapping,
+bagging y boosting
+Introducción
+Técnica de bootstrapping
+Método bagging
+Método boosting
+Tema 8. Aprendizaje supervisado: regresión y clasificación
+con máquinas de vector de soporte
+Introducción las máquinas de vector de soporte:
+hiperplanos
+Separando por hiperplanos
+Maximal-margin classifier
+Soft margin
+Kernel trick
+Referencias bibliográficas
+Tema 9. Aprendizaje supervisado: regresión y clasificación
+con redes de neuronas
+Neuronas artificiales
+Arquitectura de una red de neuronas: capas, funciones de
+activación
+Algoritmo de entrenamiento: backpropagation
+Tema 10.Técnicas de aprendizaje no supervisado:
+agrupamiento
+Introducción al aprendizaje no supervisado
+Algoritmo de k-medias
+Agrupamiento jerárquico
+Tema 11.Técnicas de detección de anomalías
+Introducción a la detección de anomalías
+Aplicación de aprendizaje automático a la detección de
+Anomalías
+Tema 12.Aprendizaje por refuerzo y control
+Introducción al aprendizaje por refuerzo
+Algoritmos de aprendizaje por refuerzo
+Tema 13.Parametrización automática y optimización de
+algoritmos
+Concepto de hiper-parámetros
+Búsqueda cartesiana de hiper-parámetros
+Búsqueda aleatoria de hiper-parámetros
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Actividad 1. Caso Grupal: Detección de anomalías y técnicas de agrupamiento | Investigación aplicada a un proyecto
+Actividad 2. Laboratorio: Árboles y random forest para regresión y clasificación | Investigación aplicada a un proyecto
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad práctica | 25%
+Evaluación continua  | Actividad práctica | 25%
+Evaluación continua  | Test | 10%
+Evaluación final | Examen final en línea, de acuerdo con los parámetros establecidos | 40%
+Flujo aplicado de machine learning: datos, entrenamiento, validación y evaluación.
+Métricas de desempeño, sesgo, explicabilidad y ética de IA.
+Notebooks reproducibles y comunicación de resultados predictivos.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+aprendizaje automatico.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+aprendizaje automatico.docx,MEDIOS EDUCATIVOS,"Bibliografía
+Boser, B. E., Guyon, I. M. y Vapnik, V. N. (1992). A training algorithm for optimal margin classifiers (pp. 144-152). En Proceedings of the Fifth Annual Workshop on Computational Learning Theory.
+Han, J., Kamber, M. y Pei, J. (2012). Data mining: concepts and technique. San Francisco: Morgan Kaufmann.
+Lichman, M. (2013). UCI Machine Learning Repository Irvine. CA: University of California, School of Information and Computer Science. Recuperado de http://archive.ics.uci.edu/ml
+Liu, B. (2010). Sentiment analysis and subjectivity. En Indurkhya, N. y Damerau, F. J. Handbook of Natural Language Processing (2a ed.). Boca Raton: CRC Press. McCulloch, W. S. y Pitts, W. (1943). A logical calculus of the ideas immanent in neurons activity. Bulletin of Mathematical Biophysics, 5, 115-133.
+Maimon, O. y Rokach, L. (2005). Data Mining and Knowledge Discovery Handbook. Berlín: Springer Books.
+Nisbet, R., Elder, J. y Miner, G. (2009). Handbook of Statistical Analysis and Data Mining Applications. Academic Press Books.
+Poole, D. L. y Mackworth, A. K. (2010). Artificial intelligence: foundations of computational agents. New York: Cambridge University Press.
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero con Doctorado o maestría en temas afines con  Inteligencia Artificial
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria
+Experiencia profesional en el área de | Experiencia de un año en proyectos de Inteligencia Artificial
+Experiencia Investigativa | Experiencia de mínimo un año en proyectos de investigación
+Experiencia con el sector externo | NA",actualizar,"Bibliografía
+Boser, B. E., Guyon, I. M. y Vapnik, V. N. (1992). A training algorithm for optimal margin classifiers (pp. 144-152). En Proceedings of the Fifth Annual Workshop on Computational Learning Theory.
+Han, J., Kamber, M. y Pei, J. (2012). Data mining: concepts and technique. San Francisco: Morgan Kaufmann.
+Lichman, M. (2013). UCI Machine Learning Repository Irvine. CA: University of California, School of Information and Computer Science. Recuperado de http://archive.ics.uci.edu/ml
+Liu, B. (2010). Sentiment analysis and subjectivity. En Indurkhya, N. y Damerau, F. J. Handbook of Natural Language Processing (2a ed.). Boca Raton: CRC Press. McCulloch, W. S. y Pitts, W. (1943). A logical calculus of the ideas immanent in neurons activity. Bulletin of Mathematical Biophysics, 5, 115-133.
+Maimon, O. y Rokach, L. (2005). Data Mining and Knowledge Discovery Handbook. Berlín: Springer Books.
+Nisbet, R., Elder, J. y Miner, G. (2009). Handbook of Statistical Analysis and Data Mining Applications. Academic Press Books.
+Poole, D. L. y Mackworth, A. K. (2010). Artificial intelligence: foundations of computational agents. New York: Cambridge University Press.
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero con Doctorado o maestría en temas afines con  Inteligencia Artificial
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria
+Experiencia profesional en el área de | Experiencia de un año en proyectos de Inteligencia Artificial
+Experiencia Investigativa | Experiencia de mínimo un año en proyectos de investigación
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+aprendizaje automatico.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,DESCRIPCIÓN DE LA ASIGNATURA,"La era de la información en que vivimos requiere que sepamos manejar datos. La ciencia que se encarga de «aprender» a partir de estos datos es la estadística. Para aprender o leer estos datos debemos saber producirlos, analizarlos y sacar conclusiones de ellos. Cuanto mayor sea nuestra comprensión del uso de las herramientas estadísticas, mayor será nuestra capacidad de analizar la realidad (o leer la «historia» que hay en los datos), lo que nos permitirá tomar decisiones lo más correctas posibles. A día de hoy, no podemos tomar una decisión con garantías basándonos tan solo en nuestra intuición, es preciso echar mano de la estadística y sus herramientas.
+Más específicamente, en esta asignatura se aprenderán los conceptos introductorios de la estadística, así como a razonar estadísticamente. Se aprenderá, entre otras cosas, a graficar las representaciones de datos más habituales, a manejar las relaciones lineales entre dos variables, etc.
+Se hará hincapié en la estadística inferencial, para ello se repasarán los principios de probabilidad en los que esta descansa. Las técnicas inferenciales son importantes, pues nos permitirán contrastar conjeturas que hacemos constantemente sobre cómo es una determinada población a través de los llamados contrastes de hipótesis.
+Por último, cabe destacar el carácter aplicado, dinámico y actual en el que se enmarca la asignatura, ya que se estudiarán casos reales de aplicación e informes estadísticos recientes de diferentes campos. Además, el enfoque didáctico que se va a emplear, dentro de la seriedad que se le presupone, procurará generar interés y aprecio por la ciencia estadística en el alumno.",actualizar,"La era de la información en que vivimos requiere que sepamos manejar datos. La ciencia que se encarga de «aprender» a partir de estos datos es la estadística. Para aprender o leer estos datos debemos saber producirlos, analizarlos y sacar conclusiones de ellos. Cuanto mayor sea nuestra comprensión del uso de las herramientas estadísticas, mayor será nuestra capacidad de analizar la realidad (o leer la «historia» que hay en los datos), lo que nos permitirá tomar decisiones lo más correctas posibles. A día de hoy, no podemos tomar una decisión con garantías basándonos tan solo en nuestra intuición, es preciso echar mano de la estadística y sus herramientas.
+Más específicamente, en esta asignatura se aprenderán los conceptos introductorios de la estadística, así como a razonar estadísticamente. Se aprenderá, entre otras cosas, a graficar las representaciones de datos más habituales, a manejar las relaciones lineales entre dos variables, etc.
+Se hará hincapié en la estadística inferencial, para ello se repasarán los principios de probabilidad en los que esta descansa. Las técnicas inferenciales son importantes, pues nos permitirán contrastar conjeturas que hacemos constantemente sobre cómo es una determinada población a través de los llamados contrastes de hipótesis.
+Por último, cabe destacar el carácter aplicado, dinámico y actual en el que se enmarca la asignatura, ya que se estudiarán casos reales de aplicación e informes estadísticos recientes de diferentes campos. Además, el enfoque didáctico que se va a emplear, dentro de la seriedad que se le presupone, procurará generar interés y aprecio por la ciencia estadística en el alumno.
+Se fortalece el enfoque en visual analytics, diseño de dashboards ejecutivos, criterios de usabilidad y narrativa con datos para la toma de decisiones.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,RESULTADOS DE APRENDIZAJE,"Aplicar herramientas tecnológicas para el análisis estadístico descriptivo e inferencial.
+Desarrollar modelos estadísticos para el análisis y visualización de datos.",profundizar,"Aplicar herramientas tecnológicas para el análisis estadístico descriptivo e inferencial.
+Desarrollar modelos estadísticos para el análisis y visualización de datos.
+Diseñar visualizaciones interactivas orientadas a decisiones ejecutivas, aplicando principios de claridad, jerarquía visual y storytelling with data.
+Construir dashboards en Power BI o Tableau integrando métricas, segmentaciones y evidencia para públicos estratégicos.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,CONTENIDO TEMÁTICO,"Tema 1. Introducción a la estadística
+•	¿Qué es la estadística?
+•	Población, muestra y muestreo
+•	Tipos de variables estadísticas
+•	Diseños de experimentos
+•	Razonamiento estadístico
+•	Representando  los  datos:  distribución  de frecuencias
+•	Tabulación de variables
+•	Graficas básicas
+•	El arte de elegir el gráfico adecuado
+•	Retos de la estadística en Big Data
+Tema 2. Estadística computacional
+•	Principios básicos
+•	Ámbitos de aplicación
+•	Técnicas básicas de programación
+•	Presentación del software R
+Tema 3. Medidas que resumen la información
+•	Medidas de tendencia central
+•	Medidas de tendencia central robustas
+•	Medidas de dispersión
+•	Medidas de dispersión robustas
+•	Medidas de posición y forma
+•	Gráficos de caja
+•	Datos atípicos y análisis exploratorio de datos
+Tema 4. Regresión y correlación
+•	Introducción
+•	Correlación
+•	Regresión lineal
+•	Gráfico de residuos
+•	Regresión lineal multivariante
+•	Regresión no lineal
+•	LTS (Least Trimmed Squares)
+Tema 5. Probabilidad condicional y variables aleatorias
+•	Introducción a la teoría de la probabilidad
+•	Principios de la teoría de la probabilidad
+•	Probabilidad condicional e independencia
+•	Variable aleatoria
+•	Modelos discretos
+•	Modelos continuos
+Tema 6. Distribución en el muestreo
+•	Distribución en el muestreo del conteo y la proporción muestral
+•	Teorema Central del Límite y distribución de  la media muestral
+•	Aplicabilidad del Teorema Central del Límite en ámbitos Big Data
+•	Estimación puntual vs. estimación por intervalos
+•	Propiedades de los estimadores
+Tema 7. Intervalos de confianza
+•	Introducción a los intervalos de confianza
+•	Intervalo de confianza para la media de una población normal: varianza conocida y desconocida
+•	Calculando el tamaño de la muestra
+•	Intervalo de confianza para la proporción
+•	Intervalo de confianza para la varianza de una población normal
+•	Intervalo de confianza para la diferencia de medias y proporciones
+•	Intervalos de confianza robustos
+Tema 8. Contrastes de hipótesis
+•	Introducción a los contrastes de hipótesis
+•	Dos tipos de error en la significancia estadística
+•	Pasos a seguir en un contraste de hipótesis
+•	Contrastes de hipótesis para una media
+•	Contrastes de hipótesis para la proporción
+•	Contrastes de hipótesis sobre la varianza
+•	Contrastes paramétricos para dos muestras
+•	Contrastes de hipótesis robustos
+Tema 9. Regresión
+•	El modelo de regresión simple
+•	Contrastando la regresión
+•	Contrastando la regresión con el programa
+•	La regresión como suma de cuadrados
+•	Aplicación de las TIC
+Tema 10. Análisis de componentes principales
+•	Motivación
+•	Definición
+•	Aplicaciones
+•	Ejemplo de aplicación en R
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Estadística descriptiva: información a partir del análisis crítico de datos. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Estadística Inferencial del análisis muestral a la predicción poblacional. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Introducción a la estadística
+•	¿Qué es la estadística?
+•	Población, muestra y muestreo
+•	Tipos de variables estadísticas
+•	Diseños de experimentos
+•	Razonamiento estadístico
+•	Representando  los  datos:  distribución  de frecuencias
+•	Tabulación de variables
+•	Graficas básicas
+•	El arte de elegir el gráfico adecuado
+•	Retos de la estadística en Big Data
+Tema 2. Estadística computacional
+•	Principios básicos
+•	Ámbitos de aplicación
+•	Técnicas básicas de programación
+•	Presentación del software R
+Tema 3. Medidas que resumen la información
+•	Medidas de tendencia central
+•	Medidas de tendencia central robustas
+•	Medidas de dispersión
+•	Medidas de dispersión robustas
+•	Medidas de posición y forma
+•	Gráficos de caja
+•	Datos atípicos y análisis exploratorio de datos
+Tema 4. Regresión y correlación
+•	Introducción
+•	Correlación
+•	Regresión lineal
+•	Gráfico de residuos
+•	Regresión lineal multivariante
+•	Regresión no lineal
+•	LTS (Least Trimmed Squares)
+Tema 5. Probabilidad condicional y variables aleatorias
+•	Introducción a la teoría de la probabilidad
+•	Principios de la teoría de la probabilidad
+•	Probabilidad condicional e independencia
+•	Variable aleatoria
+•	Modelos discretos
+•	Modelos continuos
+Tema 6. Distribución en el muestreo
+•	Distribución en el muestreo del conteo y la proporción muestral
+•	Teorema Central del Límite y distribución de  la media muestral
+•	Aplicabilidad del Teorema Central del Límite en ámbitos Big Data
+•	Estimación puntual vs. estimación por intervalos
+•	Propiedades de los estimadores
+Tema 7. Intervalos de confianza
+•	Introducción a los intervalos de confianza
+•	Intervalo de confianza para la media de una población normal: varianza conocida y desconocida
+•	Calculando el tamaño de la muestra
+•	Intervalo de confianza para la proporción
+•	Intervalo de confianza para la varianza de una población normal
+•	Intervalo de confianza para la diferencia de medias y proporciones
+•	Intervalos de confianza robustos
+Tema 8. Contrastes de hipótesis
+•	Introducción a los contrastes de hipótesis
+•	Dos tipos de error en la significancia estadística
+•	Pasos a seguir en un contraste de hipótesis
+•	Contrastes de hipótesis para una media
+•	Contrastes de hipótesis para la proporción
+•	Contrastes de hipótesis sobre la varianza
+•	Contrastes paramétricos para dos muestras
+•	Contrastes de hipótesis robustos
+Tema 9. Regresión
+•	El modelo de regresión simple
+•	Contrastando la regresión
+•	Contrastando la regresión con el programa
+•	La regresión como suma de cuadrados
+•	Aplicación de las TIC
+Tema 10. Análisis de componentes principales
+•	Motivación
+•	Definición
+•	Aplicaciones
+•	Ejemplo de aplicación en R
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Estadística descriptiva: información a partir del análisis crítico de datos. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Estadística Inferencial del análisis muestral a la predicción poblacional. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Storytelling with data y comunicación ejecutiva de hallazgos.
+Diseño de dashboards, interacción, navegación y criterios UX para analítica visual.
+Buenas prácticas en Power BI, Tableau y visualización orientada a indicadores.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Moore, D. S. (2006). Introduction to the practice of statistics (5th. ed.). New York: Freeman and Company.
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones. Versión electrónica:
+https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Triola, M. F. (2009). Estadística (10ª ed.). México D.F.: Pearson Educación.
+Hey, T., Tansley, S. y Tolle, K. (2009). The Fourth Paradigm: Data-intensive Scientific Discovery. Microsoft Research [Web].
+Disponible en: https://www.microsoft.com/en-us/research/publication/fourth-paradigm-data-intensive-scientific-discovery/
+R Development Core Team (ed.). R manuals. Cran [Web].
+Disponible en: https://cran.r-project.org/manuals.html
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones.
+Versión electrónica:https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Triola, M. F. (2009). Estadística (10ª ed.). México D.F.: Pearson Educación.
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones.
+Versión electrónica: https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Salvador, M. y Gargallo, P. (2003). Análisis Exploratorio de Datos.
+Recuperado de: http://www.5campus.com/leccion/aed.
+Stigler, S. M. (1998). The history of statistics: The measurement of uncertainty before 1900 (7 ed.). London: Belknap Press of Harvard University Press.
+Martín Andrés, A. (2004). Bioestadística para las ciencias de la salud. Madrid: Norma-Capitel.
+Moore, D. S. (2006). Introduction to the practice of statistics (5th. ed.). New York: Freeman and Company.
+Diez, D., Barr, C.; Çetinkaya-Rundel, M. (2015). OpenIntro Statistics (3ª Edición). https://www.openintro.org/stat/textbook.php?stat_book=os
+Newbold, P. et al. (2008). Estadística para administración y Economía (6ª Edición). Madrid. Pearson Educación.
+Martín, A. (2004). Bioestadística para las ciencias de la salud (1ª ed. (5ª)). Madrid: Norma-Capitel.
+Recursos y fuentes necesarios para el desarrollo de los temas
+RStudio
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero, estadístico, matemático o afines, con posgrado en matemáticas, estadística, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de | Gestión de bases de datos
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Moore, D. S. (2006). Introduction to the practice of statistics (5th. ed.). New York: Freeman and Company.
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones. Versión electrónica:
+https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Triola, M. F. (2009). Estadística (10ª ed.). México D.F.: Pearson Educación.
+Hey, T., Tansley, S. y Tolle, K. (2009). The Fourth Paradigm: Data-intensive Scientific Discovery. Microsoft Research [Web].
+Disponible en: https://www.microsoft.com/en-us/research/publication/fourth-paradigm-data-intensive-scientific-discovery/
+R Development Core Team (ed.). R manuals. Cran [Web].
+Disponible en: https://cran.r-project.org/manuals.html
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones.
+Versión electrónica:https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Triola, M. F. (2009). Estadística (10ª ed.). México D.F.: Pearson Educación.
+Ríus, F. (1998). Bioestadística: Métodos y aplicaciones. Málaga: Universidad de Málaga. Publicaciones.
+Versión electrónica: https://www.bioestadistica.uma.es/baron/apuntes/clase/apuntes/pdf/
+Salvador, M. y Gargallo, P. (2003). Análisis Exploratorio de Datos.
+Recuperado de: http://www.5campus.com/leccion/aed.
+Stigler, S. M. (1998). The history of statistics: The measurement of uncertainty before 1900 (7 ed.). London: Belknap Press of Harvard University Press.
+Martín Andrés, A. (2004). Bioestadística para las ciencias de la salud. Madrid: Norma-Capitel.
+Moore, D. S. (2006). Introduction to the practice of statistics (5th. ed.). New York: Freeman and Company.
+Diez, D., Barr, C.; Çetinkaya-Rundel, M. (2015). OpenIntro Statistics (3ª Edición). https://www.openintro.org/stat/textbook.php?stat_book=os
+Newbold, P. et al. (2008). Estadística para administración y Economía (6ª Edición). Madrid. Pearson Educación.
+Martín, A. (2004). Bioestadística para las ciencias de la salud (1ª ed. (5ª)). Madrid: Norma-Capitel.
+Recursos y fuentes necesarios para el desarrollo de los temas
+RStudio
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero, estadístico, matemático o afines, con posgrado en matemáticas, estadística, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de | Gestión de bases de datos
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Análisis e interpretación de datos.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,DESCRIPCIÓN DE LA ASIGNATURA,"Esta asignatura está orientada a la enseñanza de conceptos generales sobre proyectos de innovación tecnológica y su estrecha relación con los proyectos de transformación digital de las empresas. Estos conocimientos resultan de especial interés por su carácter práctico, puesto que describen cómo es posible plantear, dentro de una estrategia de digitalización e innovación, la implantación de tecnologías del ecosistema de la Industria 4.0.
+A propósito del uso de tecnologías novedosas, se explican los aspectos fundamentales de la innovación tecnológica (conceptos, estrategia, proceso, ejecución y protección de resultados) y su relación con la aparición de nuevos modelos de negocio, inherentes a la transformación digital de las empresas.
+Por otro lado, se han incluido contenidos específicos sobre el proceso de transformación digital (conceptos, componentes clave, herramientas de autodiagnóstico, etc.), haciendo hincapié en cómo es posible llevar a cabo un planteamiento de soluciones a retos de digitalización de las empresas.
+Por último, la asignatura enseña los conceptos más importantes que debe tener en cuenta un buen director de proyectos de transformación digital, relacionados con el liderazgo y el cambio dentro de la empresa.",actualizar,"Esta asignatura está orientada a la enseñanza de conceptos generales sobre proyectos de innovación tecnológica y su estrecha relación con los proyectos de transformación digital de las empresas. Estos conocimientos resultan de especial interés por su carácter práctico, puesto que describen cómo es posible plantear, dentro de una estrategia de digitalización e innovación, la implantación de tecnologías del ecosistema de la Industria 4.0.
+A propósito del uso de tecnologías novedosas, se explican los aspectos fundamentales de la innovación tecnológica (conceptos, estrategia, proceso, ejecución y protección de resultados) y su relación con la aparición de nuevos modelos de negocio, inherentes a la transformación digital de las empresas.
+Por otro lado, se han incluido contenidos específicos sobre el proceso de transformación digital (conceptos, componentes clave, herramientas de autodiagnóstico, etc.), haciendo hincapié en cómo es posible llevar a cabo un planteamiento de soluciones a retos de digitalización de las empresas.
+Por último, la asignatura enseña los conceptos más importantes que debe tener en cuenta un buen director de proyectos de transformación digital, relacionados con el liderazgo y el cambio dentro de la empresa.
+Se fortalece la conexión entre innovación tecnológica, vigilancia, inteligencia competitiva y transformación digital basada en datos.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,RESULTADOS DE APRENDIZAJE,"Analizar el grado de digitalización de una empresa en su contexto particular.
+Determinar estrategias de innovación para la transformación digital que incluya una evaluación sobre el nivel de integración de tecnologías emergentes.",profundizar,"Analizar el grado de digitalización de una empresa en su contexto particular.
+Determinar estrategias de innovación para la transformación digital que incluya una evaluación sobre el nivel de integración de tecnologías emergentes.
+Analizar tendencias tecnológicas y señales competitivas para orientar iniciativas de transformación digital.
+Diseñar propuestas de innovación basadas en datos, viabilidad y generación de valor.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,CONTENIDO TEMÁTICO,"Tema 1. Fundamentos de innovación tecnológica
+1.1. Introducción y objetivos
+1.2. Definiciones de I+D+i (investigación, desarrollo e innovación)
+1.3. Tipos de innovación y su relación con la Industria 4.0
+1.4. La importancia de la innovación tecnológica
+1.5. El ciclo habitual de los procesos de I+D+i
+1.6. El ciclo de vida de la innovación
+1.7. La cultura de la innovación
+1.8. Pasos para promover la cultura de la innovación en la empresa
+1.9. Referencias bibliográficas
+Tema 2. Estrategias de innovación tecnológica asociadas a la transformación digital
+2.1. Introducción y objetivos
+2.2. Creatividad e innovación en el contexto de la Industria 4.0
+2.3. Elementos de la estrategia de innovación asociados a la transformación digital
+2.4. Importancia de la innovación en un contexto de transformación digital
+2.5. Definición común de «innovación»
+2.6. Visión de la innovación en un contexto de transformación digital
+2.7. Objetivos de la innovación y relación con la transformación digital
+2.8. Áreas de actuación de la innovación
+2.9. Ideas, retos de transformación digital y proyectos de innovación
+2.10. Retorno de la inversión esperado de los esfuerzos de innovación y transformación digital
+2.11. Referencias bibliográficas
+Tema 3. Procesos de innovación tecnológica en el contexto de la Industria 4.0
+3.1. Introducción y objetivos
+3.2. Modelos de procesos de innovación
+3.3. La importancia de la innovación abierta (Open Innovation)
+3.4. ¿En qué consiste el proceso de innovación?
+3.5. Fases del proceso en un contexto de transformación digital
+3.6. Las TIC y el proceso de innovación
+3.7. Referencias bibliográficas
+Tema 4. Métodos y herramientas para la gestión de la innovación
+4.1. Introducción y objetivos
+4.2. Métodos para la gestión global del proceso de innovación
+4.3. La importancia del método Design Thinking
+4.4. Métodos para identificar necesidades y oportunidades
+4.5. Generación de ideas creativas
+4.6. Herramientas de creatividad específicas
+4.7. Evaluación de ideas
+4.8. Gestión organizacional de la innovación
+4.9. Referencias bibliográficas
+Tema 5. Vigilancia y protección de la innovación tecnológica
+5.1. Introducción y objetivos
+5.2. Vigilancia tecnológica
+5.3. Prospectiva tecnológica
+5.4. Inteligencia competitiva
+5.5. Propiedad intelectual e industrial
+5.6. Patentes y modelos de utilidad
+5.7. Gestión de la cartera de propiedad industrial
+5.8. Referencias bibliográficas
+Tema 6. Ejecución de proyectos de innovación en un contexto de Industria 4.0
+6.1. Introducción y objetivos
+6.2. Buenas prácticas para la ejecución de proyectos de innovación
+6.3. Estudio de viabilidad
+6.4. Financiación y convocatorias públicas y privadas
+6.5. Prototipos y proyectos piloto
+6.6. Seguimiento y control: métricas de entrada, proceso y salida
+6.7. Referencias bibliográficas
+Tema 7. Innovación y transformación digital en Industria 4.0
+7.1. Introducción y objetivos
+7.2. La transformación digital de las empresas basada en la Industria 4.0
+7.3. Nivel de digitalización de las empresas y preparación para su transformación digital
+7.4. Herramientas y métodos de diagnóstico de madurez digital
+7.5. Referencias bibliográficas
+Tema 8. Planteamiento de soluciones a retos de transformación digital
+8.1. Introducción y objetivos
+8.2. Elementos clave para la transformación digital en Industria 4.0
+8.3. Metodología POC (Proof of Concept)
+8.4. Planteamiento de soluciones a retos de transformación digital
+8.5. Referencias bibliográficas
+Tema 9. Dirección y gestión de proyectos de transformación digital
+9.1. Introducción y objetivos
+9.2. Dificultades para la gestión y dirección de proyectos de transformación digital
+9.3. Claves para una buena dirección de proyectos de transformación digital
+9.4. Estrategias para mejorar el rendimiento del equipo del proyecto
+9.5. La gestión de las expectativas
+9.6. Gestión de subcontrataciones
+9.7. Recomendaciones para problemas habituales
+9.8. Referencias bibliográficas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Un plan estratégico de innovación tecnológica y transformación digital. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Definición de un modelo de innovación en tu empresa. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Evaluación virtual en línea de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Fundamentos de innovación tecnológica
+1.1. Introducción y objetivos
+1.2. Definiciones de I+D+i (investigación, desarrollo e innovación)
+1.3. Tipos de innovación y su relación con la Industria 4.0
+1.4. La importancia de la innovación tecnológica
+1.5. El ciclo habitual de los procesos de I+D+i
+1.6. El ciclo de vida de la innovación
+1.7. La cultura de la innovación
+1.8. Pasos para promover la cultura de la innovación en la empresa
+1.9. Referencias bibliográficas
+Tema 2. Estrategias de innovación tecnológica asociadas a la transformación digital
+2.1. Introducción y objetivos
+2.2. Creatividad e innovación en el contexto de la Industria 4.0
+2.3. Elementos de la estrategia de innovación asociados a la transformación digital
+2.4. Importancia de la innovación en un contexto de transformación digital
+2.5. Definición común de «innovación»
+2.6. Visión de la innovación en un contexto de transformación digital
+2.7. Objetivos de la innovación y relación con la transformación digital
+2.8. Áreas de actuación de la innovación
+2.9. Ideas, retos de transformación digital y proyectos de innovación
+2.10. Retorno de la inversión esperado de los esfuerzos de innovación y transformación digital
+2.11. Referencias bibliográficas
+Tema 3. Procesos de innovación tecnológica en el contexto de la Industria 4.0
+3.1. Introducción y objetivos
+3.2. Modelos de procesos de innovación
+3.3. La importancia de la innovación abierta (Open Innovation)
+3.4. ¿En qué consiste el proceso de innovación?
+3.5. Fases del proceso en un contexto de transformación digital
+3.6. Las TIC y el proceso de innovación
+3.7. Referencias bibliográficas
+Tema 4. Métodos y herramientas para la gestión de la innovación
+4.1. Introducción y objetivos
+4.2. Métodos para la gestión global del proceso de innovación
+4.3. La importancia del método Design Thinking
+4.4. Métodos para identificar necesidades y oportunidades
+4.5. Generación de ideas creativas
+4.6. Herramientas de creatividad específicas
+4.7. Evaluación de ideas
+4.8. Gestión organizacional de la innovación
+4.9. Referencias bibliográficas
+Tema 5. Vigilancia y protección de la innovación tecnológica
+5.1. Introducción y objetivos
+5.2. Vigilancia tecnológica
+5.3. Prospectiva tecnológica
+5.4. Inteligencia competitiva
+5.5. Propiedad intelectual e industrial
+5.6. Patentes y modelos de utilidad
+5.7. Gestión de la cartera de propiedad industrial
+5.8. Referencias bibliográficas
+Tema 6. Ejecución de proyectos de innovación en un contexto de Industria 4.0
+6.1. Introducción y objetivos
+6.2. Buenas prácticas para la ejecución de proyectos de innovación
+6.3. Estudio de viabilidad
+6.4. Financiación y convocatorias públicas y privadas
+6.5. Prototipos y proyectos piloto
+6.6. Seguimiento y control: métricas de entrada, proceso y salida
+6.7. Referencias bibliográficas
+Tema 7. Innovación y transformación digital en Industria 4.0
+7.1. Introducción y objetivos
+7.2. La transformación digital de las empresas basada en la Industria 4.0
+7.3. Nivel de digitalización de las empresas y preparación para su transformación digital
+7.4. Herramientas y métodos de diagnóstico de madurez digital
+7.5. Referencias bibliográficas
+Tema 8. Planteamiento de soluciones a retos de transformación digital
+8.1. Introducción y objetivos
+8.2. Elementos clave para la transformación digital en Industria 4.0
+8.3. Metodología POC (Proof of Concept)
+8.4. Planteamiento de soluciones a retos de transformación digital
+8.5. Referencias bibliográficas
+Tema 9. Dirección y gestión de proyectos de transformación digital
+9.1. Introducción y objetivos
+9.2. Dificultades para la gestión y dirección de proyectos de transformación digital
+9.3. Claves para una buena dirección de proyectos de transformación digital
+9.4. Estrategias para mejorar el rendimiento del equipo del proyecto
+9.5. La gestión de las expectativas
+9.6. Gestión de subcontrataciones
+9.7. Recomendaciones para problemas habituales
+9.8. Referencias bibliográficas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Un plan estratégico de innovación tecnológica y transformación digital. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Definición de un modelo de innovación en tu empresa. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Evaluación virtual en línea de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Vigilancia tecnológica e inteligencia competitiva.
+Transformación digital, modelos de adopción y gestión del cambio.
+Evaluación de viabilidad, impacto y valor de iniciativas digitales.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,MEDIOS EDUCATIVOS,"Bibliografía específica recomendada
+Clark, T., Osterwalder, A. y Pigneur, Y. (2012). Tu modelo de negocio. Barcelona: Deusto.
+De la Peña, J. y Cabezas, M. (2015). La gran oportunidad: claves para liderar la transformación digital en las empresas y en la economía. Barcelona: Gestión 2000.
+Morote, J. P., Serrano, G. L. e Hidalgo, A. (2014). La gestión de la innovación y la tecnología en las organizaciones. Madrid: Ediciones Pirámide.
+Project Management Institute (2017). Guía de los Fundamentos para la Dirección de Proyectos (Guía del PMBOK®) (6ª ed.). Atlanta: PMI Publications.
+Ries, E. (2012). El método Lean Startup: Cómo crear empresas de éxito utilizando la innovación continua. Barcelona: Grupo Planeta (GBS).
+Rogers, D. L. (2016). The Digital Transformation Playbook: Rethink your Business for the Digital Age. Nueva York: Columbia University Press.
+Sabbagh, A. y Mackinlay, M. (2011). El método de innovación creativa: un sistema para generar ideas y transformarlas en proyectos sustentables. Buenos Aires: Ediciones Granica.
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Administrador de empresas, ingeniero industrial, Ingeniero de Sistemas o afines. Posgrado en administración o afines, en ingeniería de sistemas o afines, o MBA.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de |
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía específica recomendada
+Clark, T., Osterwalder, A. y Pigneur, Y. (2012). Tu modelo de negocio. Barcelona: Deusto.
+De la Peña, J. y Cabezas, M. (2015). La gran oportunidad: claves para liderar la transformación digital en las empresas y en la economía. Barcelona: Gestión 2000.
+Morote, J. P., Serrano, G. L. e Hidalgo, A. (2014). La gestión de la innovación y la tecnología en las organizaciones. Madrid: Ediciones Pirámide.
+Project Management Institute (2017). Guía de los Fundamentos para la Dirección de Proyectos (Guía del PMBOK®) (6ª ed.). Atlanta: PMI Publications.
+Ries, E. (2012). El método Lean Startup: Cómo crear empresas de éxito utilizando la innovación continua. Barcelona: Grupo Planeta (GBS).
+Rogers, D. L. (2016). The Digital Transformation Playbook: Rethink your Business for the Digital Age. Nueva York: Columbia University Press.
+Sabbagh, A. y Mackinlay, M. (2011). El método de innovación creativa: un sistema para generar ideas y transformarlas en proyectos sustentables. Buenos Aires: Ediciones Granica.
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Administrador de empresas, ingeniero industrial, Ingeniero de Sistemas o afines. Posgrado en administración o afines, en ingeniería de sistemas o afines, o MBA.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de |
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"vigilancia tecnológica, inteligencia competitiva, transformación digital",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,DESCRIPCIÓN DE LA ASIGNATURA,"Esta asignatura está centrada en los fundamentos de tecnología de información y bases de datos necesarios con el fin de comprender las soluciones de inteligencia de básicos para interactuar apropiadamente con perfiles técnicos y equipos de proyecto de inteligencia de negocio.
+La asignatura está dedicada a la infraestructura de la tecnología de la información y los fundamentos de la inteligencia de negocios. Se incluyen temas dedicados a los componentes principales de una infraestructura de la tecnología de la información (plataformas hardware,
+sistemas operativos, aplicaciones empresariales), a las redes de computadores (de ámbito local, global y redes inalámbricas), a la seguridad en redes de computadores, herramientas de protección de recursos informáticos y a la computación en la nube, centrándose en los servicios disponibles e infraestructuras necesarias. El objetivo es dotar al alumno de los conocimientos básicos en esas tecnologías. Asimismo, la asignatura se centra en el estudio de las bases de datos relaciones, profundizando en el modelo relacional y los lenguajes de consulta. También se aborda el diseño de bases de datos basado en el modelo entidad-relación. El tema final proporciona una introducción a los fundamentos tecnológicos de la inteligencia de negocio, la integración de datos, el almacén de datos y el procesamiento analítico en línea. Se explicarán las diferencias entre la inteligencia de negocios y la analítica de negocios.",actualizar,"Esta asignatura está centrada en los fundamentos de tecnología de información y bases de datos necesarios con el fin de comprender las soluciones de inteligencia de básicos para interactuar apropiadamente con perfiles técnicos y equipos de proyecto de inteligencia de negocio.
+La asignatura está dedicada a la infraestructura de la tecnología de la información y los fundamentos de la inteligencia de negocios. Se incluyen temas dedicados a los componentes principales de una infraestructura de la tecnología de la información (plataformas hardware,
+sistemas operativos, aplicaciones empresariales), a las redes de computadores (de ámbito local, global y redes inalámbricas), a la seguridad en redes de computadores, herramientas de protección de recursos informáticos y a la computación en la nube, centrándose en los servicios disponibles e infraestructuras necesarias. El objetivo es dotar al alumno de los conocimientos básicos en esas tecnologías. Asimismo, la asignatura se centra en el estudio de las bases de datos relaciones, profundizando en el modelo relacional y los lenguajes de consulta. También se aborda el diseño de bases de datos basado en el modelo entidad-relación. El tema final proporciona una introducción a los fundamentos tecnológicos de la inteligencia de negocio, la integración de datos, el almacén de datos y el procesamiento analítico en línea. Se explicarán las diferencias entre la inteligencia de negocios y la analítica de negocios.
+Se conserva la base tecnológica y se profundiza en SQL, ETL, modelado y preparación de datos para analítica.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,RESULTADOS DE APRENDIZAJE,"Diseñar modelo entidad relación con base en fuentes de datos internas y externas de la empresa para el análisis y toma de decisiones.
+Desarrollar las operaciones básicas del CRUD de una base de datos relacional",profundizar,"Diseñar modelo entidad relación con base en fuentes de datos internas y externas de la empresa para el análisis y toma de decisiones.
+Desarrollar las operaciones básicas del CRUD de una base de datos relacional
+Aplicar SQL y procesos ETL para integrar, depurar y preparar datos con fines analíticos.
+Explicar fundamentos de modelado, almacenamiento y calidad de datos en soluciones BI.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,CONTENIDO TEMÁTICO,"Tema 1. Infraestructura de la tecnología de la información
+•	Introducción y objetivos
+•	Infraestructura de la tecnología de la información
+•	Evolución de la infraestructura de la tecnología de la información
+•	Componentes de la infraestructura de la tecnología de la información
+•	Tendencias de las plataformas hardware y software
+Tema 2. Computación en la nube
+•	Introducción y objetivos
+•	Computación en la nube
+•	Tecnologías que lo hacen posible
+•	Modelos de la nube
+•	Infraestructura de la nube
+Tema 3. Introducción a las bases de datos
+•	Introducción y objetivos
+•	Evolución histórica de las bases de datos y sus sistemas de gestión
+•	Objetivos y funcionalidad de los SGBD
+•	Arquitectura y modelos de los SGBD
+•	Bases de datos vía tablas relacionadas
+•	Alternativas y costo de implementación de las bases de datos en la empresa
+Tema 4. Introducción al diseño de las bases de datos relacionales
+•	Introducción y objetivos
+•	Introducción al diseño de bases de datos
+•	Estructura del modelo entidad-relación
+•	Realización de un modelo E-R
+•	Modelo entidad-relación
+•	Diseño lógico
+Tema 5. Bases de datos relacionales
+•	Introducción y objetivos
+•	Introducción al modelo relacional
+•	Estructura del modelo relacional
+•	Lenguaje SQL
+Consultas SQL
+• Consulta en base de datos
+• Vistas y procedimientos almacenados
+Tema 6. Inteligencia de negocios
+• Introducción y objetivos
+• Almacén de datos
+• Modelado del almacén de datos y cubos de datos
+• Arquitecturas OLAP
+• Consultas en almacén de datos
+• Conexión con herramientas de inteligencia de
+negocio y lenguajes de programación
+Tema 7. Telecomunicaciones y redes de computadores
+• Introducción y objetivos
+• Principios básicos de las telecomunicaciones y las
+redes de computadores
+• Redes de comunicación
+• Redes inalámbricas
+Tema 8. Seguridad en los sistemas de información
+• Introducción y objetivos
+• Seguridad en los sistemas de información
+• Seguridad de la información de la empresa
+• Tecnologías y herramientas para proteger los
+sistemas de información
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Crear una base de datos:
+Aportar una solución tabulada para almacenar datos a un problema empresarial.
+Relacionar tablas que almacenan datos. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Diseño de un esquema E-R | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluaci
+ón final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Infraestructura de la tecnología de la información
+•	Introducción y objetivos
+•	Infraestructura de la tecnología de la información
+•	Evolución de la infraestructura de la tecnología de la información
+•	Componentes de la infraestructura de la tecnología de la información
+•	Tendencias de las plataformas hardware y software
+Tema 2. Computación en la nube
+•	Introducción y objetivos
+•	Computación en la nube
+•	Tecnologías que lo hacen posible
+•	Modelos de la nube
+•	Infraestructura de la nube
+Tema 3. Introducción a las bases de datos
+•	Introducción y objetivos
+•	Evolución histórica de las bases de datos y sus sistemas de gestión
+•	Objetivos y funcionalidad de los SGBD
+•	Arquitectura y modelos de los SGBD
+•	Bases de datos vía tablas relacionadas
+•	Alternativas y costo de implementación de las bases de datos en la empresa
+Tema 4. Introducción al diseño de las bases de datos relacionales
+•	Introducción y objetivos
+•	Introducción al diseño de bases de datos
+•	Estructura del modelo entidad-relación
+•	Realización de un modelo E-R
+•	Modelo entidad-relación
+•	Diseño lógico
+Tema 5. Bases de datos relacionales
+•	Introducción y objetivos
+•	Introducción al modelo relacional
+•	Estructura del modelo relacional
+•	Lenguaje SQL
+Consultas SQL
+• Consulta en base de datos
+• Vistas y procedimientos almacenados
+Tema 6. Inteligencia de negocios
+• Introducción y objetivos
+• Almacén de datos
+• Modelado del almacén de datos y cubos de datos
+• Arquitecturas OLAP
+• Consultas en almacén de datos
+• Conexión con herramientas de inteligencia de
+negocio y lenguajes de programación
+Tema 7. Telecomunicaciones y redes de computadores
+• Introducción y objetivos
+• Principios básicos de las telecomunicaciones y las
+redes de computadores
+• Redes de comunicación
+• Redes inalámbricas
+Tema 8. Seguridad en los sistemas de información
+• Introducción y objetivos
+• Seguridad en los sistemas de información
+• Seguridad de la información de la empresa
+• Tecnologías y herramientas para proteger los
+sistemas de información
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Crear una base de datos:
+Aportar una solución tabulada para almacenar datos a un problema empresarial.
+Relacionar tablas que almacenan datos. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Diseño de un esquema E-R | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluaci
+ón final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+SQL aplicado a consulta, transformación y validación de datos.
+Procesos ETL/ELT y preparación de datos para visual analytics.
+Fundamentos de data warehousing y modelado dimensional.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Cabello, M. V. N. (2010). Introducción a las bases de datos relacionales. Vision Libros.
+Celma Giménez, M., Casamayor Ródenas, J. C., & Mota Herranz, L. (2003). Bases de datos relacionales. Madrid [etc.]: Prentice-Hall.
+Elmasri, R., Navathe, S. B., Castillo, V. C., Pérez, G. Z., & Espiga, B. G. (2007). Fundamentos de sistemas de bases de datos (No. QA76. 9D3 E553 2007.). Pearson educación.
+Joyanes Aguilar, L. (2012). Computación en la nube.
+Recursos y fuentes necesarios para el desarrollo de los temas
+Sql Server, My SQL, Excel
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de | Gestión de bases de datos
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Cabello, M. V. N. (2010). Introducción a las bases de datos relacionales. Vision Libros.
+Celma Giménez, M., Casamayor Ródenas, J. C., & Mota Herranz, L. (2003). Bases de datos relacionales. Madrid [etc.]: Prentice-Hall.
+Elmasri, R., Navathe, S. B., Castillo, V. C., Pérez, G. Z., & Espiga, B. G. (2007). Fundamentos de sistemas de bases de datos (No. QA76. 9D3 E553 2007.). Pearson educación.
+Joyanes Aguilar, L. (2012). Computación en la nube.
+Recursos y fuentes necesarios para el desarrollo de los temas
+Sql Server, My SQL, Excel
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de | Gestión de bases de datos
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"SQL, ETL, data warehousing, modelado de datos",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,DESCRIPCIÓN DE LA ASIGNATURA,"La asignatura de Gestión de Proyectos de Inteligencia de Negocios pretende reunir todos los conocimientos adquiridos en el resto de las asignaturas para poder enseñar de forma eficiente cómo gestionar un proyecto de Inteligencia de Negocio en el mundo actual.
+Esta asignatura demuestra la importancia de los datos, sus fuentes y su tratamiento como instrumento clave para el proyecto. A través de un repaso a la historia de las metodologías de transformación de negocio se conocerán las más modernas para el despliegue y la puesta en marcha de transformaciones de negocios basadas en la información obtenida de los sistemas de Inteligencia de Negocio.
+Conoceremos los elementos y tecnologías de soporte necesarios para la aplicación de proyecto, así como la principal diferencia entre un proyecto de inteligencia de negocio y un proyecto de software empresarial.
+Resaltaremos la importancia y las peculiaridades de un proyecto basado en datos e información, así como el proceso integral de un proyecto de inteligencia de negocio de principio a fin conociendo todos los elementos y personas incorporadas y necesarias.
+Se conocerá cómo diseñar la arquitectura del proyecto ahondando en los recursos tecnológicos, el acceso a datos y definición de los indicadores y reportes a generar por el sistema.
+Por último, se detallarán algunos factores determinantes del éxito a la hora de gestionar un proyecto de inteligencia de negocio y la forma de conseguirlos y se presentarán casos de implementación de proyectos que ayuden a identificar posibilitadores y frenos para su éxito.
+En resumen, la asignatura pretende formar al alumno en todos los conocimientos necesarios para implementar en una organización un proyecto de Inteligencia de Negocio basado en datos de forma exitosa.",actualizar,"La asignatura de Gestión de Proyectos de Inteligencia de Negocios pretende reunir todos los conocimientos adquiridos en el resto de las asignaturas para poder enseñar de forma eficiente cómo gestionar un proyecto de Inteligencia de Negocio en el mundo actual.
+Esta asignatura demuestra la importancia de los datos, sus fuentes y su tratamiento como instrumento clave para el proyecto. A través de un repaso a la historia de las metodologías de transformación de negocio se conocerán las más modernas para el despliegue y la puesta en marcha de transformaciones de negocios basadas en la información obtenida de los sistemas de Inteligencia de Negocio.
+Conoceremos los elementos y tecnologías de soporte necesarios para la aplicación de proyecto, así como la principal diferencia entre un proyecto de inteligencia de negocio y un proyecto de software empresarial.
+Resaltaremos la importancia y las peculiaridades de un proyecto basado en datos e información, así como el proceso integral de un proyecto de inteligencia de negocio de principio a fin conociendo todos los elementos y personas incorporadas y necesarias.
+Se conocerá cómo diseñar la arquitectura del proyecto ahondando en los recursos tecnológicos, el acceso a datos y definición de los indicadores y reportes a generar por el sistema.
+Por último, se detallarán algunos factores determinantes del éxito a la hora de gestionar un proyecto de inteligencia de negocio y la forma de conseguirlos y se presentarán casos de implementación de proyectos que ayuden a identificar posibilitadores y frenos para su éxito.
+En resumen, la asignatura pretende formar al alumno en todos los conocimientos necesarios para implementar en una organización un proyecto de Inteligencia de Negocio basado en datos de forma exitosa.
+Se refuerza la gestión de proyectos de inteligencia de negocio con indicadores, priorización de valor y gobierno de iniciativas analíticas.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,RESULTADOS DE APRENDIZAJE,"Planear los recursos y actividades necesarias para el análisis y visualización de datos en la organización.
+Aplicar herramientas tecnológicas y marcos de referencia para la gestión de proyectos de inteligencia de negocio.",profundizar,"Planear los recursos y actividades necesarias para el análisis y visualización de datos en la organización.
+Aplicar herramientas tecnológicas y marcos de referencia para la gestión de proyectos de inteligencia de negocio.
+Formular proyectos de BI alineados con objetivos estratégicos, indicadores y generación de valor.
+Priorizar iniciativas analíticas usando criterios de impacto, viabilidad, riesgos y adopción organizacional.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,CONTENIDO TEMÁTICO,"Tema 1 La implementación de un proyecto de Inteligencia de Negocio
+1.1. Introducción y objetivos.
+1.2. La estrategia empresarial impulsa los proyectos orientado a datos.
+1.3. El líder del proyecto.
+1.4. Determinación de la cartera de proyectos.
+1.5. Promotores, dirección y participación organizacional.
+1.6. Construcción del proyecto.
+1.7. Medición de los resultados del proyecto.
+1.8. Promoción interna del proyecto
+Tema 2 Evaluación de un proyecto de Inteligencia de Negocio
+2.1. Introducción y objetivos.
+2.2. Fase de descubrimiento: evaluar el entorno actual.
+2.3. Fase de análisis: identificar los gaps.
+2.4. Fase de recomendaciones: alcance, prioridades y presupuesto
+Tema 3 Estructura de descomposición del trabajo (EDT)
+3.1. Introducción y objetivos.
+3.2. Definición de la EDT.
+3.3. Principios para diseñar la EDT.
+3.4. Múltiples EDTs para el proyecto de Inteligencia de Negocio.
+3.5. Plan de arquitectura del proyecto de Inteligencia de Negocio.
+3.6. Los proyectos de Inteligencia de Negocio son diferentes
+Tema 4 Metodologías de proyectos
+4.1. Introducción y objetivos.
+4.2. La batalla de las metodologías de proyecto.
+4.3. La falsa elección entre metodologías de proyecto.
+4.4. Metodología híbrida para proyectos de Inteligencia de Negocio
+Tema 5 Fases de un proyecto de Inteligencia de Negocio
+5.1. Introducción y objetivos.
+5.1. Alcance y planificación.
+5.2. Definición y análisis.
+5.3. Diseño y arquitectura
+5.4. Construcción y prueba.
+5.5. Implementación y despliegue
+Tema 6 Cronograma de un Proyecto de Inteligencia de Negocio
+6.1. Introducción y objetivos.
+6.2. Swim lane de Inteligencia de Negocio.
+6.3. Swim lane de datos y bases de datos
+6.4. Swim lane de la integración de datos.
+6.5. Swim lane de la infraestructura.
+6.6. Swim lane de la gestión del proyecto
+Tema 7 Aplicación de un proyecto de Inteligencia de Negocio
+7.1. Introducción y objetivos.
+7.2. Modelos de marketing relacional.
+7.3. Gestión de la fuerza de ventas.
+7.3. Diseño y arquitectura
+7.4. Casos empresariales
+Tema 8 Casos de implementación de proyectos de Inteligencia de Negocio
+8.2. El caso de Google.
+8.3. El cao de Facebook
+8.4. El caso de Kaggle.
+8.5. El caso de Cornestone
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Mini Case AW-Bikes (I). Descubriendo el valor de la información. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Mini Case AW-Bikes (II). Convirtiendo datos en conocimiento | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1 La implementación de un proyecto de Inteligencia de Negocio
+1.1. Introducción y objetivos.
+1.2. La estrategia empresarial impulsa los proyectos orientado a datos.
+1.3. El líder del proyecto.
+1.4. Determinación de la cartera de proyectos.
+1.5. Promotores, dirección y participación organizacional.
+1.6. Construcción del proyecto.
+1.7. Medición de los resultados del proyecto.
+1.8. Promoción interna del proyecto
+Tema 2 Evaluación de un proyecto de Inteligencia de Negocio
+2.1. Introducción y objetivos.
+2.2. Fase de descubrimiento: evaluar el entorno actual.
+2.3. Fase de análisis: identificar los gaps.
+2.4. Fase de recomendaciones: alcance, prioridades y presupuesto
+Tema 3 Estructura de descomposición del trabajo (EDT)
+3.1. Introducción y objetivos.
+3.2. Definición de la EDT.
+3.3. Principios para diseñar la EDT.
+3.4. Múltiples EDTs para el proyecto de Inteligencia de Negocio.
+3.5. Plan de arquitectura del proyecto de Inteligencia de Negocio.
+3.6. Los proyectos de Inteligencia de Negocio son diferentes
+Tema 4 Metodologías de proyectos
+4.1. Introducción y objetivos.
+4.2. La batalla de las metodologías de proyecto.
+4.3. La falsa elección entre metodologías de proyecto.
+4.4. Metodología híbrida para proyectos de Inteligencia de Negocio
+Tema 5 Fases de un proyecto de Inteligencia de Negocio
+5.1. Introducción y objetivos.
+5.1. Alcance y planificación.
+5.2. Definición y análisis.
+5.3. Diseño y arquitectura
+5.4. Construcción y prueba.
+5.5. Implementación y despliegue
+Tema 6 Cronograma de un Proyecto de Inteligencia de Negocio
+6.1. Introducción y objetivos.
+6.2. Swim lane de Inteligencia de Negocio.
+6.3. Swim lane de datos y bases de datos
+6.4. Swim lane de la integración de datos.
+6.5. Swim lane de la infraestructura.
+6.6. Swim lane de la gestión del proyecto
+Tema 7 Aplicación de un proyecto de Inteligencia de Negocio
+7.1. Introducción y objetivos.
+7.2. Modelos de marketing relacional.
+7.3. Gestión de la fuerza de ventas.
+7.3. Diseño y arquitectura
+7.4. Casos empresariales
+Tema 8 Casos de implementación de proyectos de Inteligencia de Negocio
+8.2. El caso de Google.
+8.3. El cao de Facebook
+8.4. El caso de Kaggle.
+8.5. El caso de Cornestone
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Mini Case AW-Bikes (I). Descubriendo el valor de la información. | Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Mini Case AW-Bikes (II). Convirtiendo datos en conocimiento | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Gobierno de proyectos analíticos y portafolio de iniciativas BI.
+Indicadores, OKR/KPI y medición de valor de negocio.
+Gestión del cambio, adopción y comunicación ejecutiva.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Sherman, R. (2014). Business intelligence guidebook: From data integration to analytics. Elsevier: Ámsterdam.
+Vercellis, C. (2009). Business intelligence: data mining and optimization for decision making. Wiley: New York.
+Marr, B. (2015). Big Data Case Study Collection: 7 Amazing Companies That Really Get Big Data. John Wiley & Sons: EE.
+Marr, B. (2015). Big Data Case Study Collection: 7 Amazing Companies That Really Get Big Data. John Wiley & Sons: EE.
+e-Manuales. (s.f.). Diagrama Swim Lane: ¿qué es y cómo crear uno? [online]. Disponible en https://www.e-manuales.com/diagrama-swim-lane/
+Garzas, J. (19 de marzo de 2014). 12 fotos de tableros ágiles [online]. Disponible en https://www.javiergarzas.com/2014/03/tableros.html
+Recursos y fuentes necesarios para el desarrollo de los temas
+Weka,Gliffy,  Gantt project
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Administrador de empresas, ingeniero industrial, Ingeniero de Sistemas o afines. Posgrado en administración o afines , en ingeniería de sistemas o afines, o MBA.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Sherman, R. (2014). Business intelligence guidebook: From data integration to analytics. Elsevier: Ámsterdam.
+Vercellis, C. (2009). Business intelligence: data mining and optimization for decision making. Wiley: New York.
+Marr, B. (2015). Big Data Case Study Collection: 7 Amazing Companies That Really Get Big Data. John Wiley & Sons: EE.
+Marr, B. (2015). Big Data Case Study Collection: 7 Amazing Companies That Really Get Big Data. John Wiley & Sons: EE.
+e-Manuales. (s.f.). Diagrama Swim Lane: ¿qué es y cómo crear uno? [online]. Disponible en https://www.e-manuales.com/diagrama-swim-lane/
+Garzas, J. (19 de marzo de 2014). 12 fotos de tableros ágiles [online]. Disponible en https://www.javiergarzas.com/2014/03/tableros.html
+Recursos y fuentes necesarios para el desarrollo de los temas
+Weka,Gliffy,  Gantt project
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Administrador de empresas, ingeniero industrial, Ingeniero de Sistemas o afines. Posgrado en administración o afines , en ingeniería de sistemas o afines, o MBA.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"gobierno de proyectos analíticos, KPI, priorización, valor de negocio",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,DESCRIPCIÓN DE LA ASIGNATURA,"Hoy en día el dato se ha convertido en un activo de gran valor y es un aliado en la toma de decisiones empresariales. El gobierno del dato surge como una necesidad para gestionar la disponibilidad, integridad, usabilidad y seguridad de los datos. Crear y liderar una organización que emplee un enfoque data-driven, es decir, empresa impulsada por los datos, implica una transformación cultural. Es necesario que las empresas creen estrategias para que el dato se almacene, se utilice y se destruya de la mejor manera posible.
+En esta asignatura los alumnos aprenderán sobre almacenamiento, tratamiento y protección de datos, además de cómo utilizarlos para beneficio empresarial y mejorar las interacciones con el cliente a través del marketing. Se tratarán temas como el direccionamiento estratégico, el almacenamiento a través de data warehouse, data lake y datos maestros, que permitirán extraer conocimiento relevante para crear estrategias de marketing. El marketing tiene un papel decisivo en las empresas como fuente de ventajas competitivas; la relación de intercambio y la satisfacción de los deseos y necesidades de los consumidores es clave para diseñar estrategias adecuadas con foco en el cliente. Además, no se dejarán de lado los retos que tienen las empresas para poder resguardar la privacidad, manteniendo el equilibrio entre los requerimientos del negocio y los derechos de los ciudadanos. En este último aspecto el alumno aprenderá cómo evaluar los riesgos e identificar controles de protección de datos que mitiguen estos riesgos.",actualizar,"Hoy en día el dato se ha convertido en un activo de gran valor y es un aliado en la toma de decisiones empresariales. El gobierno del dato surge como una necesidad para gestionar la disponibilidad, integridad, usabilidad y seguridad de los datos. Crear y liderar una organización que emplee un enfoque data-driven, es decir, empresa impulsada por los datos, implica una transformación cultural. Es necesario que las empresas creen estrategias para que el dato se almacene, se utilice y se destruya de la mejor manera posible.
+En esta asignatura los alumnos aprenderán sobre almacenamiento, tratamiento y protección de datos, además de cómo utilizarlos para beneficio empresarial y mejorar las interacciones con el cliente a través del marketing. Se tratarán temas como el direccionamiento estratégico, el almacenamiento a través de data warehouse, data lake y datos maestros, que permitirán extraer conocimiento relevante para crear estrategias de marketing. El marketing tiene un papel decisivo en las empresas como fuente de ventajas competitivas; la relación de intercambio y la satisfacción de los deseos y necesidades de los consumidores es clave para diseñar estrategias adecuadas con foco en el cliente. Además, no se dejarán de lado los retos que tienen las empresas para poder resguardar la privacidad, manteniendo el equilibrio entre los requerimientos del negocio y los derechos de los ciudadanos. En este último aspecto el alumno aprenderá cómo evaluar los riesgos e identificar controles de protección de datos que mitiguen estos riesgos.
+Se profundiza el gobierno del dato, calidad, linaje, seguridad y responsabilidades institucionales sobre activos de información.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,RESULTADOS DE APRENDIZAJE,"Identificar los aspectos legales relacionados con la captura, almacenamiento y uso de datos.
+Analizar marcos de referencia para el gobierno de datos y toma de decisiones en la organización",profundizar,"Identificar los aspectos legales relacionados con la captura, almacenamiento y uso de datos.
+Analizar marcos de referencia para el gobierno de datos y toma de decisiones en la organización
+Definir criterios de gobierno, calidad y linaje de datos para soportar decisiones confiables.
+Proponer controles de seguridad, privacidad y uso responsable de datos en entornos analíticos.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,CONTENIDO TEMÁTICO,"Tema 1. Dirección estratégica y gobierno de datos
+1.1. Introducción y objetivos.
+1.2. ¿Qué es la dirección estratégica (DE)?
+1.3. El proceso de dirección estratégica.
+1.4. Análisis estratégico.
+1.5. Cuadro de mando integral (CMI).
+1.6. Toma de decisiones.
+1.7. Gobierno de datos
+Tema 2. Business intelligence y datos maestros
+2.1. Introducción y objetivos.
+2.2. Datos, información y conocimiento.
+2.3. Datos maestros.
+2.4. Inteligencia de negocios.
+2.5. Business intelligence vs. Business Analytics
+Tema 3. Data warehouse y data lake
+3.1. Introducción y objetivos.
+3.2. Procesos ETL.
+3.3. Almacén de datos (data warehouse).
+3.4. Lago de datos (data lake).
+Tema 4. Metodologías y tendencias
+4.1. Introducción y objetivos.
+4.2. Metodología Kimball.
+4.3. Metodologías PMI.
+4.4. Metodología Inmon.
+4.5. Data-driven decision modelling.
+4.6. Metodología DevOps.
+4.7. Nuevos roles.
+4.8. Tendencias.
+Tema 5. Introducción al marketing
+5.1. Introducción y objetivos.
+5.2. Fundamentos y concepto del marketing.
+5.3. Concepto de sistema de información.
+5.4. Captura de datos. Sistema de datos internos.
+5.5. La investigación del marketing. Las necesidades del cliente.
+Tema 6. Métricas y métodos de análisis
+6.1. Introducción y objetivos.
+6.2. Principios y fundamentos.
+6.3. Métricas básicas.
+6.4. Tipos de analíticas web.
+6.5. Herramientas de medición.
+Tema 7. Marketing relacional y CRM
+7.1. Introducción y objetivos.
+7.2. Introducción al marketing relacional.
+7.3. Características y beneficios del marketing relacional.
+7.4. CRM: definición y características.
+7.5. Factores clave y bases para un buen CRM
+Tema 8. Introducción a la protección de datos
+8.1. Introducción y objetivos.
+8.2. Conceptos.
+8.3. Marco legal de la protección de datos en Colombia.
+8.5. Legalidad del tratamiento. La autorización previa, expresa e informada.
+8.6. Derecho de información.
+8.7. El derecho del titular.
+8.8. Obligaciones generales del responsable de tratamiento y encargado.
+8.9. Otros marcos internacionales.
+8.10. Protección de datos en EE. UU. y en la U.E.
+8.11. Transferencias de datos a terceros países.
+8.12. Seguridad de la información y protección de datos.
+Tema 9. Big data y protección de datos personales
+9.1. Introducción y objetivos.
+9.2. ¿Amenaza el big data a la privacidad?
+9.3. Cómo cumplir con la protección de datos en el big data.
+9.4. Privacidad por diseño.
+9.5. Evaluaciones de impacto (PIA/EIPD).
+Tema 10. Big data y protección de datos personales
+10.1. Introducción y objetivos.
+10.2. Definiciones.
+10.3. La disociación y anonimización de datos.
+10.4. Técnicas de anonimización.
+10.5. K-anonimato y sus variantes.
+10.6. Herramientas de software.
+10.7. Riesgos asociados a las técnicas de anonimización.
+10.8. Principios a la hora de construir un data warehouse
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Google Analytics.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Sin seguridad, no hay privacidad. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Dirección estratégica y gobierno de datos
+1.1. Introducción y objetivos.
+1.2. ¿Qué es la dirección estratégica (DE)?
+1.3. El proceso de dirección estratégica.
+1.4. Análisis estratégico.
+1.5. Cuadro de mando integral (CMI).
+1.6. Toma de decisiones.
+1.7. Gobierno de datos
+Tema 2. Business intelligence y datos maestros
+2.1. Introducción y objetivos.
+2.2. Datos, información y conocimiento.
+2.3. Datos maestros.
+2.4. Inteligencia de negocios.
+2.5. Business intelligence vs. Business Analytics
+Tema 3. Data warehouse y data lake
+3.1. Introducción y objetivos.
+3.2. Procesos ETL.
+3.3. Almacén de datos (data warehouse).
+3.4. Lago de datos (data lake).
+Tema 4. Metodologías y tendencias
+4.1. Introducción y objetivos.
+4.2. Metodología Kimball.
+4.3. Metodologías PMI.
+4.4. Metodología Inmon.
+4.5. Data-driven decision modelling.
+4.6. Metodología DevOps.
+4.7. Nuevos roles.
+4.8. Tendencias.
+Tema 5. Introducción al marketing
+5.1. Introducción y objetivos.
+5.2. Fundamentos y concepto del marketing.
+5.3. Concepto de sistema de información.
+5.4. Captura de datos. Sistema de datos internos.
+5.5. La investigación del marketing. Las necesidades del cliente.
+Tema 6. Métricas y métodos de análisis
+6.1. Introducción y objetivos.
+6.2. Principios y fundamentos.
+6.3. Métricas básicas.
+6.4. Tipos de analíticas web.
+6.5. Herramientas de medición.
+Tema 7. Marketing relacional y CRM
+7.1. Introducción y objetivos.
+7.2. Introducción al marketing relacional.
+7.3. Características y beneficios del marketing relacional.
+7.4. CRM: definición y características.
+7.5. Factores clave y bases para un buen CRM
+Tema 8. Introducción a la protección de datos
+8.1. Introducción y objetivos.
+8.2. Conceptos.
+8.3. Marco legal de la protección de datos en Colombia.
+8.5. Legalidad del tratamiento. La autorización previa, expresa e informada.
+8.6. Derecho de información.
+8.7. El derecho del titular.
+8.8. Obligaciones generales del responsable de tratamiento y encargado.
+8.9. Otros marcos internacionales.
+8.10. Protección de datos en EE. UU. y en la U.E.
+8.11. Transferencias de datos a terceros países.
+8.12. Seguridad de la información y protección de datos.
+Tema 9. Big data y protección de datos personales
+9.1. Introducción y objetivos.
+9.2. ¿Amenaza el big data a la privacidad?
+9.3. Cómo cumplir con la protección de datos en el big data.
+9.4. Privacidad por diseño.
+9.5. Evaluaciones de impacto (PIA/EIPD).
+Tema 10. Big data y protección de datos personales
+10.1. Introducción y objetivos.
+10.2. Definiciones.
+10.3. La disociación y anonimización de datos.
+10.4. Técnicas de anonimización.
+10.5. K-anonimato y sus variantes.
+10.6. Herramientas de software.
+10.7. Riesgos asociados a las técnicas de anonimización.
+10.8. Principios a la hora de construir un data warehouse
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Google Analytics.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Sin seguridad, no hay privacidad. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Gobierno del dato, roles, políticas, catálogo y data stewardship.
+Calidad, trazabilidad, linaje y ciclo de vida de datos.
+Seguridad, privacidad y gestión de riesgos asociados al uso de datos.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+AWS. (2021). ¿Qué es DevOps? [Página web]. Amazon.
+https://aws.amazon.com/es/devops/what-is-devops/
+BARC. (2021). Data, BI & Analytics Trend Monitor 2021 [Página web]. BARC. http://barc-research.com/research/bi-trend-monitor/
+Curto, J. (2012). Introducción al business intelligence. Editorial UOC.
+EDPS. (s.f.). Data Protection Officer (DPO) [Página web]. European Data Protection Supervisor.
+https://edps.europa.eu/data-protection/data-protection/reference-library/data-protection-officer-dpo_en
+Inmon, W. H. (1992). Building the data warehouse. Wiley.
+Inmon, W. H. (2002). Building the data warehouse. Wiley.
+Kimball, R., Reeves, L., Ross, M., y Thornthwaite, W. (1998). The data warehouse lifecycle toolkit: expert methods for designing, developing, and deploying data warehouses. Wiley.
+Microsoft. (2021). ¿Qué es DevOps? [Página web]. Microsoft Azure.
+https://azure.microsoft.com/es-es/overview/what-is-devops/
+Mundy, J., Thornthwaite, W., y Kimball, R. (2006). The Microsoft data warehouse toolkit: with SQL server 2005 and the Microsoft business intelligence toolset. Wiley.
+Rivadera, G. (2010). La metodología de Kimball para el diseño de almacenes de datos (data warehouses). Universidad Católica de Salta, 5, 56-71.
+Solomatine, D., See, L. M., y Abrahart, R. J. (2009). Data-driven modelling: concepts, approaches and experiences. En Practical Hydroinformatics (pp. 17-30). Springer. https://www.springer.com/cda/content/document/cda_downloaddocument/9783540798804-c1.pdf?SGWID=0-0-45-620522-p173819207
+Vahos, L. E., Pastor, D. M., y Jiménez, J. A. (2013). Método para la formación de stakeholder en proyectos de ingeniería usando la metodología PMI y técnicas de inteligencia artificial. Revista Ingenierías, 12(23), 157-168.
+TEDx Talks. (16 de enero de 2020). La evolución del marketing | Paul Soto | TEDxUANL [Vídeo]. Youtube. https://www.youtube.com/watch?v=QyrL-K8AUuU
+Carreto, J. (2009). Análisis PEST [Mensaje en un blog]. Blogger. http://planeacion-estrategica.blogspot.com/2008/07/anlisis-pest.html
+Chandler, A. D. (1969). Strategy and structure: chapters in the history of the american industrial enterprise. MIT Press.
+Cisterna, D., y Arenas, K. [Club Data Governance Office Latam]. (6 de abril de 2020). Resumen Webinar: Primeros pasos del Data Governance: Conformando una Oficina de Gobierno de Datos [Vídeo]. Youtube.
+https://www.youtube.com/watch?v=DI21Z9yuCOY
+DAMA International. (2015). DAMA: Guía de fundamentos para la gestión de datos. Technics Publications.
+Drucker, P. F. (junio de 2004). What makes an effective executive. Harvard Business Review Press. https://hbr.org/2004/06/what-makes-an-effective-executive
+Fleitman, J. (2000). Negocios exitosos: cómo empezar administrar y operar eficientemente un negocio. McGraw-Hill.
+Forrester, J. W. (1968). Principles of systems. Productivity Press.
+Goodstein, L. D., Nolan, T. M., y Pfeiffer, J. W. (1999). Planeación estratégica aplicada. McGraw-Hill Interamericana.
+Kaplan, R., y Norton, D. (1992). The Balanced Scorecard–Measures that Drive Performance. Harvard Business Review, 70(1), 47-54.
+Martínez, D., y Milla, A. (2005). La elaboración del plan estratégico y su implantación a través del cuadro de mando integral. Ediciones Díaz de Santos.
+Menguzzato, M., y Renau, J. J. (1991). La dirección estratégica de la empresa. Ariel.
+Robbins, S. P. (2004). Comportamiento organizacional. Pearson Education.
+Starling, H. (2015). Data governance simplified: Creating and measuring trusted data for businesses.
+Tableau. (2021). KPI: rendimiento frente a objetivo [Página web]. Tableau. https://www.tableau.com/es-es/solutions/workbook/achieve-your-goals-across-all-product-lines
+Trejo, D. (2020). Gobierno de datos para directores: Realizando la transformación digital a partir de los datos.
+U. S. Government Accountability Office. (2020). Data governance: agencies made progress in establishing governance, but need to address key milestones.
+Wexler, J. S., Shaffer, J., y Cotgreave, A. (2017). The big book of dashboards: Visualizing your data using real-world business scenarios. John Wiley & Sons.
+Navarro, J. M. (8 de mayo de 2017). Brain centric marketing: la evolución del customer centric para un nuevo marketing. PuroMarketing.
+https://www.puromarketing.com/27/28755/brain-centric-marketing-evolucion-customer-centric-para-nuevo-marketing.html
+Bunker DB. (28 de junio de 2018). Google Marketing Platform, el radical reboot al que apuesta Google [Mensaje en un blog]. Bunker DB Blog. https://bunkerdb.com/blog/tendencias/google-marketing-platform/
+Ciotti, G. (s.f.). 7 Marketing Lessons from Eye-Tracking Studies [Página web]. Neil Patel. https://blog.kissmetrics.com/eye-tracking/
+SeedRocket. (2021). Taller de analítica web [Página web]. SeedRocket. https://www.seedrocket.com/eventos/eventos-talleres/taller-de-analitica-web/
+Taringa. (2007). Dónde miran nuestros ojos cuando navegamos por internet [Página web]. Taringa. http://www.taringa.net/posts/info/912167/Donde-Miran-Nuestros-Ojos-Cuando-Navegamos-Por-Internet.html
+Google. (2021). Cómo se define una sesión web en Universal Analytics [Página web]. Ayuda de Analytics. https://support.google.com/analytics/answer/2731565?hl=es
+Recursos y fuentes necesarios para el desarrollo de los temas
+Google Site, Google Analytics, documentación de protección de datos
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Abogado, Ingeniero de Sistemas o afines. Posgrado en ingeniería de sistemas o afines, o en Protección de Datos
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+AWS. (2021). ¿Qué es DevOps? [Página web]. Amazon.
+https://aws.amazon.com/es/devops/what-is-devops/
+BARC. (2021). Data, BI & Analytics Trend Monitor 2021 [Página web]. BARC. http://barc-research.com/research/bi-trend-monitor/
+Curto, J. (2012). Introducción al business intelligence. Editorial UOC.
+EDPS. (s.f.). Data Protection Officer (DPO) [Página web]. European Data Protection Supervisor.
+https://edps.europa.eu/data-protection/data-protection/reference-library/data-protection-officer-dpo_en
+Inmon, W. H. (1992). Building the data warehouse. Wiley.
+Inmon, W. H. (2002). Building the data warehouse. Wiley.
+Kimball, R., Reeves, L., Ross, M., y Thornthwaite, W. (1998). The data warehouse lifecycle toolkit: expert methods for designing, developing, and deploying data warehouses. Wiley.
+Microsoft. (2021). ¿Qué es DevOps? [Página web]. Microsoft Azure.
+https://azure.microsoft.com/es-es/overview/what-is-devops/
+Mundy, J., Thornthwaite, W., y Kimball, R. (2006). The Microsoft data warehouse toolkit: with SQL server 2005 and the Microsoft business intelligence toolset. Wiley.
+Rivadera, G. (2010). La metodología de Kimball para el diseño de almacenes de datos (data warehouses). Universidad Católica de Salta, 5, 56-71.
+Solomatine, D., See, L. M., y Abrahart, R. J. (2009). Data-driven modelling: concepts, approaches and experiences. En Practical Hydroinformatics (pp. 17-30). Springer. https://www.springer.com/cda/content/document/cda_downloaddocument/9783540798804-c1.pdf?SGWID=0-0-45-620522-p173819207
+Vahos, L. E., Pastor, D. M., y Jiménez, J. A. (2013). Método para la formación de stakeholder en proyectos de ingeniería usando la metodología PMI y técnicas de inteligencia artificial. Revista Ingenierías, 12(23), 157-168.
+TEDx Talks. (16 de enero de 2020). La evolución del marketing | Paul Soto | TEDxUANL [Vídeo]. Youtube. https://www.youtube.com/watch?v=QyrL-K8AUuU
+Carreto, J. (2009). Análisis PEST [Mensaje en un blog]. Blogger. http://planeacion-estrategica.blogspot.com/2008/07/anlisis-pest.html
+Chandler, A. D. (1969). Strategy and structure: chapters in the history of the american industrial enterprise. MIT Press.
+Cisterna, D., y Arenas, K. [Club Data Governance Office Latam]. (6 de abril de 2020). Resumen Webinar: Primeros pasos del Data Governance: Conformando una Oficina de Gobierno de Datos [Vídeo]. Youtube.
+https://www.youtube.com/watch?v=DI21Z9yuCOY
+DAMA International. (2015). DAMA: Guía de fundamentos para la gestión de datos. Technics Publications.
+Drucker, P. F. (junio de 2004). What makes an effective executive. Harvard Business Review Press. https://hbr.org/2004/06/what-makes-an-effective-executive
+Fleitman, J. (2000). Negocios exitosos: cómo empezar administrar y operar eficientemente un negocio. McGraw-Hill.
+Forrester, J. W. (1968). Principles of systems. Productivity Press.
+Goodstein, L. D., Nolan, T. M., y Pfeiffer, J. W. (1999). Planeación estratégica aplicada. McGraw-Hill Interamericana.
+Kaplan, R., y Norton, D. (1992). The Balanced Scorecard–Measures that Drive Performance. Harvard Business Review, 70(1), 47-54.
+Martínez, D., y Milla, A. (2005). La elaboración del plan estratégico y su implantación a través del cuadro de mando integral. Ediciones Díaz de Santos.
+Menguzzato, M., y Renau, J. J. (1991). La dirección estratégica de la empresa. Ariel.
+Robbins, S. P. (2004). Comportamiento organizacional. Pearson Education.
+Starling, H. (2015). Data governance simplified: Creating and measuring trusted data for businesses.
+Tableau. (2021). KPI: rendimiento frente a objetivo [Página web]. Tableau. https://www.tableau.com/es-es/solutions/workbook/achieve-your-goals-across-all-product-lines
+Trejo, D. (2020). Gobierno de datos para directores: Realizando la transformación digital a partir de los datos.
+U. S. Government Accountability Office. (2020). Data governance: agencies made progress in establishing governance, but need to address key milestones.
+Wexler, J. S., Shaffer, J., y Cotgreave, A. (2017). The big book of dashboards: Visualizing your data using real-world business scenarios. John Wiley & Sons.
+Navarro, J. M. (8 de mayo de 2017). Brain centric marketing: la evolución del customer centric para un nuevo marketing. PuroMarketing.
+https://www.puromarketing.com/27/28755/brain-centric-marketing-evolucion-customer-centric-para-nuevo-marketing.html
+Bunker DB. (28 de junio de 2018). Google Marketing Platform, el radical reboot al que apuesta Google [Mensaje en un blog]. Bunker DB Blog. https://bunkerdb.com/blog/tendencias/google-marketing-platform/
+Ciotti, G. (s.f.). 7 Marketing Lessons from Eye-Tracking Studies [Página web]. Neil Patel. https://blog.kissmetrics.com/eye-tracking/
+SeedRocket. (2021). Taller de analítica web [Página web]. SeedRocket. https://www.seedrocket.com/eventos/eventos-talleres/taller-de-analitica-web/
+Taringa. (2007). Dónde miran nuestros ojos cuando navegamos por internet [Página web]. Taringa. http://www.taringa.net/posts/info/912167/Donde-Miran-Nuestros-Ojos-Cuando-Navegamos-Por-Internet.html
+Google. (2021). Cómo se define una sesión web en Universal Analytics [Página web]. Ayuda de Analytics. https://support.google.com/analytics/answer/2731565?hl=es
+Recursos y fuentes necesarios para el desarrollo de los temas
+Google Site, Google Analytics, documentación de protección de datos
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Abogado, Ingeniero de Sistemas o afines. Posgrado en ingeniería de sistemas o afines, o en Protección de Datos
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Gobierno del dato y toma de decisiones.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"data governance, calidad, linaje, seguridad, data stewardship",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,DESCRIPCIÓN DE LA ASIGNATURA,"En esta asignatura, se presentará el framework de aplicaciones más utilizado para el procesado masivo de datos, que proporciona sistemas y técnicas para el almacenamiento y el procesamiento distribuido, tanto en bloque como en streaming, de grandes cantidades de datos de diversa naturaleza; es decir, las tecnologías para atacar las 3 V del big data: volumen, variedad, velocidad.
+En particular, la asignatura busca familiarizar al estudiante con sistemas de almacenamiento distribuido, como HDFS (Hadoop Distributed File System), y de procesamiento, como MapReduce, el paradigma de programación ideado por Google en 2004 y germen del procesamiento distribuido. No obstante, uno de los pilares básicos del temario será Spark, tecnología líder para el procesado distribuido de datos, tanto en bloque (batch) como en streaming, e incluso para el desarrollo y la ejecución de modelos de machine learning distribuidos.
+Del mismo modo, se presentarán al estudiante otras utilidades integradas dentro del ecosistema Hadoop, tales como Hive o Impala, que son sistemas que permiten a profesionales sin conocimientos de programación, pero con experiencia con SQL, realizar consultas de grandes datos distribuidas; o como Kafka, un sistema de mensajería que propicia el transporte rápido de grandes volúmenes de datos entre numerosas aplicaciones productoras y consumidoras, de forma distribuida y escalable.
+Finalmente, se considerará la posibilidad de ejecutar todas estas tecnologías no solo en servidores locales, sino también en servicios de computación en la nube (cloud computing), y se analizarán las ventajas que esto conlleva. Se detallarán las tres principales plataformas que proporcionan servicios en la nube: Amazon Web Services, Microsoft Azure, y Google Cloud Platform. Con este fin, se examinarán los servicios que ofrecen tanto de infraestructura (infrastructure as a service, IaaS) como de plataformas big data (platform as a service, PaaS).",actualizar,"En esta asignatura, se presentará el framework de aplicaciones más utilizado para el procesado masivo de datos, que proporciona sistemas y técnicas para el almacenamiento y el procesamiento distribuido, tanto en bloque como en streaming, de grandes cantidades de datos de diversa naturaleza; es decir, las tecnologías para atacar las 3 V del big data: volumen, variedad, velocidad.
+En particular, la asignatura busca familiarizar al estudiante con sistemas de almacenamiento distribuido, como HDFS (Hadoop Distributed File System), y de procesamiento, como MapReduce, el paradigma de programación ideado por Google en 2004 y germen del procesamiento distribuido. No obstante, uno de los pilares básicos del temario será Spark, tecnología líder para el procesado distribuido de datos, tanto en bloque (batch) como en streaming, e incluso para el desarrollo y la ejecución de modelos de machine learning distribuidos.
+Del mismo modo, se presentarán al estudiante otras utilidades integradas dentro del ecosistema Hadoop, tales como Hive o Impala, que son sistemas que permiten a profesionales sin conocimientos de programación, pero con experiencia con SQL, realizar consultas de grandes datos distribuidas; o como Kafka, un sistema de mensajería que propicia el transporte rápido de grandes volúmenes de datos entre numerosas aplicaciones productoras y consumidoras, de forma distribuida y escalable.
+Finalmente, se considerará la posibilidad de ejecutar todas estas tecnologías no solo en servidores locales, sino también en servicios de computación en la nube (cloud computing), y se analizarán las ventajas que esto conlleva. Se detallarán las tres principales plataformas que proporcionan servicios en la nube: Amazon Web Services, Microsoft Azure, y Google Cloud Platform. Con este fin, se examinarán los servicios que ofrecen tanto de infraestructura (infrastructure as a service, IaaS) como de plataformas big data (platform as a service, PaaS).
+Se actualiza el enfoque hacia procesamiento distribuido, arquitecturas lakehouse y servicios cloud analytics para big data.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,RESULTADOS DE APRENDIZAJE,"Aplicar técnicas de extracción, transformación y carga de datos (ETL), para realizar procesos de análisis.
+Aplicar tecnologías para gestionar grandes volúmenes de datos de naturaleza heterogénea
+Analizar los beneficios derivados de la aplicación de las técnicas de procesamiento masivo de datos en la empresa",profundizar,"Aplicar técnicas de extracción, transformación y carga de datos (ETL), para realizar procesos de análisis.
+Aplicar tecnologías para gestionar grandes volúmenes de datos de naturaleza heterogénea
+Analizar los beneficios derivados de la aplicación de las técnicas de procesamiento masivo de datos en la empresa
+Diseñar flujos de procesamiento masivo usando principios de arquitectura lakehouse y procesamiento distribuido.
+Comparar tecnologías como Spark, Databricks y servicios cloud analytics para escenarios de alto volumen.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,CONTENIDO TEMÁTICO,"Tema 1. Introducción a las tecnologías big data
+•	Introducción y objetivos
+•	La sociedad interconectada: la era del cliente
+•	Definición de las tecnologías big data
+•	Origen de las tecnologías big data
+Tema 2. HDFS y MapReduce
+•	Introducción y objetivos
+•	Introducción a HDFS
+•	Arquitectura de HDFS
+•	Comandos de HDFS más frecuentes
+•	Programación distribuida y MapReduce
+Tema 3. Spark I
+•	Introducción y objetivos
+•	Apache Spark
+•	Componentes de Spark
+•	Arquitectura de Spark
+•	Resilient distributed datasets (RDD)
+•	Transformaciones y acciones
+•	Jobs, stages y tasks
+•	Ejemplo completo con RDD
+Tema 4. Spark II
+•	Introducción y objetivos
+•	DataFrames en Spark
+•	API estructurada de Spark: lectura y escritura de DataFrames
+•	API estructurada de Spark: manipulación de DataFrames
+•	Ejemplo de uso de API estructurada
+•	Spark SQL
+•	Ejemplo de Spark SQL
+Tema 5. Spark III
+•	Introducción y objetivos
+•	Spark MLlib
+•	Spark Structured Streaming
+Tema 6. Apache Kafka
+•	Introducción y objetivos
+•	Mensajería publicación/suscripción
+•	Introducción a Apache Kafka
+•	Casos de uso típicos de Kafka
+•	Conceptos fundamentales
+•	Implementación de productores Kafka
+•	Implementación de consumidores Kafka	técnicas de procesamiento masivo de datos en una situación real.	formativas de esta asignatura son las siguientes:
+•	Proyecto
+•	Resolución de problemas
+Tema 7. Hive e Impala
+•	Introducción y objetivos
+•	Apache Hive
+•	Apache Impala
+Tema 8. Cloud computing I
+•	Introducción y objetivos
+•	Introducción a cloud computing
+•	Ventajas del cloud computing
+•	Tipos de nube y servicios en la nube
+•	Casos de uso de los servicios en la nube
+•	Microsoft Azure
+Tema 9. Cloud computing II
+•	Introducción y objetivos
+•	Amazon Web Services
+•	Regiones y availability zones (AZ)
+•	Servicios transversales: seguridad y gestión
+•	Servicios de computación
+•	Servicios de red
+•	Servicios de almacenamiento
+•	Bases de datos
+•	Servicios de big data y analítica
+•	Machine learning e inteligencia artificial
+Tema 10. Cloud computing III
+•	Introducción y objetivos
+•	Google Cloud Platform
+•	Regiones y zonas
+•	Servicios transversales: seguridad y gestión
+•	Servicios de computación
+•	Servicios de red
+•	Servicios de almacenamiento
+•	Bases de datos
+•	Servicios de big data y analítica
+•	Machine learning e inteligencia artificial
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. HDFS, Spark SQL y Mllib.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Spark Streaming y Kafka. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Introducción a las tecnologías big data
+•	Introducción y objetivos
+•	La sociedad interconectada: la era del cliente
+•	Definición de las tecnologías big data
+•	Origen de las tecnologías big data
+Tema 2. HDFS y MapReduce
+•	Introducción y objetivos
+•	Introducción a HDFS
+•	Arquitectura de HDFS
+•	Comandos de HDFS más frecuentes
+•	Programación distribuida y MapReduce
+Tema 3. Spark I
+•	Introducción y objetivos
+•	Apache Spark
+•	Componentes de Spark
+•	Arquitectura de Spark
+•	Resilient distributed datasets (RDD)
+•	Transformaciones y acciones
+•	Jobs, stages y tasks
+•	Ejemplo completo con RDD
+Tema 4. Spark II
+•	Introducción y objetivos
+•	DataFrames en Spark
+•	API estructurada de Spark: lectura y escritura de DataFrames
+•	API estructurada de Spark: manipulación de DataFrames
+•	Ejemplo de uso de API estructurada
+•	Spark SQL
+•	Ejemplo de Spark SQL
+Tema 5. Spark III
+•	Introducción y objetivos
+•	Spark MLlib
+•	Spark Structured Streaming
+Tema 6. Apache Kafka
+•	Introducción y objetivos
+•	Mensajería publicación/suscripción
+•	Introducción a Apache Kafka
+•	Casos de uso típicos de Kafka
+•	Conceptos fundamentales
+•	Implementación de productores Kafka
+•	Implementación de consumidores Kafka	técnicas de procesamiento masivo de datos en una situación real.	formativas de esta asignatura son las siguientes:
+•	Proyecto
+•	Resolución de problemas
+Tema 7. Hive e Impala
+•	Introducción y objetivos
+•	Apache Hive
+•	Apache Impala
+Tema 8. Cloud computing I
+•	Introducción y objetivos
+•	Introducción a cloud computing
+•	Ventajas del cloud computing
+•	Tipos de nube y servicios en la nube
+•	Casos de uso de los servicios en la nube
+•	Microsoft Azure
+Tema 9. Cloud computing II
+•	Introducción y objetivos
+•	Amazon Web Services
+•	Regiones y availability zones (AZ)
+•	Servicios transversales: seguridad y gestión
+•	Servicios de computación
+•	Servicios de red
+•	Servicios de almacenamiento
+•	Bases de datos
+•	Servicios de big data y analítica
+•	Machine learning e inteligencia artificial
+Tema 10. Cloud computing III
+•	Introducción y objetivos
+•	Google Cloud Platform
+•	Regiones y zonas
+•	Servicios transversales: seguridad y gestión
+•	Servicios de computación
+•	Servicios de red
+•	Servicios de almacenamiento
+•	Bases de datos
+•	Servicios de big data y analítica
+•	Machine learning e inteligencia artificial
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. HDFS, Spark SQL y Mllib.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Spark Streaming y Kafka. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Procesamiento distribuido con Spark y patrones de ingesta masiva.
+Arquitecturas data lake, data warehouse y lakehouse.
+Servicios cloud analytics y criterios de selección tecnológica.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Dean, J. y Ghemawat, S. (2008). MapReduce: simplified data processing on large clusters. Communications of the ACM, 51(1), 107-113. https://doi.org/10.1145/1327452.1327492
+Ghemawat, S., Gobioff, H. y Leung, S-T. (2003). The Google File System. ACM SIGOPS Operating Systems Review, 37(5), 29-43. https://doi.org/10.1145/1165389.945450
+Chambers, B. y Zaharia, M. (2018). Spark: the definitive guide. O’Reilly.
+Apache Spark 2.4.5. (s. f.). Machine Learning Library (MLlib) Guide. https://spark.apache.org/docs/2.4.5/ml-guide.html
+Chambers, B. y Zaharia, M. (2018). Spark: the definitive guide. O’Reilly.
+White, T. (2015). Hadoop: the definitive guide. O’Reilly.
+Kornacker, M.; Behm, A.; Bittorf, V.; Bobrovytsky, T.; Ching, C.; Choi, A.; Erickson, J.; Grund, M.; Hecht, D.; Jacobs, M.; Joshi, I.; Kuff, L.; Kumar, D.; Leblang, A.; Li, N.; Pandis, I.; Robinson, H.; Rorke, D.; Rus, S. Russell, J.; Tsirogiannis, D.; Wanderman-Milne, S. y Yoder, M. (2015). Impala: A Modern, Open-Source SQL Engine for Hadoop. Actas de la 7a Conferencia Bianual en Innovative Data Systems Research. 4-7 de enero de 2015. Asilomar, California, EE. UU. http://pandis.net/resources/cidr15impala.pdf
+Recursos y fuentes necesarios para el desarrollo de los temas
+Spark, Apache Hadoop
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Dean, J. y Ghemawat, S. (2008). MapReduce: simplified data processing on large clusters. Communications of the ACM, 51(1), 107-113. https://doi.org/10.1145/1327452.1327492
+Ghemawat, S., Gobioff, H. y Leung, S-T. (2003). The Google File System. ACM SIGOPS Operating Systems Review, 37(5), 29-43. https://doi.org/10.1145/1165389.945450
+Chambers, B. y Zaharia, M. (2018). Spark: the definitive guide. O’Reilly.
+Apache Spark 2.4.5. (s. f.). Machine Learning Library (MLlib) Guide. https://spark.apache.org/docs/2.4.5/ml-guide.html
+Chambers, B. y Zaharia, M. (2018). Spark: the definitive guide. O’Reilly.
+White, T. (2015). Hadoop: the definitive guide. O’Reilly.
+Kornacker, M.; Behm, A.; Bittorf, V.; Bobrovytsky, T.; Ching, C.; Choi, A.; Erickson, J.; Grund, M.; Hecht, D.; Jacobs, M.; Joshi, I.; Kuff, L.; Kumar, D.; Leblang, A.; Li, N.; Pandis, I.; Robinson, H.; Rorke, D.; Rus, S. Russell, J.; Tsirogiannis, D.; Wanderman-Milne, S. y Yoder, M. (2015). Impala: A Modern, Open-Source SQL Engine for Hadoop. Actas de la 7a Conferencia Bianual en Innovative Data Systems Research. 4-7 de enero de 2015. Asilomar, California, EE. UU. http://pandis.net/resources/cidr15impala.pdf
+Recursos y fuentes necesarios para el desarrollo de los temas
+Spark, Apache Hadoop
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"Spark, lakehouse, cloud analytics, Databricks, procesamiento distribuido",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",DESCRIPCIÓN DE LA ASIGNATURA,"Esta asignatura estudia las medidas o actividades que son necesarias para implementar la seguridad de sistemas operativos y de las aplicaciones web para que una vez desplegadas online, se comporten de la forma esperada, tanto por los propietarios como por parte de los usuarios de la aplicación y puedan mitigar cualquier ataque. Además, profundiza en la seguridad de los servicios desplegados de arquitecturas en la nube y de big data.
+La base de la seguridad de las aplicaciones online y de los servicios desplegados en la nube, dependen de la seguridad de los sistemas operativos que las soportan instalados en máquinas físicas, virtualizados o en contenedores. Es fundamental abordar las actividades de seguridad que se realizan antes y una vez desplegados los sistemas y aplicaciones siguiendo un Ciclo de Vida de Desarrollo Seguro de Software (SSCLC).
+Un SSDLC implica la realización de determinadas actividades de seguridad relacionadas con los requisitos de seguridad, el diseño y desarrollo seguros, así como las pruebas y operaciones de seguridad que se deben llevar a cabo de forma ordenada y procedimental por personal experto en seguridad.
+Las arquitecturas y servicios que dan soporte al cómputo de datos masivos en la Nube son un ejemplo de arquitectura particular que se considera necesario abordar debido a su proliferación y auge en los últimos tiempos. Se analizará un caso de estudio concreto open source y las posibilidades que ofrece el mercado para el diseño e implementación de la seguridad.",actualizar,"Esta asignatura estudia las medidas o actividades que son necesarias para implementar la seguridad de sistemas operativos y de las aplicaciones web para que una vez desplegadas online, se comporten de la forma esperada, tanto por los propietarios como por parte de los usuarios de la aplicación y puedan mitigar cualquier ataque. Además, profundiza en la seguridad de los servicios desplegados de arquitecturas en la nube y de big data.
+La base de la seguridad de las aplicaciones online y de los servicios desplegados en la nube, dependen de la seguridad de los sistemas operativos que las soportan instalados en máquinas físicas, virtualizados o en contenedores. Es fundamental abordar las actividades de seguridad que se realizan antes y una vez desplegados los sistemas y aplicaciones siguiendo un Ciclo de Vida de Desarrollo Seguro de Software (SSCLC).
+Un SSDLC implica la realización de determinadas actividades de seguridad relacionadas con los requisitos de seguridad, el diseño y desarrollo seguros, así como las pruebas y operaciones de seguridad que se deben llevar a cabo de forma ordenada y procedimental por personal experto en seguridad.
+Las arquitecturas y servicios que dan soporte al cómputo de datos masivos en la Nube son un ejemplo de arquitectura particular que se considera necesario abordar debido a su proliferación y auge en los últimos tiempos. Se analizará un caso de estudio concreto open source y las posibilidades que ofrece el mercado para el diseño e implementación de la seguridad.
+Se mantiene el foco de seguridad y se conecta con gobierno, privacidad y protección de datos en ecosistemas big data.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"seguridad del dato, privacidad, controles, cloud security",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",RESULTADOS DE APRENDIZAJE,"Aplicar técnicas y herramientas para mitigar el nivel de riesgo de los servicios de la empresa
+Establecer mecanismos de protección que garanticen la disponibilidad, integridad y confidencialidad de la información en aplicaciones web",profundizar,"Aplicar técnicas y herramientas para mitigar el nivel de riesgo de los servicios de la empresa
+Establecer mecanismos de protección que garanticen la disponibilidad, integridad y confidencialidad de la información en aplicaciones web
+Identificar riesgos de seguridad, privacidad y acceso en plataformas de datos y analítica.
+Proponer controles para proteger datos, aplicaciones y servicios cloud usados en soluciones big data.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"seguridad del dato, privacidad, controles, cloud security",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",CONTENIDO TEMÁTICO,"Tema 1. Seguridad en Windows Server
+1.1. Introducción y objetivos
+1.2. Seguridad en Windows Server
+1.3. Seguridad en Active Directory. Políticas Base
+1.4. Analizadores de Políticas base
+1.5. Herramientas de análisis de configuración de seguridad
+Tema 2. Seguridad en aplicaciones web: introducción
+2.1. Introducción y objetivos
+2.2. Ciclo de Vida de Desarrollo Seguro de Software (SSDLC)
+2.3. Arquitecturas de las Aplicaciones Web
+2.4. Protocolo HTTP
+Tema 3. Vulnerabilidades en aplicaciones web
+3.1. Introducción y objetivos
+3.2. OWASP Top Ten
+3.3. OWASP Top Ten 2013: otras vulnerabilidades importantes
+Tema 4. Autenticación en aplicaciones web
+4.1. Introducción y objetivos
+4.2. Autenticación
+Tema 5. Gestión de sesiones y autorización en aplicaciones web
+5.1. Introducción y objetivos
+5.2. Gestión de sesiones
+5.3. Autorización
+5.4. Cabeceras de seguridad
+Tema 6. Seguridad en el desarrollo de las Aplicaciones Web
+6.1. Introducción y objetivos
+6.2. Principios del Desarrollo Seguro
+6.3. Desarrollo seguro: OWASP Top Ten
+Tema 7. Análisis de seguridad de las aplicaciones web
+Introducción y objetivos
+Análisis de seguridad de las aplicaciones web
+Análisis de seguridad estático de código fuente
+Tema 8.  Seguridad en fase de producción de las aplicaciones web
+8.1. Introducción y objetivos
+8.2. Seguridad en fase de producción online
+8.3. Cabeceras de seguridad HTTP
+8.4. Seguridad en aplicaciones RIA
+Tema 9. Seguridad en la Nube
+9.1. Introducción y objetivos
+9.2. Componentes de Azure
+9.3. Azure Active Directory
+9.4. Administración de usuarios y grupos en Azure AD
+9.5. Configuración y administración de secretos con Key Vault
+Tema 10. Seguridad en Big data
+10.1. Introducción y objetivos
+10.2. Arquitecturas big data
+10.3. Vulnerabilidades y amenazas en big data
+10.4. Seguridad y privacidad en big data
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua | Actividad 1. Seguridad en aplicaciones Ajax.. | Rúbrica de evaluación | 27%
+Evaluación continua | Actividad 2. Test de penetración a la aplicación web Badstore utilizando una herramienta de análisis dinámico. | Rúbrica de evaluación | 27%
+Evaluación continua | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Seguridad en Windows Server
+1.1. Introducción y objetivos
+1.2. Seguridad en Windows Server
+1.3. Seguridad en Active Directory. Políticas Base
+1.4. Analizadores de Políticas base
+1.5. Herramientas de análisis de configuración de seguridad
+Tema 2. Seguridad en aplicaciones web: introducción
+2.1. Introducción y objetivos
+2.2. Ciclo de Vida de Desarrollo Seguro de Software (SSDLC)
+2.3. Arquitecturas de las Aplicaciones Web
+2.4. Protocolo HTTP
+Tema 3. Vulnerabilidades en aplicaciones web
+3.1. Introducción y objetivos
+3.2. OWASP Top Ten
+3.3. OWASP Top Ten 2013: otras vulnerabilidades importantes
+Tema 4. Autenticación en aplicaciones web
+4.1. Introducción y objetivos
+4.2. Autenticación
+Tema 5. Gestión de sesiones y autorización en aplicaciones web
+5.1. Introducción y objetivos
+5.2. Gestión de sesiones
+5.3. Autorización
+5.4. Cabeceras de seguridad
+Tema 6. Seguridad en el desarrollo de las Aplicaciones Web
+6.1. Introducción y objetivos
+6.2. Principios del Desarrollo Seguro
+6.3. Desarrollo seguro: OWASP Top Ten
+Tema 7. Análisis de seguridad de las aplicaciones web
+Introducción y objetivos
+Análisis de seguridad de las aplicaciones web
+Análisis de seguridad estático de código fuente
+Tema 8.  Seguridad en fase de producción de las aplicaciones web
+8.1. Introducción y objetivos
+8.2. Seguridad en fase de producción online
+8.3. Cabeceras de seguridad HTTP
+8.4. Seguridad en aplicaciones RIA
+Tema 9. Seguridad en la Nube
+9.1. Introducción y objetivos
+9.2. Componentes de Azure
+9.3. Azure Active Directory
+9.4. Administración de usuarios y grupos en Azure AD
+9.5. Configuración y administración de secretos con Key Vault
+Tema 10. Seguridad en Big data
+10.1. Introducción y objetivos
+10.2. Arquitecturas big data
+10.3. Vulnerabilidades y amenazas en big data
+10.4. Seguridad y privacidad en big data
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua | Actividad 1. Seguridad en aplicaciones Ajax.. | Rúbrica de evaluación | 27%
+Evaluación continua | Actividad 2. Test de penetración a la aplicación web Badstore utilizando una herramienta de análisis dinámico. | Rúbrica de evaluación | 27%
+Evaluación continua | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Seguridad y privacidad en ecosistemas de datos.
+Controles de acceso, cifrado, auditoría y cumplimiento.
+Riesgos de seguridad en servicios cloud analytics y aplicaciones de datos.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"seguridad del dato, privacidad, controles, cloud security",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","seguridad del dato, privacidad, controles, cloud security",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",MEDIOS EDUCATIVOS,"Bibliografía específica recomendada
+Centro Criptológico Nacional. (2018). Guía de seguridad de las tic ccn-stic 570. Implementación del esquema nacional de seguridad en windows server. Ministerio de defensa. Secretaría General Técnica.
+https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/guias-de-acceso-publico-ccn-stic/3179-ccn-stic-570a-implementacion-de-seguridad-sobre-microsoft-windows-server-2016/file.html https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/guias-de-acceso-publico-ccn-stic/3182-ccn-stic-570a-ens-anexo-a/file.html
+Docsmicrosoft. (2022). Windows Server Security Documentation. https://docs.microsoft.com/en-us/windows-server/security/security-and-assurance
+Aviles. G. (2016). Seguridad en Bases de Datos y Aplicaciones Web: 2ª edición (Spanish Edition). ISBN-10: 1540420566
+OWASP. (2022). WSTG – Stable. https://owasp.org/www-project-web-security-testing-guide/stable/
+Moeller, J. P. (2016). Security for web developers: using javascript, HTML and CSS. O’Reilly Media.
+OWASP. (2018). OWASP Proactive Controls. https://www.owasp.org/index.php/OWASP_Proactive_Controls
+OWASP. (2021). Application Security Verification Standard Project. https://www.owasp.org/index.php/Category:OWASP_Application_Security_Verification_Standard_Project
+OWASP. (2022). OWASP Cheat Sheet Series. https://www.owasp.org/index.php/OWASP_Cheat_Sheet_Series
+Centro Criptológico Nacional. (2019). Guía de seguridad TIC CCN-STIC 884. Guía de configuración segura para Azure.
+https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/800-guia-esquema-nacional-de-seguridad/4253-ccn-stic-884a-guia-de-configuracion-segura-para-azure/file.html
+NIST. (2021). Big Data Interoperability Framework: Volume 4, Security and Privacy Version. 2019. 3. https://csrc.nist.gov/publications/detail/sp/1500-4r2/final
+Recursos y fuentes necesarios
+Recursos y fuentes
+Computador, acceso a la plataforma de estudio, conexión a Internet, herramienta de modelado de amenazas, como Threat Analysis and Modeling Tool 2016, herramientas de análisis estático de código fuente
+•	Herramientas Fortify, Emarisma, PILAR
+•	OWASP, Jmeter
+•
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, electrónico, informático o afines. Con posgrado en Ingeniería de Sistemas o afines, Posgrado en Ciberseguridad
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía específica recomendada
+Centro Criptológico Nacional. (2018). Guía de seguridad de las tic ccn-stic 570. Implementación del esquema nacional de seguridad en windows server. Ministerio de defensa. Secretaría General Técnica.
+https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/guias-de-acceso-publico-ccn-stic/3179-ccn-stic-570a-implementacion-de-seguridad-sobre-microsoft-windows-server-2016/file.html https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/guias-de-acceso-publico-ccn-stic/3182-ccn-stic-570a-ens-anexo-a/file.html
+Docsmicrosoft. (2022). Windows Server Security Documentation. https://docs.microsoft.com/en-us/windows-server/security/security-and-assurance
+Aviles. G. (2016). Seguridad en Bases de Datos y Aplicaciones Web: 2ª edición (Spanish Edition). ISBN-10: 1540420566
+OWASP. (2022). WSTG – Stable. https://owasp.org/www-project-web-security-testing-guide/stable/
+Moeller, J. P. (2016). Security for web developers: using javascript, HTML and CSS. O’Reilly Media.
+OWASP. (2018). OWASP Proactive Controls. https://www.owasp.org/index.php/OWASP_Proactive_Controls
+OWASP. (2021). Application Security Verification Standard Project. https://www.owasp.org/index.php/Category:OWASP_Application_Security_Verification_Standard_Project
+OWASP. (2022). OWASP Cheat Sheet Series. https://www.owasp.org/index.php/OWASP_Cheat_Sheet_Series
+Centro Criptológico Nacional. (2019). Guía de seguridad TIC CCN-STIC 884. Guía de configuración segura para Azure.
+https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/800-guia-esquema-nacional-de-seguridad/4253-ccn-stic-884a-guia-de-configuracion-segura-para-azure/file.html
+NIST. (2021). Big Data Interoperability Framework: Volume 4, Security and Privacy Version. 2019. 3. https://csrc.nist.gov/publications/detail/sp/1500-4r2/final
+Recursos y fuentes necesarios
+Recursos y fuentes
+Computador, acceso a la plataforma de estudio, conexión a Internet, herramienta de modelado de amenazas, como Threat Analysis and Modeling Tool 2016, herramientas de análisis estático de código fuente
+•	Herramientas Fortify, Emarisma, PILAR
+•	OWASP, Jmeter
+•
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, electrónico, informático o afines. Con posgrado en Ingeniería de Sistemas o afines, Posgrado en Ciberseguridad
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"seguridad del dato, privacidad, controles, cloud security",0.86
+"Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"seguridad del dato, privacidad, controles, cloud security",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,DESCRIPCIÓN DE LA ASIGNATURA,"El cerebro humano es capaz de reconocer patrones, sacar conclusiones de experiencias pasadas y aplicar dichas conclusiones a escenarios futuros.
+Las técnicas de Inteligencia Artificial (IA) pretenden dotar a los ordenadores de estas capacidades típicamente humanas.
+En esta asignatura se explican conceptos y métodos de aprendizaje automático y se hace énfasis en aquellas técnicas más apropiadas para su aplicación en la minería de datos, enfocada a resolver problemas analizando grandes cantidades de datos disponibles en una base de datos.
+El análisis masivo de datos aplicando técnicas de inteligencia artificial permite extraer conclusiones de un conjunto de datos que no podrían ser extraídas con técnicas estadísticas clásicas. En concreto, en esta asignatura se explican algoritmos y técnicas de inteligencia artificial, como pueden ser aquellos que permiten obtener reglas de clasificación o asociación, o representaciones del conocimiento mediante árboles de decisión, así como técnicas de clustering para la clasificación no-supervisada, redes neuronales o la computación evolutiva.
+Mediante la aplicación de herramientas de minería de datos el alumno podrá ejecutar diferentes algoritmos para la resolución de problemas de aprendizaje e interpretar el resultado de dichos algoritmos y su evaluación. Así mismo, el alumno será capaz de diseñar un sistema experto que sea capaz de inferir nuevos conocimientos.",actualizar,"El cerebro humano es capaz de reconocer patrones, sacar conclusiones de experiencias pasadas y aplicar dichas conclusiones a escenarios futuros.
+Las técnicas de Inteligencia Artificial (IA) pretenden dotar a los ordenadores de estas capacidades típicamente humanas.
+En esta asignatura se explican conceptos y métodos de aprendizaje automático y se hace énfasis en aquellas técnicas más apropiadas para su aplicación en la minería de datos, enfocada a resolver problemas analizando grandes cantidades de datos disponibles en una base de datos.
+El análisis masivo de datos aplicando técnicas de inteligencia artificial permite extraer conclusiones de un conjunto de datos que no podrían ser extraídas con técnicas estadísticas clásicas. En concreto, en esta asignatura se explican algoritmos y técnicas de inteligencia artificial, como pueden ser aquellos que permiten obtener reglas de clasificación o asociación, o representaciones del conocimiento mediante árboles de decisión, así como técnicas de clustering para la clasificación no-supervisada, redes neuronales o la computación evolutiva.
+Mediante la aplicación de herramientas de minería de datos el alumno podrá ejecutar diferentes algoritmos para la resolución de problemas de aprendizaje e interpretar el resultado de dichos algoritmos y su evaluación. Así mismo, el alumno será capaz de diseñar un sistema experto que sea capaz de inferir nuevos conocimientos.
+Se orienta la asignatura hacia modelos predictivos aplicados, validación, interpretación y uso responsable de técnicas de inteligencia artificial.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,RESULTADOS DE APRENDIZAJE,"Aplicar herramientas tecnológicas para el desarrollo de modelos supervisados (predictivo) y no supervisados (descriptivos) sobre los datos de la organización""
+Desarrollar algoritmos de inteligencia artificial a un conjunto de datos
+Aplicar técnicas de inteligencia artificial para el procesado masivo de datos y de acuerdo a unos requisitos establecidos",profundizar,"Aplicar herramientas tecnológicas para el desarrollo de modelos supervisados (predictivo) y no supervisados (descriptivos) sobre los datos de la organización""
+Desarrollar algoritmos de inteligencia artificial a un conjunto de datos
+Aplicar técnicas de inteligencia artificial para el procesado masivo de datos y de acuerdo a unos requisitos establecidos
+Aplicar modelos predictivos con Python o R considerando preparación de datos, entrenamiento, validación e interpretación de resultados.
+Evaluar la pertinencia y límites de modelos de machine learning en escenarios de analítica institucional y empresarial.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,CONTENIDO TEMÁTICO,"Tema 1. Introducción
+Aproximación a los conceptos inteligencia artificial, aprendizaje automático y minería de datos. Interés y aplicaciones
+Definición de aprendizaje, tareas básicas y ejemplos
+Etapas en el descubrimiento de conocimiento
+Referencias bibliográficas
+Tema 2. Python para la implementación de técnicas de inteligencia artificial
+Introducción
+El lenguaje Python: conceptos básicos e instalación
+La sintaxis de Python
+Listas, tuplas, conjuntos y diccionarios
+Librerías útiles para el análisis de datos
+La librería NumPy para el manejo de datos
+Importación de datos
+Introducción a machine learning con librerías en Python
+Referencias bibliográficas
+Tema 3. Árboles de decisión
+Introducción. Representación del conocimiento mediante árboles de decisión
+Descripción de la tarea de inducción
+Algoritmo básico de aprendizaje de árboles de decisión: ID3
+Espacio de búsqueda y bias inductivo
+Métodos de selección de atributos
+Sobreajuste y poda de árboles
+Medidas de precisión de la clasificación. Curva ROC
+Simplificación de árboles de decisión mediante poda: algoritmo C4.5
+Aplicaciones y ejemplos de implementación
+Referencias bibliográficas
+Tema 4. Reglas
+Reglas de clasificación y reglas de asociación
+Algoritmos  de     aprendizaje  de     reglas     de clasificación
+Algoritmos de aprendizaje de reglas de asociación
+Aplicaciones y ejemplos de implementación
+Referencias bibliográficas
+Tema 5. Redes neuronales artificiales
+•	Introducción. Fundamento biológico
+•	La neurona artificial. El perceptrón
+•	Redes neuronales multicapa
+•	Redes neuronales recurrentes. Redes Hopfield
+•	Hacia el deep learning
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+Tema 6. Deep learning
+•	Introducción
+•	El papel del deep learning dentro del machine learning
+•	Redes neuronales y deep learning
+•	Redes prealimentadas profundas
+•	Redes neuronales recurrentes profundas
+•	Autoencoders
+•	Redes neuronales convolucionales
+•	Redes generativas antagónicas
+•	Aprendizaje por refuerzo
+•	Aprendizaje por refuerzo profundo
+•	Ejemplos de implementación
+•	Referencias bibliográficas
+Tema 7. Clustering: Agrupamiento o clasificación no supervisada
+•	Conceptos. Tipos de algoritmos de clustering. Medida de distancia
+•	Agrupamiento exclusivo. El algoritmo k-means
+•	Agrupamiento	jerárquico.	Algoritmo	de agrupamiento jerárquico aglomerativo
+•	Agrupamiento probabilista. El algoritmo EM
+•	Agrupamiento solapado. El algoritmo Fuzzy C- means
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+Tema 8. Sistemas de recomendación
+•	Introducción. Tipos de recomendadores y aplicaciones
+•	Recomendación	colaborativa.	Filtrado colaborativo basado en usuarios. Filtrado colaborativo basado en ítems
+•	Recomendación basada en contenido. Representación del contenido y similitud entre elementos
+•	Sistemas de recomendación híbridos
+•	Ejemplos de implementación
+•	Referencias bibliográficas
+Tema 9. Resolución de problemas mediante búsqueda
+•	Introducción: «El mundo de los bloques»
+•	Dirección de la búsqueda
+•	Búsqueda exhaustiva o a ciegas
+•	Búsqueda heurística
+•	Búsqueda en juegos
+•	Costes
+•	Aplicaciones	prácticas	y	ejemplos	de implementación
+•	Referencias bibliográficas
+Tema 10. Gestión de la incertidumbre e imprecisión en sistemas expertos
+•	Introducción
+•	Razonamiento bayesiano
+•	Factores de certeza
+•	Lógica difusa
+•	Inferencia difusa
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Árboles de decisión, reglas y ensemble learning.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Trabajando con redes neuronales y Deep Learning. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Introducción
+Aproximación a los conceptos inteligencia artificial, aprendizaje automático y minería de datos. Interés y aplicaciones
+Definición de aprendizaje, tareas básicas y ejemplos
+Etapas en el descubrimiento de conocimiento
+Referencias bibliográficas
+Tema 2. Python para la implementación de técnicas de inteligencia artificial
+Introducción
+El lenguaje Python: conceptos básicos e instalación
+La sintaxis de Python
+Listas, tuplas, conjuntos y diccionarios
+Librerías útiles para el análisis de datos
+La librería NumPy para el manejo de datos
+Importación de datos
+Introducción a machine learning con librerías en Python
+Referencias bibliográficas
+Tema 3. Árboles de decisión
+Introducción. Representación del conocimiento mediante árboles de decisión
+Descripción de la tarea de inducción
+Algoritmo básico de aprendizaje de árboles de decisión: ID3
+Espacio de búsqueda y bias inductivo
+Métodos de selección de atributos
+Sobreajuste y poda de árboles
+Medidas de precisión de la clasificación. Curva ROC
+Simplificación de árboles de decisión mediante poda: algoritmo C4.5
+Aplicaciones y ejemplos de implementación
+Referencias bibliográficas
+Tema 4. Reglas
+Reglas de clasificación y reglas de asociación
+Algoritmos  de     aprendizaje  de     reglas     de clasificación
+Algoritmos de aprendizaje de reglas de asociación
+Aplicaciones y ejemplos de implementación
+Referencias bibliográficas
+Tema 5. Redes neuronales artificiales
+•	Introducción. Fundamento biológico
+•	La neurona artificial. El perceptrón
+•	Redes neuronales multicapa
+•	Redes neuronales recurrentes. Redes Hopfield
+•	Hacia el deep learning
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+Tema 6. Deep learning
+•	Introducción
+•	El papel del deep learning dentro del machine learning
+•	Redes neuronales y deep learning
+•	Redes prealimentadas profundas
+•	Redes neuronales recurrentes profundas
+•	Autoencoders
+•	Redes neuronales convolucionales
+•	Redes generativas antagónicas
+•	Aprendizaje por refuerzo
+•	Aprendizaje por refuerzo profundo
+•	Ejemplos de implementación
+•	Referencias bibliográficas
+Tema 7. Clustering: Agrupamiento o clasificación no supervisada
+•	Conceptos. Tipos de algoritmos de clustering. Medida de distancia
+•	Agrupamiento exclusivo. El algoritmo k-means
+•	Agrupamiento	jerárquico.	Algoritmo	de agrupamiento jerárquico aglomerativo
+•	Agrupamiento probabilista. El algoritmo EM
+•	Agrupamiento solapado. El algoritmo Fuzzy C- means
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+Tema 8. Sistemas de recomendación
+•	Introducción. Tipos de recomendadores y aplicaciones
+•	Recomendación	colaborativa.	Filtrado colaborativo basado en usuarios. Filtrado colaborativo basado en ítems
+•	Recomendación basada en contenido. Representación del contenido y similitud entre elementos
+•	Sistemas de recomendación híbridos
+•	Ejemplos de implementación
+•	Referencias bibliográficas
+Tema 9. Resolución de problemas mediante búsqueda
+•	Introducción: «El mundo de los bloques»
+•	Dirección de la búsqueda
+•	Búsqueda exhaustiva o a ciegas
+•	Búsqueda heurística
+•	Búsqueda en juegos
+•	Costes
+•	Aplicaciones	prácticas	y	ejemplos	de implementación
+•	Referencias bibliográficas
+Tema 10. Gestión de la incertidumbre e imprecisión en sistemas expertos
+•	Introducción
+•	Razonamiento bayesiano
+•	Factores de certeza
+•	Lógica difusa
+•	Inferencia difusa
+•	Aplicaciones y ejemplos de implementación
+•	Referencias bibliográficas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Árboles de decisión, reglas y ensemble learning.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Trabajando con redes neuronales y Deep Learning. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Flujo aplicado de machine learning: datos, entrenamiento, validación y evaluación.
+Métricas de desempeño, sesgo, explicabilidad y ética de IA.
+Notebooks reproducibles y comunicación de resultados predictivos.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Abduljabbar, R., Dia, H., Liyanage, S. & Bagloee, S. A. (2019). Applications of Artificial Intelligence in Transport: An Overview. Sustainability, 11(1), 189. Disponible en https://doi.org/10.3390/su11010189
+Aguado, F., Cabalar, P., Fandinno, J., Muñiz, B., Pérez, G. & Suárez, F. (2019). A Rule-Based System for Explainable Donor-Patient Matching in Liver Transplantation. Electronic Proceedings in Theoretical Computer Science, 306, 266-272. Disponible en https://doi.org/10.4204/EPTCS.306.31
+Akinnola, B. (2012). Computer Troubleshooting, Using an Expert System: A Research Work. LAP Lambert Academic Publishing.
+Alonso, R. S., Prieto, J., García, Ó. & Corchado, J. M. (2019). Collaborative learning via social computing. Frontiers of Information Technology & Electronic Engineering, 20(2), 265-282. Disponible en https://doi.org/10.1631/FITEE.1700840
+Alonso, R. S., Sittón-Candanedo, I., García, Ó., Prieto, J. & Rodríguez-González, S. (2020). An intelligent Edge-IoT platform for monitoring livestock and crops in a dairy farming scenario. Ad Hoc Networks, 98, 102047. Disponible en https://doi.org/10.1016/j.adhoc.2019.102047
+Bansal, H. (2019, octubre 18). Best Languages For Machine Learning in 2020! Medium. Disponible en https://becominghuman.ai/best-languages-for-machine-learning-in-2020-6034732dd242
+Best Python libraries for Machine Learning. (2019, enero 18). GeeksforGeeks. Disponible en https://www.geeksforgeeks.org/best-python-libraries-for-machine-learning/
+Puget, J.F. (2016) The Most Popular Language For Machine Learning and Data Science Is… KDnuggets. Recuperado de https://www.kdnuggets.com/the-most-popular-language-for-machine-learning-and-data-science-is.html/
+Raschka, S. & Mirjalili, V. (2019). Python Machine Learning: Machine Learning and Deep Learning with Python, scikit-learn, and TensorFlow 2. Packt Publishing Ltd.
+Recuero de los Santos, P. (2019, octubre 1). Python para todos: 5 formas de cargar datos para tus proyectos de Machine Learning - Think Big Empresas. Think Big. Disponible en https://empresas.blogthinkbig.com/python-5-formas-de-cargar-datos-csv-proyectos-machine-learning/
+Rogers, S. & Girolami, M. (2016). A first course in machine learning. Chapman and Hall/CRC.
+Russell, S. & Norvig, P. (2016). Artificial Intelligence: A Modern Approach Global Edition (Third Edition). Pearson.
+Unipython (2019). Importar datos con Python. Disponible en https://unipython.com/importar-datos-con-python/
+Recursos y fuentes necesarios para el desarrollo de los temas
+Python
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Abduljabbar, R., Dia, H., Liyanage, S. & Bagloee, S. A. (2019). Applications of Artificial Intelligence in Transport: An Overview. Sustainability, 11(1), 189. Disponible en https://doi.org/10.3390/su11010189
+Aguado, F., Cabalar, P., Fandinno, J., Muñiz, B., Pérez, G. & Suárez, F. (2019). A Rule-Based System for Explainable Donor-Patient Matching in Liver Transplantation. Electronic Proceedings in Theoretical Computer Science, 306, 266-272. Disponible en https://doi.org/10.4204/EPTCS.306.31
+Akinnola, B. (2012). Computer Troubleshooting, Using an Expert System: A Research Work. LAP Lambert Academic Publishing.
+Alonso, R. S., Prieto, J., García, Ó. & Corchado, J. M. (2019). Collaborative learning via social computing. Frontiers of Information Technology & Electronic Engineering, 20(2), 265-282. Disponible en https://doi.org/10.1631/FITEE.1700840
+Alonso, R. S., Sittón-Candanedo, I., García, Ó., Prieto, J. & Rodríguez-González, S. (2020). An intelligent Edge-IoT platform for monitoring livestock and crops in a dairy farming scenario. Ad Hoc Networks, 98, 102047. Disponible en https://doi.org/10.1016/j.adhoc.2019.102047
+Bansal, H. (2019, octubre 18). Best Languages For Machine Learning in 2020! Medium. Disponible en https://becominghuman.ai/best-languages-for-machine-learning-in-2020-6034732dd242
+Best Python libraries for Machine Learning. (2019, enero 18). GeeksforGeeks. Disponible en https://www.geeksforgeeks.org/best-python-libraries-for-machine-learning/
+Puget, J.F. (2016) The Most Popular Language For Machine Learning and Data Science Is… KDnuggets. Recuperado de https://www.kdnuggets.com/the-most-popular-language-for-machine-learning-and-data-science-is.html/
+Raschka, S. & Mirjalili, V. (2019). Python Machine Learning: Machine Learning and Deep Learning with Python, scikit-learn, and TensorFlow 2. Packt Publishing Ltd.
+Recuero de los Santos, P. (2019, octubre 1). Python para todos: 5 formas de cargar datos para tus proyectos de Machine Learning - Think Big Empresas. Think Big. Disponible en https://empresas.blogthinkbig.com/python-5-formas-de-cargar-datos-csv-proyectos-machine-learning/
+Rogers, S. & Girolami, M. (2016). A first course in machine learning. Chapman and Hall/CRC.
+Russell, S. & Norvig, P. (2016). Artificial Intelligence: A Modern Approach Global Edition (Third Edition). Pearson.
+Unipython (2019). Importar datos con Python. Disponible en https://unipython.com/importar-datos-con-python/
+Recursos y fuentes necesarios para el desarrollo de los temas
+Python
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, software, informático, electrónico o profesiones afines. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | NA
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"Python, R, machine learning aplicado, validación de modelos, ética de IA",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,DESCRIPCIÓN DE LA ASIGNATURA,"La visualización de la información consiste en la representación gráfica de datos por medio de estadísticas, mapas, diagramas y esquemas con dos objetivos: presentarlos a una audiencia determinada (amplia o especializada) y servir como herramienta de análisis para explorar el conocimiento que esos datos esconden.
+Hoy en día la visualización está presente desde el análisis de mercado de las grandes empresas financieras hasta los medios de comunicación, pasando por todas las disciplinas universitarias que hacen uso de métodos cuantitativos. Esta asignatura es una introducción a los principios conceptuales de la disciplina.",actualizar,"La visualización de la información consiste en la representación gráfica de datos por medio de estadísticas, mapas, diagramas y esquemas con dos objetivos: presentarlos a una audiencia determinada (amplia o especializada) y servir como herramienta de análisis para explorar el conocimiento que esos datos esconden.
+Hoy en día la visualización está presente desde el análisis de mercado de las grandes empresas financieras hasta los medios de comunicación, pasando por todas las disciplinas universitarias que hacen uso de métodos cuantitativos. Esta asignatura es una introducción a los principios conceptuales de la disciplina.
+Se fortalece el enfoque en visual analytics, diseño de dashboards ejecutivos, criterios de usabilidad y narrativa con datos para la toma de decisiones.",Se actualiza la descripción para alinear la asignatura con señales actuales del mercado laboral.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,RESULTADOS DE APRENDIZAJE,"Diseñar sistemas que combinen técnicas de captura, almacenamiento, análisis y visualización de datos para representar la realidad empresarial.",profundizar,"Diseñar sistemas que combinen técnicas de captura, almacenamiento, análisis y visualización de datos para representar la realidad empresarial.
+Diseñar visualizaciones interactivas orientadas a decisiones ejecutivas, aplicando principios de claridad, jerarquía visual y storytelling with data.
+Construir dashboards en Power BI o Tableau integrando métricas, segmentaciones y evidencia para públicos estratégicos.",Se incorporan resultados de aprendizaje observables y pertinentes frente al subdominio.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,CONTENIDO TEMÁTICO,"Tema 1. Introducción a la visualización de datos
+•	Introducción
+•	Concepto de infografía y visualización de datos
+•	Importancia de la infografía y la visualización de datos
+•	Estadios de la visualización
+•	Referencias bibliográficas
+Tema 2. Historia de la visualización de datos
+•	Orígenes de la infografía y la visualización de datos
+•	Introducción a la infografía periodística
+•	Del gráfico impreso a la visualización en tiempo real. La era digital
+•	Referencias bibliográficas
+Tema 3. Trabajar con datos
+•	Fundamentos de los datos
+•	Recolección de datos
+•	Preparación y limpieza de datos
+•	Transformación de datos
+•	Visualización de datos
+Tema 4. Psicología aplicada al diseño de visualizaciones
+•	Visión humana. Del ojo al cerebro
+•	Percepción visual y cognición
+•	Psicología de la Gestalt. Principios «gestaltistas»
+•	Aplicación a la comunicación gráfica de información cuantitativa
+Tema 5. El diseño aplicado a la visualización de datos
+•	Tipografía. Eficacia y legibilidad
+•	Color
+•	Dimensiones y resolución: milímetros y píxeles
+•	Composición gráfica. Uso adecuado del espacio
+•	Principales formatos de imagen
+•	Importancia de lo icónico
+•	De lo estético a lo funcional en la infografía
+Tema 6. Definición y tipologías de gráficos
+•	Gráficos no figurativos
+•	Gráficos figurativos
+•	Anatomía de un gráfico: elementos
+Tema 7. Codificación gráfica de datos
+•	Fundamentos de la codificación gráfica
+•	Atributos gráficos
+•	Tareas de analítica visual
+Tema 8. Visualización estática
+•	Concepto
+•	Formato de salida
+•	Principales herramientas. Adobe Ilustrador
+Tema 9. Visualización dinámica e interactividad (I)
+•	Concepto
+•	Formato de salida
+•	Herramientas para explorar conjuntos de datos públicos
+Tema 10. Visualización dinámica e interactividad (II)
+•	Utilización de herramientas estándar
+•	Otras herramientas de software propietario
+Tema 11. Representación gráfica: la relación entre eficacia y ética
+•	Introducción
+•	Ética en visualización de datos
+•	Buenas prácticas
+•	Ejemplos de visualizaciones inadecuadas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Visualización de evolución en el tiempo.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Laboratorio (tratamiento y preparación de los datos
+para su procesamiento por herramientas de visualización).. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%",profundizar,"Tema 1. Introducción a la visualización de datos
+•	Introducción
+•	Concepto de infografía y visualización de datos
+•	Importancia de la infografía y la visualización de datos
+•	Estadios de la visualización
+•	Referencias bibliográficas
+Tema 2. Historia de la visualización de datos
+•	Orígenes de la infografía y la visualización de datos
+•	Introducción a la infografía periodística
+•	Del gráfico impreso a la visualización en tiempo real. La era digital
+•	Referencias bibliográficas
+Tema 3. Trabajar con datos
+•	Fundamentos de los datos
+•	Recolección de datos
+•	Preparación y limpieza de datos
+•	Transformación de datos
+•	Visualización de datos
+Tema 4. Psicología aplicada al diseño de visualizaciones
+•	Visión humana. Del ojo al cerebro
+•	Percepción visual y cognición
+•	Psicología de la Gestalt. Principios «gestaltistas»
+•	Aplicación a la comunicación gráfica de información cuantitativa
+Tema 5. El diseño aplicado a la visualización de datos
+•	Tipografía. Eficacia y legibilidad
+•	Color
+•	Dimensiones y resolución: milímetros y píxeles
+•	Composición gráfica. Uso adecuado del espacio
+•	Principales formatos de imagen
+•	Importancia de lo icónico
+•	De lo estético a lo funcional en la infografía
+Tema 6. Definición y tipologías de gráficos
+•	Gráficos no figurativos
+•	Gráficos figurativos
+•	Anatomía de un gráfico: elementos
+Tema 7. Codificación gráfica de datos
+•	Fundamentos de la codificación gráfica
+•	Atributos gráficos
+•	Tareas de analítica visual
+Tema 8. Visualización estática
+•	Concepto
+•	Formato de salida
+•	Principales herramientas. Adobe Ilustrador
+Tema 9. Visualización dinámica e interactividad (I)
+•	Concepto
+•	Formato de salida
+•	Herramientas para explorar conjuntos de datos públicos
+Tema 10. Visualización dinámica e interactividad (II)
+•	Utilización de herramientas estándar
+•	Otras herramientas de software propietario
+Tema 11. Representación gráfica: la relación entre eficacia y ética
+•	Introducción
+•	Ética en visualización de datos
+•	Buenas prácticas
+•	Ejemplos de visualizaciones inadecuadas
+ACTIVIDADES FORMATIVAS | ACTIVIDADES FORMATIVAS
+Tipo actividad formativa | Descripción
+Sesiones presenciales virtuales.
+Foro.
+Lecciones magistrales.
+Laboratorios.
+Test. | Las actividades formativas de la asignatura se han elaborado con el objetivo de adaptar el proceso de aprendizaje a las diferentes capacidades, necesidades e intereses de los alumnos
+EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN | EVALUACIÓN Y CALIFICACIÓN
+Tipo de evaluación | Descripción | Instrumento de medición | Porcentaje
+Evaluación continua  | Actividad 1. Visualización de evolución en el tiempo.
+| Rúbrica de evaluación | 27%
+Evaluación continua  | Actividad 2. Laboratorio (tratamiento y preparación de los datos
+para su procesamiento por herramientas de visualización).. | Rúbrica de evaluación | 27%
+Evaluación continua  | Test | Test | 6%
+Evaluación final | Examen final on line, de acuerdo con los parámetros establecidos | Prueba tipo Saber Pro | 40%
+Storytelling with data y comunicación ejecutiva de hallazgos.
+Diseño de dashboards, interacción, navegación y criterios UX para analítica visual.
+Buenas prácticas en Power BI, Tableau y visualización orientada a indicadores.",Se profundiza contenido pertinente sin eliminar los temas vigentes del documento original.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,ACTIVIDADES FORMATIVAS,,actualizar,"Desarrollo de un caso aplicado con datos reales o simulados, evidencia de decisiones y sustentación ejecutiva.
+Laboratorio guiado para producir un entregable verificable alineado con el foco de la asignatura.","Se agregan actividades prácticas trazables, manteniendo la orientación académica original.","Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,MEDIOS EDUCATIVOS,"Bibliografía básica
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Meirelles, I. (2013). Design for Information. Beverly, Massachusetts: Rockport Publishers.
+Ware, C. (2013). Information Visualization. Waltham, Massachusetts: Morgan Kaufmann Publishers.
+Agar, M. et al. (2003). Los mejores gráficos de la historia. Malofiej 10. Premios Internacionales de Infografía. Pamplona: Index Book.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Gómez, A. (2002). Del macroscopio al microscopio: Historia de la medicina científica. Bogotá: U. Javeriana.
+McGhee, G. (2011). Notas sobre la revolución de datos. Malofiej 18. Premios Internacionales de Infografía. Pamplona: Index Book.
+Pettersson, R. (2013). Information Design 4- Graphic Design. Austria: International Institute for Information Design (IID).
+SND-E (2002). Peter Sullivan. Maestro de infografías. Testigo del último tercio del siglo XX. Infografía. I Exposición de Gráficos Periodísticos. Pamplona: SND-E.
+Tufte, E. R. (2001). The Visual Display of Quantitative Information. Cheshire, Connecticut: Graphic Press.
+Valero, J. L. (2002). La infografía: técnicas, análisis y usos periodísticos. Barcelona: Universitat Autònoma de Barcelona.
+Baines, P. y Hassam, A. (2005). Tipografía. Función, forma y diseño. Barcelona: Gustavo Gili.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Chiasson, T.; Gregory, D. et al. (2014). DATA + DESIGN A simple introduction to preparing and visualizing information. Columbia, Missouri: Donald W. Reynolds Journalism Institute and Infoactive.
+Modley, R. (2011). Handbook of Pictorial Symbols. Nueva York: Dover Publications, Inc.
+Pettersson, R. (2013). Information Design 4- Graphic Design. Austria: International Institute for Information Design (IID).
+Ware, C. (2013). Information Visualization. Waltham, Massachusetts: Morgan Kaufmann Publishers.
+Chiasson, T.; Gregory, D. et al. (2014). DATA + DESIGN A simple introduction to preparing and visualizing information. Columbia, Missouri: Donald W. Reynolds Journalism Institute and Infoactive.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Few, S. (2012). Show me the Numbers. Burlingame, California: Analytics Press.
+Meirelles, I. (2013). Design for Information. Beverly, Massachusetts: Rockport Publishers.
+Sitios web
+Sitio web oficial de Datawrapper: https://datawrapper.de/
+Sitio web oficial de Timeline.js: http://timeline.knightlab.com/
+Sitio web oficial de Google Charts: https://developers.google.com/chart/
+Sitio web oficial de Google Fusion Tables: https://support.google.com/fusiontables/answer/2571232
+Sitio web oficial de la librería D3.js: http://d3js.org/
+Sitio web oficial de RAW: http://raw.densitydesign.org/
+Sitio web oficial de DevInfo: http://www.devinfo.org/mdg5b/libraries/aspx/DataView.aspx
+Sitio web oficial de StoryMap.js: http://storymap.knightlab.com/
+Sitio web oficial de R: http://www.r-project.org/
+Sitio web oficial https://powerbi.microsoft.com/en-au/
+Sitio web oficial de Tableau Public: http://www.tableau.com/public/
+Sitio web oficial de CartoDB: http://cartodb.com/
+Sitio web oficial de la fundación Gapminder: http://www.gapminder.org/
+Sitio web oficial de Google Public Data Explorer: https://www.google.com/publicdata/directory
+Recursos y fuentes necesarios para el desarrollo de los temas
+Power BI, Adobe Illustrator
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, informático o profesiones afines, especialista en marketing, Diseño Gráfico. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | Experiencia demostrable en investigación formativa o de formación en investigación.
+Experiencia con el sector externo | NA",actualizar,"Bibliografía básica
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Meirelles, I. (2013). Design for Information. Beverly, Massachusetts: Rockport Publishers.
+Ware, C. (2013). Information Visualization. Waltham, Massachusetts: Morgan Kaufmann Publishers.
+Agar, M. et al. (2003). Los mejores gráficos de la historia. Malofiej 10. Premios Internacionales de Infografía. Pamplona: Index Book.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Gómez, A. (2002). Del macroscopio al microscopio: Historia de la medicina científica. Bogotá: U. Javeriana.
+McGhee, G. (2011). Notas sobre la revolución de datos. Malofiej 18. Premios Internacionales de Infografía. Pamplona: Index Book.
+Pettersson, R. (2013). Information Design 4- Graphic Design. Austria: International Institute for Information Design (IID).
+SND-E (2002). Peter Sullivan. Maestro de infografías. Testigo del último tercio del siglo XX. Infografía. I Exposición de Gráficos Periodísticos. Pamplona: SND-E.
+Tufte, E. R. (2001). The Visual Display of Quantitative Information. Cheshire, Connecticut: Graphic Press.
+Valero, J. L. (2002). La infografía: técnicas, análisis y usos periodísticos. Barcelona: Universitat Autònoma de Barcelona.
+Baines, P. y Hassam, A. (2005). Tipografía. Función, forma y diseño. Barcelona: Gustavo Gili.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Chiasson, T.; Gregory, D. et al. (2014). DATA + DESIGN A simple introduction to preparing and visualizing information. Columbia, Missouri: Donald W. Reynolds Journalism Institute and Infoactive.
+Modley, R. (2011). Handbook of Pictorial Symbols. Nueva York: Dover Publications, Inc.
+Pettersson, R. (2013). Information Design 4- Graphic Design. Austria: International Institute for Information Design (IID).
+Ware, C. (2013). Information Visualization. Waltham, Massachusetts: Morgan Kaufmann Publishers.
+Chiasson, T.; Gregory, D. et al. (2014). DATA + DESIGN A simple introduction to preparing and visualizing information. Columbia, Missouri: Donald W. Reynolds Journalism Institute and Infoactive.
+Cairo, A. (2011). El Arte Funcional. Infografía y visualización de información. Madrid: Alamut.
+Few, S. (2012). Show me the Numbers. Burlingame, California: Analytics Press.
+Meirelles, I. (2013). Design for Information. Beverly, Massachusetts: Rockport Publishers.
+Sitios web
+Sitio web oficial de Datawrapper: https://datawrapper.de/
+Sitio web oficial de Timeline.js: http://timeline.knightlab.com/
+Sitio web oficial de Google Charts: https://developers.google.com/chart/
+Sitio web oficial de Google Fusion Tables: https://support.google.com/fusiontables/answer/2571232
+Sitio web oficial de la librería D3.js: http://d3js.org/
+Sitio web oficial de RAW: http://raw.densitydesign.org/
+Sitio web oficial de DevInfo: http://www.devinfo.org/mdg5b/libraries/aspx/DataView.aspx
+Sitio web oficial de StoryMap.js: http://storymap.knightlab.com/
+Sitio web oficial de R: http://www.r-project.org/
+Sitio web oficial https://powerbi.microsoft.com/en-au/
+Sitio web oficial de Tableau Public: http://www.tableau.com/public/
+Sitio web oficial de CartoDB: http://cartodb.com/
+Sitio web oficial de la fundación Gapminder: http://www.gapminder.org/
+Sitio web oficial de Google Public Data Explorer: https://www.google.com/publicdata/directory
+Recursos y fuentes necesarios para el desarrollo de los temas
+Power BI, Adobe Illustrator
+PERFIL DEL DOCENTE DE LA ASIGNATURA | PERFIL DEL DOCENTE DE LA ASIGNATURA
+Característica | Descripción
+Conocimientos (con evidencia de títulos en el área de  | Ingeniero de sistemas, informático o profesiones afines, especialista en marketing, Diseño Gráfico. Con posgrado en informática, ingeniería de software, desarrollo, ingeniería o afines.
+Experiencia docente  | Experiencia mínima de un (1) año en docencia universitaria y en manejo de medios y mediaciones tecnológicas virtuales
+Experiencia profesional en el área de
+Experiencia Investigativa | Experiencia demostrable en investigación formativa o de formación en investigación.
+Experiencia con el sector externo | NA
+Datasets de práctica, notebooks o herramientas de analítica visual según disponibilidad institucional.
+Recursos digitales para documentación, visualización, gobierno o procesamiento de datos según el foco de la asignatura.",Se incorporan recursos educativos coherentes con analítica aplicada y trabajo práctico.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86
+Microcurrículos V5_Visualización Interactiva de la Información.docx,PERFIL DEL DOCENTE DE LA ASIGNATURA,,profundizar,"Experiencia demostrable en proyectos aplicados de analítica, inteligencia de negocio, gobierno de datos o big data relacionados con el foco de la asignatura.",Se sugiere perfil docente alineado con práctica profesional y pertinencia laboral.,"Power BI, Tableau, dashboards ejecutivos, storytelling with data, UX de visualización",0.86

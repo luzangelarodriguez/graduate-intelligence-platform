@@ -1,0 +1,15 @@
+# Live Skill Universe Report
+
+- Python: weight=0.4, evidence={'portal_taxonomy': 4}, roles=[]
+- KPIs: weight=0.4, evidence={'portal_taxonomy': 4}, roles=[]
+- BI: weight=0.4, evidence={'portal_taxonomy': 4}, roles=[]
+- SQL: weight=0.3, evidence={'portal_taxonomy': 3}, roles=[]
+- data governance: weight=0.2, evidence={'portal_taxonomy': 2}, roles=[]
+- Power BI: weight=0.2, evidence={'portal_taxonomy': 2}, roles=[]
+- ETL: weight=0.2, evidence={'portal_taxonomy': 2}, roles=[]
+- machine learning: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]
+- estadistica: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]
+- Tableau: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]
+- Spark: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]
+- Hadoop: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]
+- AI: weight=0.1, evidence={'portal_taxonomy': 1}, roles=[]

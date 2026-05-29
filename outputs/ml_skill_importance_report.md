@@ -1,0 +1,27 @@
+# ML Skill Importance Report
+
+- Python: market_weight=139.1, affinity=0.82, coverage=covered
+- SQL: market_weight=89.7, affinity=0.82, coverage=covered
+- comunicacion: market_weight=79.4, affinity=0.08, coverage=irrelevant
+- dashboarding: market_weight=75.9, affinity=0.82, coverage=covered
+- KPIs: market_weight=72.4, affinity=0.82, coverage=covered
+- security: market_weight=71.6, affinity=0.08, coverage=irrelevant
+- Azure: market_weight=71.1, affinity=0.55, coverage=irrelevant
+- AWS: market_weight=69.3, affinity=0.55, coverage=irrelevant
+- AI: market_weight=63.0, affinity=0.82, coverage=covered
+- APIs: market_weight=61.1, affinity=0.75, coverage=partial
+- data governance: market_weight=56.8, affinity=0.82, coverage=covered
+- BI: market_weight=55.0, affinity=0.82, coverage=covered
+- Oracle: market_weight=54.4, affinity=0.08, coverage=irrelevant
+- trabajo en equipo: market_weight=53.3, affinity=0.08, coverage=irrelevant
+- machine learning: market_weight=52.6, affinity=0.82, coverage=covered
+- compliance: market_weight=48.8, affinity=0.48, coverage=irrelevant
+- reporting: market_weight=48.2, affinity=0.48, coverage=irrelevant
+- liderazgo: market_weight=46.4, affinity=0.08, coverage=irrelevant
+- Agile: market_weight=44.2, affinity=0.08, coverage=irrelevant
+- resolucion de problemas: market_weight=40.0, affinity=0.08, coverage=irrelevant
+- gestion de stakeholders: market_weight=39.4, affinity=0.08, coverage=irrelevant
+- Power BI: market_weight=35.0, affinity=0.82, coverage=covered
+- ETL: market_weight=34.5, affinity=0.82, coverage=covered
+- pipelines: market_weight=31.3, affinity=0.48, coverage=irrelevant
+- GCP: market_weight=29.1, affinity=0.55, coverage=irrelevant

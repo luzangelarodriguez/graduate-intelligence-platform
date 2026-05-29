@@ -1,0 +1,1 @@
+from scrapers.connectors.indeed_partner_connector import IndeedPartnerConnector as IndeedJobsConnector

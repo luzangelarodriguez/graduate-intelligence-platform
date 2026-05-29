@@ -1,0 +1,51 @@
+{
+  "correlation_id": "lap-a02e9897c87949e3",
+  "source_metrics": {
+    "linkedin": {
+      "source_name": "linkedin",
+      "started_at": 1779999872.0474033,
+      "finished_at": 1780005926.8882284,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        6054840.312
+      ],
+      "duration_seconds": 6054.8408,
+      "avg_latency_ms": 6054840.312,
+      "health_score": 0.9
+    },
+    "elempleo": {
+      "source_name": "elempleo",
+      "started_at": 1780005926.9009883,
+      "finished_at": 1780005952.1134517,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        25212.072
+      ],
+      "duration_seconds": 25.2125,
+      "avg_latency_ms": 25212.072,
+      "health_score": 0.9
+    },
+    "ticjob": {
+      "source_name": "ticjob",
+      "started_at": 1780005952.140434,
+      "finished_at": 1780006196.8222334,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        244681.776
+      ],
+      "duration_seconds": 244.6818,
+      "avg_latency_ms": 244681.776,
+      "health_score": 0.9
+    }
+  },
+  "errors": []
+}

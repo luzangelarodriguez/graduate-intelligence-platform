@@ -1,0 +1,49 @@
+pilot: visual_analytics_big_data
+roles:
+  primary:
+    - Analista de datos
+    - Analista BI
+    - Especialista Business Intelligence
+    - Consultor BI
+    - Desarrollador BI
+    - Ingeniero de datos
+    - Analista de visualizacion de datos
+    - Especialista en visualizacion de datos
+    - Cientifico de datos junior
+    - Analytics Engineer
+    - Data Analyst
+    - BI Analyst
+    - Business Intelligence Analyst
+    - Data Visualization Specialist
+    - Data Engineer
+    - Analytics Consultant
+    - Reporting Analyst
+    - Power BI Developer
+    - Tableau Developer
+skills:
+  technologies:
+    - Power BI
+    - Tableau
+    - SQL
+    - Python
+    - R
+    - ETL
+    - Big Data
+    - Spark
+    - Hadoop
+    - Databricks
+    - Snowflake
+    - Data Warehouse
+    - Data Lake
+    - Lakehouse
+    - Data Governance
+    - Data Quality
+    - Storytelling with Data
+    - Dashboards
+    - KPIs
+    - Machine Learning
+    - MLOps
+    - DataOps
+    - Azure Data
+    - AWS Analytics
+    - Google Cloud Analytics

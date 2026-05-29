@@ -1,0 +1,484 @@
+# Workspace Audit
+
+Workspace: `C:\\Users\\SoporteTI\\Desktop\\SOFTWARE`
+
+## Summary
+
+- `ACTIVE_CORE`: 170 files, 4,024,024 bytes
+- `EXPERIMENTAL`: 39 files, 10,421,669 bytes
+- `LEGACY`: 56 files, 903,755 bytes
+- `MOCK`: 10 files, 55,981 bytes
+- `SAFE_TO_DELETE`: 10841 files, 134,964,144 bytes
+- `TEMP`: 135 files, 10,554,933 bytes
+- `UNKNOWN`: 3166 files, 197,127,793 bytes
+
+## Productive Core
+
+- Backend oficial: `graduate_intelligence_platform/backend/app/main.py`
+- API routes: `graduate_intelligence_platform/backend/app/api.py`
+- Auth/JWT: `graduate_intelligence_platform/backend/app/auth.py`
+- Frontend oficial: `graduate_intelligence_platform/frontend`
+- Repositories/services compartidos: `backend/repositories`, `backend/services`
+- Microcurriculum engine: `microcurriculum_engine`
+- Labor matching: `build_labor_program_matches.py`, `diagnose_labor_matching.py`, `database/migrations/008_labor_matching_bridge.sql`
+- Contextual curriculum: `microcurriculum_context_engine.py`, `database/migrations/009_microcurriculum_program_context.sql`
+
+## High-Risk Areas
+
+- `.env.local` contains operational credentials and must remain ignored.
+- Root `app.py`, `templates/`, `static/` are Flask legacy fallback; archive only after explicit approval.
+- `scrapers/lakehouse/**` contains generated evidence snapshots; archive/compress by retention policy, not blindly.
+- `storage/test_microcurriculos/**` contains pilot institutional documents; do not delete.
+- `outputs/**` contains generated reports; safe to regenerate but useful for audit history.
+
+## Candidates By Category
+
+### ACTIVE_CORE
+
+- `graduate_intelligence_platform/frontend/src/assets/images/institutional-observatory-bg.png` (1,815,214 bytes): Referenced production architecture or tests.
+- `ml/models/domain_classifier_lightgbm_baseline_fallback.joblib` (1,038,839 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/styles/index.css` (116,642 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/backend/app/engine.py` (104,162 bytes): Referenced production architecture or tests.
+- `ml/models/domain_classifier_logistic_regression.joblib` (78,268 bytes): Referenced production architecture or tests.
+- `ml/models/domain_classifier_logreg.joblib` (78,268 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/backend/app/api.py` (57,504 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/MicrocurriculumDemoPage.tsx` (54,326 bytes): Referenced production architecture or tests.
+- `scrapers/pipelines/elempleo_gold_pipeline.py` (37,179 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/InstitutionalObservatoryPage.tsx` (29,998 bytes): Referenced production architecture or tests.
+- `ml/ml_match_program_jobs.py` (28,366 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/evaluation/cross_domain_validator.py` (27,238 bytes): Referenced production architecture or tests.
+- `database/migrations/003_enterprise_labor_intelligence_schema.sql` (26,476 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/evaluation/functional_ai_validator.py` (24,348 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/recommendations/recommendation_engine.py` (20,673 bytes): Referenced production architecture or tests.
+- `scrapers/taxonomy/domain_taxonomy.py` (17,673 bytes): Referenced production architecture or tests.
+- `scrapers/sources/base.py` (17,302 bytes): Referenced production architecture or tests.
+- `ml/datasets/domain_training_seed.csv` (16,995 bytes): Referenced production architecture or tests.
+- `ml/models/domain_classifier_evaluation_report.json` (14,762 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/DashboardPage.tsx` (14,162 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/rewrite/curriculum_rewriter.py` (13,934 bytes): Referenced production architecture or tests.
+- `ml/ner/curriculum_entity_ruler.py` (13,598 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/storage/repository.py` (13,565 bytes): Referenced production architecture or tests.
+- `scrapers/pipelines/jobs_pipeline.py` (13,344 bytes): Referenced production architecture or tests.
+- `backend/repositories/programas_repository.py` (13,302 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/backend/app/auth.py` (12,546 bytes): Referenced production architecture or tests.
+- `database/migrations/005_ml_training_schema.sql` (12,323 bytes): Referenced production architecture or tests.
+- `scrapers/pipelines/validate_labor_engine.py` (12,194 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/evaluation/batch_validator.py` (12,182 bytes): Referenced production architecture or tests.
+- `ml/ml_training_schema.sql` (11,519 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/pipelines/run_latest_pdf_analysis.py` (9,900 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/AlumniOnboardingPage.tsx` (9,542 bytes): Referenced production architecture or tests.
+- `backend/services/alumni_service.py` (8,931 bytes): Referenced production architecture or tests.
+- `database/migrations/002_curricular_core_schema.sql` (7,762 bytes): Referenced production architecture or tests.
+- `ml/models/domain_classifier_training_report.json` (7,688 bytes): Referenced production architecture or tests.
+- `ml/ner/semantic_hardening_runner.py` (7,503 bytes): Referenced production architecture or tests.
+- `backend/services/dashboard_service.py` (6,745 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/types/api.ts` (6,661 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/services/api.ts` (6,571 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/normalization/skill_extractor.py` (6,390 bytes): Referenced production architecture or tests.
+- `ml/inference/domain_classifier.py` (5,574 bytes): Referenced production architecture or tests.
+- `backend/services/recommendation_service.py` (5,290 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/ingestion/document_loader.py` (5,241 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/pipelines/process_microcurriculum.py` (5,202 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/data/institutional_observatory.ts` (5,197 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/rewrite/docx_template_mapper.py` (5,084 bytes): Referenced production architecture or tests.
+- `ml/ner/semantic_matcher.py` (4,616 bytes): Referenced production architecture or tests.
+- `scrapers/normalization/classify_domains.py` (4,453 bytes): Referenced production architecture or tests.
+- `scrapers/pipelines/semantic_matching_pipeline.py` (4,390 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/parsing/academic_parser.py` (4,276 bytes): Referenced production architecture or tests.
+- `tests/microcurriculum/test_microcurriculum_engine.py` (4,235 bytes): Referenced production architecture or tests.
+- `ml/registry.py` (4,077 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/matching/market_matching.py` (4,032 bytes): Referenced production architecture or tests.
+- `database/migrations/008_labor_matching_bridge.sql` (3,998 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/LoginPage.tsx` (3,979 bytes): Referenced production architecture or tests.
+- `ml/train_domain_classifier.py` (3,967 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/pages/ProgramsPage.tsx` (3,851 bytes): Referenced production architecture or tests.
+- `tests/backend/test_api_endpoints.py` (3,694 bytes): Referenced production architecture or tests.
+- `scrapers/normalization/normalize_skills.py` (3,620 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/hooks/useDashboardData.ts` (3,591 bytes): Referenced production architecture or tests.
+- `tests/microcurriculum/test_recommendation_engine_hardening.py` (3,578 bytes): Referenced production architecture or tests.
+- `tests/ml/test_taxonomy_matching_pipeline.py` (3,428 bytes): Referenced production architecture or tests.
+- `ml/ner/build_curriculum_gold_dataset.py` (3,220 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/components/ProgramObservatoryCards.tsx` (3,195 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/components/enterprise/ObservatoryPrimitives.tsx` (3,162 bytes): Referenced production architecture or tests.
+- `ml/evaluate_models.py` (3,043 bytes): Referenced production architecture or tests.
+- `backend/repositories/skills_repository.py` (2,921 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/backend/app/main.py` (2,905 bytes): Referenced production architecture or tests.
+- `ml/training/build_curriculum_gold_dataset.py` (2,896 bytes): Referenced production architecture or tests.
+- `tests/scrapers/test_lakehouse_quality_gates.py` (2,784 bytes): Referenced production architecture or tests.
+- `database/migrations/009_microcurriculum_program_context.sql` (2,714 bytes): Referenced production architecture or tests.
+- `ml/training/dataset_builder.py` (2,688 bytes): Referenced production architecture or tests.
+- `scrapers/taxonomy/skills_master_loader.py` (2,647 bytes): Referenced production architecture or tests.
+- `database/migrations/007_curricular_market_compatibility.sql` (2,561 bytes): Referenced production architecture or tests.
+- `backend/services/normalization_service.py` (2,485 bytes): Referenced production architecture or tests.
+- `microcurriculum_engine/rewrite/rewritten_microcurriculum_exporter.py` (2,478 bytes): Referenced production architecture or tests.
+- `backend/repositories/matches_repository.py` (2,475 bytes): Referenced production architecture or tests.
+- `tests/data_quality/test_program_skill_coherence.py` (2,466 bytes): Referenced production architecture or tests.
+- `graduate_intelligence_platform/frontend/src/context/AuthContext.tsx` (2,463 bytes): Referenced production architecture or tests.
+- `tests/scrapers/test_scraping_runtime_hardening.py` (2,229 bytes): Referenced production architecture or tests.
+- ... 90 more in JSON inventory
+
+### EXPERIMENTAL
+
+- `scrapers/lakehouse/silver/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/normalized_jobs.json` (3,541,607 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/b713617c4061.json` (3,407,360 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/b713617c4061.json` (3,407,360 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/normalized_jobs.csv` (18,180 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/623cd1c3bcbf.json` (14,015 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/623cd1c3bcbf.json` (14,015 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/f77e07babf53.json` (6,138 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/f77e07babf53.json` (6,138 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/75837176adb7.json` (408 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/ea92088b24ab.json` (408 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/75837176adb7.json` (408 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/ea92088b24ab.json` (408 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/851fa889a759.json` (394 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/851fa889a759.json` (394 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/find_page_1_17d5f442ca.json` (390 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_163927_47914091/find_page_1_1dc9a91fb0.json` (345 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/find_page_1_f03a21aba5.json` (338 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_163927_47914091/find_page_1_ac151d06ea.json` (316 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/find_page_1_81699811f5.json` (305 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/find_page_1_9a49bf19b2.json` (305 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/find_page_1_094e6465d4.json` (304 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_163927_47914091/find_page_1_0b6e73362a.json` (283 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_163927_47914091/find_page_1_6d06cde67d.json` (283 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/elempleo/20260519/elempleo_gold_20260519_163927_47914091/find_page_1_d2b6f56579.json` (282 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/d4395482701d.json` (258 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/d4395482701d.json` (258 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/gold/elempleo/20260519/elempleo_gold_20260519_163927_47914091/gold_publication_summary.json` (106 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/gold/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/gold_publication_summary.json` (106 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160154_05dc78d3/eab88f95b4ca.json` (94 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/magneto_api/20260519/magneto_api_20260519_160245_b0478959/eab88f95b4ca.json` (94 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/elempleo/20260519/elempleo_gold_20260519_163927_47914091/normalized_jobs.csv` (88 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/normalized_jobs.csv` (88 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/magneto_api/20260519/magneto_api_20260519_160245_b0478959/normalized_jobs.csv` (69 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/__init__.py` (41 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/bronze/__init__.py` (39 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/gold/__init__.py` (38 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/elempleo/20260519/elempleo_gold_20260519_163927_47914091/normalized_jobs.json` (2 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/elempleo/20260519/elempleo_gold_20260519_164024_5246ce43/normalized_jobs.json` (2 bytes): Generated lakehouse snapshot/evidence artifact.
+- `scrapers/lakehouse/silver/magneto_api/20260519/magneto_api_20260519_160245_b0478959/normalized_jobs.json` (2 bytes): Generated lakehouse snapshot/evidence artifact.
+
+### LEGACY
+
+- `app.py` (118,674 bytes): Root-level compatibility/legacy module.
+- `archive/outputs/job_extraction_output_public_aggressive/job_extraction.sqlite3` (106,496 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public/job_extraction.sqlite3` (77,824 bytes): Legacy coexistence or archived material.
+- `static/css/dashboard.css` (63,139 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/unir_alumni_alerts_app.py` (60,694 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/curriculum_intelligence_platform.py` (43,119 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_final/job_extraction.sqlite3` (40,960 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test/job_extraction.sqlite3` (40,960 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test2/job_extraction.sqlite3` (40,960 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output/job_extraction.sqlite3` (32,768 bytes): Legacy coexistence or archived material.
+- `archive/legacy/build_asturias_match_system.ps1` (28,151 bytes): Legacy coexistence or archived material.
+- `templates/dashboard/registration.html` (22,706 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/video_creator_app.py` (22,032 bytes): Legacy coexistence or archived material.
+- `static/css/registration.css` (21,754 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_browser_probe/job_extraction.sqlite3` (20,480 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public_now/job_extraction.sqlite3` (20,480 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public/jobs.csv` (17,548 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/asturias_bi_app.py` (17,287 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public/job_skills.csv` (16,547 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/curriculum_intelligence_platform.html` (16,231 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_final/job_skills.csv` (9,616 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test/job_skills.csv` (9,616 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test2/job_skills.csv` (9,616 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public_aggressive/jobs.csv` (8,255 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output/job_skills.csv` (7,120 bytes): Legacy coexistence or archived material.
+- `static/js/registration.js` (6,985 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public_aggressive/job_skills.csv` (6,386 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output/jobs.csv` (2,834 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_final/jobs.csv` (2,807 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test/jobs.csv` (2,807 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_real_test2/jobs.csv` (2,807 bytes): Legacy coexistence or archived material.
+- `templates/components/sidebar.html` (1,634 bytes): Legacy coexistence or archived material.
+- `templates/dashboard/base.html` (510 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/start_preview.py` (280 bytes): Legacy coexistence or archived material.
+- `archive/legacy/apps/main.py` (233 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/scrape_unir_especializaciones_pg.py` (232 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/extract_job_offers_and_skills.py` (229 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/structured_job_html_extractor.py` (229 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/ticjob_deep_bi_scraper.py` (222 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/linkedin_access_check.py` (221 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/ticjob_bi_skills_job.py` (220 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/public_jobs_scraper.py` (219 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/unir_market_scraper.py` (219 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/linkedin_jobs_api.py` (217 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/ticjob_scraper.py` (214 bytes): Legacy coexistence or archived material.
+- `archive/legacy_root_scripts/linkedin_sync.py` (213 bytes): Legacy coexistence or archived material.
+- `scraper.py` (207 bytes): Root-level compatibility/legacy module.
+- `archive/legacy/apps/run_video_creator_5050.py` (178 bytes): Legacy coexistence or archived material.
+- `archive/legacy/app.txt` (164 bytes): Legacy coexistence or archived material.
+- `archive/legacy/openia.txt` (164 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_browser_probe/jobs.csv` (59 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public_now/jobs.csv` (59 bytes): Legacy coexistence or archived material.
+- `queries.py` (49 bytes): Root-level compatibility/legacy module.
+- `db.py` (44 bytes): Root-level compatibility/legacy module.
+- `archive/outputs/job_extraction_output_browser_probe/job_skills.csv` (40 bytes): Legacy coexistence or archived material.
+- `archive/outputs/job_extraction_output_public_now/job_skills.csv` (40 bytes): Legacy coexistence or archived material.
+
+### MOCK
+
+- `selenium_deps/playwright/driver/package/lib/generated/webSocketMockSource.js` (12,109 bytes): Contains mock/placeholder naming; review before production use.
+- `graduate_intelligence_platform/backend/deps/pydantic/_internal/_mock_val_ser.py` (8,885 bytes): Contains mock/placeholder naming; review before production use.
+- `graduate_intelligence_platform/backend/vendor/pydantic/_internal/_mock_val_ser.py` (8,885 bytes): Contains mock/placeholder naming; review before production use.
+- `selenium_deps/trio/_core/_mock_clock.py` (6,316 bytes): Contains mock/placeholder naming; review before production use.
+- `vendor/trio/_core/_mock_clock.py` (6,316 bytes): Contains mock/placeholder naming; review before production use.
+- `selenium_deps/trio/_core/_tests/test_mock_clock.py` (5,827 bytes): Contains mock/placeholder naming; review before production use.
+- `vendor/trio/_core/_tests/test_mock_clock.py` (5,827 bytes): Contains mock/placeholder naming; review before production use.
+- `graduate_intelligence_platform/frontend/src/data/snies_benchmark_mock.ts` (1,577 bytes): Contains mock/placeholder naming; review before production use.
+- `_archive_cleanup/frontend_placeholder/README.md` (152 bytes): Contains mock/placeholder naming; review before production use.
+- `_archive_cleanup/frontend_placeholder/package-lock.json` (87 bytes): Contains mock/placeholder naming; review before production use.
+
+### SAFE_TO_DELETE
+
+- `graduate_intelligence_platform/frontend/node_modules/@esbuild/win32-x64/esbuild.exe` (9,913,856 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/typescript.js` (9,112,572 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/_tsc.js` (6,213,092 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/cjs/lucide-react.js.map` (5,639,205 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/tailwindcss/peers/index.js` (4,501,254 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/lucide-react.js.map` (3,321,405 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@rollup/rollup-win32-x64-msvc/rollup.win32-x64-msvc.node` (2,546,176 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/recharts.js.map` (2,393,242 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dynamic.d.mts` (2,295,913 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dynamic.d.ts` (2,295,913 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dynamicIconImports.d.mts` (2,294,701 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dynamicIconImports.d.ts` (2,294,701 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/lucide-react.d.ts` (2,206,381 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/lucide-react.prefixed.d.ts` (2,117,169 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/lucide-react.suffixed.d.ts` (2,113,257 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js` (2,086,035 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@rollup/rollup-win32-x64-gnu/rollup.win32-x64-gnu.node` (1,947,648 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/lib.dom.d.ts` (1,874,901 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/jiti/dist/babel.js` (1,736,792 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/recharts/umd/Recharts.js.map` (1,723,633 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/chunk-PJEEZAML.js.map` (1,492,548 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@babel/parser/lib/index.js.map` (1,434,020 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/lucide-react.js` (1,390,607 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/recharts.js` (1,260,068 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/umd/react-dom.development.js` (1,080,227 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/cjs/react-dom.development.js` (1,029,622 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/rollup/dist/es/shared/node-entry.js` (945,699 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/rollup/dist/shared/rollup.js` (944,905 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/cjs/lucide-react.js` (939,324 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/chunk-PJEEZAML.js` (928,027 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/csstype/index.d.ts` (894,969 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@babel/types/lib/index.d.ts` (666,005 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/lib.webworker.d.ts` (609,557 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/typescript.d.ts` (588,085 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/react-router-dom.js.map` (580,822 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lodash/lodash.js` (545,945 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@babel/parser/lib/index.js` (512,666 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/recharts/umd/Recharts.js` (502,946 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@remix-run/router/dist/router.umd.js.map` (452,542 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@remix-run/router/dist/router.cjs.js.map` (452,532 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@remix-run/router/dist/router.js.map` (449,976 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/esm/dynamicIconImports.mjs.map` (443,628 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/ru/diagnosticMessages.generated.json` (443,587 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/axios/dist/node/axios.cjs.map` (394,171 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/ja/diagnosticMessages.generated.json` (381,398 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@remix-run/router/dist/router.umd.min.js.map` (354,837 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/recharts/umd/report.html` (348,549 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/ko/diagnosticMessages.generated.json` (346,139 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/fr/diagnosticMessages.generated.json` (346,016 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/csstype/index.js.flow` (344,546 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/de/diagnosticMessages.generated.json` (344,426 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/pl/diagnosticMessages.generated.json` (342,111 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/es/diagnosticMessages.generated.json` (340,054 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/it/diagnosticMessages.generated.json` (339,409 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/vite/dist/node/chunks/dep-D-7KCb9p.js` (331,672 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/tr/diagnosticMessages.generated.json` (330,684 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/pt-br/diagnosticMessages.generated.json` (330,482 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/cs/diagnosticMessages.generated.json` (320,453 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/zh-cn/diagnosticMessages.generated.json` (295,909 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/zh-tw/diagnosticMessages.generated.json` (292,532 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/axios/dist/axios.js.map` (292,462 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@babel/types/lib/validators/generated/index.js.map` (290,238 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/rollup/dist/es/shared/watch.js` (264,026 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/umd/react-dom-server-legacy.browser.development.js` (256,331 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/umd/react-dom-server.browser.development.js` (255,190 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/axios/dist/esm/axios.js.map` (255,134 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/jiti/dist/jiti.js` (255,009 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/rollup/dist/shared/index.js` (254,170 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/axios/dist/browser/axios.cjs.map` (253,765 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js` (246,340 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/cjs/react-dom-server.node.development.js` (244,692 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js` (244,422 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/react-dom/cjs/react-dom-server.browser.development.js` (243,311 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/vite/dist/node/chunks/dep-Dnp7gl8U.js` (232,635 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/lucide-react/dist/esm/lucide-react.mjs` (229,085 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@babel/types/lib/ast-types/generated/index.js.map` (223,851 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/@remix-run/router/dist/router.umd.js` (218,953 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/typescript/lib/lib.es5.d.ts` (218,439 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/axios/dist/axios.min.js.map` (215,411 bytes): Regenerable cache/build/temp artifact.
+- `graduate_intelligence_platform/frontend/node_modules/.vite/deps/react-router-dom.js` (209,890 bytes): Regenerable cache/build/temp artifact.
+- ... 10761 more in JSON inventory
+
+### TEMP
+
+- `logs/screenshots/hecaa_scraper_error_20260516_143859.png` (903,593 bytes): Generated runtime output/log artifact.
+- `logs/screenshots/hecaa_scraper_error_20260516_143847.png` (903,511 bytes): Generated runtime output/log artifact.
+- `logs/screenshots/hecaa_scraper_error_20260516_143917.png` (903,105 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_virtuales_20260516_144832.csv` (882,415 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_export_20260516_144635.xlsx` (684,164 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_export_20260516_144714.xlsx` (684,164 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_export_20260516_144829.xlsx` (684,164 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_export_20260516_144508.xlsx` (684,160 bytes): Generated runtime output/log artifact.
+- `logs/screenshots/elempleo_error.png` (621,303 bytes): Generated runtime output/log artifact.
+- `outputs/api_discovery/xhr_capture_20260519_162554.json` (547,712 bytes): Generated runtime output/log artifact.
+- `outputs/api_discovery/bundle_findings_20260519_162554.json` (293,075 bytes): Generated runtime output/log artifact.
+- `outputs/visual_analytics_microcurriculum_context.json` (236,179 bytes): Generated runtime output/log artifact.
+- `outputs/observatorio-institucional-live.png` (230,499 bytes): Generated runtime output/log artifact.
+- `outputs/observatorio-institucional-home.png` (216,646 bytes): Generated runtime output/log artifact.
+- `outputs/curriculum_change_traceability.csv` (188,014 bytes): Generated runtime output/log artifact.
+- `logs/share-registro.out.log` (143,084 bytes): Generated runtime output/log artifact.
+- `outputs/labor_intelligence_stabilization/xhr_endpoint_discovery.json` (101,022 bytes): Generated runtime output/log artifact.
+- `logs/jobs_pipeline.log` (98,173 bytes): Generated runtime output/log artifact.
+- `outputs/cross_domain_validation_results.json` (90,264 bytes): Generated runtime output/log artifact.
+- `outputs/observatorio-institucional-mobile.png` (78,009 bytes): Generated runtime output/log artifact.
+- `logs/share-link.log` (63,610 bytes): Generated runtime output/log artifact.
+- `outputs/ml_validation_results.json` (49,799 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Gobierno_del_dato_y_toma_de_decisiones_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___TI.docx` (42,537 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Gobierno_del_dato_y_toma_de_decisiones.docx` (42,423 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Técnicas_de_Inteligencia_Artificial_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___TIPO_.docx` (41,404 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Tecnicas_de_Inteligencia_Artificial.docx` (41,294 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Análisis_e_interpretación_de_datos_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___TIPO_D.docx` (40,967 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Analisis_e_interpretacion_de_datos.docx` (40,856 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Visualización_Interactiva_de_la_Información_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS.docx` (40,699 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Ingeniería_para_el_procesado_masivo_de_datos_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORA.docx` (40,600 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Visualizacion_Interactiva_de_la_Informacion.docx` (40,592 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Ingenieria_para_el_procesado_masivo_de_datos.docx` (40,492 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Innovación_tecnológica_y_transformación_digital_en_las_empresas_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HO.docx` (40,474 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Seguridad_en_Sistemas__Aplicaciones_y_el_Big_Data_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS.docx` (40,443 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Electiva_Innovacion_Tecnologica_y_Transformacion_Digital_de_las_Empresas.docx` (40,375 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Seguridad_en_Sistemas__Aplicaciones_y_el_Big_Data.docx` (40,332 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Aprendizaje_automático_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___TIPO_DE_ASIGNATURA.docx` (40,248 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_aprendizaje_automatico.docx` (40,137 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Gestión_de_proyectos_de_inteligencia_de_negocio_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_H.docx` (40,118 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Gestion_de_proyectos_de_inteligencia_de_negocio.docx` (40,010 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Fundamentos_Tecnológicos_par_el_Tratamiento_de_Datos_SEMESTRE___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDITOS_HORAS___CRÉDI.docx` (39,756 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Microcurriculo_Actualizado_Fundamentos_tecnologicos_para_el_tratamiento_de_datos.docx` (39,642 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/educacion.json` (38,863 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/derecho_digital.json` (37,603 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/ambiental_energia.json` (34,142 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/summary.json` (26,517 bytes): Generated runtime output/log artifact.
+- `outputs/microcurriculum_release_validation.json` (22,586 bytes): Generated runtime output/log artifact.
+- `outputs/microcurriculum_result.json` (22,553 bytes): Generated runtime output/log artifact.
+- `logs/fastapi_8010_local_stdout.log` (22,368 bytes): Generated runtime output/log artifact.
+- `outputs/recommendation_engine_hardening_report.md` (16,839 bytes): Generated runtime output/log artifact.
+- `outputs/recommendation_validation_matrix.csv` (16,587 bytes): Generated runtime output/log artifact.
+- `outputs/human_validation_matrix.csv` (15,563 bytes): Generated runtime output/log artifact.
+- `outputs/source_governance/source_governance_dashboard.json` (12,650 bytes): Generated runtime output/log artifact.
+- `logs/vite_5173_local_stdout.log` (12,615 bytes): Generated runtime output/log artifact.
+- `logs/labor_engine_validation_phase_1.log` (11,016 bytes): Generated runtime output/log artifact.
+- `logs/unir_app.err.txt` (10,327 bytes): Generated runtime output/log artifact.
+- `outputs/source_governance/source_governance_dashboard.html` (10,158 bytes): Generated runtime output/log artifact.
+- `logs/fastapi_8010_local_stderr.log` (10,108 bytes): Generated runtime output/log artifact.
+- `logs/fastapi_8010_stderr.log` (7,701 bytes): Generated runtime output/log artifact.
+- `logs/screenshots/hecaa_detail_error_20260516_144023.png` (6,488 bytes): Generated runtime output/log artifact.
+- `outputs/ml_recommendation_quality.md` (6,401 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_virtuales_20260516_144054.csv` (6,038 bytes): Generated runtime output/log artifact.
+- `outputs/mineducacion_programas_virtuales_20260516_144136.csv` (6,038 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/ciberseguridad.json` (5,652 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/datos_analitica.json` (5,646 bytes): Generated runtime output/log artifact.
+- `outputs/ml_validation_report.md` (5,514 bytes): Generated runtime output/log artifact.
+- `outputs/labor_engine_validation_phase_1/gestion_humana.json` (5,450 bytes): Generated runtime output/log artifact.
+- `outputs/microcurriculum_analysis.json` (5,107 bytes): Generated runtime output/log artifact.
+- `outputs/labor_matching_diagnosis.json` (4,759 bytes): Generated runtime output/log artifact.
+- `logs/mineducacion_scraper_20260516_143810.log` (3,701 bytes): Generated runtime output/log artifact.
+- `outputs/cross_domain_validation_report.md` (3,392 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260524_154647.log` (2,873 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260525_110505.log` (2,873 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260525_130115.log` (2,794 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260525_130035.log` (2,462 bytes): Generated runtime output/log artifact.
+- `outputs/rewritten_microcurricula/Resumen_Cambios_Visual_Analytics_Big_Data.md` (2,434 bytes): Generated runtime output/log artifact.
+- `outputs/scraping_gold_quality_report.md` (2,428 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260524_154659.log` (2,421 bytes): Generated runtime output/log artifact.
+- `outputs/semantic_metrics_comparison.json` (2,384 bytes): Generated runtime output/log artifact.
+- `logs/sync_to_railway_20260524_154640.log` (2,040 bytes): Generated runtime output/log artifact.
+- ... 55 more in JSON inventory
+
+### UNKNOWN
+
+- `selenium_deps/playwright/driver/node.exe` (89,953,280 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/macos/selenium-manager` (8,027,024 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/macos/selenium-manager` (8,027,024 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/pydantic_core/_pydantic_core.cp312-win_amd64.pyd` (5,436,928 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/pydantic_core/_pydantic_core.cp312-win_amd64.pyd` (5,436,928 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/linux/selenium-manager` (5,386,048 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/linux/selenium-manager` (5,386,048 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/windows/selenium-manager.exe` (3,648,000 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/windows/selenium-manager.exe` (3,648,000 bytes): No automated safe classification.
+- `docs/workspace_audit_inventory.json` (3,621,463 bytes): Data/documentation artifact; requires owner decision.
+- `selenium_deps/playwright/driver/package/api.json` (2,863,316 bytes): Data/documentation artifact; requires owner decision.
+- `_archive_cleanup/generated_inventory/estructura_proyecto.csv` (2,479,210 bytes): Data/documentation artifact; requires owner decision.
+- `_archive_cleanup/generated_inventory/estructura.txt` (1,787,776 bytes): Data/documentation artifact; requires owner decision.
+- `selenium_deps/playwright/driver/package/types/types.d.ts` (944,714 bytes): No automated safe classification.
+- `data/raw/unir_market_jobs.json` (943,435 bytes): Data/documentation artifact; requires owner decision.
+- `selenium_deps/playwright/sync_api/_generated.py` (847,715 bytes): No automated safe classification.
+- `selenium_deps/playwright/async_api/_generated.py` (846,417 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/types/protocol.d.ts` (787,755 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/mcpBundleImpl/index.js` (681,755 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/traceViewer/assets/defaultSettingsView-CJSZINFr.js` (640,870 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/htmlReport/index.html` (527,464 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/utilsBundleImpl/index.js` (470,200 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/recorder/assets/index-BhTWtUlo.js` (363,108 bytes): No automated safe classification.
+- `storage/microcurriculos/20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `storage/microcurriculos/20260520_183929_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `storage/microcurriculos/20260520_184116_2d37515dd9551380_20260520_183751_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `storage/microcurriculos/20260520_184335_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `storage/microcurriculos/20260520_184649_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `storage/microcurriculos/Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf` (341,196 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/generated/injectedScriptSource.js` (314,611 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/traceViewer/assets/codeMirrorModule-a5XoALAZ.js` (313,023 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/recorder/assets/codeMirrorModule-DadYNm1I.js` (313,009 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/vite/traceViewer/assets/xtermModule-CsJ4vdCR.js` (292,244 bytes): No automated safe classification.
+- `selenium_deps/certifi/cacert.pem` (272,441 bytes): No automated safe classification.
+- `vendor/certifi/cacert.pem` (272,441 bytes): No automated safe classification.
+- `data/ml/program_job_matches_5433.record.jsonl` (271,851 bytes): Data/documentation artifact; requires owner decision.
+- `graduate_intelligence_platform/backend/deps/idna/uts46data.py` (243,725 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/idna/uts46data.py` (243,725 bytes): No automated safe classification.
+- `selenium_deps/idna/uts46data.py` (243,725 bytes): No automated safe classification.
+- `vendor/idna/uts46data.py` (243,725 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-TIN.pdf` (237,942 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-DB.pdf` (237,328 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-TD.pdf` (235,323 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-ESP-DEBEC.pdf` (234,831 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-HBDGD.pdf` (234,503 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-INMD.pdf` (234,191 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-SPT.pdf` (233,680 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-ICO.pdf` (232,689 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-ADID.pdf` (230,830 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-EL-BDINF.pdf` (230,478 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-BDBI.pdf` (229,799 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-BIACE.pdf` (229,502 bytes): No automated safe classification.
+- `data/raw/extract_especializacion/CUA-E-VD.pdf` (229,483 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/lib/protocol/validator.js` (224,835 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/package/ThirdPartyNotices.txt` (198,280 bytes): Data/documentation artifact; requires owner decision.
+- `graduate_intelligence_platform/backend/deps/fastapi/routing.py` (197,632 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/fastapi/routing.py` (197,632 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/fastapi/applications.py` (182,934 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/fastapi/applications.py` (182,934 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/devtools/v147/network.py` (181,781 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/devtools/v147/network.py` (181,781 bytes): No automated safe classification.
+- `selenium_deps/_cffi_backend.cp312-win_amd64.pyd` (181,248 bytes): No automated safe classification.
+- `vendor/_cffi_backend.cp312-win_amd64.pyd` (181,248 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/devtools/v145/network.py` (179,930 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/devtools/v145/network.py` (179,930 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/devtools/v146/network.py` (179,456 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/devtools/v146/network.py` (179,456 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/typing_extensions.py` (160,429 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/typing_extensions.py` (160,429 bytes): No automated safe classification.
+- `selenium_deps/typing_extensions.py` (160,429 bytes): No automated safe classification.
+- `vendor/typing_extensions.py` (160,429 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/pydantic_core/core_schema.py` (159,165 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/pydantic_core/core_schema.py` (159,165 bytes): No automated safe classification.
+- `selenium_deps/playwright/driver/LICENSE` (145,976 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/click/core.py` (132,905 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/click/core.py` (132,905 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/deps/pydantic/_internal/_generate_schema.py` (132,665 bytes): No automated safe classification.
+- `graduate_intelligence_platform/backend/vendor/pydantic/_internal/_generate_schema.py` (132,665 bytes): No automated safe classification.
+- `selenium_deps/selenium/webdriver/common/devtools/v147/page.py` (130,426 bytes): No automated safe classification.
+- `vendor/selenium/webdriver/common/devtools/v147/page.py` (130,426 bytes): No automated safe classification.
+- ... 3086 more in JSON inventory

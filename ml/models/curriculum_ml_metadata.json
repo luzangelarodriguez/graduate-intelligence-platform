@@ -1,0 +1,41 @@
+{
+  "dataset": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\ml\\datasets\\curriculum_alignment_dataset.csv",
+  "relevance_model": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\ml\\models\\curriculum_relevance_classifier.joblib",
+  "skill_importance_model": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\ml\\models\\skill_importance_ranker.joblib",
+  "metrics": {
+    "accuracy": 1.0,
+    "precision_macro": 1.0,
+    "recall_macro": 1.0,
+    "f1_macro": 1.0,
+    "rows": 67,
+    "classes": [
+      "highly_relevant",
+      "partially_relevant",
+      "weak_signal"
+    ],
+    "weighted_training": true,
+    "probability_outputs": true,
+    "calibration_strategy": "probabilistic labels with sample weights; explicit calibration dataset pending"
+  },
+  "calibration": {
+    "enabled": true,
+    "method": "native_predict_proba",
+    "notes": "Soft labels and training weights stabilize probabilities until a larger human-validated calibration set is available."
+  },
+  "explainability": {
+    "feature_importance_persisted": true,
+    "top_features_source": "TF-IDF coefficients plus numeric feature weights in model artifacts",
+    "prediction_payload": [
+      "prediction_confidence",
+      "top_features",
+      "explanation_payload"
+    ]
+  },
+  "models_requested": {
+    "logistic_regression": "trained",
+    "gradient_boosting_ranker": "trained",
+    "xgboost": "optional_not_required",
+    "lightgbm": "optional_not_required",
+    "hdbscan_umap_bertopic": "handled_by existing clustering/fallback layers"
+  }
+}

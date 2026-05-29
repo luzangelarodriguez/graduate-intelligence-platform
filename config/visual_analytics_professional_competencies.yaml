@@ -1,0 +1,74 @@
+pilot: visual_analytics_big_data
+competencies:
+  - dimension: Fundamentos cuantitativos
+    competency_text: matematicas, algebra, calculo, fisica y estadistica aplicadas al analisis de datos.
+    extracted_skills: [matematicas, algebra, calculo, fisica, estadistica]
+    normalized_skills: [matematicas, algebra, calculo, fisica, estadistica]
+    relevance_to_visual_analytics: alta
+    market_alignment_weight: 0.74
+  - dimension: Computacion e infraestructura
+    competency_text: principios de computacion, sistemas informaticos, redes, interconexion, seguridad y eficiencia.
+    extracted_skills: [principios de computacion, sistemas informaticos, redes, interconexion, seguridad, eficiencia]
+    normalized_skills: [computacion, sistemas informaticos, redes, seguridad, eficiencia]
+    relevance_to_visual_analytics: media-alta
+    market_alignment_weight: 0.68
+  - dimension: Desarrollo de software
+    competency_text: algoritmia, diseno, programacion, software eficiente, escalabilidad y procesamiento de informacion.
+    extracted_skills: [algoritmia, diseno, programacion, software eficiente, escalabilidad, procesamiento de informacion]
+    normalized_skills: [algoritmos, diseno de software, programacion, escalabilidad, procesamiento de datos]
+    relevance_to_visual_analytics: media-alta
+    market_alignment_weight: 0.72
+  - dimension: Bases de datos
+    competency_text: almacenamiento, procesamiento, analisis de informacion, integridad, seguridad, eficiencia y escalabilidad.
+    extracted_skills: [almacenamiento, procesamiento, analisis de informacion, integridad, seguridad, eficiencia, escalabilidad]
+    normalized_skills: [data warehouse, procesamiento de datos, analitica de datos, integridad de datos, seguridad de datos, escalabilidad]
+    relevance_to_visual_analytics: alta
+    market_alignment_weight: 0.86
+  - dimension: Gestion de proyectos tecnologicos
+    competency_text: gestion de proyectos, etica, legalidad, gestion de recursos, calidad, sostenibilidad y mejora continua.
+    extracted_skills: [gestion de proyectos, etica, legalidad, gestion de recursos, calidad, sostenibilidad, mejora continua]
+    normalized_skills: [gestion de proyectos, etica, cumplimiento, gestion de recursos, calidad, sostenibilidad, mejora continua]
+    relevance_to_visual_analytics: media
+    market_alignment_weight: 0.56
+  - dimension: Ingenieria de software
+    competency_text: metodologias, herramientas, fiabilidad, seguridad, calidad, accesibilidad y necesidades del cliente.
+    extracted_skills: [metodologias, herramientas, fiabilidad, seguridad, calidad, accesibilidad, necesidades del cliente]
+    normalized_skills: [metodologias agiles, herramientas de software, fiabilidad, seguridad, calidad, accesibilidad, orientacion al cliente]
+    relevance_to_visual_analytics: media
+    market_alignment_weight: 0.55
+  - dimension: Investigacion e innovacion
+    competency_text: aplicacion, investigacion, innovacion, comunicacion de resultados y propuestas originales.
+    extracted_skills: [aplicacion, investigacion, innovacion, comunicacion de resultados, propuestas originales]
+    normalized_skills: [investigacion aplicada, innovacion, comunicacion de resultados, propuestas de valor]
+    relevance_to_visual_analytics: media-alta
+    market_alignment_weight: 0.66
+  - dimension: Ingles profesional
+    competency_text: comprension auditiva, expresion oral, expresion escrita y comunicacion profesional.
+    extracted_skills: [comprension auditiva, expresion oral, expresion escrita, comunicacion profesional]
+    normalized_skills: [ingles profesional, comunicacion profesional]
+    relevance_to_visual_analytics: media
+    market_alignment_weight: 0.44
+  - dimension: Inteligencia artificial y aprendizaje automatico
+    competency_text: aprendizaje automatico, inteligencia artificial, percepcion computacional, procesamiento de lenguaje natural y toma de decisiones.
+    extracted_skills: [aprendizaje automatico, inteligencia artificial, percepcion computacional, procesamiento de lenguaje natural, toma de decisiones]
+    normalized_skills: [machine learning, AI, computer vision, NLP, toma de decisiones basada en datos]
+    relevance_to_visual_analytics: alta
+    market_alignment_weight: 0.82
+  - dimension: Etica, impacto social y liderazgo
+    competency_text: impacto social, etica tecnologica, comunicacion, liderazgo, responsabilidad social y sostenibilidad.
+    extracted_skills: [impacto social, etica tecnologica, comunicacion, liderazgo, responsabilidad social, sostenibilidad]
+    normalized_skills: [impacto social, etica tecnologica, comunicacion, liderazgo, responsabilidad social, sostenibilidad]
+    relevance_to_visual_analytics: media
+    market_alignment_weight: 0.50
+  - dimension: Areas emergentes
+    competency_text: informatica especializada, tecnicas emergentes y soluciones tecnologicas especializadas.
+    extracted_skills: [informatica especializada, tecnicas emergentes, soluciones tecnologicas especializadas]
+    normalized_skills: [tecnologias emergentes, cloud analytics, lakehouse, MLOps, DataOps]
+    relevance_to_visual_analytics: alta
+    market_alignment_weight: 0.78
+  - dimension: Habilidades complementarias
+    competency_text: negociacion, liderazgo, innovacion, emprendimiento y TIC.
+    extracted_skills: [negociacion, liderazgo, innovacion, emprendimiento, TIC]
+    normalized_skills: [negociacion, liderazgo, innovacion, emprendimiento, TIC]
+    relevance_to_visual_analytics: media
+    market_alignment_weight: 0.48

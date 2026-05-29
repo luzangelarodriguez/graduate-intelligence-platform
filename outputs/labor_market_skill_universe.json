@@ -1,0 +1,2687 @@
+[
+  {
+    "skill": "Python",
+    "skill_type": "technology",
+    "total_weight": 0.8,
+    "evidence_count": 8,
+    "source_breakdown": {
+      "portal_taxonomy": 8
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+    ],
+    "evidence": [
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Python",
+        "normalized_skill": "Python",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "KPIs",
+    "skill_type": "explicit_skill",
+    "total_weight": 0.8,
+    "evidence_count": 8,
+    "source_breakdown": {
+      "portal_taxonomy": 8
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "KPIs",
+        "normalized_skill": "KPIs",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "SQL",
+    "skill_type": "technology",
+    "total_weight": 0.6,
+    "evidence_count": 6,
+    "source_breakdown": {
+      "portal_taxonomy": 6
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "SQL",
+        "normalized_skill": "SQL",
+        "skill_type": "language",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "data governance",
+    "skill_type": "methodology",
+    "total_weight": 0.5,
+    "evidence_count": 5,
+    "source_breakdown": {
+      "portal_taxonomy": 5
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+    ],
+    "evidence": [
+      {
+        "skill": "data governance",
+        "normalized_skill": "data governance",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "data governance",
+        "normalized_skill": "data governance",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "data governance",
+        "normalized_skill": "data governance",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "data governance",
+        "normalized_skill": "data governance",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "data governance",
+        "normalized_skill": "data governance",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "comunicacion",
+    "skill_type": "soft_skill",
+    "total_weight": 0.5,
+    "evidence_count": 5,
+    "source_breakdown": {
+      "portal_taxonomy": 5
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "comunicacion",
+        "normalized_skill": "comunicacion",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "comunicacion",
+        "normalized_skill": "comunicacion",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "comunicacion",
+        "normalized_skill": "comunicacion",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "comunicacion",
+        "normalized_skill": "comunicacion",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "comunicacion",
+        "normalized_skill": "comunicacion",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "trabajo en equipo",
+    "skill_type": "soft_skill",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "trabajo en equipo",
+        "normalized_skill": "trabajo en equipo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "trabajo en equipo",
+        "normalized_skill": "trabajo en equipo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "trabajo en equipo",
+        "normalized_skill": "trabajo en equipo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "trabajo en equipo",
+        "normalized_skill": "trabajo en equipo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "reporting",
+    "skill_type": "explicit_skill",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "reporting",
+        "normalized_skill": "reporting",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "reporting",
+        "normalized_skill": "reporting",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "reporting",
+        "normalized_skill": "reporting",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "reporting",
+        "normalized_skill": "reporting",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "Power BI",
+    "skill_type": "tool",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "Power BI",
+        "normalized_skill": "Power BI",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Power BI",
+        "normalized_skill": "Power BI",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Power BI",
+        "normalized_skill": "Power BI",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "tool",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Power BI",
+        "normalized_skill": "Power BI",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "ETL",
+    "skill_type": "methodology",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "ETL",
+        "normalized_skill": "ETL",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "ETL",
+        "normalized_skill": "ETL",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "ETL",
+        "normalized_skill": "ETL",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "ETL",
+        "normalized_skill": "ETL",
+        "skill_type": "methodology",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "BI",
+    "skill_type": "technical_skill",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "BI",
+        "normalized_skill": "BI",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "BI",
+        "normalized_skill": "BI",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "BI",
+        "normalized_skill": "BI",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "BI",
+        "normalized_skill": "BI",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "",
+        "evidence_confidence": 0.0
+      }
+    ]
+  },
+  {
+    "skill": "Azure",
+    "skill_type": "technology",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+    ],
+    "evidence": [
+      {
+        "skill": "Azure",
+        "normalized_skill": "Azure",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Azure",
+        "normalized_skill": "Azure",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Azure",
+        "normalized_skill": "Azure",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Azure",
+        "normalized_skill": "Azure",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "AWS",
+    "skill_type": "technology",
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "source_breakdown": {
+      "portal_taxonomy": 4
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+    ],
+    "evidence": [
+      {
+        "skill": "AWS",
+        "normalized_skill": "AWS",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "AWS",
+        "normalized_skill": "AWS",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "AWS",
+        "normalized_skill": "AWS",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "AWS",
+        "normalized_skill": "AWS",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "resolucion de problemas",
+    "skill_type": "soft_skill",
+    "total_weight": 0.3,
+    "evidence_count": 3,
+    "source_breakdown": {
+      "portal_taxonomy": 3
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664"
+    ],
+    "evidence": [
+      {
+        "skill": "resolucion de problemas",
+        "normalized_skill": "resolucion de problemas",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "resolucion de problemas",
+        "normalized_skill": "resolucion de problemas",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "resolucion de problemas",
+        "normalized_skill": "resolucion de problemas",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Oracle",
+    "skill_type": "technology",
+    "total_weight": 0.3,
+    "evidence_count": 3,
+    "source_breakdown": {
+      "portal_taxonomy": 3
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+    ],
+    "evidence": [
+      {
+        "skill": "Oracle",
+        "normalized_skill": "Oracle",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Oracle",
+        "normalized_skill": "Oracle",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "title": "Administrador de Servidores de Aplicaciones",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador de Servidores de Aplicaciones",
+        "content_hash": "0a750148c2013d73a5fe3783f1c0a0def5fa9cdc3500bfd1ee75126bdc779ef8",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Oracle",
+        "normalized_skill": "Oracle",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Agile",
+    "skill_type": "methodology",
+    "total_weight": 0.3,
+    "evidence_count": 3,
+    "source_breakdown": {
+      "portal_taxonomy": 3
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "Agile",
+        "normalized_skill": "Agile",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Agile",
+        "normalized_skill": "Agile",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Agile",
+        "normalized_skill": "Agile",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "APIs",
+    "skill_type": "technology",
+    "total_weight": 0.3,
+    "evidence_count": 3,
+    "source_breakdown": {
+      "portal_taxonomy": 3
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "APIs",
+        "normalized_skill": "APIs",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "APIs",
+        "normalized_skill": "APIs",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.092
+      },
+      {
+        "skill": "APIs",
+        "normalized_skill": "APIs",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "pensamiento analitico",
+    "skill_type": "soft_skill",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "pensamiento analitico",
+        "normalized_skill": "pensamiento analitico",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "pensamiento analitico",
+        "normalized_skill": "pensamiento analitico",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "machine learning",
+    "skill_type": "explicit_skill",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "machine learning",
+        "normalized_skill": "machine learning",
+        "skill_type": "emerging_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "machine learning",
+        "normalized_skill": "machine learning",
+        "skill_type": "emerging_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "liderazgo",
+    "skill_type": "soft_skill",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "liderazgo",
+        "normalized_skill": "liderazgo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "liderazgo",
+        "normalized_skill": "liderazgo",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "ingles",
+    "skill_type": "soft_skill",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "ingles",
+        "normalized_skill": "ingles",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "ingles",
+        "normalized_skill": "ingles",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Tableau",
+    "skill_type": "tool",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Tableau",
+        "normalized_skill": "Tableau",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Tableau",
+        "normalized_skill": "Tableau",
+        "skill_type": "tool",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Spark",
+    "skill_type": "technology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Spark",
+        "normalized_skill": "Spark",
+        "skill_type": "platform",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Spark",
+        "normalized_skill": "Spark",
+        "skill_type": "platform",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Redis",
+    "skill_type": "technology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Redis",
+        "normalized_skill": "Redis",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "Redis",
+        "normalized_skill": "Redis",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "PostgreSQL",
+    "skill_type": "technology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83",
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "PostgreSQL",
+        "normalized_skill": "PostgreSQL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "PostgreSQL",
+        "normalized_skill": "PostgreSQL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "ITIL",
+    "skill_type": "methodology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search",
+      "https://ticjob.co/es/search/job/administrador-linux/8664"
+    ],
+    "evidence": [
+      {
+        "skill": "ITIL",
+        "normalized_skill": "ITIL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      },
+      {
+        "skill": "ITIL",
+        "normalized_skill": "ITIL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "title": "Administrador Linux",
+        "company": "Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia.? Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio. Ver todo >",
+        "role": "Administrador Linux",
+        "content_hash": "75857a70cee529a19e200f472d43f510c73a696e0a50e431b197d4b380bcf3ba",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Hadoop",
+    "skill_type": "technology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Hadoop",
+        "normalized_skill": "Hadoop",
+        "skill_type": "platform",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "Hadoop",
+        "normalized_skill": "Hadoop",
+        "skill_type": "platform",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "AI",
+    "skill_type": "technology",
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "source_breakdown": {
+      "portal_taxonomy": 2
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "AI",
+        "normalized_skill": "AI",
+        "skill_type": "emerging_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.0
+      },
+      {
+        "skill": "AI",
+        "normalized_skill": "AI",
+        "skill_type": "emerging_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "visualizacion analitica",
+    "skill_type": "explicit_skill",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "visualizacion analitica",
+        "normalized_skill": "visualizacion analitica",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "explicit_skill",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "scikit-learn",
+    "skill_type": "tool",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "scikit-learn",
+        "normalized_skill": "scikit-learn",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "pandas",
+    "skill_type": "tool",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "pandas",
+        "normalized_skill": "pandas",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "gestion de stakeholders",
+    "skill_type": "soft_skill",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/office/seti-s-s/83"
+    ],
+    "evidence": [
+      {
+        "skill": "gestion de stakeholders",
+        "normalized_skill": "gestion de stakeholders",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/office/seti-s-s/83",
+        "title": "SETI S.A.S.",
+        "company": "SETI S.A.S. Somos una compañía con una trayectoria de más de 20 años en administración, manejo y mejora de los componentes de la plataforma tecnológica relacionada con la gestión de la información. Proveemos a compañías de diferentes sectores económicos soluciones tecnológicas bajo el modelo de outsourcing y consultoría en el manejo de sus procesos, buscando integración y eficiencia. Expertos en gobierno de datos, brindamos servicios en administración, implementación, soporte, optimización e integración de bases de datos, servidores de aplicaciones, sistema operativo, inteligencia de negocios, migración de datos, integración SOA y gestión de procesos de negocio.",
+        "role": "SETI S.A.S.",
+        "content_hash": "a8ee602f95726b3f5f7e8d215553668efc461ca9b70eef23b00b1be51101ab85",
+        "entity_type": "soft_skill",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "executive reporting",
+    "skill_type": "responsibility_skill",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "executive reporting",
+        "normalized_skill": "executive reporting",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "responsibility_skill",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "estadistica",
+    "skill_type": "foundational_skill",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://www.elempleo.com/co/ofertas-empleo/"
+    ],
+    "evidence": [
+      {
+        "skill": "estadistica",
+        "normalized_skill": "estadistica",
+        "skill_type": "foundational_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "unknown",
+        "source_name": "Elempleo",
+        "source_url": "https://www.elempleo.com/co/ofertas-empleo/",
+        "title": "",
+        "company": "industry MICHIGAN MASTER SAS",
+        "role": "",
+        "content_hash": "fa6b0b1091c27d6659f0ac86efe18a3c358e83de892e8d4133069fabdee8bce4",
+        "entity_type": "",
+        "evidence_confidence": 0.0
+      }
+    ]
+  },
+  {
+    "skill": "Scrum",
+    "skill_type": "methodology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Scrum",
+        "normalized_skill": "Scrum",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "SSIS",
+    "skill_type": "tool",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "SSIS",
+        "normalized_skill": "SSIS",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "SQL Server",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "SQL Server",
+        "normalized_skill": "SQL Server",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "RAG",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "RAG",
+        "normalized_skill": "RAG",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Qlik",
+    "skill_type": "tool",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Qlik",
+        "normalized_skill": "Qlik",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "PL/SQL",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "PL/SQL",
+        "normalized_skill": "PL/SQL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "NoSQL",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "NoSQL",
+        "normalized_skill": "NoSQL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "MySQL",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "MySQL",
+        "normalized_skill": "MySQL",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "MongoDB",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "MongoDB",
+        "normalized_skill": "MongoDB",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "MLflow",
+    "skill_type": "tool",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "MLflow",
+        "normalized_skill": "MLflow",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "tool",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "LLM",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "LLM",
+        "normalized_skill": "LLM",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Kanban",
+    "skill_type": "methodology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Kanban",
+        "normalized_skill": "Kanban",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Kafka",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Kafka",
+        "normalized_skill": "Kafka",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "GCP",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "GCP",
+        "normalized_skill": "GCP",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.092
+      }
+    ]
+  },
+  {
+    "skill": "ELT",
+    "skill_type": "methodology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "ELT",
+        "normalized_skill": "ELT",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "methodology",
+        "evidence_confidence": 0.1
+      }
+    ]
+  },
+  {
+    "skill": "Copilot BI",
+    "skill_type": "technology",
+    "total_weight": 0.1,
+    "evidence_count": 1,
+    "source_breakdown": {
+      "portal_taxonomy": 1
+    },
+    "roles": [],
+    "companies": [],
+    "source_urls": [
+      "https://ticjob.co/es/search"
+    ],
+    "evidence": [
+      {
+        "skill": "Copilot BI",
+        "normalized_skill": "Copilot BI",
+        "skill_type": "technical_skill",
+        "evidence_source": "portal_taxonomy",
+        "evidence_weight": 0.1,
+        "document_type": "portal_taxonomy",
+        "source_name": "Ticjob",
+        "source_url": "https://ticjob.co/es/search",
+        "title": "Lugar de trabajo",
+        "company": "",
+        "role": "Lugar de trabajo",
+        "content_hash": "b8fcbef0f52b259b51bc83e26e501be652c07220d5c4e07d032cb445d3737903",
+        "entity_type": "technology",
+        "evidence_confidence": 0.092
+      }
+    ]
+  }
+]

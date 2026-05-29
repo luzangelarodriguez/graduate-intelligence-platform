@@ -2,3 +2,4 @@
 -r requirements/backend.txt
 -r requirements/scraping.txt
 -r requirements/ml.txt
+-r requirements/document_processing.txt

@@ -1,0 +1,124 @@
+pilot: visual_analytics_big_data
+description: Fuentes laborales controladas para el piloto de Especializacion en Visual Analytics y Big Data.
+sources:
+  - name: LinkedIn
+    url: https://www.linkedin.com/jobs
+    country: Colombia
+    priority: alta
+    source_type: red_profesional_tecnologia_data_cloud_desarrollo
+    access_mode: restricted_manual_api_fallback
+    enabled: true
+    rate_limit_seconds: 12
+    max_pages: 2
+    max_jobs: 50
+    allowed_paths:
+      - /jobs
+    blocked_reason: Puede requerir autenticacion y aplica restricciones anti-scraping.
+  - name: Computrabajo
+    url: https://co.computrabajo.com
+    country: Colombia
+    priority: alta
+    source_type: portal_general_colombiano
+    access_mode: scraping_controlado
+    enabled: true
+    rate_limit_seconds: 8
+    max_pages: 3
+    max_jobs: 80
+    allowed_paths:
+      - /
+      - /trabajo-de-
+      - /ofertas-de-trabajo/
+  - name: Elempleo
+    url: https://www.elempleo.com/co/ofertas-empleo/sistemas-tecnologia
+    country: Colombia
+    priority: alta
+    source_type: portal_colombiano_tecnologia_informatica
+    access_mode: api_first_or_scraping_controlado
+    enabled: true
+    rate_limit_seconds: 8
+    max_pages: 3
+    max_jobs: 80
+    allowed_paths:
+      - /co/ofertas-empleo/sistemas-tecnologia
+      - /co/api/joboffers/findbyfilter
+      - /co/api/joboffers/getjoboffer
+  - name: Ticjob
+    url: https://ticjob.co/
+    country: Colombia
+    priority: alta
+    source_type: portal_especializado_it
+    access_mode: scraping_controlado
+    enabled: true
+    rate_limit_seconds: 10
+    max_pages: 3
+    max_jobs: 80
+    allowed_paths:
+      - /
+      - /jobs
+      - /ofertas-trabajo
+  - name: Hireline
+    url: https://hireline.io/co
+    country: Colombia
+    priority: media-alta
+    source_type: perfiles_tecnologicos_latam
+    access_mode: scraping_controlado
+    enabled: true
+    rate_limit_seconds: 10
+    max_pages: 2
+    max_jobs: 60
+    allowed_paths:
+      - /co
+      - /co/empleos
+  - name: Servicio Publico de Empleo
+    url: https://www.serviciodeempleo.gov.co
+    country: Colombia
+    priority: alta
+    source_type: fuente_oficial_colombia
+    access_mode: fuente_oficial
+    enabled: true
+    rate_limit_seconds: 12
+    max_pages: 3
+    max_jobs: 80
+    allowed_paths:
+      - /
+      - /buscador
+      - /personas/buscador-empleo
+  - name: Agencia Publica de Empleo SENA
+    url: https://agenciapublicadeempleo.sena.edu.co
+    country: Colombia
+    priority: alta
+    source_type: fuente_oficial_colombia
+    access_mode: fuente_oficial
+    enabled: true
+    rate_limit_seconds: 12
+    max_pages: 3
+    max_jobs: 80
+    allowed_paths:
+      - /
+      - /spe-web/spe
+  - name: Mi Futuro Empleo
+    url: https://mifuturoempleo.co/empleos/de-tecnologia
+    country: Colombia
+    priority: media
+    source_type: portal_colombia_tecnologia
+    access_mode: scraping_controlado
+    enabled: true
+    rate_limit_seconds: 10
+    max_pages: 2
+    max_jobs: 50
+    allowed_paths:
+      - /empleos/de-tecnologia
+      - /empleos
+  - name: FindJobIT
+    url: https://findjobit.com/jobs/country/colombia
+    country: Colombia
+    priority: media
+    source_type: it_colombia_remoto
+    access_mode: scraping_controlado
+    enabled: true
+    rate_limit_seconds: 10
+    max_pages: 2
+    max_jobs: 50
+    allowed_paths:
+      - /jobs/country/colombia
+      - /jobs
