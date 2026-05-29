@@ -4,6 +4,10 @@ from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any
 
+from backend.repositories import microcurriculum_context_repository, programas_repository
+from backend.services import dashboard_service
+from backend.services.normalization_service import normalize_program_row
+
 from api.database import fetch_all, fetch_one, relation_exists, relation_has_rows, startup_validate, table_row_count
 from intelligence.semantic_search_engine import semantic_search
 from ml.labor.market_skill_intelligence_engine import build_market_skill_intelligence_map
@@ -509,3 +513,73 @@ def observatory_summary() -> dict[str, Any]:
         "curriculum_gaps": gaps,
         "company_intelligence": companies,
     }
+
+
+def _program_limit(value: int) -> int:
+    try:
+        integer = int(value)
+    except Exception:
+        integer = 25
+    return max(1, min(integer, MAX_LIMIT))
+
+
+def list_programas_compatibility(*, limit: int = 25, offset: int = 0) -> dict[str, Any]:
+    limit = _program_limit(limit)
+    offset = _offset(offset)
+    rows = dashboard_service.list_programs_base(db_name=None)
+    total = len(rows)
+    items = rows[offset : offset + limit]
+    return {
+        "items": items,
+        "count": total,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+def get_programa_compatibility(program_id: int) -> dict[str, Any]:
+    resolved_id = programas_repository.resolve_program_id(program_id, db_name=None)
+    row = programas_repository.fetch_program_base_row(resolved_id, db_name=None)
+    if not row:
+        raise KeyError(f"programa {program_id} not found")
+    normalized = normalize_program_row(row)
+    for item in dashboard_service.list_programs_base(db_name=None):
+        if int(item.get("especializacion_id") or 0) == resolved_id:
+            normalized.update(item)
+            break
+    normalized["skills"] = dashboard_service.normalize_skill_rows(
+        programas_repository.fetch_program_skill_rows(resolved_id, db_name=None)
+    )
+    micro_context = microcurriculum_context_repository.fetch_program_context(
+        resolved_id,
+        specialization_name=normalized.get("nombre_especializacion"),
+        db_name=None,
+    )
+    if micro_context:
+        contextual_skills = [
+            {"nombre": item.get("name"), "conteo": item.get("frequency", 1)}
+            for item in (micro_context.get("technologies") or micro_context.get("technical_skills") or [])
+        ]
+        scores = micro_context.get("scores") or {}
+        normalized.update(
+            {
+                "curricular_context_source": "microcurriculum_program_contexts",
+                "microcurriculum_context": micro_context,
+                "skills": contextual_skills,
+                "skills_reales_microcurriculo": contextual_skills,
+                "competencias_reales_microcurriculo": micro_context.get("transversal_skills") or [],
+                "herramientas_reales_microcurriculo": (micro_context.get("tools") or []) + (micro_context.get("platforms") or []),
+                "brechas_reales_microcurriculo": micro_context.get("real_market_gaps") or [],
+                "areas_a_fortalecer": micro_context.get("strengthening_areas") or [],
+                "roles_laborales_contextuales": micro_context.get("labor_roles") or [],
+                "benchmarking_contextual": micro_context.get("benchmarking") or [],
+                "narrativa_ia": micro_context.get("executive_narrative") or "",
+                "total_skills_programa": len(contextual_skills),
+                "promedio_match_mercado": float(scores.get("market_skill_coverage") or normalized.get("promedio_match_mercado") or 0),
+                "porcentaje_match": float(scores.get("market_skill_coverage") or normalized.get("porcentaje_match") or 0),
+                "max_match_mercado": float(scores.get("curricular_relevance") or normalized.get("max_match_mercado") or 0),
+                "total_empleos_relacionados": len(micro_context.get("labor_roles") or []),
+            }
+        )
+    return normalized

@@ -43,6 +43,36 @@ class SearchResponse(BaseModel):
     items: list[dict[str, Any]] = Field(default_factory=list)
 
 
+class ProgramSkill(BaseModel):
+    skill_id: int
+    nombre: str
+    conteo: int = 0
+
+
+class Program(BaseModel):
+    especializacion_id: int
+    nombre_especializacion: str
+    rol: str = ""
+    total_skills_programa: int = 0
+    total_herramientas: int = 0
+    total_competencias: int = 0
+    total_habilidades_blandas: int = 0
+    promedio_match_mercado: float = 0.0
+    porcentaje_match: float = 0.0
+    max_match_mercado: float = 0.0
+    total_empleos_relacionados: int = 0
+    skills_cubiertas: int = 0
+    skills: list[ProgramSkill] = Field(default_factory=list)
+
+
+class ProgramPageResponse(BaseModel):
+    items: list[Program] = Field(default_factory=list)
+    count: int = 0
+    total: int = 0
+    limit: int = 0
+    offset: int = 0
+
+
 class ObservatoryStatusResponse(BaseModel):
     observatory_tables: dict[str, bool] = Field(default_factory=dict)
     missing_tables: list[str] = Field(default_factory=list)

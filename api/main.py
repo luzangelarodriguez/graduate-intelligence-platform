@@ -9,7 +9,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth import auth_router
-from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, SearchResponse
+from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, Program, ProgramPageResponse, SearchResponse
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api import services
 
@@ -99,6 +99,24 @@ def metrics(
     metric_name: str | None = Query(default=None),
 ) -> dict[str, Any]:
     return services.list_observatory_metrics(limit=limit, offset=offset, metric_category=metric_category, metric_name=metric_name)
+
+
+@app.get("/api/programas", response_model=ProgramPageResponse, tags=["programas"])
+def programas(
+    limit: int = Query(25, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> dict[str, Any]:
+    return services.list_programas_compatibility(limit=limit, offset=offset)
+
+
+@app.get("/api/programas/{program_id}", response_model=Program, tags=["programas"])
+def programa(program_id: int) -> dict[str, Any]:
+    try:
+        return services.get_programa_compatibility(program_id)
+    except KeyError as exc:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @app.get("/curriculum-gaps", response_model=PaginatedResponse, tags=["observatory"])
