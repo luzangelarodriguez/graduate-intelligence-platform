@@ -1,29 +1,4 @@
 # Semantic Role Graph Report
 
-- Roles detectados: 29
-- Edges ocupacionales: 4
-- Administrador de Servidores de Aplicaciones: AI Analytics (0.2692)
-- Aprendiz en Desarrollo de Software: Governance & Quality (0.28)
-- Ejecutivo Comercial TI: AI Analytics (0.2545)
-- Indra Colombia LTDA: AI Analytics (0.5833)
-- Técnico de Soporte: BI & Visualization (0.3652)
-- Administrador Linux: Governance & Quality (0.2435)
-- Desarrollador Backend .NET Senior (hibrido): Governance & Quality (0.21)
-- CS3 SAS: Analytics Engineering (0.2074)
-- Administrador de Aplicaciones (Oracle / WebLogic / Middleware): Cloud Analytics (0.3111)
-- Ingeniero Preventa - Administrador de Plataforma: BI & Visualization (0.28)
-- Líder IA Generativa-GitHub Copilot-Bogotá: AI Analytics (0.28)
-- Ingeniero de Soporte Infraestructura Junior: Cloud Analytics (0.24)
-- Analista Funcional de Procesos de Software: AI Analytics (0.227)
-- Especialista IA: Cloud Analytics (0.2154)
-- Administrador de Bases de Datos (DBA): Cloud Analytics (0.1806)
-- Venta Equipos SAS: Governance & Quality (0.1647)
-- 19/05/2026 Atlántico: Enterprise Analytics (0.0)
-- 26/05/2026 Cundinamarca, Bogotá: Enterprise Analytics (0.0)
-- 08/05/2026 A convenir Bogotá: Enterprise Analytics (0.0)
-- 21/05/2026 Bogotá: Enterprise Analytics (0.0)
-- 27/05/2026 Bogotá: Enterprise Analytics (0.0)
-- 26/05/2026 Bogotá: Enterprise Analytics (0.0)
-- 20/05/2026 Bogotá: Enterprise Analytics (0.0)
-- Confidencial2: Governance & Quality (0.2333)
-- SETI S.A.S.: Cloud Analytics (0.28)
+- Roles detectados: 0
+- Edges ocupacionales: 0

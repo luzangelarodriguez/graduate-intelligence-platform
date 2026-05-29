@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -23,6 +24,7 @@ from ml.labor.market_skill_intelligence_engine import build_market_skill_intelli
 ROOT_DIR = Path(__file__).resolve().parents[1]
 ANALYTICS_DIR = ROOT_DIR / "outputs" / "analytics"
 DASHBOARD_DIR = ROOT_DIR / "outputs" / "dashboard_datasets"
+OBSERVATORY_MATERIALIZATION_REPORT = ANALYTICS_DIR / "observatory_materialization_report.md"
 MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "015_labor_acquisition_warehouse.sql",
     ROOT_DIR / "database" / "migrations" / "016_labor_intelligence_enrichment.sql",
@@ -30,6 +32,15 @@ MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "018_labor_curriculum_intelligence.sql",
     ROOT_DIR / "database" / "migrations" / "019_labor_observatory_layer.sql",
 ]
+OBSERVATORY_TABLES = (
+    "observatory_metrics",
+    "curriculum_gap_observatory",
+    "recommendation_observatory",
+    "semantic_role_graph",
+    "company_observatory",
+    "emerging_technology_observatory",
+)
+logger = logging.getLogger(__name__)
 
 
 def _apply_migrations(cur: Any) -> None:
@@ -363,6 +374,55 @@ def _export_dashboard_datasets(
     return exports
 
 
+def _validate_observatory_tables(cur: Any) -> dict[str, Any]:
+    table_counts: dict[str, int] = {}
+    table_exists: dict[str, bool] = {}
+    for table in OBSERVATORY_TABLES:
+        cur.execute("SELECT to_regclass(%s) IS NOT NULL AS exists", (table,))
+        exists = bool((cur.fetchone() or {}).get("exists"))
+        table_exists[table] = exists
+        if exists:
+            cur.execute(f"SELECT COUNT(*)::int AS total FROM {table}")
+            table_counts[table] = int((cur.fetchone() or {}).get("total") or 0)
+        else:
+            table_counts[table] = 0
+    completion_percentage = round(sum(1 for exists in table_exists.values() if exists) / max(len(OBSERVATORY_TABLES), 1) * 100, 2)
+    status = "observatory_ready" if completion_percentage >= 100 else "partial_observatory"
+    return {
+        "status": status,
+        "completion_percentage": completion_percentage,
+        "observatory_tables": table_exists,
+        "table_counts": table_counts,
+        "missing_tables": [table for table, exists in table_exists.items() if not exists],
+    }
+
+
+def _write_observatory_materialization_report(validation: dict[str, Any], metric_period: str) -> str:
+    OBSERVATORY_MATERIALIZATION_REPORT.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# Observatory Materialization Report",
+        "",
+        f"- Periodo: {metric_period}",
+        f"- Status: {validation['status']}",
+        f"- Completion percentage: {validation['completion_percentage']}",
+        "",
+        "## Table counts",
+        "",
+    ]
+    for table, count in validation["table_counts"].items():
+        lines.append(f"- {table}: {count}")
+    lines.extend(
+        [
+            "",
+            "## Missing tables",
+            "",
+        ]
+    )
+    lines.extend([f"- {table}" for table in validation["missing_tables"]] or ["- Ninguna"])
+    OBSERVATORY_MATERIALIZATION_REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return str(OBSERVATORY_MATERIALIZATION_REPORT)
+
+
 def run_observatory_layer(
     *,
     jobs: list[dict[str, Any]],
@@ -436,6 +496,15 @@ def run_observatory_layer(
                 persisted["emerging_technology_observatory"] = _persist_emerging_technology(cur, emerging_tech, metric_period)
             conn.commit()
 
+    observatory_validation = None
+    observatory_report = None
+    if persist:
+        load_environment()
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                observatory_validation = _validate_observatory_tables(cur)
+                observatory_report = _write_observatory_materialization_report(observatory_validation, metric_period)
+
     return {
         "metric_period": metric_period,
         "market_skills": len(market_intelligence.market_skills),
@@ -446,4 +515,6 @@ def run_observatory_layer(
         "emerging_technologies": len(emerging_tech),
         "persisted": persisted,
         "dashboard_exports": dashboard_exports,
+        "observatory_validation": observatory_validation,
+        "observatory_materialization_report": observatory_report,
     }
