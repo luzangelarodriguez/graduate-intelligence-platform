@@ -1,0 +1,74 @@
+{
+  "cases": 3,
+  "passed": 3,
+  "quality": 1.0,
+  "results": [
+    {
+      "name": "bi_power_bi",
+      "expected": "high",
+      "micro": "Power BI SQL visual analytics data governance storytelling with data",
+      "title": "BI Analyst Power BI",
+      "description": "Rol de analitica para dashboards, SQL, Power BI, gobierno de datos y visualizacion ejecutiva.",
+      "skills": [
+        "Power BI",
+        "SQL",
+        "data governance",
+        "dashboarding"
+      ],
+      "score": {
+        "semantic_similarity": 0.3909,
+        "skill_overlap": 0.75,
+        "role_alignment": 0.88,
+        "emerging_skill_weight": 0.0,
+        "final_match_score": 0.6536,
+        "role_class": "visualization",
+        "confidence": 0.7154
+      },
+      "passed": true
+    },
+    {
+      "name": "data_engineering",
+      "expected": "high",
+      "micro": "ETL big data processing data warehouse lakehouse Spark",
+      "title": "Data Engineer",
+      "description": "Ingeniero de datos para ETL, Spark, lakehouse, data warehouse y pipelines analiticos.",
+      "skills": [
+        "ETL",
+        "Spark",
+        "lakehouse",
+        "data warehouse"
+      ],
+      "score": {
+        "semantic_similarity": 0.4979,
+        "skill_overlap": 1.0,
+        "role_alignment": 0.88,
+        "emerging_skill_weight": 0.3333,
+        "final_match_score": 0.828,
+        "role_class": "data_engineer",
+        "confidence": 0.8774
+      },
+      "passed": true
+    },
+    {
+      "name": "irrelevant_accounting",
+      "expected": "low",
+      "micro": "Power BI SQL visual analytics data governance storytelling with data",
+      "title": "Auxiliar contable",
+      "description": "Registro contable, conciliaciones bancarias y facturacion.",
+      "skills": [
+        "contabilidad",
+        "facturacion"
+      ],
+      "score": {
+        "semantic_similarity": 0.1656,
+        "skill_overlap": 0.0,
+        "role_alignment": 0.62,
+        "emerging_skill_weight": 0.0,
+        "final_match_score": 0.1798,
+        "role_class": "analytics_related",
+        "confidence": 0.1278
+      },
+      "passed": true
+    }
+  ]
+}

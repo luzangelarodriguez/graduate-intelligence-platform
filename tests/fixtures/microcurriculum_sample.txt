@@ -1,0 +1,22 @@
+Programa: Especializacion en Ingenieria de Software
+Asignatura: Desarrollo de Aplicaciones Web
+Semestre: 1
+Creditos: 3
+
+Competencias:
+- Disenar servicios backend con Python y SQL.
+- Implementar interfaces con React y JavaScript.
+- Aplicar liderazgo tecnico y trabajo en equipo.
+
+Resultados de aprendizaje:
+- Construye APIs RESTful y despliega aplicaciones con Docker.
+- Integra practicas de Scrum y Agile para entregas iterativas.
+
+Contenidos:
+Python, SQL, React, Docker, REST API, arquitectura de software.
+
+Metodologias:
+Scrum, Agile, aprendizaje basado en proyectos.
+
+Herramientas:
+AWS, Docker, GitHub Actions.

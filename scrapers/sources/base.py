@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,10 +38,120 @@ class SourceConfig:
     city_selectors: tuple[str, ...] = ("[class*='city']", "[class*='location']", "[class*='ubicacion']")
     description_selectors: tuple[str, ...] = ("[class*='description']", "[class*='descripcion']", "main", "article")
     next_selectors: tuple[str, ...] = ("a[rel='next']", "button:has-text('Siguiente')", "a:has-text('Siguiente')")
+    max_pages: int = 3
+    max_runtime_seconds: int = 75
+    max_detail_attempts: int = 24
+
+
+@dataclass(frozen=True)
+class WaitResult:
+    selector: str
+    elapsed_ms: int
+    attempts: int
+    runtime: dict[str, Any]
+    status: str
 
 
 def build_search_url(template: str, query: str, location: str = "Colombia") -> str:
     return template.format(query=quote_plus(query), location=quote_plus(location))
+
+
+async def detect_runtime(page: Page) -> dict[str, Any]:
+    try:
+        return await page.evaluate(
+            """() => ({
+                nextjs: Boolean(window.__NEXT_DATA__ || document.querySelector('script[src*="/_next/"]')),
+                reactRoot: Boolean(
+                    document.querySelector('#root, #__next, [data-reactroot]') ||
+                    Array.from(document.querySelectorAll('script[src]')).some((script) =>
+                        /react|webpack|vite|chunk/i.test(script.getAttribute('src') || '')
+                    )
+                ),
+                likelyPolling: performance.getEntriesByType('resource')
+                    .filter((entry) => Date.now() - entry.responseEnd < 5000).length > 8
+            })"""
+        )
+    except Exception:
+        return {"nextjs": False, "reactRoot": False, "likelyPolling": False}
+
+
+async def safe_wait_for_results(
+    page: Page,
+    selectors: tuple[str, ...],
+    *,
+    source: str,
+    phase: str,
+    timeout_ms: int = 12000,
+    retries: int = 2,
+    fallback_wait_ms: int = 1200,
+) -> WaitResult:
+    """Wait for real DOM evidence instead of network idleness.
+
+    Modern job portals often keep analytics, GraphQL polling or long-lived XHR
+    alive forever. This helper treats visible/attached result selectors as the
+    primary readiness signal and falls back to domcontentloaded plus short
+    exponential sleeps so a source can degrade without blocking the pipeline.
+    """
+    started = time.perf_counter()
+    runtime = await detect_runtime(page)
+    last_error = ""
+    for attempt in range(1, retries + 2):
+        attempt_deadline = time.perf_counter() + (timeout_ms / 1000)
+        for selector in selectors:
+            try:
+                remaining_ms = int((attempt_deadline - time.perf_counter()) * 1000)
+                if remaining_ms <= 0:
+                    break
+                selector_timeout_ms = max(250, min(remaining_ms, timeout_ms // max(1, len(selectors))))
+                await page.wait_for_selector(selector, state="attached", timeout=selector_timeout_ms)
+                elapsed_ms = int((time.perf_counter() - started) * 1000)
+                LOGGER.info(
+                    "source=%s phase=%s wait_status=selector_found selector=%r elapsed_ms=%s attempt=%s runtime=%s",
+                    source,
+                    phase,
+                    selector,
+                    elapsed_ms,
+                    attempt,
+                    runtime,
+                )
+                return WaitResult(selector=selector, elapsed_ms=elapsed_ms, attempts=attempt, runtime=runtime, status="selector_found")
+            except PlaywrightTimeoutError as exc:
+                last_error = str(exc).splitlines()[0]
+            except Exception as exc:
+                last_error = str(exc)
+
+        try:
+            remaining_ms = max(250, int((attempt_deadline - time.perf_counter()) * 1000))
+            await page.wait_for_load_state("domcontentloaded", timeout=min(1000, remaining_ms))
+        except PlaywrightTimeoutError as exc:
+            last_error = str(exc).splitlines()[0]
+        except Exception as exc:
+            last_error = str(exc)
+
+        sleep_ms = fallback_wait_ms * attempt
+        LOGGER.warning(
+            "source=%s phase=%s wait_retry=%s timeout_ms=%s fallback_sleep_ms=%s runtime=%s error=%s",
+            source,
+            phase,
+            attempt,
+            timeout_ms,
+            sleep_ms,
+            runtime,
+            last_error,
+        )
+        await page.wait_for_timeout(sleep_ms)
+
+    elapsed_ms = int((time.perf_counter() - started) * 1000)
+    LOGGER.error(
+        "source=%s phase=%s wait_status=timeout elapsed_ms=%s retries=%s runtime=%s error=%s",
+        source,
+        phase,
+        elapsed_ms,
+        retries,
+        runtime,
+        last_error,
+    )
+    return WaitResult(selector="", elapsed_ms=elapsed_ms, attempts=retries + 1, runtime=runtime, status="timeout")
 
 
 async def first_text(page: Page, selectors: tuple[str, ...]) -> str:
@@ -134,24 +245,76 @@ class PlaywrightJobSource:
             ),
         )
         page = await context.new_page()
-        page.set_default_timeout(18000)
+        page.set_default_timeout(10000)
         url = build_search_url(self.config.search_url_template, query=query, location=location)
         jobs: list[dict[str, Any]] = []
+        source_deadline = time.perf_counter() + self.config.max_runtime_seconds
+        detail_attempts = 0
         try:
-            await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_load_state("networkidle", timeout=20000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=15000)
+            wait_result = await safe_wait_for_results(
+                page,
+                self.config.card_selectors,
+                source=self.config.portal,
+                phase="search",
+                timeout_ms=12000,
+                retries=2,
+            )
+            if wait_result.status == "timeout":
+                LOGGER.warning("source=%s source_status=degraded phase=search reason=no_result_selectors", self.config.portal)
             seen_links: set[str] = set()
-            while len(jobs) < limit:
+            page_number = 1
+            while len(jobs) < limit and page_number <= self.config.max_pages and time.perf_counter() < source_deadline:
                 links = await extract_card_links(page, self.config)
+                LOGGER.info(
+                    "source=%s phase=listing page=%s links=%s jobs=%s limit=%s",
+                    self.config.portal,
+                    page_number,
+                    len(links),
+                    len(jobs),
+                    limit,
+                )
                 for link in links:
+                    if time.perf_counter() >= source_deadline:
+                        LOGGER.warning(
+                            "source=%s source_status=degraded reason=source_runtime_budget_exhausted jobs=%s elapsed_seconds=%s",
+                            self.config.portal,
+                            len(jobs),
+                            self.config.max_runtime_seconds,
+                        )
+                        break
+                    if detail_attempts >= self.config.max_detail_attempts:
+                        LOGGER.warning(
+                            "source=%s source_status=degraded reason=max_detail_attempts attempts=%s jobs=%s",
+                            self.config.portal,
+                            detail_attempts,
+                            len(jobs),
+                        )
+                        break
                     if link in seen_links or len(jobs) >= limit:
                         continue
                     seen_links.add(link)
+                    detail_attempts += 1
                     detail = await self._extract_detail(context, link)
                     if detail.get("titulo") or detail.get("descripcion"):
                         jobs.append(detail)
-                if len(jobs) >= limit or not await self._go_next(page):
+                if (
+                    len(jobs) >= limit
+                    or page_number >= self.config.max_pages
+                    or detail_attempts >= self.config.max_detail_attempts
+                    or time.perf_counter() >= source_deadline
+                    or not await self._go_next(page)
+                ):
                     break
+                page_number += 1
+            if len(jobs) < limit and page_number >= self.config.max_pages:
+                LOGGER.info(
+                    "source=%s source_status=degraded reason=max_pages_reached pages=%s jobs=%s requested_limit=%s",
+                    self.config.portal,
+                    self.config.max_pages,
+                    len(jobs),
+                    limit,
+                )
         except Exception as exc:
             LOGGER.exception("source=%s failed: %s", self.config.portal, exc)
             await page.screenshot(path=str(screenshots_dir / f"{self.config.portal}_error.png"), full_page=True)
@@ -162,11 +325,16 @@ class PlaywrightJobSource:
     async def _extract_detail(self, context: Any, url: str) -> dict[str, Any]:
         page = await context.new_page()
         try:
-            await page.goto(url, wait_until="domcontentloaded")
-            try:
-                await page.wait_for_load_state("networkidle", timeout=12000)
-            except PlaywrightTimeoutError:
-                pass
+            await page.goto(url, wait_until="domcontentloaded", timeout=8000)
+            await safe_wait_for_results(
+                page,
+                ("h1", "h2", "main", "article", *self.config.description_selectors),
+                source=self.config.portal,
+                phase="detail",
+                timeout_ms=2500,
+                retries=0,
+                fallback_wait_ms=500,
+            )
             title = await first_text(page, self.config.title_selectors)
             company = await first_text(page, self.config.company_selectors)
             city = await first_text(page, self.config.city_selectors)
@@ -196,6 +364,9 @@ class PlaywrightJobSource:
             }
             job["hash_contenido"] = job_content_hash(job)
             return job
+        except Exception as exc:
+            LOGGER.warning("source=%s source_status=degraded phase=detail url=%s error=%s", self.config.portal, url, exc)
+            return {}
         finally:
             await page.close()
 
@@ -205,7 +376,16 @@ class PlaywrightJobSource:
                 target = page.locator(selector).first
                 if await target.count() and await target.is_enabled():
                     await target.click()
-                    await page.wait_for_load_state("networkidle", timeout=15000)
+                    wait_result = await safe_wait_for_results(
+                        page,
+                        self.config.card_selectors,
+                        source=self.config.portal,
+                        phase="pagination",
+                        timeout_ms=9000,
+                        retries=1,
+                    )
+                    if wait_result.status == "timeout":
+                        LOGGER.warning("source=%s source_status=degraded phase=pagination reason=no_next_results", self.config.portal)
                     return True
             except Exception:
                 continue

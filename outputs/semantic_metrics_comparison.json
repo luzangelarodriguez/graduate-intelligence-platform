@@ -1,0 +1,84 @@
+{
+  "before": {
+    "documents_processed": 6,
+    "unique_document_hashes": 1,
+    "precision_approx": 0.8333,
+    "recall_approx": 0.0833,
+    "domain_contamination_rate": 0.1667,
+    "recommendation_coherence_score": 1.0,
+    "taxonomy_coverage": 0.375,
+    "contextual_understanding_score": 0.65,
+    "recommendation_quality_score": 0.94,
+    "domain_accuracy_heuristic": 1.0,
+    "readiness_for_university_pilot": "bajo",
+    "missing_taxonomies": [
+      ".net",
+      "android studio",
+      "cloud",
+      "eclipse",
+      "google cloud",
+      "innovacion",
+      "java",
+      "mariadb",
+      "netbeans",
+      "php"
+    ],
+    "contamination_events": [
+      {
+        "skill": "liderazgo",
+        "skill_domain": "management",
+        "predicted_domain": "ti"
+      }
+    ],
+    "overclassification_count": 0,
+    "underclassification_count": 6
+  },
+  "after": {
+    "documents_processed": 6,
+    "unique_document_hashes": 1,
+    "precision_approx": 1.0,
+    "recall_approx": 0.6667,
+    "domain_contamination_rate": 0.0,
+    "recommendation_coherence_score": 1.0,
+    "taxonomy_coverage": 0.9524,
+    "contextual_understanding_score": 0.9238,
+    "recommendation_quality_score": 1.0,
+    "domain_accuracy_heuristic": 1.0,
+    "readiness_for_university_pilot": "medio",
+    "missing_taxonomies": [
+      "innovacion"
+    ],
+    "contamination_events": [],
+    "overclassification_count": 0,
+    "underclassification_count": 0
+  },
+  "deltas": {
+    "precision_approx": 0.1667,
+    "recall_approx": 0.5834,
+    "domain_contamination_rate": -0.1667,
+    "taxonomy_coverage": 0.5774,
+    "contextual_understanding_score": 0.2738,
+    "recommendation_quality_score": 0.06
+  },
+  "gold_dataset": {
+    "documents_scanned": 19,
+    "rows_generated": 39,
+    "output": "ml\\datasets\\curriculum_gold_dataset.csv",
+    "entity_types": [
+      "cloud_provider",
+      "database",
+      "framework",
+      "methodology",
+      "programming_language",
+      "technical_skill",
+      "tool",
+      "transversal_skill"
+    ]
+  },
+  "baseline_source": "embedded_pre_hardening_baseline",
+  "outputs": {
+    "functional_validation_json": "outputs\\ml_validation_results.json",
+    "comparison_json": "outputs\\semantic_metrics_comparison.json",
+    "report": "outputs\\semantic_hardening_report.md"
+  }
+}

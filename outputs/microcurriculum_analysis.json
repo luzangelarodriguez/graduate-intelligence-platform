@@ -1,0 +1,149 @@
+{
+  "programa": "Especialización en Ingeniería de Software",
+  "asignaturas": [
+    {
+      "nombre": "Direccion y gestion de proyectos",
+      "semestre": "",
+      "creditos": "",
+      "contenidos": [],
+      "metodologias": []
+    },
+    {
+      "nombre": "Computacion en la nube",
+      "semestre": "",
+      "creditos": "",
+      "contenidos": [],
+      "metodologias": []
+    },
+    {
+      "nombre": "DevOps",
+      "semestre": "",
+      "creditos": "",
+      "contenidos": [],
+      "metodologias": []
+    }
+  ],
+  "skills": [
+    "liderazgo",
+    "javascript",
+    "sql",
+    "agile",
+    "scrum",
+    "devops"
+  ],
+  "platforms": [
+    "javascript",
+    "sql"
+  ],
+  "competencias": [],
+  "missing_market_skills": [
+    "docker",
+    "python",
+    "react",
+    "rest api"
+  ],
+  "recommendations": [
+    {
+      "title": "Incorporar docker",
+      "text": "Se recomienda incorporar competencias practicas en docker porque aparece como evidencia laboral relevante para el dominio ti.",
+      "confidence": 0.7,
+      "evidence": {
+        "skill": "docker",
+        "domain": "ti",
+        "demand_count": 1,
+        "evidence_jobs": []
+      }
+    },
+    {
+      "title": "Incorporar python",
+      "text": "Se recomienda incorporar competencias practicas en python porque aparece como evidencia laboral relevante para el dominio ti.",
+      "confidence": 0.7,
+      "evidence": {
+        "skill": "python",
+        "domain": "ti",
+        "demand_count": 1,
+        "evidence_jobs": []
+      }
+    },
+    {
+      "title": "Incorporar react",
+      "text": "Se recomienda incorporar competencias practicas en react porque aparece como evidencia laboral relevante para el dominio ti.",
+      "confidence": 0.7,
+      "evidence": {
+        "skill": "react",
+        "domain": "ti",
+        "demand_count": 1,
+        "evidence_jobs": []
+      }
+    },
+    {
+      "title": "Incorporar rest api",
+      "text": "Se recomienda incorporar competencias practicas en rest api porque aparece como evidencia laboral relevante para el dominio ti.",
+      "confidence": 0.7,
+      "evidence": {
+        "skill": "rest api",
+        "domain": "ti",
+        "demand_count": 1,
+        "evidence_jobs": []
+      }
+    },
+    {
+      "title": "Revisar tecnologias con baja senal laboral",
+      "text": "Se recomienda revisar la vigencia de tecnologias sin evidencia suficiente en el mercado laboral reciente y conectarlas con herramientas mas demandadas.",
+      "confidence": 0.68,
+      "evidence": {
+        "skills": [
+          "agile",
+          "scrum"
+        ],
+        "domain": "ti"
+      }
+    }
+  ],
+  "scores": {
+    "pertinencia_curricular": 0.4277,
+    "cobertura_skills_mercado": 0.4286,
+    "modernizacion_tecnologica": 0.9,
+    "alineacion_laboral": 0.5703,
+    "riesgo_obsolescencia": 0.3333,
+    "recommendations_count": 5
+  },
+  "diagnostics": {
+    "source_document": "storage\\microcurriculos\\Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+    "stored_path": "storage\\microcurriculos\\20260520_184649_2d37515dd9551380_Anexo 3.1 Microcurriculos - Esp_ing_Software.pdf",
+    "microcurriculo_id": 1,
+    "run_id": "micro_4e6afb1d6664",
+    "page_count": 21,
+    "chars_by_page": [
+      4008,
+      2492,
+      2406,
+      1989,
+      3887,
+      1989,
+      2630,
+      1802,
+      1462,
+      2825,
+      3283,
+      934,
+      3019,
+      1318,
+      3421,
+      1760,
+      1128,
+      3259,
+      2140,
+      2118,
+      278
+    ],
+    "extraction_probe": "pdfplumber",
+    "extraction_method": "pdfplumber",
+    "clean_text_chars": 47715,
+    "clean_text_preview": "Microcurrículos del programa de Especialización en Ingeniería de Software Fundación Universitaria Internacional de La Rioja – UNIR\nASIGNATURA DESCRIPCIÓN CONTENIDOS RESULTADOS DEL ACTIVIDADES FORMATIVAS\nAPRENDIZAJE\nSEMESTRE I\nTema 1. Introducción al desarrollo de aplicaciones • Diseñar la arquitectura,\nAplicaciones de escritorio implantar, gestionar,\nLas actividades formativas de la asignatura se han\nLenguaje de programación operar, administrar y\nelaborado con el objetivo de adaptar el proceso de\nEntornos de desarrollo integrado mantener aplicaciones,\nAplicaciones web sistemas, servicios y\nnecesidades e intereses de los alumnos.\nAplicaciones móviles contenidos informáticos.\nAplicaciones en la nube • Desarrollar\nLas actividades formativas de esta asignatura son\nEl continuo avance en las Tema 2. Desarrollo de aplicaciones Java metodologías, métodos,\nlas siguientes:\ntecnologías hardware y software hace Entornos de desarrollo integrados para Java técnicas, programas de\nque cada día vayan apareciendo nuevos Principales IDE para Java uso específico, normas y\ntipos de dispositivos y paradigmas de • Trabajos. Se trata de actividades de\nIntroducción a la plataforma de desarrollo Eclipse est",
+    "domain": "ti",
+    "confidence": 0.86,
+    "confidence_level": "high",
+    "processing_seconds": 3.654
+  }
+}

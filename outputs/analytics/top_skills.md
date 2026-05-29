@@ -1,0 +1,47 @@
+# Top Skills
+
+- comunicacion: 169
+- security: 169
+- AWS: 153
+- Azure: 151
+- compliance: 129
+- APIs: 117
+- Oracle: 113
+- reporting: 109
+- Python: 108
+- trabajo en equipo: 107
+- liderazgo: 96
+- Agile: 88
+- BI: 86
+- resolucion de problemas: 83
+- gestion de stakeholders: 81
+- pipelines: 68
+- KPIs: 67
+- dashboarding: 63
+- GCP: 63
+- privacy: 63
+- SQL: 61
+- ITIL: 60
+- data governance: 57
+- AI: 46
+- Scrum: 42
+- MongoDB: 41
+- ELT: 39
+- Kanban: 39
+- machine learning: 39
+- MLflow: 39
+- pandas: 39
+- scikit-learn: 39
+- Power BI: 30
+- ingles: 29
+- PostgreSQL: 27
+- Redis: 27
+- ETL: 25
+- SQL Server: 25
+- SSIS: 25
+- executive reporting: 16
+- pensamiento analitico: 12
+- Copilot BI: 11
+- LLM: 11
+- RAG: 11
+- PL/SQL: 5

@@ -6,7 +6,7 @@ from backend.repositories.base import fetch_all, fetch_one, pick_relation, relat
 
 
 def match_relation_name(*, db_name: str | None = None) -> str | None:
-    for name in ("vw_latest_ml_program_job_matches", "vw_match_empleo_especializacion_positivo"):
+    for name in ("vw_labor_program_job_matches", "vw_latest_ml_program_job_matches", "vw_match_empleo_especializacion_positivo"):
         if relation_has_rows(name, db_name=db_name):
             return name
     return pick_relation(("vw_match_empleo_especializacion_positivo",), db_name=db_name)

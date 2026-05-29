@@ -1,0 +1,108 @@
+{
+  "skills_frecuentes": [
+    [
+      "power bi",
+      1
+    ],
+    [
+      "sql",
+      1
+    ],
+    [
+      "dashboards",
+      1
+    ],
+    [
+      "etl",
+      1
+    ],
+    [
+      "reporting",
+      1
+    ],
+    [
+      "kpis",
+      1
+    ],
+    [
+      "azure",
+      1
+    ],
+    [
+      "cloud analytics",
+      1
+    ],
+    [
+      "dataops",
+      1
+    ],
+    [
+      "data quality",
+      1
+    ]
+  ],
+  "clusters_comunes": [
+    [
+      "business_intelligence",
+      4
+    ],
+    [
+      "visualization",
+      4
+    ],
+    [
+      "analytics",
+      4
+    ],
+    [
+      "data_engineering",
+      4
+    ],
+    [
+      "reporting",
+      3
+    ],
+    [
+      "cloud_data",
+      2
+    ],
+    [
+      "governance",
+      1
+    ],
+    [
+      "dataops",
+      1
+    ]
+  ],
+  "roles_hibridos_detectados": [
+    [
+      "backend_data_platform",
+      1
+    ],
+    [
+      "data_engineering",
+      1
+    ],
+    [
+      "cloud_data",
+      1
+    ],
+    [
+      "analytics_bi_visualization",
+      1
+    ],
+    [
+      "generic_technology",
+      1
+    ]
+  ],
+  "senales_emergentes": [
+    "lakehouse",
+    "databricks",
+    "snowflake",
+    "mlops",
+    "dataops",
+    "cloud analytics"
+  ]
+}

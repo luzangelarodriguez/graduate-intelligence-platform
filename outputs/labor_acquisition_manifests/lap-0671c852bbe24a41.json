@@ -1,0 +1,256 @@
+{
+  "correlation_id": "lap-0671c852bbe24a41",
+  "sources": [
+    "linkedin",
+    "elempleo",
+    "ticjob"
+  ],
+  "execute_network": true,
+  "max_jobs": 50,
+  "max_pages": 3,
+  "persist": true,
+  "quality_review": true,
+  "started_at": 1779992164.2116752,
+  "checkpoints": {
+    "source:linkedin": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "linkedin",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:elempleo": {
+      "results": 6,
+      "errors": 1,
+      "circuit": {
+        "source_name": "elempleo",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:ticjob": {
+      "results": 56,
+      "errors": 1,
+      "circuit": {
+        "source_name": "ticjob",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 66,
+      "occupational_clusters": 9,
+      "covered_skills": 15,
+      "missing_skills": 5,
+      "emerging_skills": 8,
+      "market_skills": 66,
+      "warehouse_verification": {
+        "jobs_count": 38,
+        "jobs_by_source": [
+          {
+            "source": "Ticjob",
+            "count": 38
+          }
+        ],
+        "top_skills": [
+          {
+            "canonical_skill": "AWS",
+            "count": 24
+          },
+          {
+            "canonical_skill": "Azure",
+            "count": 24
+          },
+          {
+            "canonical_skill": "comunicacion",
+            "count": 22
+          },
+          {
+            "canonical_skill": "security",
+            "count": 22
+          },
+          {
+            "canonical_skill": "Oracle",
+            "count": 21
+          },
+          {
+            "canonical_skill": "APIs",
+            "count": 18
+          },
+          {
+            "canonical_skill": "Python",
+            "count": 16
+          },
+          {
+            "canonical_skill": "compliance",
+            "count": 15
+          },
+          {
+            "canonical_skill": "liderazgo",
+            "count": 14
+          },
+          {
+            "canonical_skill": "trabajo en equipo",
+            "count": 13
+          },
+          {
+            "canonical_skill": "BI",
+            "count": 12
+          },
+          {
+            "canonical_skill": "data governance",
+            "count": 12
+          },
+          {
+            "canonical_skill": "reporting",
+            "count": 12
+          },
+          {
+            "canonical_skill": "Agile",
+            "count": 11
+          },
+          {
+            "canonical_skill": "gestion de stakeholders",
+            "count": 11
+          },
+          {
+            "canonical_skill": "resolucion de problemas",
+            "count": 10
+          },
+          {
+            "canonical_skill": "dashboarding",
+            "count": 9
+          },
+          {
+            "canonical_skill": "GCP",
+            "count": 9
+          },
+          {
+            "canonical_skill": "KPIs",
+            "count": 9
+          },
+          {
+            "canonical_skill": "pipelines",
+            "count": 9
+          },
+          {
+            "canonical_skill": "privacy",
+            "count": 9
+          },
+          {
+            "canonical_skill": "ingles",
+            "count": 8
+          },
+          {
+            "canonical_skill": "AI",
+            "count": 7
+          },
+          {
+            "canonical_skill": "PostgreSQL",
+            "count": 7
+          },
+          {
+            "canonical_skill": "Redis",
+            "count": 7
+          },
+          {
+            "canonical_skill": "ELT",
+            "count": 5
+          },
+          {
+            "canonical_skill": "Kanban",
+            "count": 5
+          },
+          {
+            "canonical_skill": "machine learning",
+            "count": 5
+          },
+          {
+            "canonical_skill": "MLflow",
+            "count": 5
+          },
+          {
+            "canonical_skill": "pandas",
+            "count": 5
+          },
+          {
+            "canonical_skill": "scikit-learn",
+            "count": 5
+          },
+          {
+            "canonical_skill": "Scrum",
+            "count": 5
+          },
+          {
+            "canonical_skill": "SQL",
+            "count": 5
+          },
+          {
+            "canonical_skill": "Copilot BI",
+            "count": 4
+          },
+          {
+            "canonical_skill": "LLM",
+            "count": 4
+          },
+          {
+            "canonical_skill": "RAG",
+            "count": 4
+          },
+          {
+            "canonical_skill": "ITIL",
+            "count": 3
+          },
+          {
+            "canonical_skill": "MongoDB",
+            "count": 3
+          }
+        ],
+        "jobs_by_seniority": [
+          {
+            "seniority": "Senior",
+            "count": 24
+          },
+          {
+            "seniority": "No especificado",
+            "count": 12
+          },
+          {
+            "seniority": "Semi Senior",
+            "count": 2
+          }
+        ],
+        "jobs_by_modality": [
+          {
+            "modality": "Hibrido",
+            "count": 21
+          },
+          {
+            "modality": "Remoto",
+            "count": 17
+          }
+        ],
+        "recent_companies": [
+          {
+            "company": "No especificada",
+            "count": 38
+          }
+        ]
+      },
+      "analytics_reports": {
+        "top_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\top_skills.md",
+        "source_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\source_distribution.md",
+        "salary_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\salary_distribution.md",
+        "emerging_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skills.md",
+        "labor_market_summary.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_summary.md"
+      }
+    }
+  },
+  "finished_at": 1779992298.0910501,
+  "cancelled": false
+}

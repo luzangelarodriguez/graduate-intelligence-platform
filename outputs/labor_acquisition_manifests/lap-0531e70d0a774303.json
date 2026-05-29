@@ -1,0 +1,371 @@
+{
+  "correlation_id": "lap-0531e70d0a774303",
+  "sources": [
+    "linkedin",
+    "elempleo",
+    "ticjob"
+  ],
+  "execute_network": true,
+  "max_jobs": 100,
+  "max_pages": 5,
+  "persist": true,
+  "quality_review": true,
+  "started_at": 1779994400.4151504,
+  "checkpoints": {
+    "source:linkedin": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "linkedin",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:elempleo": {
+      "results": 8,
+      "errors": 1,
+      "circuit": {
+        "source_name": "elempleo",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:ticjob": {
+      "results": 108,
+      "errors": 1,
+      "circuit": {
+        "source_name": "ticjob",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 67,
+      "occupational_clusters": 9,
+      "covered_skills": 15,
+      "missing_skills": 7,
+      "emerging_skills": 9,
+      "market_skills": 67,
+      "warehouse_verification": {
+        "jobs_count": 169,
+        "jobs_by_source": [
+          {
+            "source": "Ticjob",
+            "count": 169
+          }
+        ],
+        "top_skills": [
+          {
+            "canonical_skill": "comunicacion",
+            "count": 124
+          },
+          {
+            "canonical_skill": "security",
+            "count": 124
+          },
+          {
+            "canonical_skill": "AWS",
+            "count": 113
+          },
+          {
+            "canonical_skill": "Azure",
+            "count": 112
+          },
+          {
+            "canonical_skill": "compliance",
+            "count": 94
+          },
+          {
+            "canonical_skill": "APIs",
+            "count": 90
+          },
+          {
+            "canonical_skill": "Oracle",
+            "count": 86
+          },
+          {
+            "canonical_skill": "trabajo en equipo",
+            "count": 83
+          },
+          {
+            "canonical_skill": "Python",
+            "count": 82
+          },
+          {
+            "canonical_skill": "reporting",
+            "count": 76
+          },
+          {
+            "canonical_skill": "liderazgo",
+            "count": 74
+          },
+          {
+            "canonical_skill": "Agile",
+            "count": 65
+          },
+          {
+            "canonical_skill": "resolucion de problemas",
+            "count": 63
+          },
+          {
+            "canonical_skill": "gestion de stakeholders",
+            "count": 62
+          },
+          {
+            "canonical_skill": "BI",
+            "count": 61
+          },
+          {
+            "canonical_skill": "pipelines",
+            "count": 55
+          },
+          {
+            "canonical_skill": "SQL",
+            "count": 51
+          },
+          {
+            "canonical_skill": "dashboarding",
+            "count": 50
+          },
+          {
+            "canonical_skill": "GCP",
+            "count": 50
+          },
+          {
+            "canonical_skill": "privacy",
+            "count": 50
+          },
+          {
+            "canonical_skill": "ITIL",
+            "count": 45
+          },
+          {
+            "canonical_skill": "KPIs",
+            "count": 45
+          },
+          {
+            "canonical_skill": "data governance",
+            "count": 39
+          },
+          {
+            "canonical_skill": "AI",
+            "count": 32
+          },
+          {
+            "canonical_skill": "MongoDB",
+            "count": 31
+          },
+          {
+            "canonical_skill": "Scrum",
+            "count": 29
+          },
+          {
+            "canonical_skill": "ELT",
+            "count": 27
+          },
+          {
+            "canonical_skill": "Kanban",
+            "count": 27
+          },
+          {
+            "canonical_skill": "machine learning",
+            "count": 27
+          },
+          {
+            "canonical_skill": "MLflow",
+            "count": 27
+          },
+          {
+            "canonical_skill": "pandas",
+            "count": 27
+          },
+          {
+            "canonical_skill": "scikit-learn",
+            "count": 27
+          },
+          {
+            "canonical_skill": "Power BI",
+            "count": 22
+          },
+          {
+            "canonical_skill": "PostgreSQL",
+            "count": 21
+          },
+          {
+            "canonical_skill": "Redis",
+            "count": 21
+          },
+          {
+            "canonical_skill": "ETL",
+            "count": 19
+          },
+          {
+            "canonical_skill": "SQL Server",
+            "count": 19
+          },
+          {
+            "canonical_skill": "SSIS",
+            "count": 19
+          },
+          {
+            "canonical_skill": "ingles",
+            "count": 17
+          },
+          {
+            "canonical_skill": "executive reporting",
+            "count": 12
+          },
+          {
+            "canonical_skill": "pensamiento analitico",
+            "count": 9
+          },
+          {
+            "canonical_skill": "Copilot BI",
+            "count": 8
+          },
+          {
+            "canonical_skill": "LLM",
+            "count": 8
+          },
+          {
+            "canonical_skill": "RAG",
+            "count": 8
+          },
+          {
+            "canonical_skill": "PL/SQL",
+            "count": 4
+          }
+        ],
+        "jobs_by_seniority": [
+          {
+            "seniority": "Senior",
+            "count": 121
+          },
+          {
+            "seniority": "No especificado",
+            "count": 42
+          },
+          {
+            "seniority": "Semi Senior",
+            "count": 6
+          }
+        ],
+        "jobs_by_modality": [
+          {
+            "modality": "Remoto",
+            "count": 108
+          },
+          {
+            "modality": "Hibrido",
+            "count": 61
+          }
+        ],
+        "recent_companies": [
+          {
+            "company": "No especificada",
+            "count": 106
+          },
+          {
+            "company": "Venta Equipos",
+            "count": 3
+          },
+          {
+            "company": "CS3",
+            "count": 2
+          },
+          {
+            "company": "SETI",
+            "count": 11
+          },
+          {
+            "company": "TALENTO SOLIDO",
+            "count": 2
+          },
+          {
+            "company": "GINKO FINANCIAL SOLUTIONS",
+            "count": 4
+          },
+          {
+            "company": "Indra",
+            "count": 2
+          },
+          {
+            "company": "Desarrollador Backend .NET Senior (hibrido) Hibrido SETI . 26/05/2026 A convenir Bogota Desarrollador Backend .NET Senior En SETI nos encontramos en la busqueda de un Desarrollador Backend .NET Senior para vincularse a nuestro equipo de trabajo en Bogota, participando en proyectos de desarrollo y modernizacion de aplicaciones en entornos tecnologicos de alta exigencia. Requisitos Profesional o tecnologo en Ingenieria de Sistemas o carreras afines. Experiencia minima de 5 anos en desarrollo backend con .NET y C#. Experiencia en manejo de Entity Framework y LINQ. Conocimiento en arquitectura SOA y desarrollo orientado a dominio (DDD). Experiencia en despliegue o trabajo con Azure Cloud (deseable). Funciones Desarrollo y mantenimiento de soluciones backend escalables. Participacion en procesos de modernizacion y optimizacion de aplicaciones. Implementacion de buenas practicas de desarrollo y arquitectura. Trabajo en entornos cloud y soporte a despliegues en Azure. Condiciones Ubicacion: Bogota Modalidad: Hibrida (2-3 dias en sitio) Tipo de contrato: A termino indefinido Salario: A convenir segun experiencia Beneficios Seguro de vida desde el dia 1 Certificaciones patrocinadas Bonos por referidos Plan de carrera Fondo de empleados",
+            "count": 1
+          },
+          {
+            "company": "SETI . 12/05/2026 A convenir Antioquia Rol: Ingeniero de Infraestructura Cloud y OnPremise (AWS) Descripcion: Nos encontramos en la busqueda de un Consultor de Infraestructura Cloud & OnPrem para integrarse a nuestro equipo de tecnologia en la ciudad de Medellin. Buscamos una persona con solidos conocimientos en administracion de infraestructura hibrida, servicios cloud y plataformas OnPremise, orientada a la operacion, soporte y optimizacion de ambientes tecnologicos empresariales. Requisitos: Formacion academica Tecnico, Tecnologo o Profesional en Ingenieria de Sistemas, Informatica, Telecomunicaciones o areas afines. Experiencia requerida minimo dos (2) anos de experiencia en: Administracion de Infraestructura en la Nube ( AWS). Aprovisionamiento y Administracion de Infraestructura OnPremise Virtualizacion de Maquinas y Administracion de entornos VMware y/o Hyper-V. Administracion de Sistemas Operativos Windows Server y Linux. Gestion de Accesos, Usuarios y Permisos Soporte y Operacion de Infraestructura Tecnologica, Administracion Basica de Redes y Conectividad Conocimientos tecnicos: Infraestructura y virtualizacion: (VMware ESXi / vCenter, Provisionamiento de maquinas virtuales, Administracion de snapshots y alta disponibilidad). Sistemas operativos: (Windows Server y Linux (Ubuntu, Debian, Rocky, RHEL o similares). Networking: (TCP/IP, VLANs, VPN, DNS, DHCP, Firewalls, Balanceadores de carga). Cloud AWS ( EC2, VPC, IAM, S3, Route 53, CloudWatch, Security Groups, VPN Site-to-Site. Automatizacion y herramientas: (Terraform, Bash o PowerShell, GIT (deseable). Condiciones Laborales: Ubicacion: Medellin. Modalidad: Presencial. Tipo de Contrato: A termino indefinido. Salario: A convenir de acuerdo a la experiencia. Horario: Lunes a viernes en horario de oficina. Disponibilidad para atencion Stand By segun operacion. Valoramos perfiles con experiencia en ambientes hibridos, buenas practicas de seguridad, monitoreo y continuidad operativa. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Rol: Ingeniero Preventa - Administrador de Plataforma Requisitos: Profesional Tecnologico con vocacion comercial y habilidades de comunicacion, responsable de apoyar al equipo de ventas en el diseno y presentacion de soluciones de identidad y ciberseguridad. Asegura que las propuestas sean tecnicamente solidas, alineadas al negocio del cliente y comunicadas de forma clara. Experiencia de seis (6) meses a dos (2) anos. Cuenta con conocimientos en IAM y dominio de plataformas como Microsoft Entra ID / Azure AD (preferido), Okta, Ping y Auth0, asi como en la administracion del ciclo de vida de identidades, integracion de aplicaciones SaaS, on-prem y custom mediante SSO, y estandares como SAML 2.0, OAuth 2.0, OIDC y SCIM. Tiene experiencia en MFA, passwordless, acceso condicional, RBAC y aplicacion de principios Zero Trust. Posee nociones de accesos privilegiados (PAM) con herramientas como CyberArk, BeyondTrust o similares, revisiones y certificaciones de acceso, cumplimiento y analisis de riesgos. En preventa, participa en reuniones con clientes, levantamiento de requerimientos, demos, PoC y workshops, disenando arquitecturas de alto nivel y traduciendo necesidades de negocio en soluciones tecnicas. Conocimiento en identidades y Ciberseguridad: Dominio de plataformas de identidad: Microsoft Entra ID/Azure AD (preferido), Okta, Ping, Auth0. Administracion de usuarios, grupos, roles, lifecycle, aprovisionamiento y desprovisionamiento. Conocimiento solido de SAML 2.0, OAuth 2.0, OpenID Connect (OIDC) y SCIM. Integracion de aplicaciones SaaS, on?prem y custom con SSO. Implementacion de MFA, Passwordless, politicas de acceso condicional, RBAC. Aplicacion de principios Zero Trust: acceso minimo privilegiado, autenticacion continua, segmentacion, verificacion explicita. Conocimiento de administracion de accesos privilegiados (CyberArk, BeyondTrust, Segura, Etc). Proteccion de cuentas administrativas, bovedas y sesiones privilegiadas. Conocimientos de revisiones de acceso, certificaciones, SoD, recertificaciones y cumplimiento. Identificacion de riesgos, amenazas y vulnerabilidades relacionadas con identidad y autenticacion. Funciones y responsabilidades: Proponer al director Comercial los cambios estructurales para el desarrollo del proceso deservicio. Hacer visitas a los clientes con el objetivo de definir las necesidades, generacion y/ocierre de negocios cuando estos lo requieran. Hacer seguimiento de los clientes que se encuentren en estado de preventa, en el disenode soluciones para satisfacer las necesidades. Hacer seguimiento de los clientes para medir el grado de satisfaccion, atender quejas yreclamos. Analizar el resultado de las encuestas de satisfaccion del cliente. Analizar los informes de los Indicadores de gestion. Verificar el Cierre de las No Conformidades en su Area. Generar oportunidades de negocios para la empresa dentro de los parametros fijados porel director Comercial. Mantener a los canales vigentes realizando seguimiento post venta. Realizar presentaciones de la Empresa y del portafolio de productos y servicios. Realizar entrevistas con los canales para definir sus necesidades. Elaborar propuestas economicas o cotizaciones de las soluciones que se ajusten a lasnecesidades de cada cliente, previo dimensionamiento con el Director Comercial. Efectuar labores de seguimiento a las propuestas economicas, resultados parciales depruebas de concepto implementadas segun el proceso de servicio. Recibir y validar las ordenes de compras de cada canal. Participar activamente en los comites de ventas, con la informacion veraz y precisa de cada uno de los clientes que se encuentre trabajando, para informar al director comercialdel estado de cada oportunidad de negocio de una forma real y detallada. Brindar apoyo a los consultores comerciales externos Manejar las relaciones de alto nivel con los canales que representen gran importanciapara la compania. Habilidades: Habilidades de Preventa Tecnica: Capacidad para participar en reuniones con clientes, levantar requerimientos y explicar soluciones de identidad y seguridad. Experiencia en demos, PoC, workshops y presentaciones tecnicas. Capacidad para disenar arquitecturas de alto nivel y traducir necesidades de negocio a soluciones tecnicas. Habilidades Blandas: Comunicacion clara con audiencias tecnicas y ejecutivas. Capacidad para traducir contenido tecnico a terminos de negocio. Enfoque consultivo y orientacion a resultados. Organizacion, pensamiento estructurado y autogestion. Excelentes habilidades de presentacion y manejo de clientes. Condiciones Laborales: Lugar de Trabajo: Bogota. Modalidad de Trabajo: Hibrido. Tipo de Contrato: A Termino Indefinido. Salario: A convenir de acuerdo a la experiencia. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "GINKO FINANCIAL SOLUTIONS 17/05/2026 A convenir Remoto Rol: Desarrollador Java Requisitos: Profesional en Ingenieria de Sistemas o carreras afines. Minimo de tres (3) anos de experiencia como Desarrollador. Excelente programador de software, disenando soluciones a los problemas que se presentan y generando codigo limpio, estructurado, mantenible y reutilizable. Experiencia con el siguiente Stack: Java / J2EE. Framework Spring. API, REST. Hibernate. Maven. SQL. GIT. Arquitecturas Cloud. Herramientas Deseables: WebLogic. Contenedores Docker. Base de datos Oracle. Vue3 Habilidades: Autogestion. Sentido de urgencia Herramientas de comunicacion Proactividad. Busqueda de excelencia Condiciones Laborales: Lugar de Trabajo: . Modalidad de Trabajo: Remoto. Salario: A convenir de acuerdo a la experiencia. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "SETI . 27/05/2026 1,000,000 - 1,500,000 Amazonas, Antioquia, Arauca, Atlantico, Bolivar, Boyaca, Caldas, Caqueta, Casanare, Cauca, Cesar, Choco, Cordoba, Cundinamarca, Guainia, Guaviare, Huila, La Guajira, Magdalena, Meta, Narino, Norte de Santander, Putumayo, Quindio, Risaralda, San Andres, Providencia y Santa Catalina, Santander, Sucre, Tolima, Valle del Cauca, Vaupes, Vichada, Bogota Importante empresa Colombiana requiere para su equipo de desarrollo: Rol: Aprendiz en Desarrollo de Software Requisitos: Estudiantes, Tecnicos y Tecnologos en Desarrollo de Software. Primer empleo que se encuentren disponibles para realizar su etapa de practica. Condiciones Laborales: Lugar de Trabajo: Bogota y Medellin preferiblemente. Modalidad de Trabajo: Hibrido (3 dias oficina y 2 casa). Tipo de Contrato: De aprendizaje. Salario: SMLV. Horario: Lunes a viernes. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "GINKO FINANCIAL SOLUTIONS 17/05/2026 A convenir Remoto Rol: Desarrollador Frontend Descripcion Buscamos una persona apasionada por la tecnologia, autoexigente y con un fuerte compromiso con el aprendizaje continuo. Se espera un perfil proactivo, con criterio y capacidad para expresar ideas y propuestas de manera asertiva, sin temor a participar activamente, pero tambien con la habilidad de construir consensos y llegar a acuerdos. Experiencia en la gestion de proyectos complejos, con demostrada capacidad de organizacion, adaptacion y resiliencia; contar con mas de dos (2) anos de experiencia. Requisitos tecnicos: Profesional en Ingenieria de Sistemas o carreras afines. Experiencia de dos (2) a cinco (5) anos. JavaScript. Vue3. TypeScript. CSS / SASS GIT. Experiencia integrando API s, REST. Deseables Vite. Axios. AWS (muy basico). Git Flow. Vue3 Composition API. Experiencia en la industria financiera. Experiencia con sistemas de diseno. Experiencia generando liberaria de componentes. Experiencia en Arquitecturas Cloud. Habilidades: Autogestion. Priorizacion. Herramientas de comunicacion. Proactividad. Busqueda de excelencia. Condiciones Laborales: Lugar de Trabajo: . Modalidad de Trabajo: Remoto. Salario: A convenir de acuerdo a la experiencia. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Administrador de Servidores de Aplicaciones SETI . 27/05/2026 0 Bogota Rol: Administrador de Servidores de Aplicaciones Requerimientos: Ingeniero de Sistemas o carreras afines. Con minimo tres (3) anos de experiencia administrando servidores de aplicaciones capa media (oracle-Weblogic, OAS, SOA, OSB, IIS). Debe contar con al menos una certificacion de producto. Tarjeta profesional Condiciones Laborales: Contrato indefinido directo por la compania. Salario 100% prestacional mas beneficios. Lugar Bogota Modalidad de trabajo hibrido 3 oficina x 2 en casa Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Administrador de Aplicaciones (Oracle / WebLogic / Middleware) 100% Remoto UNIVERSITAS XXI SOLUCIONES Y TECNOLOGIA PARA LA UNIVERSIDAD DE 21/05/2026 A convenir Remoto Rol: Administrador de Aplicaciones (Oracle / WebLogic / Middleware) Requisitos: Tecnico, Tecnologo o Profesional en Sistemas o carreras afines. Experiencia minima de dos (2) anos como Administrador de Aplicaciones Oracle, WebLogic, Middleware. Conocimientos y Certificados Demostrables en: Administracion de Oracle, WebLogic. Valorable: Oracle Forms / Reports. Oracle Http Server. Oracle Service Bus. Oracle Access Manager. Oracle Analytics Server. AWS (Amazon Web Services). Ansible. Jenkins. Docker. Kubernetes. Numero de Vacantes: 2 Otros Beneficios: Poliza Exequial grupo familiar. Cobertura al 100% de las incapacidades. Celebracion fechas especiales. Media jornada laboral por cumpleanos. Actividades de integracion, etc. Poliza de salud. Formacion: Tecnica ofrecida por la Empresa y remunerada al 100%. Condiciones Laborales: Lugar de Trabajo: . Modalidad de Trabajo: 100% Teletrabajo. Tipo de Contrato: A Termino Indefinido. Rango Salarial: A convenir de acuerdo con la experiencia y en funcion de la cualificacion. Horario: Lunes a viernes de 5:00 a.m. a 3:00 p.m. con algun sabado alterno. Esta oferta de trabajo es publicada bajo la propiedad exclusiva de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Analista de Proyectos Venta Equipos 14/05/2026 3,500,000 - 4,000,000 Bogota ¡Unete a nuestro equipo como Analista de Proyectos! Descripcion: n Theiax by Venta Equipos buscamos un Analista de Proyectos orientado al detalle, organizado y con habilidades de seguimiento operativo y documental, que contribuya al control y trazabilidad de proyectos tecnologicos. i tienes experiencia en gestion documental, seguimiento de proyectos y elaboracion de informes ejecutivos, esta oportunidad es para ti. ¿Cual sera tu mision? Apoyar la gestion integral de proyectos mediante el seguimiento de actividades, consolidacion de informacion y administracion documental, asegurando la organizacion, disponibilidad y trazabilidad de cada proyecto. Tus principales retos: Realizar seguimiento al avance de proyectos, cronogramas y entregables. Consolidar informacion tecnica, operativa y administrativa. Identificar desviaciones y alertar oportunamente al lider del proyecto. Elaborar reportes de seguimiento, informes tecnicos y ejecutivos. Organizar y administrar la documentacion de los proyectos. Coordinar reuniones, actas y seguimiento de compromisos. Validar entregables y mantener control de versiones y cambios. Apoyar el control de obligaciones contractuales y documentacion final. Proponer mejoras en procesos de seguimiento y gestion documental. ¿Que buscamos? Profesional en Ingenieria de Sistemas, Ingenieria Electronica o Telecomunicaciones, Ingenieria Industrial, Administracion de Empresas, Administracion de Sistemas de Informacion o areas afines. Experiencia minima de dos (2) anos en: Seguimiento de proyectos. Gestion administrativa y documental. Coordinacion de actividades operativas. Elaboracion de informes y reportes ejecutivos. Deseable concimientos en Gestion de proyectos, Metodologias agiles (Scrum Fundamentals), PMI o cursos afines, Gestion documental, Manejo de herramientas ofimaticas (Excel, Word, PowerPoint). ¿Que te ofrecemos? Contrato a termino indefinido. Salario competitivo. Participacion en un proyecto tecnologico de alto impacto. Ambiente de aprendizaje y crecimiento profesional. Trabajo colaborativo con equipos especializados en TI. Beneficios despues del periodo de prueba. Condiciones Laborales: Ubicacion: Bogota. Modalidad: Presencial. Tipo de Contrato: A termino indefinido. Salario: A convenir de acuerdo a la experiencia. En Theiax by Venta Equipos impulsamos proyectos tecnologicos con equipos comprometidos, organizados y orientados a resultados. Si quieres crecer profesionalmente en un entorno dinamico y colaborativo, queremos conocerte. #OportunidadLaboral #AnalistaDeProyectos #ProjectManagement #PMI #Scrum #GestionDocumental #TI #Empleo #VentaEquipos Esta oferta de trabajo es publicada bajo la propiedad exclusiva de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "CS3 19/05/2026 A convenir Atlantico Rol: Analista Funcional de Procesos de Software Objetivo del cargo: Levantar, analizar, modelar y documentar los procesos funcionales ejecutados en los softwares existentes de la empresa, garantizando claridad, trazabilidad, estandarizacion y disponibilidad de la informacion funcional para los equipos de desarrollo, mantenimiento y soporte, QA, operaciones y clientes. El cargo debera permitir que el conocimiento funcional actualmente disperso en usuarios, lideres de producto, soporte, desarrollo y operacion quede documentado de forma estructurada, actualizada y util para mantenimiento, capacitacion, pruebas, auditorias, evolucion del software y mejora continua. Requisitos: Tecnico en Sistemas o carreras afines. Experiencia de seis (6) meses a dos (2) anos. Requisitos tecnicos obligatorios: Experiencia comprobable como Business Analyst, Analista Funcional, Analista de Procesos, Product Analyst o rol similar. Experiencia documentando procesos funcionales en sistemas de informacion o software empresarial. Conocimiento en levantamiento de informacion funcional mediante entrevistas, talleres, observacion de procesos y analisis de documentacion existente. Capacidad para documentar procesos AS-IS y proponer procesos TO-BE cuando aplique. Conocimiento en modelado de procesos: BPMN. Diagramas de flujo. Diagramas funcionales. Mapas de proceso. Experiencia elaborando documentacion funcional, incluyendo: Especificaciones funcionales. Fichas de proceso. Manuales funcionales. Historias de usuario. Criterios de aceptacion. Casos de uso. Casos de prueba funcionales. Capacidad para interpretar pantallas, formularios, reportes, estados, validaciones, roles y flujos de aprobacion dentro de un sistema. Manejo de herramientas de documentacion y diagramacion: Draw.io / Diagrams.NET. Mermaid. Bizagi. Visio. Lucidchart. Confluence. Google Drive. Word. Excel. Capacidad para trabajar con equipos de desarrollo, QA, mantenimiento y soporte, operaciones y coordinadores de producto. Buena redaccion tecnica y capacidad para estructurar documentacion clara, completa y mantenible. Conocimientos deseables: Experiencia en empresas de desarrollo de software o productos SaaS. Experiencia documentando sistemas ya existentes, no solo proyectos nuevos. Conocimiento funcional en alguno de los siguientes dominios: ERP Software financiero Nomina Impuestos territoriales Conocimiento basico de APIs, integraciones y servicios web. Conocimiento en gestion de cambios de software. Conocimiento basico en pruebas funcionales y aseguramiento de calidad. Habilidades blandas: Pensamiento analitico. Capacidad de abstraccion funcional. Comunicacion clara con usuarios tecnicos y no tecnicos. Escucha activa y capacidad para hacer preguntas relevantes. Redaccion estructurada y precisa. Organizacion documental. Orientacion al detalle. Pensamiento critico. Capacidad para identificar inconsistencias, brechas y reprocesos. Autonomia para levantar informacion con diferentes areas. Trabajo en equipo con desarrollo, QA, mantenimiento y soporte y coordinacion de productos. Capacidad de priorizacion. Proactividad y orientacion a resultados. Capacidad para convertir conocimiento tacito en documentacion formal. Responsabilidades principales: Levantar informacion funcional de los sistemas existentes mediante entrevistas, revision de pantallas, analisis de flujos, revision de tickets, reuniones con usuarios clave y validacion con equipos tecnicos. Documentar procesos AS-IS ejecutados actualmente en los aplicativos de la empresa. Identificar y documentar actores, roles, permisos, entradas, actividades, salidas, estados, reglas de negocio, validaciones, excepciones y puntos de control. Modelar procesos mediante diagramas de flujo, BPMN, diagramas funcionales o herramientas equivalentes. Construir documentacion funcional por modulo, proceso o componente del software. Elaborar fichas funcionales de procesos, incluyendo objetivo, alcance, responsables, flujo operativo, reglas de negocio, evidencias y dependencias. Identificar brechas entre el proceso operativo, el comportamiento real del sistema y la documentacion existente. Documentar funcionalidades existentes, parametrizaciones, campos, reportes, integraciones y condiciones especiales. Construir historias de usuario, criterios de aceptacion y escenarios funcionales cuando se identifiquen necesidades de mejora o nuevos desarrollos. Apoyar al equipo de QA en la definicion de casos de prueba funcionales basados en procesos reales. Apoyar al equipo de soporte en la construccion de guias operativas, manuales funcionales y documentacion de consulta. Mantener trazabilidad entre procesos, funcionalidades, tickets, requerimientos, historias de usuario, documentacion funcional y cambios del sistema. Participar en sesiones de validacion funcional con lideres de producto, desarrollo, soporte, QA y usuarios internos. Proponer mejoras en procesos, documentacion, usabilidad, parametrizacion o control funcional de los aplicativos. Mantener actualizada la documentacion funcional conforme a cambios, ajustes, mejoras o nuevas versiones del software. Condiciones Laborales: Lugar de Trabajo: Barranquilla. Modalidad de Trabajo: Presencial / Hibrido 4-2. Tipo de Contrato: A Termino Indefinido. Salario: A convenir de acuerdo a la experiencia. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Venta Equipos 14/05/2026 3,500,000 - 4,000,000 Bogota Unete a nuestro equipo como: Administrador de Plataformas Descripcion: En Theiax Buscamos un Administrador de Plataformas orientado al analisis, monitoreo y gestion de herramientas tecnologicas criticas para la operacion. Si tienes experiencia en plataformas de monitoreo, seguridad y soporte corporativo, y te apasiona la mejora continua de los servicios TI, esta oportunidad es para ti. ¿Que buscamos? Tecnologo en Sistemas, Redes y Telecomunicaciones o carreras afines. Experiencia entre dos (2) y tres (3) anos en: Gestion de Plataformas de Monitoreo o Seguridad. Herramientas de Control de Equipos y Endpoints. Soporte Tecnico Corporativo. Seguimiento de Alertas y Tickets. Generacion de reportes en Excel (deseable Power BI). Conocimientos en sistemas operativos Windows. Certificaciones deseables: ITIL Foundations (en curso o finalizada). Power BI o analitica de datos. Certificaciones HP , HP WXP, HP Wolf, HP Secure Access. Formacion en administracion de herramientas de monitoreo o gestion de endpoints. Tus Retos: Administrar plataformas de monitoreo, seguridad y productividad tecnologica Gestionar alertas, eventos y tickets hasta su cierre efectivo Analizar informacion operativa y generar reportes de gestion Apoyar la solucion de incidentes tecnicos y el seguimiento de equipos de computo Garantizar la continuidad y correcto funcionamiento de las herramientas tecnologicas Documentar procesos y mantener trazabilidad de la operacion Competencias clave: Orientacion al cliente. Resolucion de problemas. Comunicacion efectiva. Trabajo en equipo. Organizacion y documentacion de procesos. ¿Que te ofrecemos? Contrato a termino indefinido. Participacion en un proyecto tecnologico de alto impacto. Ambiente de aprendizaje y crecimiento profesional. Trabajo colaborativo con equipos especializados en TI. Beneficios despues del periodo de prueba. Condiciones Laborales: Ubicacion: Bogota. Modalidad: Presencial. Tipo de Contrato: A termino indefinido. Salario: A convenir de acuerdo a la experiencia. Si quieres ser parte de un equipo que impulsa la continuidad y evolucion tecnologica, queremos conocerte. #OportunidadLaboral #AdministradorDePlataformas #TI #MesaDeServicio #PowerBI #ITIL #SoporteTI #InfraestructuraTecnologica #EmpleoTI Esta oferta de trabajo es publicada bajo la propiedad exclusiva de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Ingeniero Preventa - Administrador de Plataforma Hibrido Confidencial2 15/05/2026 5,000,000 - 5,500,000 Bogota Rol: Ingeniero Preventa - Administrador de Plataforma Requisitos: Profesional Tecnologico con vocacion comercial y habilidades de comunicacion, responsable de apoyar al equipo de ventas en el diseno y presentacion de soluciones de identidad y ciberseguridad. Asegura que las propuestas sean tecnicamente solidas, alineadas al negocio del cliente y comunicadas de forma clara. Experiencia de seis (6) meses a dos (2) anos. Cuenta con conocimientos en IAM y dominio de plataformas como Microsoft Entra ID / Azure AD (preferido), Okta, Ping y Auth0, asi como en la administracion del ciclo de vida de identidades, integracion de aplicaciones SaaS, on-prem y custom mediante SSO, y estandares como SAML 2.0, OAuth 2.0, OIDC y SCIM. Tiene experiencia en MFA, passwordless, acceso condicional, RBAC y aplicacion de principios Zero Trust. Posee nociones de accesos privilegiados (PAM) con herramientas como CyberArk, BeyondTrust o similares, revisiones y certificaciones de acceso, cumplimiento y analisis de riesgos. En preventa, participa en reuniones con clientes, levantamiento de requerimientos, demos, PoC y workshops, disenando arquitecturas de alto nivel y traduciendo necesidades de negocio en soluciones tecnicas. Conocimiento en identidades y Ciberseguridad: Dominio de plataformas de identidad: Microsoft Entra ID/Azure AD (preferido), Okta, Ping, Auth0. Administracion de usuarios, grupos, roles, lifecycle, aprovisionamiento y desprovisionamiento. Conocimiento solido de SAML 2.0, OAuth 2.0, OpenID Connect (OIDC) y SCIM. Integracion de aplicaciones SaaS, on?prem y custom con SSO. Implementacion de MFA, Passwordless, politicas de acceso condicional, RBAC. Aplicacion de principios Zero Trust: acceso minimo privilegiado, autenticacion continua, segmentacion, verificacion explicita. Conocimiento de administracion de accesos privilegiados (CyberArk, BeyondTrust, Segura, Etc). Proteccion de cuentas administrativas, bovedas y sesiones privilegiadas. Conocimientos de revisiones de acceso, certificaciones, SoD, recertificaciones y cumplimiento. Identificacion de riesgos, amenazas y vulnerabilidades relacionadas con identidad y autenticacion. Funciones y responsabilidades: Proponer al director Comercial los cambios estructurales para el desarrollo del proceso deservicio. Hacer visitas a los clientes con el objetivo de definir las necesidades, generacion y/ocierre de negocios cuando estos lo requieran. Hacer seguimiento de los clientes que se encuentren en estado de preventa, en el disenode soluciones para satisfacer las necesidades. Hacer seguimiento de los clientes para medir el grado de satisfaccion, atender quejas yreclamos. Analizar el resultado de las encuestas de satisfaccion del cliente. Analizar los informes de los Indicadores de gestion. Verificar el Cierre de las No Conformidades en su Area. Generar oportunidades de negocios para la empresa dentro de los parametros fijados porel director Comercial. Mantener a los canales vigentes realizando seguimiento post venta. Realizar presentaciones de la Empresa y del portafolio de productos y servicios. Realizar entrevistas con los canales para definir sus necesidades. Elaborar propuestas economicas o cotizaciones de las soluciones que se ajusten a lasnecesidades de cada cliente, previo dimensionamiento con el Director Comercial. Efectuar labores de seguimiento a las propuestas economicas, resultados parciales depruebas de concepto implementadas segun el proceso de servicio. Recibir y validar las ordenes de compras de cada canal. Participar activamente en los comites de ventas, con la informacion veraz y precisa de cada uno de los clientes que se encuentre trabajando, para informar al director comercialdel estado de cada oportunidad de negocio de una forma real y detallada. Brindar apoyo a los consultores comerciales externos Manejar las relaciones de alto nivel con los canales que representen gran importanciapara la compania. Habilidades: Habilidades de Preventa Tecnica: Capacidad para participar en reuniones con clientes, levantar requerimientos y explicar soluciones de identidad y seguridad. Experiencia en demos, PoC, workshops y presentaciones tecnicas. Capacidad para disenar arquitecturas de alto nivel y traducir necesidades de negocio a soluciones tecnicas. Habilidades Blandas: Comunicacion clara con audiencias tecnicas y ejecutivas. Capacidad para traducir contenido tecnico a terminos de negocio. Enfoque consultivo y orientacion a resultados. Organizacion, pensamiento estructurado y autogestion. Excelentes habilidades de presentacion y manejo de clientes. Condiciones Laborales: Lugar de Trabajo: Bogota. Modalidad de Trabajo: Hibrido. Tipo de Contrato: A Termino Indefinido. Salario: A convenir de acuerdo a la experiencia. Esta vacante es divulgada a traves de ticjob.co",
+            "count": 1
+          },
+          {
+            "company": "Venta Equipos 20/05/2026 3,000,000 - 3,500,000 Bogota Rol: Ingeniero de Soporte Infraestructura Junior ¿Por que te buscamos? Ven a ser parte de nuestro equipo! Buscamos un talento con pasion por la tecnologia y las soluciones innovadoras, capaz de entender a profundidad las necesidades de cada cliente. Seras el puente que nos conecta con los desafios de los clientes, contibuyendo al cumplimiento de los objetivos tecnologicos convirtiendo complejidades en oportunidades reales. Queremos un apasionado que combine sus habilidades tecnicas con una vision estrategica, listo para asumir retos y crecer en un entorno dinamico e inspirador. ¿Que necesitamos de ti? Educacion: Ingeniero de Redes, Electronico, Sistemas, Telecomunicaciones o areas afines. Formacion Complementaria Ideal: Curso o diplomado en administracion basica de servidores fisicos o virtuales (HPE, VMware, Windows Server, Linux). Conocimiento funcional en virtualizacion utilizando VMware vSphere Essentials (encendido/apagado de VMs, snapshots, revision de recursos, acceso al vSphere Client). Acredita conocimientos en infraestructura de servidores ProLiant, almacenamiento y administracion basica con HPE OneView e iLO. Cursos o capacitaciones basicas en operaciones de centros de datos o gestion de instalaciones. Cursos sobre conceptos electricos basicos o sistemas UPS (Uninterruptible Power Supply). Certificacion ITIL Foundation. Experiencia: Minimo dos (2) anos de experiencia en roles de Soporte Tecnico, preferiblemente en entornos de TI o centros de datos. Resolucion basica de problemas de hardware de servidores (ej. identificacion de componentes fallidos, revision de luces de error). Manejo de sistemas de gestion de tickets (ej. ServiceNow, Jira Service Desk, Zendesk, GLPI) para el registro y seguimiento de incidentes. Soporte en servidores HPE, almacenamiento en red y plataformas de virtualizacion (VMware, Hyper-V, KVM). Documentacion de acciones realizadas y reporte de hallazgos fisicos. Capacidad para ejecutar tareas documentadas en ventanas de mantenimiento (aplicacion de parches, reinicios, pruebas de servicios). Ejecucion de scripts de verificacion o herramientas de monitoreo Conocimiento en interpretacion de logs de HPE iLO, diagnostico de fallas fisicas (discos, ventiladores, fuentes). Actividades de monitoreo, provision basica de LUNs, validacion de espacios de almacenamiento, RAID y snapshots. Conectividad por Fibre Channel, iSCSI, zonificacion basica en switches SAN. Competencias Tecnicas: Conocimientos y gestion de servidores fisicos (HPE, Dell, Lenovo, entre otros). Manejo basico de sistemas operativos Windows Server (instalacion, activacion de roles y servicios comunes). Uso de herramientas de acceso remoto (RDP, VNC, iLO). Nociones basicas en herramientas de respaldo y recuperacion de informacion. Nivel basico/intermedio en administracion de servicios en Windows Server, Active Directory, DNS, Hyper-V, etc. Conceptos basicos de virtualizacion (VMware, Hyper-V). Monitoreo, provision basica de LUNs, validacion de espacios de almacenamiento, RAID, Snapshots. Competencias Personales: Excelente comunicacion verbal y escrita, con capacidad para explicar conceptos tecnicos a usuarios no tecnicos. Buena comunicacion oral y escrita para interactuar con usuarios y equipos tecnicos. Habilidad para el trabajo en equipo y la colaboracion con otros niveles de soporte. Capacidad de analisis y resolucion de problemas, con un enfoque metodico para diagnosticar incidentes. Proactividad y autonomia para buscar soluciones y aprender nuevas tecnologias. Capacidad para trabajar en entornos dinamicos y con tiempos de respuesta definidos. Responsabilidad y compromiso con el cumplimiento de tareas y el seguimiento de incidentes. Orientacion al servicio y capacidad de escucha activa. ¿Que ofrecemos para ti? Desarrollo Profesional: Te apoyamos con cursos y certificaciones. Beneficios Adicionales: Despues del periodo de prueba. ¿Que tenemos para ti? Lugar de Trabajo: Bogota. Modalidad de Trabajo: Presencial. Tipo de Contrato: A termino indefinido. Salario: Competitivo. ¿Por que hacer parte de nuestra empresa? Con mas de 39 anos de trayectoria en el mercado y un solido plan de expansion, en Venta Equipos transformamos la tecnologia en soluciones que impulsan el crecimiento. Se parte de una empresa lider en , con un equipo apasionado y proyectos desafiantes que te permitiran crecer y marcar la diferencia. ¡El futuro te espera con nosotros! Esta oferta de trabajo es publicada bajo la propiedad exclusiva de ticjob.co",
+            "count": 1
+          }
+        ],
+        "duplicate_groups": 151,
+        "job_embeddings": 338,
+        "skill_embeddings": 45,
+        "company_embeddings": 44,
+        "company_profiles": 890,
+        "emerging_candidates": 1
+      },
+      "analytics_reports": {
+        "top_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\top_skills.md",
+        "source_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\source_distribution.md",
+        "salary_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\salary_distribution.md",
+        "emerging_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skills.md",
+        "company_skill_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\company_skill_distribution.md",
+        "duplicate_detection_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\duplicate_detection_report.md",
+        "emerging_skill_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skill_report.md",
+        "semantic_role_clusters.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\semantic_role_clusters.md",
+        "labor_market_maturity_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_maturity_report.md",
+        "labor_market_summary.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_summary.md"
+      }
+    }
+  },
+  "finished_at": 1779994591.3891363,
+  "cancelled": false
+}

@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-05-24T15:47:05",
+  "table_counts": {
+    "especializaciones": 52,
+    "skills": 179,
+    "herramientas": 9,
+    "competencias": 15,
+    "habilidades_blandas": 12,
+    "perfiles_egreso": 164,
+    "especializacion_skills": 250,
+    "especializacion_herramientas": 28,
+    "especializacion_competencias": 270,
+    "especializacion_habilidades_blandas": 106
+  },
+  "empty_tables": [],
+  "orphan_checks": {
+    "especializacion_skills.especializacion_id->especializaciones.id": 0,
+    "especializacion_skills.skill_id->skills.id": 0,
+    "especializacion_herramientas.especializacion_id->especializaciones.id": 0,
+    "especializacion_herramientas.herramienta_id->herramientas.id": 0,
+    "especializacion_competencias.especializacion_id->especializaciones.id": 0,
+    "especializacion_competencias.competencia_id->competencias.id": 0,
+    "especializacion_habilidades_blandas.especializacion_id->especializaciones.id": 0,
+    "especializacion_habilidades_blandas.habilidad_id->habilidades_blandas.id": 0,
+    "perfiles_egreso.especializacion_id->especializaciones.id": 0
+  },
+  "api_programas": {
+    "url": "https://graduate-intelligence-platform-production.up.railway.app/api/programas",
+    "status": "error",
+    "error": "HTTP Error 401: Unauthorized"
+  }
+}

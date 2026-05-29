@@ -1,0 +1,8 @@
+technology,emergence_score,growth_velocity,adoption_trend,forecast_confidence,source_payload
+Synapse,1.0,9.1,accelerating,0.9,"{""aliases"": [""synapse"", ""azure synapse""], ""matched_forecasts"": [""Azure""], ""matched_skills"": [""Azure""], ""metric_period"": ""2026-05""}"
+GenAI,1.0,8.2,accelerating,0.9,"{""aliases"": [""genai"", ""gen ai"", ""generative ai"", ""agentic ai""], ""matched_forecasts"": [""AI""], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
+AI Analytics,1.0,8.2,accelerating,0.9,"{""aliases"": [""ai analytics""], ""matched_forecasts"": [""AI""], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
+RAG,0.841,0.89,accelerating,0.75,"{""aliases"": [""rag""], ""matched_forecasts"": [""RAG""], ""matched_skills"": [""RAG""], ""metric_period"": ""2026-05""}"
+LLMOps,0.8215,0.86,accelerating,0.75,"{""aliases"": [""llmops"", ""llm ops""], ""matched_forecasts"": [""LLM""], ""matched_skills"": [""LLM""], ""metric_period"": ""2026-05""}"
+Databricks,0.305,0.2,stable,0.5,"{""aliases"": [""databricks""], ""matched_forecasts"": [], ""matched_skills"": [""Databricks""], ""metric_period"": ""2026-05""}"
+dbt,0.1815,0.01,stable,0.5,"{""aliases"": [""dbt""], ""matched_forecasts"": [], ""matched_skills"": [""dbt""], ""metric_period"": ""2026-05""}"

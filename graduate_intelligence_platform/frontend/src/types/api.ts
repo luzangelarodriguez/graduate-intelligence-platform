@@ -160,3 +160,142 @@ export interface RegisterPayload extends LoginPayload {
   full_name: string;
   role: 'admin' | 'universidad' | 'egresado' | 'mentor';
 }
+
+export interface MicroRecommendation {
+  recommendation_type: string;
+  title: string;
+  recommendation_text: string;
+  text?: string;
+  confidence_score: number;
+  confidence?: number;
+  gap_detectado: string;
+  evidencia_curricular: string;
+  evidencia_laboral: string;
+  asignatura_o_modulo_sugerido: string;
+  accion_curricular: string;
+  prioridad: string;
+  justificacion: string;
+  nivel_impacto: string;
+  explanation: string;
+  subdomain: string;
+}
+
+export interface MicroEntity {
+  entity: string;
+  entity_type: string;
+  normalized_skill: string;
+  domain: string;
+  confidence: number;
+  source?: string;
+  text_fragment?: string;
+}
+
+export interface MicroAnalysis {
+  id?: string | number;
+  run_id?: string;
+  document: {
+    filename?: string;
+    source_document?: string;
+    extension?: string;
+    content_hash?: string;
+    extraction_method?: string;
+    clean_text_chars?: number;
+  };
+  detected_domain: string;
+  detected_subdomain: string;
+  confidence: number;
+  confidence_level?: string;
+  detected_entities?: MicroEntity[];
+  entities: MicroEntity[];
+  skills: string[];
+  technical_skills?: string[];
+  transversal_skills: string[];
+  platforms: string[];
+  tools: string[];
+  databases?: string[];
+  cloud_providers?: string[];
+  frameworks?: string[];
+  methodologies: string[];
+  real_market_gaps?: string[];
+  strengthening_areas?: string[];
+  market_gaps: string[];
+  recommendations: MicroRecommendation[];
+  scores: Record<string, number>;
+  score_percent: Record<string, number>;
+  executive_summary: {
+    headline: string;
+    narrative: string;
+    decision_signal: string;
+    top_actions: string[];
+  };
+}
+
+export interface SpecializationOption {
+  id: string;
+  nombre: string;
+  facultad?: string;
+  nivel?: string;
+  estado?: string;
+}
+
+export interface MicrocurriculumDocument {
+  file_name: string;
+  path: string;
+  extension: string;
+  status: string;
+}
+
+export interface SpecializationDocumentsResponse {
+  specialization: string;
+  documents: MicrocurriculumDocument[];
+}
+
+export interface SpecializationMicroAnalysis extends MicroAnalysis {
+  specialization: string;
+  documents_processed: number;
+  documents?: MicroAnalysis['document'][];
+}
+
+export interface CurriculumTraceabilityRow {
+  document_name: string;
+  section: string;
+  original_text: string;
+  action: string;
+  rewritten_text: string;
+  reason: string;
+  market_signal: string;
+  confidence: number;
+}
+
+export interface RewrittenMicrocurriculumItem {
+  rewrite_id: string;
+  document_name: string;
+  specialization: string;
+  assignment: string;
+  focus: string;
+  file_path: string;
+  download_url?: string;
+  rewritten_curriculum: Record<string, string>;
+  change_traceability: CurriculumTraceabilityRow[];
+}
+
+export interface SpecializationRewriteResponse {
+  specialization: string;
+  documents_processed: number;
+  items: RewrittenMicrocurriculumItem[];
+  traceability_path: string;
+  traceability_download_url?: string;
+  summary_path: string;
+  output_dir: string;
+}
+
+export interface MicroDemoCase {
+  id: string;
+  document_name: string;
+  expected_domain?: string;
+  expected_subdomain?: string;
+  detected_domain?: string;
+  confidence?: number;
+  score?: number;
+  recommendations_count?: number;
+}

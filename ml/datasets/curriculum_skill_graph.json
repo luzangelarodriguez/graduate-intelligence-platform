@@ -1,0 +1,410 @@
+{
+  "source_path": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\storage\\test_microcurriculos\\especialización en visual analytics y big data",
+  "documents_processed": 10,
+  "skills": [
+    {
+      "skill": "visualizacion analitica",
+      "aliases": [
+        "Power BI",
+        "Tableau",
+        "dashboarding",
+        "data visualization",
+        "storytelling with data",
+        "visual analytics",
+        "visualizacion analitica",
+        "visualizacion de datos"
+      ],
+      "semantic_cluster": "visualization",
+      "frequency": 9,
+      "curricular_importance": 0.805,
+      "related_tools": [
+        "Power BI",
+        "Tableau",
+        "dashboarding",
+        "storytelling with data"
+      ],
+      "related_concepts": [
+        "Power BI",
+        "Tableau",
+        "dashboarding",
+        "storytelling with data"
+      ]
+    },
+    {
+      "skill": "AI",
+      "aliases": [
+        "ai",
+        "artificial intelligence",
+        "ia",
+        "inteligencia artificial"
+      ],
+      "semantic_cluster": "ai_analytics",
+      "frequency": 4,
+      "curricular_importance": 0.58,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "BI",
+      "aliases": [
+        "KPIs",
+        "analitica empresarial",
+        "bi",
+        "business intelligence",
+        "dashboarding",
+        "inteligencia de negocios",
+        "reporting"
+      ],
+      "semantic_cluster": "business_intelligence",
+      "frequency": 4,
+      "curricular_importance": 0.68,
+      "related_tools": [
+        "KPIs",
+        "dashboarding"
+      ],
+      "related_concepts": [
+        "KPIs",
+        "analitica empresarial",
+        "business intelligence",
+        "dashboarding",
+        "reporting"
+      ]
+    },
+    {
+      "skill": "SQL",
+      "aliases": [
+        "ETL",
+        "data integration",
+        "data quality",
+        "data warehouse",
+        "pipelines",
+        "queries",
+        "sql",
+        "structured query language"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 3,
+      "curricular_importance": 0.635,
+      "related_tools": [
+        "ETL",
+        "data quality",
+        "data warehouse"
+      ],
+      "related_concepts": [
+        "ETL",
+        "data integration",
+        "data quality",
+        "data warehouse",
+        "pipelines",
+        "queries"
+      ]
+    },
+    {
+      "skill": "machine learning",
+      "aliases": [
+        "MLOps",
+        "Python",
+        "aprendizaje automatico",
+        "machine learning",
+        "ml",
+        "modelos predictivos",
+        "notebooks",
+        "scikit learn"
+      ],
+      "semantic_cluster": "ai_analytics",
+      "frequency": 3,
+      "curricular_importance": 0.535,
+      "related_tools": [
+        "MLOps",
+        "Python"
+      ],
+      "related_concepts": [
+        "MLOps",
+        "Python",
+        "modelos predictivos",
+        "notebooks",
+        "scikit learn"
+      ]
+    },
+    {
+      "skill": "ETL",
+      "aliases": [
+        "DataOps",
+        "data integration",
+        "data warehouse",
+        "etl",
+        "extraccion transformacion carga",
+        "extract transform load",
+        "pipelines"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 2,
+      "curricular_importance": 0.49,
+      "related_tools": [
+        "DataOps",
+        "data warehouse"
+      ],
+      "related_concepts": [
+        "DataOps",
+        "data integration",
+        "data warehouse",
+        "pipelines"
+      ]
+    },
+    {
+      "skill": "KPIs",
+      "aliases": [
+        "indicadores",
+        "indicadores clave",
+        "kpi",
+        "kpis"
+      ],
+      "semantic_cluster": "business_intelligence",
+      "frequency": 2,
+      "curricular_importance": 0.49,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "Tableau",
+      "aliases": [
+        "tableau"
+      ],
+      "semantic_cluster": "visualization",
+      "frequency": 2,
+      "curricular_importance": 0.49,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "data warehouse",
+      "aliases": [
+        "ETL",
+        "SQL",
+        "almacen de datos",
+        "bodega de datos",
+        "data lake",
+        "data warehouse",
+        "data warehousing",
+        "lakehouse",
+        "pipelines"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 2,
+      "curricular_importance": 0.49,
+      "related_tools": [
+        "ETL",
+        "SQL",
+        "data lake",
+        "lakehouse"
+      ],
+      "related_concepts": [
+        "ETL",
+        "SQL",
+        "data lake",
+        "lakehouse",
+        "pipelines"
+      ]
+    },
+    {
+      "skill": "Hadoop",
+      "aliases": [
+        "apache hadoop",
+        "hadoop"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "Power BI",
+      "aliases": [
+        "KPIs",
+        "Microsoft Fabric",
+        "dashboarding",
+        "microsoft power bi",
+        "pbi",
+        "power bi",
+        "powerbi",
+        "reporting",
+        "storytelling with data",
+        "visualizacion analitica"
+      ],
+      "semantic_cluster": "visualization",
+      "frequency": 1,
+      "curricular_importance": 0.545,
+      "related_tools": [
+        "KPIs",
+        "Microsoft Fabric",
+        "dashboarding",
+        "storytelling with data",
+        "visualizacion analitica"
+      ],
+      "related_concepts": [
+        "KPIs",
+        "Microsoft Fabric",
+        "dashboarding",
+        "reporting",
+        "storytelling with data",
+        "visualizacion analitica"
+      ]
+    },
+    {
+      "skill": "Python",
+      "aliases": [
+        "MLOps",
+        "analytics",
+        "machine learning",
+        "modelos predictivos",
+        "notebooks",
+        "pandas",
+        "py",
+        "python"
+      ],
+      "semantic_cluster": "language",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [
+        "MLOps",
+        "machine learning"
+      ],
+      "related_concepts": [
+        "MLOps",
+        "analytics",
+        "machine learning",
+        "modelos predictivos",
+        "notebooks",
+        "pandas"
+      ]
+    },
+    {
+      "skill": "Spark",
+      "aliases": [
+        "apache spark",
+        "pyspark",
+        "spark"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "big data processing",
+      "aliases": [
+        "big data processing",
+        "procesamiento distribuido",
+        "procesamiento masivo de datos"
+      ],
+      "semantic_cluster": "technical_skill",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [],
+      "related_concepts": []
+    },
+    {
+      "skill": "dashboarding",
+      "aliases": [
+        "KPIs",
+        "cuadros de mando",
+        "dashboard",
+        "dashboarding",
+        "dashboards",
+        "reporting",
+        "storytelling with data",
+        "tableros de control",
+        "visualizacion analitica"
+      ],
+      "semantic_cluster": "visualization",
+      "frequency": 1,
+      "curricular_importance": 0.545,
+      "related_tools": [
+        "KPIs",
+        "storytelling with data",
+        "visualizacion analitica"
+      ],
+      "related_concepts": [
+        "KPIs",
+        "reporting",
+        "storytelling with data",
+        "visualizacion analitica"
+      ]
+    },
+    {
+      "skill": "data governance",
+      "aliases": [
+        "data governance",
+        "data quality",
+        "gobernanza de datos",
+        "gobierno de datos",
+        "linaje",
+        "seguridad del dato"
+      ],
+      "semantic_cluster": "governance",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [
+        "data quality"
+      ],
+      "related_concepts": [
+        "data quality",
+        "gobierno de datos",
+        "linaje",
+        "seguridad del dato"
+      ]
+    },
+    {
+      "skill": "data lake",
+      "aliases": [
+        "Databricks",
+        "Spark",
+        "cloud analytics",
+        "data lake",
+        "lago de datos",
+        "lakehouse"
+      ],
+      "semantic_cluster": "data_engineering",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [
+        "Databricks",
+        "Spark",
+        "lakehouse"
+      ],
+      "related_concepts": [
+        "Databricks",
+        "Spark",
+        "cloud analytics",
+        "lakehouse"
+      ]
+    },
+    {
+      "skill": "estadistica",
+      "aliases": [
+        "analisis estadistico",
+        "estadistica",
+        "statistics"
+      ],
+      "semantic_cluster": "foundational_skill",
+      "frequency": 1,
+      "curricular_importance": 0.445,
+      "related_tools": [],
+      "related_concepts": []
+    }
+  ],
+  "concept_frequency": {
+    "visualizacion": 28,
+    "bases de datos": 19,
+    "resultados de aprendizaje": 11,
+    "business intelligence": 6,
+    "toma de decisiones": 5,
+    "gobierno de datos": 5,
+    "mineria de datos": 3,
+    "tableros": 2,
+    "procesamiento masivo": 2,
+    "indicadores": 1
+  }
+}

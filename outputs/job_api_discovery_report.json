@@ -1,0 +1,27 @@
+{
+  "endpoints": [
+    {
+      "source_name": "ticjob",
+      "portal_url": "https://ticjob.co/es/search",
+      "endpoint": "https://ticjob.co/es/search",
+      "method": "GET",
+      "resource_type": "dry_run",
+      "response_type": "unknown",
+      "confidence": 0.0,
+      "reason": "network_not_executed",
+      "discovered_at": "2026-05-29T00:16:13.099352+00:00"
+    },
+    {
+      "source_name": "elempleo",
+      "portal_url": "https://www.elempleo.com/co/ofertas-empleo/",
+      "endpoint": "https://www.elempleo.com/co/ofertas-empleo/",
+      "method": "GET",
+      "resource_type": "dry_run",
+      "response_type": "unknown",
+      "confidence": 0.0,
+      "reason": "network_not_executed",
+      "discovered_at": "2026-05-29T00:16:13.099368+00:00"
+    }
+  ],
+  "errors": []
+}

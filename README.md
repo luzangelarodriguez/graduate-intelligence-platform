@@ -1,55 +1,28 @@
-# Graduate Intelligence Platform
+# AI Labor & Curriculum Observatory
 
-Plataforma de inteligencia curricular, scraping laboral, extraccion de skills y matching programa-empleo sobre PostgreSQL.
+Enterprise platform for controlled labor acquisition, semantic skill intelligence, company intelligence, curriculum gaps, recommendations and observatory dashboards.
 
-## Estado Actual
+## What ships now
 
-El repositorio fue consolidado en una estructura monorepo segura. No se eliminaron datasets, modelos, JSONL, outputs ni scripts historicos; los artefactos se clasificaron y movieron a carpetas de trabajo o archivo.
+- Acquisition workers with Playwright and controlled crawling.
+- PostgreSQL warehouse with probabilistic scoring.
+- Semantic extraction, clustering, embeddings and QA feedback.
+- Company, role, career and forecasting intelligence.
+- Observatory metrics and dashboard datasets for Vercel consumption.
+- Public FastAPI layer in `api/` for deployment.
 
-## Arquitectura
-
-```text
-backend/          servicios backend nuevos o modulos API
-frontend/         frontend React/Vite objetivo
-ml/               pipelines de matching, esquemas y entrenamiento ML
-scrapers/         scrapers y extractores activos
-data/raw/         datasets fuente, SQLite, CSV, JSON, PDFs
-data/processed/   datasets curados
-data/ml/          JSONL y artefactos de entrenamiento
-database/         SQL, vistas, migraciones y esquemas
-docs/             diagnosticos, reportes y decisiones tecnicas
-scripts/          utilidades operativas y jobs manuales
-logs/             logs de ejecucion local
-archive/          prototipos, outputs temporales y legacy
-tests/            pruebas automatizadas
-```
-
-## Entry Points Actuales
-
-- Dashboard principal Flask: `app.py`, servido por Docker como `app:app`.
-- Scraper curricular PostgreSQL: `scrapers/scraper.py` con wrapper compatible `scraper.py`.
-- Scraper UNIR PostgreSQL: `scrapers/scrape_unir_especializaciones_pg.py` con wrapper compatible.
-- Extraccion de ofertas y skills: `scrapers/extract_job_offers_and_skills.py`.
-- Matching ML/rules: `ml/ml_match_program_jobs.py` con wrapper compatible.
-- Esquema ML PostgreSQL: `ml/ml_training_schema.sql`.
-
-## Docker
-
-La configuracion actual mantiene `docker-compose.yml` y `Dockerfile` en raiz para no romper el despliegue existente. En una segunda iteracion conviene separar imagenes:
-
-- `backend-api`: FastAPI/Flask API.
-- `worker-scraper`: jobs de scraping.
-- `worker-ml`: matching, export JSONL, scoring.
-- `frontend`: React/Vite estatico.
-- `db`: PostgreSQL 16.
-
-## Desarrollo
+## Quick start
 
 ```powershell
-python -m pip install -r requirements.txt
+copy .env.example .env.local
 docker compose up --build
 ```
 
-## Reportes
+The public API runs in the `api` service from `api.main:app`.
 
-Ver [docs/REPOSITORY_AUDIT.md](docs/REPOSITORY_AUDIT.md) para el mapa, diagnostico, riesgos, plan de limpieza y estrategia de produccion.
+## Main docs
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [API Reference](docs/API_REFERENCE.md)
+

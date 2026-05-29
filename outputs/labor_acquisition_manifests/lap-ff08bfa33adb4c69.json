@@ -1,0 +1,28 @@
+{
+  "correlation_id": "lap-ff08bfa33adb4c69",
+  "sources": [
+    "linkedin",
+    "elempleo",
+    "ticjob"
+  ],
+  "execute_network": true,
+  "max_jobs": 200,
+  "max_pages": 10,
+  "persist": true,
+  "quality_review": true,
+  "started_at": 1780007995.1496336,
+  "checkpoints": {
+    "source:linkedin": {
+      "results": 0,
+      "errors": 0,
+      "circuit": {
+        "source_name": "linkedin",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    }
+  },
+  "finished_at": null,
+  "cancelled": false
+}

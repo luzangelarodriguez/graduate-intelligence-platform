@@ -8,6 +8,12 @@ import type {
   Job,
   LoginPayload,
   Match,
+  MicroAnalysis,
+  MicroDemoCase,
+  SpecializationDocumentsResponse,
+  SpecializationMicroAnalysis,
+  SpecializationOption,
+  SpecializationRewriteResponse,
   Page,
   Program,
   ProgramDashboardResponse,
@@ -110,6 +116,11 @@ export async function getProgramas(limit = 100) {
   return data;
 }
 
+export async function getSpecializations() {
+  const { data } = await apiClient.get<SpecializationOption[]>('/api/specializations');
+  return data;
+}
+
 export async function getPrograma(programId: number) {
   const { data } = await apiClient.get<Program>(`/api/programas/${programId}`);
   return data;
@@ -160,5 +171,52 @@ export async function getJobRecommendations(programId: number, limit = 8) {
 
 export async function registerAlumni(payload: AlumniRegistrationPayload) {
   const { data } = await apiClient.post<AlumniRegistrationResponse>('/api/alumni/register', payload);
+  return data;
+}
+
+export async function analyzeMicrocurriculum(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await apiClient.post<MicroAnalysis>('/api/microcurriculum/analyze', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  });
+  return data;
+}
+
+export async function getMicrocurriculumDemoCases() {
+  const { data } = await apiClient.get<{ items: MicroDemoCase[]; summary: Record<string, unknown> }>(
+    '/api/microcurriculum/demo-cases',
+  );
+  return data;
+}
+
+export async function getSpecializationMicrocurriculumDocuments(specializationId: string) {
+  const { data } = await apiClient.get<SpecializationDocumentsResponse>(
+    `/api/microcurriculum/specialization/${encodeURIComponent(specializationId)}/documents`,
+  );
+  return data;
+}
+
+export async function analyzeSpecializationMicrocurriculums(specializationId: string) {
+  const { data } = await apiClient.post<SpecializationMicroAnalysis>(
+    `/api/microcurriculum/specialization/${encodeURIComponent(specializationId)}/analyze`,
+  );
+  return data;
+}
+
+export async function rewriteSpecializationMicrocurriculums(specializationId: string) {
+  const { data } = await apiClient.post<SpecializationRewriteResponse>(
+    `/api/microcurriculum/specialization/${encodeURIComponent(specializationId)}/rewrite`,
+    {},
+    { timeout: 120000 },
+  );
+  return data;
+}
+
+export async function getMicrocurriculumExecutiveReport(caseId: string) {
+  const { data } = await apiClient.get<{ id: string; format: string; analysis?: MicroAnalysis; markdown: string }>(
+    `/api/microcurriculum/${encodeURIComponent(caseId)}/executive-report`,
+  );
   return data;
 }

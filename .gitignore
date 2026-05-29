@@ -12,10 +12,20 @@ __pycache__/
 .env
 .env.*
 !.env.example
+!.env.local.example
 
 # Logs and runtime files
 logs/*.log
 logs/*.txt
+outputs/raw/
+outputs/cache/
+outputs/tmp/
+outputs/screenshots/
+.local_sessions/
+cookies/
+playwright/.auth/
+*.session.json
+linkedin_storage_state.json
 *.log
 *.err.log
 *.out.log
@@ -30,6 +40,9 @@ data/raw/
 data/processed/
 data/ml/*.jsonl
 archive/outputs/
+storage/microcurriculos/*.pdf
+storage/microcurriculos/*.txt
+!storage/microcurriculos/.gitkeep
 
 # Vendored dependencies
 vendor/
@@ -43,6 +56,7 @@ node_modules/
 dist/
 build/
 .vite/
+coverage/
 
 # OS/editor
 .DS_Store

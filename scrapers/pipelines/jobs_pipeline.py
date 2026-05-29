@@ -36,6 +36,7 @@ except ModuleNotFoundError:
 
 
 LOGGER = logging.getLogger("jobs_pipeline")
+SOURCE_STATUS: dict[str, dict[str, Any]] = {}
 
 SOURCES = {
     "computrabajo": "scrapers.sources.computrabajo_scraper",
@@ -97,10 +98,36 @@ def scrape_sources(source_names: list[str], query: str, location: str, limit: in
         module_path = SOURCES[source]
         LOGGER.info("scraping source=%s query=%s limit=%s", source, query, per_source_limit)
         module = importlib.import_module(module_path)
+        source_started = datetime.now(timezone.utc)
         try:
-            jobs.extend(module.scrape_jobs(query=query, location=location, limit=per_source_limit, headless=headless))
-        except Exception:
-            LOGGER.exception("source=%s failed", source)
+            source_jobs = module.scrape_jobs(query=query, location=location, limit=per_source_limit, headless=headless)
+            elapsed_ms = int((datetime.now(timezone.utc) - source_started).total_seconds() * 1000)
+            status = "ok" if source_jobs else "degraded"
+            reason = "" if source_jobs else "no_jobs_extracted"
+            SOURCE_STATUS[source] = {
+                "source_status": status,
+                "jobs": len(source_jobs),
+                "elapsed_ms": elapsed_ms,
+                "reason": reason,
+            }
+            LOGGER.info(
+                "source=%s source_status=%s jobs=%s elapsed_ms=%s reason=%s",
+                source,
+                status,
+                len(source_jobs),
+                elapsed_ms,
+                reason,
+            )
+            jobs.extend(source_jobs)
+        except Exception as exc:
+            elapsed_ms = int((datetime.now(timezone.utc) - source_started).total_seconds() * 1000)
+            SOURCE_STATUS[source] = {
+                "source_status": "degraded",
+                "jobs": 0,
+                "elapsed_ms": elapsed_ms,
+                "reason": exc.__class__.__name__,
+            }
+            LOGGER.exception("source=%s source_status=degraded elapsed_ms=%s failed", source, elapsed_ms)
     return jobs
 
 
@@ -285,8 +312,8 @@ def main() -> int:
     args = parser.parse_args()
     configure_logging(Path(args.log_file))
     jobs = run_pipeline(args)
-    LOGGER.info("pipeline finished jobs=%s output=%s", len(jobs), args.csv_output)
-    print(json.dumps({"jobs": len(jobs), "csv_output": args.csv_output}, ensure_ascii=False))
+    LOGGER.info("pipeline finished jobs=%s output=%s source_status=%s", len(jobs), args.csv_output, SOURCE_STATUS)
+    print(json.dumps({"jobs": len(jobs), "csv_output": args.csv_output, "source_status": SOURCE_STATUS}, ensure_ascii=False))
     return 0
 
 

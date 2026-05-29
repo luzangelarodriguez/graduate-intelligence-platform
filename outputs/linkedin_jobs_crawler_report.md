@@ -1,0 +1,130 @@
+# LinkedIn Jobs Crawler Report
+
+- Resultados: 200
+- Errores: 0
+- Storage state: local file used, contents never printed.
+
+## Vacantes
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4420475879/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4420444404/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4415397312/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4419897524/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4416539780/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4410824168/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4417389839/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4413872799/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4411889722/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4420430532/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4417390704/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4420450424/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4418224620/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4417766407/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4404889137/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4413539940/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4420468467/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4351614123/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4417389941/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4406986653/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4410302233/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4402006255/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4415124598/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4416314615/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4383889767/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4278635515/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4365938829/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4402900691/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4410738361/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4379677461/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4215914079/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4365935865/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4411756568/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4418048358/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4416358442/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4415098901/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4412459248/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4406964275/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4415066961/
+  - Skills: N/A
+-  | ForBI | Colombia
+  - URL: https://www.linkedin.com/jobs/view/4412198418/
+  - Skills: N/A
+
+## Errores
+- Sin errores.

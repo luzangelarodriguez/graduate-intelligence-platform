@@ -83,6 +83,8 @@ def classify_program_domain(name: str, description: str = "") -> DomainClassific
 def is_domain_compatible(source_domain: str | None, target_domain: str | None) -> bool:
     if not source_domain or not target_domain:
         return True
+    if "transversal" in {source_domain, target_domain}:
+        return True
     if source_domain == target_domain:
         return True
     source = DOMAIN_BY_CODE.get(source_domain)

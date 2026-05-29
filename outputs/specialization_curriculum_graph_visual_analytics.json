@@ -1,0 +1,307 @@
+{
+  "specialization_id": "visual-analytics-big-data",
+  "specialization_name": "Especialización en Visual Analytics y Big Data",
+  "source_root": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\storage\\test_microcurriculos\\especialización en visual analytics y big data",
+  "documents_processed": 10,
+  "skills": [
+    {
+      "skill": "visualizacion analitica",
+      "frequency": 9,
+      "source_documents": [
+        "Microcurrículos V5_Análisis e interpretación de datos.docx",
+        "Microcurrículos V5_Electiva Innovación Tecnológica y Transformación Digital de las Empresas.docx",
+        "Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx",
+        "Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx",
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx",
+        "Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",
+        "Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx",
+        "Microcurrículos V5_Visualización Interactiva de la Información.docx"
+      ],
+      "evidence_fragments": [
+        "Especialización en Visual Analytics y Big Data",
+        "Especialización en Visual Analytics y Big Data",
+        "Especialización en Visual Analytics y Big Data",
+        "Especialización en Visual Analytics y Big Data",
+        "Especialización en Visual Analytics y Big Data"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.845
+    },
+    {
+      "skill": "AI",
+      "frequency": 4,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx",
+        "Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx",
+        "aprendizaje automatico.docx"
+      ],
+      "evidence_fragments": [
+        "Especialización en Inteligencia Artificial",
+        "Esta El aprendizaje automático es una rama de la inteligencia artificial que simula la forma en la que las personas aprenden en base a ejemplos y situaciones observadas. Los mecanismos de aprendizaje permiten que los sistemas cognitivos puedan operar y actuar ",
+        "Conocimientos (con evidencia de títulos en el área de | Ingeniero con Doctorado o maestría en temas afines con Inteligencia Artificial",
+        "Vahos, L. E., Pastor, D. M., y Jiménez, J. A. (2013). Método para la formación de stakeholder en proyectos de ingeniería usando la metodología PMI y técnicas de inteligencia artificial. Revista Ingenierías, 12(23), 157-168.",
+        "• Machine learning e inteligencia artificial"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.57
+    },
+    {
+      "skill": "BI",
+      "frequency": 4,
+      "source_documents": [
+        "Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx",
+        "Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx",
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Visualización Interactiva de la Información.docx"
+      ],
+      "evidence_fragments": [
+        "La asignatura está dedicada a la infraestructura de la tecnología de la información y los fundamentos de la inteligencia de negocios. Se incluyen temas dedicados a los componentes principales de una infraestructura de la tecnología de la información (plataform",
+        "sistemas operativos, aplicaciones empresariales), a las redes de computadores (de ámbito local, global y redes inalámbricas), a la seguridad en redes de computadores, herramientas de protección de recursos informáticos y a la computación en la nube, centrándos",
+        "Tema 6. Inteligencia de negocios",
+        "Sherman, R. (2014). Business intelligence guidebook: From data integration to analytics. Elsevier: Ámsterdam.",
+        "Vercellis, C. (2009). Business intelligence: data mining and optimization for decision making. Wiley: New York."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.57
+    },
+    {
+      "skill": "SQL",
+      "frequency": 3,
+      "source_documents": [
+        "Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx",
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx"
+      ],
+      "evidence_fragments": [
+        "Sql Server, My SQL, Excel",
+        "Mundy, J., Thornthwaite, W., y Kimball, R. (2006). The Microsoft data warehouse toolkit: with SQL server 2005 and the Microsoft business intelligence toolset. Wiley.",
+        "Del mismo modo, se presentarán al estudiante otras utilidades integradas dentro del ecosistema Hadoop, tales como Hive o Impala, que son sistemas que permiten a profesionales sin conocimientos de programación, pero con experiencia con SQL, realizar consultas d",
+        "Evaluación continua | Actividad 1. HDFS, Spark SQL y Mllib.",
+        "Kornacker, M.; Behm, A.; Bittorf, V.; Bobrovytsky, T.; Ching, C.; Choi, A.; Erickson, J.; Grund, M.; Hecht, D.; Jacobs, M.; Joshi, I.; Kuff, L.; Kumar, D.; Leblang, A.; Li, N.; Pandis, I.; Robinson, H.; Rorke, D.; Rus, S. Russell, J.; Tsirogiannis, D.; Wanderm"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.515
+    },
+    {
+      "skill": "machine learning",
+      "frequency": 3,
+      "source_documents": [
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx",
+        "Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx",
+        "aprendizaje automatico.docx"
+      ],
+      "evidence_fragments": [
+        "Lichman, M. (2013). UCI Machine Learning Repository Irvine. CA: University of California, School of Information and Computer Science. Recuperado de http://archive.ics.uci.edu/ml",
+        "En particular, la asignatura busca familiarizar al estudiante con sistemas de almacenamiento distribuido, como HDFS (Hadoop Distributed File System), y de procesamiento, como MapReduce, el paradigma de programación ideado por Google en 2004 y germen del proces",
+        "• Machine learning e inteligencia artificial",
+        "• Machine learning e inteligencia artificial",
+        "Introducción a machine learning con librerías en Python"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.515
+    },
+    {
+      "skill": "ETL",
+      "frequency": 2,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx"
+      ],
+      "evidence_fragments": [
+        "Aplicar técnicas de extracción, transformación y carga de datos (ETL), para realizar procesos de análisis."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.46
+    },
+    {
+      "skill": "KPIs",
+      "frequency": 2,
+      "source_documents": [
+        "Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx",
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx"
+      ],
+      "evidence_fragments": [
+        "Se conocerá cómo diseñar la arquitectura del proyecto ahondando en los recursos tecnológicos, el acceso a datos y definición de los indicadores y reportes a generar por el sistema.",
+        "Tableau. (2021). KPI: rendimiento frente a objetivo [Página web]. Tableau. https://www.tableau.com/es-es/solutions/workbook/achieve-your-goals-across-all-product-lines"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.46
+    },
+    {
+      "skill": "Tableau",
+      "frequency": 2,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+        "Microcurrículos V5_Visualización Interactiva de la Información.docx"
+      ],
+      "evidence_fragments": [
+        "Tableau. (2021). KPI: rendimiento frente a objetivo [Página web]. Tableau. https://www.tableau.com/es-es/solutions/workbook/achieve-your-goals-across-all-product-lines",
+        "Sitio web oficial de Tableau Public: http://www.tableau.com/public/"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.46
+    },
+    {
+      "skill": "data warehouse",
+      "frequency": 2,
+      "source_documents": [
+        "Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx",
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx"
+      ],
+      "evidence_fragments": [
+        "sistemas operativos, aplicaciones empresariales), a las redes de computadores (de ámbito local, global y redes inalámbricas), a la seguridad en redes de computadores, herramientas de protección de recursos informáticos y a la computación en la nube, centrándos",
+        "• Modelado del almacén de datos y cubos de datos",
+        "• Consultas en almacén de datos",
+        "En esta asignatura los alumnos aprenderán sobre almacenamiento, tratamiento y protección de datos, además de cómo utilizarlos para beneficio empresarial y mejorar las interacciones con el cliente a través del marketing. Se tratarán temas como el direccionamien",
+        "Tema 3. Data warehouse y data lake"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.46
+    },
+    {
+      "skill": "Hadoop",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx"
+      ],
+      "evidence_fragments": [
+        "En particular, la asignatura busca familiarizar al estudiante con sistemas de almacenamiento distribuido, como HDFS (Hadoop Distributed File System), y de procesamiento, como MapReduce, el paradigma de programación ideado por Google en 2004 y germen del proces",
+        "Del mismo modo, se presentarán al estudiante otras utilidades integradas dentro del ecosistema Hadoop, tales como Hive o Impala, que son sistemas que permiten a profesionales sin conocimientos de programación, pero con experiencia con SQL, realizar consultas d",
+        "White, T. (2015). Hadoop: the definitive guide. O’Reilly."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "Power BI",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Visualización Interactiva de la Información.docx"
+      ],
+      "evidence_fragments": [
+        "Power BI, Adobe Illustrator"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "Python",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Tecnicas de Inteligencia Artificial.docx"
+      ],
+      "evidence_fragments": [
+        "Tema 2. Python para la implementación de técnicas de inteligencia artificial",
+        "El lenguaje Python: conceptos básicos e instalación",
+        "Introducción a machine learning con librerías en Python"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "Spark",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx"
+      ],
+      "evidence_fragments": [
+        "En particular, la asignatura busca familiarizar al estudiante con sistemas de almacenamiento distribuido, como HDFS (Hadoop Distributed File System), y de procesamiento, como MapReduce, el paradigma de programación ideado por Google en 2004 y germen del proces",
+        "• API estructurada de Spark: lectura y escritura de DataFrames",
+        "• API estructurada de Spark: manipulación de DataFrames"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "big data processing",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Ingenieria para el procesado masivo de datos.docx"
+      ],
+      "evidence_fragments": [
+        "Analizar los beneficios derivados de la aplicación de las técnicas de procesamiento masivo de datos en la empresa",
+        "• Implementación de consumidores Kafka técnicas de procesamiento masivo de datos en una situación real. formativas de esta asignatura son las siguientes:"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "dashboarding",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx"
+      ],
+      "evidence_fragments": [
+        "Wexler, J. S., Shaffer, J., y Cotgreave, A. (2017). The big book of dashboards: Visualizing your data using real-world business scenarios. John Wiley & Sons."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "data governance",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx"
+      ],
+      "evidence_fragments": [
+        "Cisterna, D., y Arenas, K. [Club Data Governance Office Latam]. (6 de abril de 2020). Resumen Webinar: Primeros pasos del Data Governance: Conformando una Oficina de Gobierno de Datos [Vídeo]. Youtube.",
+        "Starling, H. (2015). Data governance simplified: Creating and measuring trusted data for businesses.",
+        "U. S. Government Accountability Office. (2020). Data governance: agencies made progress in establishing governance, but need to address key milestones."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "data lake",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx"
+      ],
+      "evidence_fragments": [
+        "En esta asignatura los alumnos aprenderán sobre almacenamiento, tratamiento y protección de datos, además de cómo utilizarlos para beneficio empresarial y mejorar las interacciones con el cliente a través del marketing. Se tratarán temas como el direccionamien",
+        "Tema 3. Data warehouse y data lake",
+        "3.4. Lago de datos (data lake)."
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    },
+    {
+      "skill": "estadistica",
+      "frequency": 1,
+      "source_documents": [
+        "Microcurrículos V5_Análisis e interpretación de datos.docx"
+      ],
+      "evidence_fragments": [
+        "La era de la información en que vivimos requiere que sepamos manejar datos. La ciencia que se encarga de «aprender» a partir de estos datos es la estadística. Para aprender o leer estos datos debemos saber producirlos, analizarlos y sacar conclusiones de ellos",
+        "Más específicamente, en esta asignatura se aprenderán los conceptos introductorios de la estadística, así como a razonar estadísticamente. Se aprenderá, entre otras cosas, a graficar las representaciones de datos más habituales, a manejar las relaciones lineal",
+        "Se hará hincapié en la estadística inferencial, para ello se repasarán los principios de probabilidad en los que esta descansa. Las técnicas inferenciales son importantes, pues nos permitirán contrastar conjeturas que hacemos constantemente sobre cómo es una d"
+      ],
+      "node_type": "skill",
+      "curricular_weight": 0.405
+    }
+  ],
+  "profile_concepts": {
+    "big data": 33,
+    "visualizacion": 28,
+    "bases de datos": 19,
+    "inteligencia artificial": 15,
+    "resultados de aprendizaje": 11,
+    "visual analytics": 9,
+    "analitica": 7,
+    "business intelligence": 6,
+    "toma de decisiones": 5
+  },
+  "raw_concept_frequency": {
+    "inteligencia artificial": 15,
+    "resultados de aprendizaje": 11,
+    "visualizacion": 28,
+    "bases de datos": 19,
+    "big data": 33,
+    "visual analytics": 9,
+    "toma de decisiones": 5,
+    "analitica": 7,
+    "business intelligence": 6
+  }
+}
