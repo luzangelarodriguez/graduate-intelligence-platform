@@ -1,14 +1,22 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
+import { Sidebar } from '../components/Sidebar';
 import { Topbar } from '../components/Topbar';
 
 export function AppLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-canvas text-ink">
-      <Topbar />
-      <main className="mx-auto max-w-[1440px] px-4 pb-8 pt-4 sm:px-6 lg:px-7">
-        <Outlet />
-      </main>
+    <div className="sidebar-layout">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className="main-content">
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
+        <main className="page-container">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

@@ -299,3 +299,97 @@ export interface MicroDemoCase {
   score?: number;
   recommendations_count?: number;
 }
+
+// Observatory API Types
+
+export interface ObservatoryMetric {
+  metric_name: string;
+  metric_value: number | string;
+  metric_category?: string;
+  unit?: string;
+  trend?: string;
+  timestamp?: string;
+}
+
+export interface HealthResponse {
+  status: string;
+  database: string;
+  timestamp: string;
+  checks?: Record<string, boolean>;
+  observatory_freshness?: {
+    last_update?: string;
+    records_count?: number;
+    status?: string;
+  };
+}
+
+export interface EmergingSkill {
+  skill_name: string;
+  demand_count: number;
+  trend?: string;
+  growth_rate?: number;
+  category?: string;
+}
+
+export interface CurriculumGap {
+  specialization: string;
+  specialization_id?: number;
+  gap_skill: string;
+  gap_severity: number;
+  market_demand: number;
+  coverage_percent?: number;
+  priority?: string;
+}
+
+export interface ObservatoryRecommendation {
+  recommendation_id?: string;
+  recommendation_type: string;
+  title: string;
+  description: string;
+  target_company?: string;
+  target_specialization?: string;
+  impact_level?: string;
+  confidence?: number;
+  created_at?: string;
+}
+
+export interface CompanyIntelligence {
+  company_name: string;
+  job_count: number;
+  top_skills?: string[];
+  avg_salary_range?: string;
+  hiring_trend?: string;
+  industry?: string;
+}
+
+export interface SemanticRole {
+  role_name: string;
+  role_family?: string;
+  demand_count: number;
+  avg_skills_required?: number;
+  trend?: string;
+}
+
+export interface CareerPath {
+  path_name: string;
+  entry_role: string;
+  target_role: string;
+  required_skills?: string[];
+  time_estimate?: string;
+}
+
+export interface MarketForecast {
+  entity_type: string;
+  entity_name: string;
+  forecast_period: string;
+  predicted_demand: number;
+  confidence_interval?: number;
+}
+
+export interface PaginatedObservatoryResponse<T = Record<string, unknown>> {
+  items: T[];
+  count: number;
+  limit: number;
+  offset: number;
+  filters?: Record<string, string | null>;
+}

@@ -1,55 +1,57 @@
-﻿import { Menu, Search } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Menu, Search } from 'lucide-react';
 
-import unirLogo from '../assets/logos/unir-logo.svg';
 import { useAuth } from '../context/AuthContext';
 
-const navItems = [
-  { to: '/', label: 'Observatorio' },
-  { to: '/programas', label: 'Inteligencia curricular' },
-  { to: '/registro', label: 'Egresados' },
-];
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
 
-export function Topbar() {
+export function Topbar({ onMenuClick }: TopbarProps) {
   const { user, logout } = useAuth();
 
   return (
-    <header className="unir-header">
-      <div className="unir-topbar">
-        <div className="unir-topbar-inner">
-          <img className="unir-logo" src={unirLogo} alt="UNIR - La Universidad en Internet" />
-          <div className="unir-platform-title">
-            <span>UNIR Colombia</span>
-            <strong>Observatorio institucional de inteligencia curricular</strong>
-          </div>
-          <div className="unir-session">
-            <span>{user?.full_name}</span>
-            <button type="button" onClick={() => void logout()}>
-              Salir
-            </button>
-          </div>
+    <header className="topbar">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          className="lg:hidden btn-ghost p-2 -ml-2"
+          onClick={onMenuClick}
+          aria-label="Abrir menu"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="hidden lg:block">
+          <span className="text-sm font-semibold text-ink">Observatorio Curricular</span>
         </div>
       </div>
 
-      <nav className="unir-blackbar">
-        <div className="unir-blackbar-inner">
-          <button className="unir-menu-button" type="button" aria-label="MenÃº institucional">
-            <Menu size={18} strokeWidth={1.8} />
-            MenÃº
-          </button>
-          <div className="unir-nav-links">
-            {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? 'active' : '')}>
-                {item.label}
-              </NavLink>
-            ))}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          className="btn-ghost p-2"
+          aria-label="Buscar"
+        >
+          <Search size={18} strokeWidth={1.5} />
+        </button>
+        
+        <div className="flex items-center gap-3 pl-3 border-l border-line">
+          <div className="text-right hidden sm:block">
+            <span className="block text-sm font-semibold text-ink">
+              {user?.full_name || 'Usuario'}
+            </span>
+            <span className="block text-xs text-muted">
+              {user?.roles?.[0] || 'Observador'}
+            </span>
           </div>
-          <button className="unir-search-button" type="button" aria-label="Buscar">
-            <Search size={17} strokeWidth={1.8} />
+          <button
+            type="button"
+            className="btn btn-secondary text-sm"
+            onClick={() => void logout()}
+          >
+            Salir
           </button>
         </div>
-      </nav>
+      </div>
     </header>
   );
 }
-

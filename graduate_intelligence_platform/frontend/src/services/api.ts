@@ -4,12 +4,22 @@ import type {
   AlumniRegistrationPayload,
   AlumniRegistrationResponse,
   AuthUser,
+  CareerPath,
+  CompanyIntelligence,
+  CurriculumGap,
   DashboardKpisResponse,
+  EmergingSkill,
+  HealthResponse,
   Job,
   LoginPayload,
+  MarketForecast,
   Match,
   MicroAnalysis,
   MicroDemoCase,
+  ObservatoryMetric,
+  ObservatoryRecommendation,
+  PaginatedObservatoryResponse,
+  SemanticRole,
   SpecializationDocumentsResponse,
   SpecializationMicroAnalysis,
   SpecializationOption,
@@ -218,5 +228,52 @@ export async function getMicrocurriculumExecutiveReport(caseId: string) {
   const { data } = await apiClient.get<{ id: string; format: string; analysis?: MicroAnalysis; markdown: string }>(
     `/api/microcurriculum/${encodeURIComponent(caseId)}/executive-report`,
   );
+  return data;
+}
+
+// Observatory API Endpoints
+
+export async function getObservatoryHealth() {
+  const { data } = await apiClient.get<HealthResponse>('/health');
+  return data;
+}
+
+export async function getObservatoryMetrics(params?: { limit?: number; offset?: number; metric_category?: string; metric_name?: string }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<ObservatoryMetric>>('/metrics', { params });
+  return data;
+}
+
+export async function getEmergingSkills(params?: { limit?: number; offset?: number }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<EmergingSkill>>('/emerging-skills', { params });
+  return data;
+}
+
+export async function getCurriculumGaps(params?: { limit?: number; offset?: number; specialization?: string }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<CurriculumGap>>('/curriculum-gaps', { params });
+  return data;
+}
+
+export async function getObservatoryRecommendations(params?: { limit?: number; offset?: number; recommendation_type?: string; target_company?: string }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<ObservatoryRecommendation>>('/recommendations', { params });
+  return data;
+}
+
+export async function getCompanyIntelligence(params?: { limit?: number; offset?: number }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<CompanyIntelligence>>('/company-intelligence', { params });
+  return data;
+}
+
+export async function getSemanticRoles(params?: { limit?: number; offset?: number; role_family?: string }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<SemanticRole>>('/semantic-roles', { params });
+  return data;
+}
+
+export async function getCareerPaths(params?: { limit?: number; offset?: number }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<CareerPath>>('/career-paths', { params });
+  return data;
+}
+
+export async function getMarketForecast(params?: { limit?: number; offset?: number; entity_type?: string }) {
+  const { data } = await apiClient.get<PaginatedObservatoryResponse<MarketForecast>>('/market-forecast', { params });
   return data;
 }
