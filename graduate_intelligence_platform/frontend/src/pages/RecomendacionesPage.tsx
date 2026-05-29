@@ -103,8 +103,10 @@ export function RecomendacionesPage() {
   const totalRecommendations = recommendations.length;
   const highImpactCount = groupedByImpact.high.length;
   const avgConfidence =
-    recommendations.reduce((sum, r) => sum + (r.confidence || 0), 0) /
-    (totalRecommendations || 1);
+    recommendations.reduce((sum, r) => {
+      const conf = r.recommendation_confidence ? parseFloat(r.recommendation_confidence) : (r.confidence || 0);
+      return sum + conf;
+    }, 0) / (totalRecommendations || 1);
 
   return (
     <div className="space-y-6">
@@ -277,12 +279,15 @@ export function RecomendacionesPage() {
 interface RecommendationCardProps {
   recommendation: {
     recommendation_type?: string;
-    title: string;
-    description: string;
+    target_role?: string;
     target_company?: string;
-    target_specialization?: string;
-    impact_level?: string;
-    confidence?: number;
+    recommendation_reasoning?: string;
+    recommendation_confidence?: string;
+    recommendation_payload?: {
+      why_recommended?: string[];
+      recommended_skills?: string[];
+      market_alignment_score?: number;
+    };
   };
   impact: 'high' | 'medium' | 'low';
 }
@@ -295,24 +300,32 @@ function RecommendationCard({ recommendation, impact }: RecommendationCardProps)
       ? 'border-l-4 border-l-warning'
       : 'border-l-4 border-l-line';
 
+  const confidence = recommendation.recommendation_confidence 
+    ? parseFloat(recommendation.recommendation_confidence)
+    : null;
+
+  const title = recommendation.target_role || recommendation.recommendation_type || 'Recomendacion';
+  const description = recommendation.recommendation_reasoning || 
+    recommendation.recommendation_payload?.why_recommended?.join(' ') || '';
+
   return (
     <article className={`rec-card ${borderClass}`}>
       <div className="rec-card-header">
         <div className="flex-1">
           {recommendation.recommendation_type && (
-            <span className="rec-card-type">{recommendation.recommendation_type}</span>
+            <span className="rec-card-type">{recommendation.recommendation_type.toUpperCase()}</span>
           )}
-          <h4 className="rec-card-title">{recommendation.title}</h4>
+          <h4 className="rec-card-title">{title}</h4>
         </div>
-        {recommendation.confidence && (
+        {confidence !== null && (
           <StatusBadge
-            status={recommendation.confidence >= 0.7 ? 'success' : 'neutral'}
-            label={`${(recommendation.confidence * 100).toFixed(0)}%`}
+            status={confidence >= 0.7 ? 'success' : 'neutral'}
+            label={`${(confidence * 100).toFixed(0)}%`}
           />
         )}
       </div>
-      <p className="rec-card-body">{recommendation.description}</p>
-      {(recommendation.target_company || recommendation.target_specialization) && (
+      {description && <p className="rec-card-body">{description}</p>}
+      {(recommendation.target_company || recommendation.recommendation_payload?.recommended_skills?.length) && (
         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-line">
           {recommendation.target_company && (
             <span className="badge badge-accent">
@@ -320,12 +333,11 @@ function RecommendationCard({ recommendation, impact }: RecommendationCardProps)
               {recommendation.target_company}
             </span>
           )}
-          {recommendation.target_specialization && (
-            <span className="badge badge-neutral">
-              <GraduationCap size={10} />
-              {recommendation.target_specialization}
+          {recommendation.recommendation_payload?.recommended_skills?.slice(0, 3).map((skill) => (
+            <span key={skill} className="badge badge-neutral">
+              {skill}
             </span>
-          )}
+          ))}
         </div>
       )}
     </article>

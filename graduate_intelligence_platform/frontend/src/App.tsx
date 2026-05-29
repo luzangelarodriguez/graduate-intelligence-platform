@@ -23,17 +23,21 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/microcurriculum-demo" element={<MicrocurriculumDemoPage />} />
           <Route path="/observatorio-institucional" element={<MicrocurriculumDemoPage />} />
+          {/* Observatory routes - public access */}
+          <Route element={<AppLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="/oferta-academica" element={<OfertaAcademicaPage />} />
+            <Route path="/mercado-laboral" element={<MercadoLaboralPage />} />
+            <Route path="/brechas-curriculares" element={<BrechasCurricularesPage />} />
+            <Route path="/recomendaciones" element={<RecomendacionesPage />} />
+            <Route path="/configuracion" element={<ConfiguracionPage />} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+          </Route>
+          {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="/oferta-academica" element={<OfertaAcademicaPage />} />
-              <Route path="/mercado-laboral" element={<MercadoLaboralPage />} />
-              <Route path="/brechas-curriculares" element={<BrechasCurricularesPage />} />
-              <Route path="/recomendaciones" element={<RecomendacionesPage />} />
-              <Route path="/configuracion" element={<ConfiguracionPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
               <Route path="/registro" element={<AlumniOnboardingPage />} />
-              <Route path="/dashboard" element={<Navigate to="/" replace />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

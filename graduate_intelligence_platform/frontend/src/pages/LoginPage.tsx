@@ -5,14 +5,11 @@ import { GraduationCap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
-  const { isAuthenticated, login, register } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('admin@demo.local');
-  const [password, setPassword] = useState('Admin12345');
-  const [fullName, setFullName] = useState('Administrador Plataforma');
-  const [role, setRole] = useState<'admin' | 'universidad' | 'egresado' | 'mentor'>('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,11 +24,7 @@ export function LoginPage() {
     setError(null);
     setIsSubmitting(true);
     try {
-      if (mode === 'login') {
-        await login({ email, password });
-      } else {
-        await register({ email, password, full_name: fullName, role });
-      }
+      await login({ email, password });
       navigate(from, { replace: true });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No fue posible autenticar la sesion.');
@@ -54,53 +47,9 @@ export function LoginPage() {
 
         {/* Login Card */}
         <div className="exec-card p-6">
-          {/* Auth Tabs */}
-          <div className="tabs mb-6">
-            <button
-              type="button"
-              className={`tab ${mode === 'login' ? 'active' : ''}`}
-              onClick={() => setMode('login')}
-            >
-              Iniciar Sesion
-            </button>
-            <button
-              type="button"
-              className={`tab ${mode === 'register' ? 'active' : ''}`}
-              onClick={() => setMode('register')}
-            >
-              Registro
-            </button>
-          </div>
+          <h2 className="text-lg font-semibold text-ink mb-4 text-center">Iniciar Sesion</h2>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            {mode === 'register' && (
-              <>
-                <div className="form-group">
-                  <label className="form-label">Nombre completo</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={fullName}
-                    onChange={(event) => setFullName(event.target.value)}
-                    placeholder="Tu nombre completo"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Rol</label>
-                  <select
-                    className="form-select"
-                    value={role}
-                    onChange={(event) => setRole(event.target.value as typeof role)}
-                  >
-                    <option value="admin">Administrador</option>
-                    <option value="universidad">Universidad</option>
-                    <option value="egresado">Egresado</option>
-                    <option value="mentor">Mentor</option>
-                  </select>
-                </div>
-              </>
-            )}
-
             <div className="form-group">
               <label className="form-label">Email</label>
               <input
@@ -109,6 +58,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="tu@email.com"
+                required
               />
             </div>
 
@@ -120,6 +70,8 @@ export function LoginPage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="********"
+                required
+                minLength={8}
               />
             </div>
 
@@ -134,11 +86,7 @@ export function LoginPage() {
               className="btn btn-primary w-full"
               disabled={isSubmitting}
             >
-              {isSubmitting
-                ? 'Validando...'
-                : mode === 'login'
-                ? 'Iniciar Sesion'
-                : 'Crear Cuenta'}
+              {isSubmitting ? 'Validando...' : 'Iniciar Sesion'}
             </button>
           </form>
         </div>

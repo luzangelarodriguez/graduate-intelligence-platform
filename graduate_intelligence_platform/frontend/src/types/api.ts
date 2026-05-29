@@ -344,13 +344,26 @@ export interface CurriculumGap {
 export interface ObservatoryRecommendation {
   recommendation_id?: string;
   recommendation_type: string;
-  title: string;
-  description: string;
+  target_role?: string;
   target_company?: string;
+  recommendation_payload?: {
+    target_role?: string;
+    why_missing?: string[];
+    why_recommended?: string[];
+    recommended_skills?: string[];
+    market_alignment_score?: number;
+  };
+  recommendation_reasoning?: string;
+  recommendation_confidence?: string;
+  recommendation_evidence?: Record<string, unknown>;
+  metric_period?: string;
+  generated_at?: string;
+  // Legacy fields for backwards compatibility
+  title?: string;
+  description?: string;
   target_specialization?: string;
   impact_level?: string;
   confidence?: number;
-  created_at?: string;
 }
 
 export interface CompanyIntelligence {
