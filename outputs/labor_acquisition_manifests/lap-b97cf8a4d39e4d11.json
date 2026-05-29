@@ -1,0 +1,36 @@
+{
+  "correlation_id": "lap-b97cf8a4d39e4d11",
+  "sources": [
+    "unit"
+  ],
+  "execute_network": false,
+  "max_jobs": 1,
+  "max_pages": 1,
+  "persist": false,
+  "quality_review": true,
+  "started_at": 1780061250.848037,
+  "checkpoints": {
+    "source:unit": {
+      "results": 1,
+      "errors": 0,
+      "circuit": {
+        "source_name": "unit",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 49,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 49,
+      "warehouse_verification": {},
+      "analytics_reports": {}
+    }
+  },
+  "finished_at": 1780061253.620298,
+  "cancelled": false
+}

@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.auth import auth_router
 from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, SearchResponse
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api import services
@@ -55,6 +56,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router, prefix="/auth")
+app.include_router(auth_router, prefix="/api/auth", include_in_schema=False)
 
 
 @app.get("/", tags=["system"])
