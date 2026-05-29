@@ -49,6 +49,10 @@ class ProgramSkill(BaseModel):
     conteo: int = 0
 
 
+class Skill(ProgramSkill):
+    pass
+
+
 class Program(BaseModel):
     especializacion_id: int
     nombre_especializacion: str
@@ -62,7 +66,58 @@ class Program(BaseModel):
     max_match_mercado: float = 0.0
     total_empleos_relacionados: int = 0
     skills_cubiertas: int = 0
-    skills: list[ProgramSkill] = Field(default_factory=list)
+    skills: list[Skill] = Field(default_factory=list)
+
+
+class Match(BaseModel):
+    especializacion_id: int | None = None
+    empleo_id: str
+    titulo_empleo: str
+    total_skills_empleo: int = 0
+    total_skills_especializacion: int = 0
+    skills_en_comun: int = 0
+    porcentaje_match: float = 0.0
+
+
+class RecommendationProgram(BaseModel):
+    nombre: str
+    match: float
+    reason: str
+
+
+class ProgramDashboardKpis(BaseModel):
+    alignment_score: float = 0.0
+    missing_critical_skills: int = 0
+    high_demand_roles: int = 0
+    employability_trend: float = 0.0
+    digital_coverage: float = 0.0
+    curricular_update_signal: str = ""
+
+
+class ProgramDashboardStatus(BaseModel):
+    curricular_status: str = ""
+    curricular_status_detail: str = ""
+    ai_signal: str = ""
+    trend_label: str = ""
+
+
+class ProgramDashboardInsights(BaseModel):
+    detected: str = ""
+    ai_recommends: list[str] = Field(default_factory=list)
+    emerging_gap: str = ""
+    critical_signal: str = ""
+
+
+class ProgramDashboardResponse(BaseModel):
+    program_id: int
+    program: Program
+    kpis: ProgramDashboardKpis
+    status: ProgramDashboardStatus
+    missing_skills: list[Skill] = Field(default_factory=list)
+    matches: list[Match] = Field(default_factory=list)
+    recommendations: list[RecommendationProgram] = Field(default_factory=list)
+    insights: ProgramDashboardInsights
+    source: str
 
 
 class ProgramPageResponse(BaseModel):

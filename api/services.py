@@ -5,8 +5,10 @@ from datetime import UTC, datetime
 from typing import Any
 
 from backend.repositories import microcurriculum_context_repository, programas_repository
+from backend.repositories import matches_repository, skills_repository
 from backend.services import dashboard_service
-from backend.services.normalization_service import normalize_program_row
+from backend.services import recommendation_service
+from backend.services.normalization_service import basic_text_key, normalize_program_row
 
 from api.database import fetch_all, fetch_one, relation_exists, relation_has_rows, startup_validate, table_row_count
 from intelligence.semantic_search_engine import semantic_search
@@ -27,6 +29,12 @@ OBSERVATORY_TABLES = (
     "company_observatory",
     "emerging_technology_observatory",
 )
+AREA_KEYWORDS_BY_KEY = {
+    "datos": ("datos", "data", "analytics", "analitica", "bi", "business intelligence"),
+    "tecnologia": ("software", "tecnologia", "cloud", "devops", "arquitectura", "sistemas"),
+    "negocios": ("negocio", "gerencia", "marketing", "ventas", "finanzas", "gestion"),
+    "operaciones": ("operaciones", "proyectos", "procesos", "calidad", "riesgo", "cumplimiento"),
+}
 
 
 def _bounded(value: int, *, default: int = DEFAULT_LIMIT) -> int:
@@ -583,3 +591,101 @@ def get_programa_compatibility(program_id: int) -> dict[str, Any]:
             }
         )
     return normalized
+
+
+def get_program_dashboard_compatibility(program_id: int) -> dict[str, Any]:
+    current_programs = dashboard_service.list_programs_base(db_name=None)
+    selected = get_programa_compatibility(program_id)
+    relation = matches_repository.match_relation_name(db_name=None)
+    resolved_id = int(selected.get("especializacion_id") or programas_repository.resolve_program_id(program_id, db_name=None))
+    matches = (
+        matches_repository.fetch_match_rows_for_program(relation, resolved_id, limit=25, db_name=None)
+        if relation
+        else []
+    )
+    missing_skills = (
+        skills_repository.fetch_missing_market_skill_rows_for_program(relation, resolved_id, 22, db_name=None)
+        if relation
+        else []
+    )
+    recommendations = recommendation_service.recommended_program_cards(
+        current_programs,
+        selected,
+        "",
+        [],
+        [],
+        [],
+        "",
+        area_keywords_by_key=AREA_KEYWORDS_BY_KEY,
+        get_program_skill_rows=lambda current_id: programas_repository.fetch_program_skill_rows(current_id, db_name=None),
+        skill_identity_key=basic_text_key,
+        program_role_candidates=lambda program, limit=4: [
+            value
+            for value in [
+                str(program.get("rol", "") or "").strip(),
+                str(program.get("nombre_especializacion", "") or "").strip(),
+            ]
+            if value
+        ][:limit],
+        limit=5,
+    )
+    payload = dashboard_service.program_context_dashboard(
+        selected,
+        matches=matches,
+        missing_skills=missing_skills,
+        recommendations=recommendations,
+    )
+    micro_context = selected.get("microcurriculum_context")
+    if micro_context:
+        real_gaps = micro_context.get("real_market_gaps") or []
+        strengthening = micro_context.get("strengthening_areas") or []
+        scores = micro_context.get("scores") or {}
+        labor_roles = micro_context.get("labor_roles") or []
+        payload["microcurriculum_context"] = micro_context
+        payload["missing_skills"] = [
+            {"skill_id": index + 1, "nombre": item.get("name"), "conteo": 1, "priority": item.get("priority")}
+            for index, item in enumerate(real_gaps)
+        ]
+        payload["matches"] = [
+            {
+                "empleo_id": f"context-role-{index + 1}",
+                "titulo_empleo": role,
+                "total_skills_empleo": len(micro_context.get("technologies") or []),
+                "total_skills_especializacion": len(micro_context.get("technologies") or []),
+                "skills_en_comun": max(1, len(micro_context.get("technologies") or []) - len(real_gaps)),
+                "porcentaje_match": scores.get("market_skill_coverage") or 0,
+                "source": "microcurriculum_context",
+            }
+            for index, role in enumerate(labor_roles)
+        ]
+        payload["kpis"].update(
+            {
+                "alignment_score": scores.get("market_skill_coverage") or payload["kpis"].get("alignment_score", 0),
+                "missing_critical_skills": len(real_gaps),
+                "high_demand_roles": len(labor_roles),
+                "employability_trend": scores.get("curricular_relevance") or payload["kpis"].get("employability_trend", 0),
+                "digital_coverage": scores.get("market_skill_coverage") or payload["kpis"].get("digital_coverage", 0),
+                "curricular_update_signal": "Alta" if len(real_gaps) >= 6 else "Media" if strengthening else "Baja",
+            }
+        )
+        payload["status"].update(
+            {
+                "curricular_status": "Contextualizado",
+                "curricular_status_detail": f"Análisis basado en {micro_context.get('documents_processed')} microcurrículos reales del programa.",
+                "ai_signal": micro_context.get("executive_narrative") or payload["status"].get("ai_signal", ""),
+                "trend_label": "Tendencia contextual de Visual Analytics y Big Data",
+            }
+        )
+        payload["insights"].update(
+            {
+                "detected": micro_context.get("executive_narrative") or payload["insights"].get("detected", ""),
+                "ai_recommends": [
+                    f"Fortalecer {item.get('name')} con mayor profundidad aplicada."
+                    for item in real_gaps[:5]
+                ],
+                "emerging_gap": real_gaps[0].get("name") if real_gaps else "Sin brechas críticas detectadas",
+                "critical_signal": "Microcurrículo real indexado",
+            }
+        )
+    payload["source"] = relation or "empleo_skills"
+    return payload

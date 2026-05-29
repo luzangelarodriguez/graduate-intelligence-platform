@@ -9,7 +9,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth import auth_router
-from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, Program, ProgramPageResponse, SearchResponse
+from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, Program, ProgramDashboardResponse, ProgramPageResponse, SearchResponse
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api import services
 
@@ -113,6 +113,16 @@ def programas(
 def programa(program_id: int) -> dict[str, Any]:
     try:
         return services.get_programa_compatibility(program_id)
+    except KeyError as exc:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/api/dashboard/programa/{program_id}", response_model=ProgramDashboardResponse, tags=["dashboard"])
+def dashboard_programa(program_id: int) -> dict[str, Any]:
+    try:
+        return services.get_program_dashboard_compatibility(program_id)
     except KeyError as exc:
         from fastapi import HTTPException
 
