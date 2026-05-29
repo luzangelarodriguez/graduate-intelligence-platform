@@ -249,7 +249,7 @@ export function BrechasCurricularesPage() {
           {gaps.length > 0 ? (
             <DataTable
               data={gaps}
-              keyExtractor={(g, i) => `${g.specialization}-${g.gap_skill}-${i}`}
+              keyExtractor={(g) => `${g.specialization}-${g.gap_skill}-${gaps.indexOf(g)}`}
               emptyMessage="No hay brechas que mostrar"
               columns={[
                 {

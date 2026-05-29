@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { GraduationCap } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -40,67 +41,113 @@ export function LoginPage() {
   }
 
   return (
-    <main className="login-shell">
-      <section className="login-panel">
-        <div className="login-copy">
-          <div className="brand-lockup">
-            <span>gi</span>
-            <div>
-              <strong>Graduate Intelligence</strong>
-              <small>Powered for UNIR Colombia</small>
-            </div>
+    <main className="min-h-screen bg-canvas flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        {/* Brand Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-accent mb-4">
+            <GraduationCap size={32} className="text-white" />
           </div>
-          <h1>Plataforma de inteligencia curricular y empleabilidad</h1>
-          <p>
-            Centraliza analítica académica, matching profesional y recomendaciones inteligentes para fortalecer el
-            impacto de los egresados.
-          </p>
+          <h1 className="text-2xl font-bold text-ink">Graduate Intelligence</h1>
+          <p className="text-sm text-muted mt-1">Observatorio Curricular UNIR Colombia</p>
         </div>
 
-        <form className="login-card" onSubmit={onSubmit}>
-          <div className="auth-tabs">
-            <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>
-              Login
+        {/* Login Card */}
+        <div className="exec-card p-6">
+          {/* Auth Tabs */}
+          <div className="tabs mb-6">
+            <button
+              type="button"
+              className={`tab ${mode === 'login' ? 'active' : ''}`}
+              onClick={() => setMode('login')}
+            >
+              Iniciar Sesion
             </button>
-            <button type="button" className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>
+            <button
+              type="button"
+              className={`tab ${mode === 'register' ? 'active' : ''}`}
+              onClick={() => setMode('register')}
+            >
               Registro
             </button>
           </div>
 
-          {mode === 'register' && (
-            <>
-              <label className="field">
-                <span>Nombre completo</span>
-                <input value={fullName} onChange={(event) => setFullName(event.target.value)} />
-              </label>
-              <label className="field">
-                <span>Rol</span>
-                <select value={role} onChange={(event) => setRole(event.target.value as typeof role)}>
-                  <option value="admin">admin</option>
-                  <option value="universidad">universidad</option>
-                  <option value="egresado">egresado</option>
-                  <option value="mentor">mentor</option>
-                </select>
-              </label>
-            </>
-          )}
+          <form onSubmit={onSubmit} className="space-y-4">
+            {mode === 'register' && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Nombre completo</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Rol</label>
+                  <select
+                    className="form-select"
+                    value={role}
+                    onChange={(event) => setRole(event.target.value as typeof role)}
+                  >
+                    <option value="admin">Administrador</option>
+                    <option value="universidad">Universidad</option>
+                    <option value="egresado">Egresado</option>
+                    <option value="mentor">Mentor</option>
+                  </select>
+                </div>
+              </>
+            )}
 
-          <label className="field">
-            <span>Email</span>
-            <input value={email} onChange={(event) => setEmail(event.target.value)} />
-          </label>
-          <label className="field">
-            <span>Password</span>
-            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-          </label>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-input"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="tu@email.com"
+              />
+            </div>
 
-          {error && <div className="notice error">{error}</div>}
+            <div className="form-group">
+              <label className="form-label">Contrasena</label>
+              <input
+                type="password"
+                className="form-input"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="********"
+              />
+            </div>
 
-          <button className="btn-primary" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Validando...' : mode === 'login' ? 'Entrar' : 'Crear usuario'}
-          </button>
-        </form>
-      </section>
+            {error && (
+              <div className="p-3 rounded border border-red-200 bg-red-50 text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? 'Validando...'
+                : mode === 'login'
+                ? 'Iniciar Sesion'
+                : 'Crear Cuenta'}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-muted mt-6">
+          Plataforma de inteligencia curricular y empleabilidad
+        </p>
+      </div>
     </main>
   );
 }

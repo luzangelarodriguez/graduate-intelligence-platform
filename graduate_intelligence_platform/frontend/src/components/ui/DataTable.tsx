@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 interface DataTableColumn<T> {
   key: string;
   header: string;
-  render?: (item: T) => ReactNode;
+  render: (item: T) => ReactNode;
   align?: 'left' | 'center' | 'right';
   width?: string;
 }
@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   emptyMessage?: string;
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   data,
   columns,
   keyExtractor,
@@ -58,9 +58,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   key={col.key}
                   style={{ textAlign: col.align || 'left' }}
                 >
-                  {col.render
-                    ? col.render(item)
-                    : String(item[col.key] ?? '-')}
+                  {col.render(item)}
                 </td>
               ))}
             </tr>

@@ -184,7 +184,7 @@ export function MercadoLaboralPage() {
             </div>
             <DataTable
               data={emergingSkills}
-              keyExtractor={(s, i) => `${s.skill_name}-${i}`}
+              keyExtractor={(s) => `${s.skill_name}-${emergingSkills.indexOf(s)}`}
               emptyMessage="Sin skills registradas"
               columns={[
                 {
@@ -240,7 +240,7 @@ export function MercadoLaboralPage() {
           {companies.length > 0 ? (
             <DataTable
               data={companies}
-              keyExtractor={(c, i) => `${c.company_name}-${i}`}
+              keyExtractor={(c) => `${c.company_name}-${companies.indexOf(c)}`}
               emptyMessage="Sin empresas registradas"
               columns={[
                 {
@@ -316,7 +316,7 @@ export function MercadoLaboralPage() {
           {roles.length > 0 ? (
             <DataTable
               data={roles}
-              keyExtractor={(r, i) => `${r.role_name}-${i}`}
+              keyExtractor={(r) => `${r.role_name}-${roles.indexOf(r)}`}
               emptyMessage="Sin roles registrados"
               columns={[
                 {
