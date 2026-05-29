@@ -20,12 +20,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Pytest
         run: python -m pytest tests
 
       - name: Py compile
-        run: python -m py_compile api/*.py intelligence/*.py
+        run: |
+          python -m py_compile api/*.py
+          python -m py_compile intelligence/*.py
 
   docker-build:
     runs-on: ubuntu-latest
@@ -35,4 +38,3 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t labor-observatory .
-
