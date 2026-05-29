@@ -6,12 +6,23 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+class HealthChecks(BaseModel):
+    database: bool = False
+    labor_core: bool = False
+    curriculum_core: bool = False
+    ml_core: bool = False
+    observatory: bool = False
+    labor_core_tables: dict[str, bool] = Field(default_factory=dict)
+    curriculum_core_tables: dict[str, bool] = Field(default_factory=dict)
+    ml_core_tables: dict[str, bool] = Field(default_factory=dict)
+
+
 class HealthResponse(BaseModel):
     status: str
     database: str
     timestamp: datetime
     layers: dict[str, bool] = Field(default_factory=dict)
-    checks: dict[str, bool] = Field(default_factory=dict)
+    checks: HealthChecks = Field(default_factory=HealthChecks)
     observatory_status: dict[str, Any] = Field(default_factory=dict)
     observatory_freshness: dict[str, Any] = Field(default_factory=dict)
 
