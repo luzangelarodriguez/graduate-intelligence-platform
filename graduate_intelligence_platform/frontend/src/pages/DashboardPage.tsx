@@ -186,10 +186,13 @@ export function DashboardPage() {
           {companies.length > 0 ? (
             <div className="company-grid">
               {companies.slice(0, 9).map((company, index) => (
-                <div key={`${company.company_name}-${index}`} className="company-card">
-                  <p className="company-card-name truncate">{company.company_name}</p>
+                <div key={`${company.company}-${index}`} className="company-card">
+                  <p className="company-card-name truncate">{company.company}</p>
                   <p className="company-card-metric">
-                    {company.job_count} {company.job_count === 1 ? 'vacante' : 'vacantes'}
+                    {company.dominant_cluster}
+                  </p>
+                  <p className="company-card-metric text-xs">
+                    Contratacion: {(parseFloat(company.hiring_velocity) * 100).toFixed(0)}%
                   </p>
                 </div>
               ))}

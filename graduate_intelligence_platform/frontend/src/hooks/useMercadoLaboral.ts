@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
+  getCareerPaths,
   getCompanyIntelligence,
   getEmergingSkills,
-  getSemanticRoles,
 } from '../services/api';
 import type {
+  CareerPath,
   CompanyIntelligence,
   EmergingSkill,
-  SemanticRole,
 } from '../types/api';
 
 interface UseMercadoLaboralResult {
   emergingSkills: EmergingSkill[];
   companies: CompanyIntelligence[];
-  roles: SemanticRole[];
+  careerPaths: CareerPath[];
   isLoading: boolean;
   error: string | null;
   refresh: () => void;
@@ -23,7 +23,7 @@ interface UseMercadoLaboralResult {
 export function useMercadoLaboral(): UseMercadoLaboralResult {
   const [emergingSkills, setEmergingSkills] = useState<EmergingSkill[]>([]);
   const [companies, setCompanies] = useState<CompanyIntelligence[]>([]);
-  const [roles, setRoles] = useState<SemanticRole[]>([]);
+  const [careerPaths, setCareerPaths] = useState<CareerPath[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,10 +32,10 @@ export function useMercadoLaboral(): UseMercadoLaboralResult {
     setError(null);
 
     try {
-      const [skillsRes, companiesRes, rolesRes] = await Promise.allSettled([
+      const [skillsRes, companiesRes, careerRes] = await Promise.allSettled([
         getEmergingSkills({ limit: 50 }),
         getCompanyIntelligence({ limit: 50 }),
-        getSemanticRoles({ limit: 50 }),
+        getCareerPaths({ limit: 50 }),
       ]);
 
       if (skillsRes.status === 'fulfilled') {
@@ -44,11 +44,11 @@ export function useMercadoLaboral(): UseMercadoLaboralResult {
       if (companiesRes.status === 'fulfilled') {
         setCompanies(companiesRes.value.items);
       }
-      if (rolesRes.status === 'fulfilled') {
-        setRoles(rolesRes.value.items);
+      if (careerRes.status === 'fulfilled') {
+        setCareerPaths(careerRes.value.items);
       }
 
-      const allFailed = [skillsRes, companiesRes, rolesRes].every(
+      const allFailed = [skillsRes, companiesRes, careerRes].every(
         (r) => r.status === 'rejected'
       );
       if (allFailed) {
@@ -69,7 +69,7 @@ export function useMercadoLaboral(): UseMercadoLaboralResult {
   return {
     emergingSkills,
     companies,
-    roles,
+    careerPaths,
     isLoading,
     error,
     refresh: fetchData,

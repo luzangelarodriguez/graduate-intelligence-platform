@@ -367,12 +367,21 @@ export interface ObservatoryRecommendation {
 }
 
 export interface CompanyIntelligence {
-  company_name: string;
-  job_count: number;
-  top_skills?: string[];
-  avg_salary_range?: string;
-  hiring_trend?: string;
-  industry?: string;
+  company: string;
+  dominant_stack: string;
+  dominant_cluster: string;
+  hiring_velocity: string;
+  ai_adoption_score: string;
+  cloud_maturity_score: string;
+  bi_maturity_score: string;
+  technology_maturity: string;
+  top_skills: string[];
+  top_clusters: string[];
+  evidence?: {
+    metric_period?: string;
+    dominant_skills?: string[];
+    dominant_clusters?: string[];
+  };
 }
 
 export interface SemanticRole {
@@ -384,11 +393,11 @@ export interface SemanticRole {
 }
 
 export interface CareerPath {
-  path_name: string;
-  entry_role: string;
+  source_role: string;
   target_role: string;
-  required_skills?: string[];
-  time_estimate?: string;
+  role_progression_probability: string;
+  transition_skill_gaps: string[];
+  recommended_next_skills: string[];
 }
 
 export interface MarketForecast {
