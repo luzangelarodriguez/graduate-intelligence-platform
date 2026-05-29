@@ -10,7 +10,9 @@ class HealthResponse(BaseModel):
     status: str
     database: str
     timestamp: datetime
+    layers: dict[str, bool] = Field(default_factory=dict)
     checks: dict[str, bool] = Field(default_factory=dict)
+    observatory_status: dict[str, Any] = Field(default_factory=dict)
     observatory_freshness: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -29,3 +31,9 @@ class SearchResponse(BaseModel):
     limit: int
     items: list[dict[str, Any]] = Field(default_factory=list)
 
+
+class ObservatoryStatusResponse(BaseModel):
+    observatory_tables: dict[str, bool] = Field(default_factory=dict)
+    missing_tables: list[str] = Field(default_factory=list)
+    completion_percentage: float = 0.0
+    status: str = "partial_observatory"

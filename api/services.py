@@ -12,6 +12,18 @@ from ml.labor.market_skill_intelligence_engine import build_market_skill_intelli
 DEFAULT_LIMIT = 20
 MAX_LIMIT = 100
 
+LABOR_CORE_TABLES = ("empleos", "canonical_jobs", "silver_normalized_jobs", "gold_validated_jobs")
+CURRICULUM_CORE_TABLES = ("especializaciones", "skills", "labor_program_skill_matches")
+ML_CORE_TABLES = ("ml_predictions", "ml_program_job_matches", "ml_training_examples")
+OBSERVATORY_TABLES = (
+    "observatory_metrics",
+    "curriculum_gap_observatory",
+    "recommendation_observatory",
+    "semantic_role_graph",
+    "company_observatory",
+    "emerging_technology_observatory",
+)
+
 
 def _bounded(value: int, *, default: int = DEFAULT_LIMIT) -> int:
     try:
@@ -65,54 +77,118 @@ def _column_exists(table: str, column: str) -> bool:
 
 
 def _latest_timestamp(table: str) -> str | None:
-    candidates = [column for column in ("generated_at", "updated_at", "created_at") if _column_exists(table, column)]
-    for column in candidates:
-        row = fetch_one(f"SELECT MAX({column}) AS latest FROM {table}")
-        value = row.get("latest") if row else None
-        if value:
-            return value.isoformat() if hasattr(value, "isoformat") else str(value)
+    try:
+        candidates = [column for column in ("generated_at", "updated_at", "created_at") if _column_exists(table, column)]
+        for column in candidates:
+            row = fetch_one(f"SELECT MAX({column}) AS latest FROM {table}")
+            value = row.get("latest") if row else None
+            if value:
+                return value.isoformat() if hasattr(value, "isoformat") else str(value)
+    except Exception:
+        return None
     return None
 
 
-def get_health_snapshot() -> dict[str, Any]:
-    required_relations = (
-        "jobs",
-        "observatory_metrics",
-        "curriculum_gap_observatory",
-        "recommendation_observatory",
-        "semantic_role_graph",
-        "company_observatory",
-        "emerging_technology_observatory",
-    )
-    checks = {
-        "database": False,
-        "jobs_table": relation_exists("jobs"),
-        "observatory_metrics": relation_exists("observatory_metrics") and relation_has_rows("observatory_metrics"),
-        "curriculum_gap_observatory": relation_exists("curriculum_gap_observatory"),
-        "recommendation_observatory": relation_exists("recommendation_observatory"),
-        "semantic_role_graph": relation_exists("semantic_role_graph"),
-        "company_observatory": relation_exists("company_observatory"),
-        "emerging_technology_observatory": relation_exists("emerging_technology_observatory"),
-    }
-    validation = startup_validate(required_relations=required_relations)
-    checks["database"] = bool(validation.get("database"))
+def _database_connected() -> bool:
+    try:
+        row = fetch_one("SELECT 1 AS ok")
+        return bool(row and row.get("ok"))
+    except Exception:
+        return False
+
+
+def _tables_present(table_names: tuple[str, ...]) -> bool:
+    try:
+        return all(relation_exists(name) for name in table_names)
+    except Exception:
+        return False
+
+
+def _observatory_status_payload() -> dict[str, Any]:
+    observatory_tables = {}
+    for table in OBSERVATORY_TABLES:
+        try:
+            observatory_tables[table] = relation_exists(table)
+        except Exception:
+            observatory_tables[table] = False
+    missing_tables = [table for table, exists in observatory_tables.items() if not exists]
+    completion_percentage = round((len(OBSERVATORY_TABLES) - len(missing_tables)) / max(len(OBSERVATORY_TABLES), 1), 4)
+    status = "observatory_ready" if not missing_tables else "partial_observatory"
     observatory_freshness = {
         table: {
             "rows": table_row_count(table),
             "latest": _latest_timestamp(table),
         }
-        for table in required_relations
-        if relation_exists(table)
+        for table, exists in observatory_tables.items()
+        if exists
     }
-    status = "ok" if checks["database"] and checks["jobs_table"] else "degraded"
-    if not checks["observatory_metrics"]:
-        status = "degraded"
     return {
         "status": status,
-        "database": "connected" if checks["database"] else "unavailable",
-        "timestamp": datetime.now(UTC),
-        "checks": checks,
+        "observatory_tables": observatory_tables,
+        "missing_tables": missing_tables,
+        "completion_percentage": completion_percentage,
         "observatory_freshness": observatory_freshness,
+    }
+
+
+def get_health_snapshot() -> dict[str, Any]:
+    database_ok = _database_connected()
+    labor_core_ok = _tables_present(LABOR_CORE_TABLES)
+    curriculum_core_ok = _tables_present(CURRICULUM_CORE_TABLES)
+    ml_core_ok = _tables_present(ML_CORE_TABLES)
+    observatory_status = _observatory_status_payload()
+    observatory_ready = observatory_status["completion_percentage"] >= 1.0
+    status = "unhealthy"
+    if database_ok:
+        if labor_core_ok and curriculum_core_ok and ml_core_ok:
+            status = "observatory_ready" if observatory_ready else "healthy"
+        else:
+            status = "degraded"
+    return {
+        "status": status,
+        "database": "connected" if database_ok else "unavailable",
+        "timestamp": datetime.now(UTC),
+        "layers": {
+            "database": database_ok,
+            "labor_core": labor_core_ok,
+            "curriculum_core": curriculum_core_ok,
+            "ml_core": ml_core_ok,
+            "observatory": observatory_ready,
+        },
+        "checks": {
+            "database": database_ok,
+            "labor_core": labor_core_ok,
+            "curriculum_core": curriculum_core_ok,
+            "ml_core": ml_core_ok,
+            "observatory": observatory_ready,
+            "labor_core_tables": {table: relation_exists(table) for table in LABOR_CORE_TABLES},
+            "curriculum_core_tables": {table: relation_exists(table) for table in CURRICULUM_CORE_TABLES},
+            "ml_core_tables": {table: relation_exists(table) for table in ML_CORE_TABLES},
+        },
+        "observatory_status": observatory_status,
+        "observatory_freshness": observatory_status["observatory_freshness"],
+    }
+
+
+def get_readiness_snapshot() -> dict[str, Any]:
+    snapshot = get_health_snapshot()
+    ready = bool(
+        snapshot["layers"]["database"]
+        and snapshot["layers"]["labor_core"]
+        and snapshot["layers"]["curriculum_core"]
+        and snapshot["layers"]["ml_core"]
+    )
+    snapshot["status"] = "ready" if ready else "degraded"
+    return snapshot
+
+
+def get_observatory_status() -> dict[str, Any]:
+    observatory_status = _observatory_status_payload()
+    return {
+        "status": observatory_status["status"],
+        "observatory_tables": observatory_status["observatory_tables"],
+        "missing_tables": observatory_status["missing_tables"],
+        "completion_percentage": observatory_status["completion_percentage"],
     }
 
 
