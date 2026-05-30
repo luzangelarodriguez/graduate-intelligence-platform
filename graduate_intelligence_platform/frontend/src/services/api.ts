@@ -277,3 +277,15 @@ export async function getMarketForecast(params?: { limit?: number; offset?: numb
   const { data } = await apiClient.get<PaginatedObservatoryResponse<MarketForecast>>('/market-forecast', { params });
   return data;
 }
+
+// Wrapper for programs that returns PaginatedObservatoryResponse format
+export async function getPrograms(params?: { limit?: number; offset?: number }) {
+  const limit = params?.limit || 100;
+  const result = await getProgramas(limit);
+  return {
+    items: result.items,
+    count: result.count,
+    limit,
+    offset: params?.offset || 0,
+  } as PaginatedObservatoryResponse<Program>;
+}
