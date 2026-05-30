@@ -268,3 +268,23 @@
 {"ts": 1780065775.4293954, "correlation_id": "lap-7970c021cda54fa1", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
 {"ts": 1780065775.4570227, "correlation_id": "lap-7970c021cda54fa1", "event": "deduplication_completed", "before": 1, "after": 1}
 {"ts": 1780065780.867801, "correlation_id": "lap-7970c021cda54fa1", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}
+{"ts": 1780068470.511023, "correlation_id": "lap-0ab596ec15ed4c8a", "event": "labor_acquisition_started", "sources": ["unit"], "execute_network": false, "workers": 1, "resume_from": ""}
+{"ts": 1780068470.52734, "correlation_id": "lap-0ab596ec15ed4c8a", "event": "source_started", "source": "unit"}
+{"ts": 1780068470.5416024, "correlation_id": "lap-0ab596ec15ed4c8a", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
+{"ts": 1780068470.5795064, "correlation_id": "lap-0ab596ec15ed4c8a", "event": "deduplication_completed", "before": 1, "after": 1}
+{"ts": 1780068476.4648979, "correlation_id": "lap-0ab596ec15ed4c8a", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}
+{"ts": 1780072276.3927748, "correlation_id": "lap-7a250fbb785c45d1", "event": "labor_acquisition_started", "sources": ["unit"], "execute_network": false, "workers": 1, "resume_from": ""}
+{"ts": 1780072276.4019322, "correlation_id": "lap-7a250fbb785c45d1", "event": "source_started", "source": "unit"}
+{"ts": 1780072276.4124272, "correlation_id": "lap-7a250fbb785c45d1", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
+{"ts": 1780072276.435586, "correlation_id": "lap-7a250fbb785c45d1", "event": "deduplication_completed", "before": 1, "after": 1}
+{"ts": 1780072279.213926, "correlation_id": "lap-7a250fbb785c45d1", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}
+{"ts": 1780074573.0563648, "correlation_id": "lap-995a793384fa412d", "event": "labor_acquisition_started", "sources": ["unit"], "execute_network": false, "workers": 1, "resume_from": ""}
+{"ts": 1780074573.0666373, "correlation_id": "lap-995a793384fa412d", "event": "source_started", "source": "unit"}
+{"ts": 1780074573.0768306, "correlation_id": "lap-995a793384fa412d", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
+{"ts": 1780074573.1050074, "correlation_id": "lap-995a793384fa412d", "event": "deduplication_completed", "before": 1, "after": 1}
+{"ts": 1780074575.99148, "correlation_id": "lap-995a793384fa412d", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}
+{"ts": 1780154437.1584008, "correlation_id": "lap-0f9971d0018b44c2", "event": "labor_acquisition_started", "sources": ["unit"], "execute_network": false, "workers": 1, "resume_from": ""}
+{"ts": 1780154437.1683774, "correlation_id": "lap-0f9971d0018b44c2", "event": "source_started", "source": "unit"}
+{"ts": 1780154437.1776588, "correlation_id": "lap-0f9971d0018b44c2", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
+{"ts": 1780154437.2056944, "correlation_id": "lap-0f9971d0018b44c2", "event": "deduplication_completed", "before": 1, "after": 1}
+{"ts": 1780154449.6935985, "correlation_id": "lap-0f9971d0018b44c2", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}

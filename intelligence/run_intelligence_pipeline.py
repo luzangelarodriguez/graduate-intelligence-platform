@@ -18,7 +18,7 @@ from intelligence.career_path_engine import build_career_paths  # noqa: E402
 from intelligence.company_intelligence_engine import build_company_profiles  # noqa: E402
 from intelligence.company_resolution_engine import resolve_company  # noqa: E402
 from intelligence.observatory_pipeline import run_observatory_layer  # noqa: E402
-from intelligence.market_forecasting_engine import forecast_skills  # noqa: E402
+from intelligence.predictive_intelligence_engine import build_executive_metrics, build_market_demand_forecasts, persist_executive_metrics  # noqa: E402
 from intelligence.recommendation_intelligence_engine import build_recommendations  # noqa: E402
 from intelligence.semantic_role_intelligence import build_role_intelligence, occupational_edges  # noqa: E402
 from intelligence.semantic_search_engine import semantic_search  # noqa: E402
@@ -29,6 +29,7 @@ MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "017_labor_intelligence_qa_feedback.sql",
     ROOT_DIR / "database" / "migrations" / "018_labor_curriculum_intelligence.sql",
     ROOT_DIR / "database" / "migrations" / "019_labor_observatory_layer.sql",
+    ROOT_DIR / "database" / "migrations" / "020_predictive_intelligence_layer.sql",
 ]
 ANALYTICS_DIR = ROOT_DIR / "outputs" / "analytics"
 
@@ -224,32 +225,76 @@ def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
                     """,
                     transition_rows,
                 )
-            forecast_rows = [
-                (
-                    item.entity_type,
-                    item.entity_name,
-                    item.growth_velocity,
-                    item.forecast_confidence,
-                    item.market_phase,
-                    Json(item.evidence),
-                )
-                for item in payload["forecasts"]
-            ]
-            if forecast_rows:
+            cur.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'market_forecasts'
+                      AND column_name = 'horizon_months'
+                ) AS exists
+                """
+            )
+            horizon_exists = bool((cur.fetchone() or {}).get("exists"))
+            forecast_source = payload["forecasts"] if horizon_exists else [item for item in payload["forecasts"] if int(getattr(item, "horizon_months", 12) or 12) == 12] or payload["forecasts"][:1]
+            if forecast_source:
                 execute_values(
                     cur,
-                    """
-                    INSERT INTO market_forecasts
-                        (entity_type, entity_name, growth_velocity, forecast_confidence, market_phase, evidence)
-                    VALUES %s
-                    ON CONFLICT (entity_type, entity_name) DO UPDATE SET
-                        growth_velocity = EXCLUDED.growth_velocity,
-                        forecast_confidence = EXCLUDED.forecast_confidence,
-                        market_phase = EXCLUDED.market_phase,
-                        evidence = EXCLUDED.evidence,
-                        updated_at = now()
-                    """,
-                    forecast_rows,
+                    (
+                        """
+                        INSERT INTO market_forecasts
+                            (entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence, market_phase, first_seen_at, last_seen_at, evidence)
+                        VALUES %s
+                        ON CONFLICT (entity_type, entity_name, horizon_months) DO UPDATE SET
+                            growth_velocity = EXCLUDED.growth_velocity,
+                            forecast_confidence = EXCLUDED.forecast_confidence,
+                            market_phase = EXCLUDED.market_phase,
+                            first_seen_at = LEAST(COALESCE(market_forecasts.first_seen_at, EXCLUDED.first_seen_at), COALESCE(EXCLUDED.first_seen_at, market_forecasts.first_seen_at)),
+                            last_seen_at = GREATEST(COALESCE(market_forecasts.last_seen_at, EXCLUDED.last_seen_at), COALESCE(EXCLUDED.last_seen_at, market_forecasts.last_seen_at)),
+                            evidence = EXCLUDED.evidence,
+                            updated_at = now()
+                        """
+                        if horizon_exists
+                        else """
+                        INSERT INTO market_forecasts
+                            (entity_type, entity_name, growth_velocity, forecast_confidence, market_phase, first_seen_at, last_seen_at, evidence)
+                        VALUES %s
+                        ON CONFLICT (entity_type, entity_name) DO UPDATE SET
+                            growth_velocity = EXCLUDED.growth_velocity,
+                            forecast_confidence = EXCLUDED.forecast_confidence,
+                            market_phase = EXCLUDED.market_phase,
+                            first_seen_at = LEAST(COALESCE(market_forecasts.first_seen_at, EXCLUDED.first_seen_at), COALESCE(EXCLUDED.first_seen_at, market_forecasts.first_seen_at)),
+                            last_seen_at = GREATEST(COALESCE(market_forecasts.last_seen_at, EXCLUDED.last_seen_at), COALESCE(EXCLUDED.last_seen_at, market_forecasts.last_seen_at)),
+                            evidence = EXCLUDED.evidence,
+                            updated_at = now()
+                        """
+                    ),
+                    [
+                        (
+                            item.entity_type,
+                            item.entity_name,
+                            item.horizon_months,
+                            item.growth_velocity,
+                            item.forecast_confidence,
+                            item.market_phase,
+                            item.first_seen_at,
+                            item.last_seen_at,
+                            Json(item.evidence),
+                        )
+                        if horizon_exists
+                        else (
+                            item.entity_type,
+                            item.entity_name,
+                            item.growth_velocity,
+                            item.forecast_confidence,
+                            item.market_phase,
+                            item.first_seen_at,
+                            item.last_seen_at,
+                            Json(item.evidence),
+                        )
+                        for item in forecast_source
+                    ],
                 )
         conn.commit()
     return {
@@ -258,6 +303,7 @@ def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
         "role_signals": len(payload["role_signals"]),
         "career_transitions": len(payload["career_transitions"]),
         "forecasts": len(payload["forecasts"]),
+        "executive_metrics": len(payload.get("executive_metrics", [])),
     }
 
 
@@ -314,7 +360,7 @@ def write_reports(payload: dict[str, Any], persisted: dict[str, int]) -> dict[st
             "# Emerging Market Forecast",
             "",
             *[
-                f"- {item.entity_name}: {item.market_phase}; velocity={item.growth_velocity}; confidence={item.forecast_confidence}"
+                f"- {item.entity_type}:{item.entity_name} ({item.horizon_months}m): {item.market_phase}; velocity={item.growth_velocity}; confidence={item.forecast_confidence}"
                 for item in payload["forecasts"][:30]
             ],
         ],
@@ -354,9 +400,11 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
         "role_signals": role_signals,
         "role_edges": occupational_edges(role_signals),
         "career_transitions": build_career_paths(role_signals, market_skills),
-        "forecasts": forecast_skills(resolved_jobs),
+        "forecasts": build_market_demand_forecasts(persist=False),
         "semantic_search_results": semantic_search("roles similares a Analytics Engineer", resolved_jobs, limit=10),
+        "executive_metrics": build_executive_metrics(),
     }
+    persist_executive_metrics(payload["executive_metrics"])
     observatory = run_observatory_layer(
         jobs=resolved_jobs,
         company_profiles=company_profiles,

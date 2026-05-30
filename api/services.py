@@ -11,6 +11,16 @@ from backend.services import recommendation_service
 from backend.services.normalization_service import basic_text_key, normalize_program_row
 
 from api.database import fetch_all, fetch_one, relation_exists, relation_has_rows, startup_validate, table_row_count
+from intelligence.predictive_intelligence_engine import (
+    build_career_intelligence,
+    build_curriculum_risk_index,
+    build_executive_metrics,
+    build_market_demand_forecasts,
+    build_recommendation_v2,
+    build_university_market_alignment,
+    detect_emerging_skills,
+    _safe_float as predictive_safe_float,
+)
 from intelligence.semantic_search_engine import semantic_search
 from ml.labor.market_skill_intelligence_engine import build_market_skill_intelligence_map
 
@@ -393,29 +403,73 @@ def list_career_paths(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[st
     return _envelope([], limit=limit, offset=offset, total=0, filters={})
 
 
-def list_market_forecast(*, limit: int = DEFAULT_LIMIT, offset: int = 0, entity_type: str | None = None) -> dict[str, Any]:
+def list_market_forecast(
+    *,
+    limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
+    entity_type: str | None = None,
+    entity_name: str | None = None,
+    horizon_months: int | None = None,
+) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
     if relation_exists("market_forecasts") and relation_has_rows("market_forecasts"):
+        horizon_exists = _column_exists("market_forecasts", "horizon_months")
         clauses: list[str] = []
         params: list[Any] = []
         if entity_type:
             clauses.append("entity_type = %s")
             params.append(entity_type)
+        if entity_name:
+            clauses.append("entity_name ILIKE %s")
+            params.append(f"%{entity_name}%")
+        if horizon_months is not None and horizon_exists:
+            clauses.append("horizon_months = %s")
+            params.append(int(horizon_months))
         where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        select_columns = (
+            "entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence,"
+            " market_phase, first_seen_at, last_seen_at, evidence, generated_at"
+        ) if horizon_exists else (
+            "entity_type, entity_name, growth_velocity, forecast_confidence,"
+            " market_phase, first_seen_at, last_seen_at, evidence, generated_at"
+        )
         rows = fetch_all(
             f"""
-            SELECT entity_type, entity_name, growth_velocity, forecast_confidence, market_phase, evidence, generated_at
+            SELECT {select_columns}
             FROM market_forecasts
             {where_sql}
-            ORDER BY growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
+            ORDER BY {'horizon_months ASC,' if horizon_exists else ''} growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
             LIMIT %s OFFSET %s
             """,
             tuple(params + [limit, offset]),
         )
         count_row = fetch_one(f"SELECT COUNT(*)::int AS total FROM market_forecasts {where_sql}", tuple(params))
-        return _envelope(_serialize_rows(rows), limit=limit, offset=offset, total=int((count_row or {}).get("total") or 0), filters={"entity_type": entity_type})
-    return _envelope([], limit=limit, offset=offset, total=0, filters={"entity_type": entity_type})
+        rows = _serialize_rows(rows)
+        if not horizon_exists:
+            for row in rows:
+                row["horizon_months"] = 12
+        if horizon_months is not None and not horizon_exists:
+            rows = [row for row in rows if int(row.get("horizon_months") or 0) == int(horizon_months)]
+            total = len(rows)
+        else:
+            total = int((count_row or {}).get("total") or 0)
+        return _envelope(
+            rows,
+            limit=limit,
+            offset=offset,
+            total=total,
+            filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months},
+        )
+
+    rows = [item.to_dict() for item in build_market_demand_forecasts(persist=False, limit=limit)]
+    if entity_type:
+        rows = [row for row in rows if row["entity_type"] == entity_type]
+    if entity_name:
+        rows = [row for row in rows if entity_name.casefold() in str(row.get("entity_name") or "").casefold()]
+    if horizon_months is not None:
+        rows = [row for row in rows if int(row.get("horizon_months") or 0) == int(horizon_months)]
+    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months, "source": "predictive_engine"})
 
 
 def list_emerging_skills(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
@@ -423,7 +477,61 @@ def list_emerging_skills(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict
     offset = _offset(offset)
     intelligence = build_market_skill_intelligence_map(include_database=True, write_output=False)
     rows = [signal.to_dict() for signal in intelligence.emerging_skills]
+    predictive_rows = [signal.to_dict() for signal in detect_emerging_skills(limit=limit)]
+    merged: dict[str, dict[str, Any]] = {}
+    for row in rows + predictive_rows:
+        key = str(row.get("skill") or row.get("skill_name") or "").strip()
+        if not key:
+            continue
+        merged[key] = {
+            **row,
+            "skill": row.get("skill") or row.get("skill_name") or key,
+            "skill_name": row.get("skill_name") or row.get("skill") or key,
+        }
+    rows = sorted(
+        merged.values(),
+        key=lambda item: (
+            predictive_safe_float(item.get("market_weight", item.get("growth_rate", 0))),
+            predictive_safe_float(item.get("confidence_score", item.get("market_signal_confidence", 0))),
+        ),
+        reverse=True,
+    )
     return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"coverage_status": "emerging"})
+
+
+def get_curriculum_risk_index(program_id: int) -> dict[str, Any]:
+    return build_curriculum_risk_index(program_id, persist=False).to_dict()
+
+
+def get_university_market_alignment(program_id: int) -> dict[str, Any]:
+    return build_university_market_alignment(program_id, persist=False).to_dict()
+
+
+def get_career_intelligence(source_role: str | None = None, limit: int = 12) -> dict[str, Any]:
+    payload = build_career_intelligence(source_role=source_role, limit=limit)
+    return {
+        "source_role": payload["source_role"],
+        "transitions": payload["transitions"],
+        "role_network": payload["role_network"][:limit],
+        "source_tables": payload["source_tables"],
+        "confidence": payload["confidence"],
+    }
+
+
+def get_executive_observatory() -> dict[str, Any]:
+    metrics = [metric.to_dict() for metric in build_executive_metrics()]
+    return {
+        "metrics": metrics,
+        "source_tables": sorted({table for metric in metrics for table in metric.get("source_tables", [])}),
+        "confidence": round(sum(float(metric.get("confidence_score", 0)) for metric in metrics) / max(len(metrics), 1), 4) if metrics else 0.0,
+    }
+
+
+def list_recommendations_v2(*, program_id: int | None = None, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
+    limit = _bounded(limit)
+    offset = _offset(offset)
+    rows = [item.to_dict() for item in build_recommendation_v2(program_id=program_id, limit=limit)]
+    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"program_id": program_id, "version": "v2", "source": "predictive_engine"})
 
 
 def build_semantic_search_corpus(entity_type: str) -> list[dict[str, Any]]:

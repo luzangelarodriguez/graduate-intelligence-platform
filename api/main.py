@@ -9,7 +9,21 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth import auth_router
-from api.contracts import HealthResponse, ObservatoryStatusResponse, PaginatedResponse, Program, ProgramDashboardResponse, ProgramPageResponse, SearchResponse
+from api.contracts import (
+    CareerIntelligenceResponse,
+    CurriculumRiskResponse,
+    ExecutiveObservatoryResponse,
+    HealthResponse,
+    MarketForecastPageResponse,
+    ObservatoryStatusResponse,
+    PaginatedResponse,
+    Program,
+    ProgramDashboardResponse,
+    ProgramPageResponse,
+    RecommendationV2PageResponse,
+    SearchResponse,
+    UniversityMarketAlignmentResponse,
+)
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api import services
 
@@ -148,6 +162,15 @@ def recommendations(
     return services.list_recommendations(limit=limit, offset=offset, recommendation_type=recommendation_type, target_company=target_company)
 
 
+@app.get("/recommendations-v2", response_model=RecommendationV2PageResponse, tags=["predictive"])
+def recommendations_v2(
+    program_id: int | None = Query(default=None),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> dict[str, Any]:
+    return services.list_recommendations_v2(program_id=program_id, limit=limit, offset=offset)
+
+
 @app.get("/emerging-skills", response_model=PaginatedResponse, tags=["observatory"])
 def emerging_skills(
     limit: int = Query(20, ge=1, le=100),
@@ -181,13 +204,35 @@ def career_paths(
     return services.list_career_paths(limit=limit, offset=offset)
 
 
-@app.get("/market-forecast", response_model=PaginatedResponse, tags=["observatory"])
+@app.get("/market-forecast", response_model=MarketForecastPageResponse, tags=["observatory"])
 def market_forecast(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     entity_type: str | None = Query(default=None),
+    entity_name: str | None = Query(default=None),
+    horizon_months: int | None = Query(default=None, ge=1, le=36),
 ) -> dict[str, Any]:
-    return services.list_market_forecast(limit=limit, offset=offset, entity_type=entity_type)
+    return services.list_market_forecast(limit=limit, offset=offset, entity_type=entity_type, entity_name=entity_name, horizon_months=horizon_months)
+
+
+@app.get("/programas/{program_id}/curriculum-risk", response_model=CurriculumRiskResponse, tags=["predictive"])
+def curriculum_risk(program_id: int) -> dict[str, Any]:
+    return services.get_curriculum_risk_index(program_id)
+
+
+@app.get("/programas/{program_id}/alignment", response_model=UniversityMarketAlignmentResponse, tags=["predictive"])
+def curriculum_alignment(program_id: int) -> dict[str, Any]:
+    return services.get_university_market_alignment(program_id)
+
+
+@app.get("/career-intelligence", response_model=CareerIntelligenceResponse, tags=["predictive"])
+def career_intelligence(source_role: str | None = Query(default=None), limit: int = Query(12, ge=1, le=25)) -> dict[str, Any]:
+    return services.get_career_intelligence(source_role=source_role, limit=limit)
+
+
+@app.get("/executive-observatory", response_model=ExecutiveObservatoryResponse, tags=["predictive"])
+def executive_observatory() -> dict[str, Any]:
+    return services.get_executive_observatory()
 
 
 @app.get("/semantic-search", response_model=SearchResponse, tags=["search"])
