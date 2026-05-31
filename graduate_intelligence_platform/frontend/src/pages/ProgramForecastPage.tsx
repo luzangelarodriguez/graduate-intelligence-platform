@@ -10,6 +10,8 @@ import {
   ProgramTabs,
   SectionTitle,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
+import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
 
 function programIdFromParam(value?: string) {
@@ -26,6 +28,7 @@ export function ProgramForecastPage() {
   const { programId: programIdParam } = useParams();
   const programId = programIdFromParam(programIdParam);
   const { program, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
+  const { executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 6);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
 
@@ -82,6 +85,19 @@ export function ProgramForecastPage() {
           tone="green"
         />
       </section>
+
+      <ExecutiveAiSection
+        title="Lectura ejecutiva del forecast"
+        subtitle="La explicación AI resume por qué la proyección cambia en 6, 12 y 24 meses y qué señales activan el riesgo."
+        body={[executiveNarrative?.narrative, executiveNarrative?.why_at_risk].filter(Boolean).join(' ')}
+        evidenceSources={executiveNarrative?.evidence_sources}
+        confidence={executiveNarrative?.confidence}
+        loading={executiveAiLoading}
+        error={executiveAiError}
+        emptyTitle="No fue posible cargar la lectura ejecutiva"
+        emptyBody="La narrativa del forecast todavía no está disponible, pero las proyecciones siguen operativas."
+        badgeLabel="Forecast AI"
+      />
 
       <section className="grid gap-5 xl:grid-cols-[1.35fr_0.95fr]">
         <article className="panel space-y-4">

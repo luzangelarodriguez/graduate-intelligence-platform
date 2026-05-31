@@ -67,6 +67,7 @@ class Program(BaseModel):
     total_empleos_relacionados: int = 0
     skills_cubiertas: int = 0
     skills: list[Skill] = Field(default_factory=list)
+    microcurriculum_context: dict[str, Any] | None = None
 
 
 class Match(BaseModel):
@@ -118,6 +119,64 @@ class ProgramDashboardResponse(BaseModel):
     recommendations: list[RecommendationProgram] = Field(default_factory=list)
     insights: ProgramDashboardInsights
     source: str
+
+
+class ExecutiveNarrativeResponse(BaseModel):
+    program_id: int | None = None
+    program_name: str = ""
+    narrative: str = ""
+    why_at_risk: str = ""
+    evidence_sources: list[str] = Field(default_factory=list)
+    source_tables: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    confidence: float = 0.0
+    model: str = ""
+    generated_at: str = ""
+
+
+class ProgramSummaryResponse(BaseModel):
+    program_id: int
+    program_name: str = ""
+    summary: str = ""
+    why_at_risk: str = ""
+    microcurriculum_traceability: dict[str, Any] = Field(default_factory=dict)
+    evidence_sources: list[str] = Field(default_factory=list)
+    source_tables: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    confidence: float = 0.0
+    model: str = ""
+    generated_at: str = ""
+
+
+class RecommendationExplanationResponse(BaseModel):
+    recommendation_id: int
+    recommendation_title: str = ""
+    explanation: str = ""
+    why_this_recommendation: str = ""
+    evidence_sources: list[str] = Field(default_factory=list)
+    source_tables: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    confidence: float = 0.0
+    model: str = ""
+    generated_at: str = ""
+
+
+class AskObservatoryRequest(BaseModel):
+    question: str
+    program_id: int | None = None
+    recommendation_id: int | None = None
+    context: dict[str, Any] = Field(default_factory=dict)
+
+
+class AskObservatoryResponse(BaseModel):
+    question: str
+    answer: str = ""
+    evidence_sources: list[str] = Field(default_factory=list)
+    source_tables: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    confidence: float = 0.0
+    model: str = ""
+    generated_at: str = ""
 
 
 class ProgramPageResponse(BaseModel):

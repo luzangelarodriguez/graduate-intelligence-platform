@@ -4,6 +4,8 @@ import { Layers3 } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
 import { MetricCard, ProgramPageHeader, ProgramTabs, SectionTitle } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
+import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramIntelligenceData } from '../hooks/useProgramIntelligenceData';
 
 function programIdFromParam(value?: string) {
@@ -29,6 +31,7 @@ export function ProgramMicrocurriculumPage() {
   const { programId: programIdParam } = useParams();
   const programId = programIdFromParam(programIdParam);
   const { program, programIntelligence, curriculumRisk, alignment, isLoading, error } = useProgramIntelligenceData(programId);
+  const { programSummary, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -178,6 +181,23 @@ export function ProgramMicrocurriculumPage() {
           )}
         </div>
       </section>
+
+      <ExecutiveAiSection
+        title="Microcurrículo trazable"
+        subtitle="La explicación AI conecta el programa con el microcurrículo, las brechas y la demanda de mercado detectada."
+        body={
+          programSummary?.microcurriculum_traceability
+            ? [programSummary.summary, programSummary.why_at_risk].filter(Boolean).join(' ')
+            : undefined
+        }
+        evidenceSources={programSummary?.evidence_sources}
+        confidence={programSummary?.confidence}
+        loading={executiveAiLoading}
+        error={executiveAiError}
+        emptyTitle="No fue posible cargar la trazabilidad ejecutiva"
+        emptyBody="La explicación del microcurrículo todavía no está disponible, pero el análisis curricular sigue operativo."
+        badgeLabel="Microcurrículo AI"
+      />
 
       <section className="rounded-lg border border-line bg-white px-4 py-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
