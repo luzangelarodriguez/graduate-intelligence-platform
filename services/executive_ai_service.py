@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import hashlib
 import json
 import os
@@ -23,6 +24,8 @@ DEFAULT_MODEL = os.getenv("OPENAI_MODEL") or "gpt-4.1-mini"
 OPENAI_BASE_URL = (os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1").rstrip("/")
 OPENAI_API_KEY = (os.getenv("OPENAI_API_KEY") or "").strip()
 CACHE_TTL_SECONDS = int(os.getenv("EXECUTIVE_AI_CACHE_TTL_SECONDS") or "21600")
+OPENAI_TIMEOUT_SECONDS = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "10")
+logger = logging.getLogger(__name__)
 
 _CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
 
@@ -136,7 +139,7 @@ def _openai_chat_json(*, system_prompt: str, user_payload: dict[str, Any], cache
         method="POST",
     )
     try:
-        with urlopen(request, timeout=40) as response:
+        with urlopen(request, timeout=OPENAI_TIMEOUT_SECONDS) as response:
             raw = response.read().decode("utf-8")
         payload = json.loads(raw)
         content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -180,6 +183,51 @@ def _program_traceability(program_id: int, db_name: str | None = None) -> dict[s
     risk = build_curriculum_risk_index(program_id, persist=False, db_name=db_name).to_dict()
     alignment = build_university_market_alignment(program_id, persist=False, db_name=db_name).to_dict()
     forecast = build_forecast_summary(db_name=db_name, persist=False, limit=20)
+    return {
+        "program": program,
+        "program_intelligence": intelligence,
+        "microcurriculum_context": context,
+        "curriculum_risk": risk,
+        "alignment": alignment,
+        "forecast_summary": forecast,
+    }
+
+
+def _safe_program_traceability(program_id: int, db_name: str | None = None) -> dict[str, Any]:
+    try:
+        program = _program_base(program_id, db_name=db_name)
+    except Exception:
+        program = {"especializacion_id": program_id, "nombre_especializacion": f"Programa {program_id}", "rol": ""}
+    try:
+        intelligence = _program_intelligence(program_id, db_name=db_name)
+    except Exception:
+        intelligence = {}
+    try:
+        context = _microcurriculum_context(program_id, str(program.get("nombre_especializacion") or ""), db_name=db_name)
+    except Exception:
+        context = {}
+    try:
+        risk = build_curriculum_risk_index(program_id, persist=False, db_name=db_name).to_dict()
+    except Exception:
+        risk = {}
+    try:
+        alignment = build_university_market_alignment(program_id, persist=False, db_name=db_name).to_dict()
+    except Exception:
+        alignment = {}
+    try:
+        forecast = build_forecast_summary(db_name=db_name, persist=False, limit=20)
+    except Exception:
+        forecast = {
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "source_tables": [],
+            "total_records": 0,
+            "counts": {},
+            "coverage": {},
+            "top_skills": [],
+            "top_technologies": [],
+            "top_companies": [],
+            "top_roles": [],
+        }
     return {
         "program": program,
         "program_intelligence": intelligence,
@@ -249,7 +297,11 @@ def _deterministic_program_summary(program_id: int, payload: dict[str, Any]) -> 
 
 
 def build_program_summary(program_id: int, *, db_name: str | None = None) -> dict[str, Any]:
-    payload = _program_traceability(program_id, db_name=db_name)
+    try:
+        payload = _program_traceability(program_id, db_name=db_name)
+    except Exception as exc:
+        logger.warning("program_summary_traceability_failed: %s", exc, exc_info=True)
+        payload = _safe_program_traceability(program_id, db_name=db_name)
     program = payload["program"]
     context = payload["microcurriculum_context"]
     intelligence = payload["program_intelligence"]
@@ -313,7 +365,11 @@ def build_program_summary(program_id: int, *, db_name: str | None = None) -> dic
 
 def build_executive_narrative(*, program_id: int | None = None, db_name: str | None = None) -> dict[str, Any]:
     if program_id is not None:
-        summary = build_program_summary(program_id, db_name=db_name)
+        try:
+            summary = build_program_summary(program_id, db_name=db_name)
+        except Exception as exc:
+            logger.warning("executive_narrative_program_summary_failed: %s", exc, exc_info=True)
+            summary = _deterministic_program_summary(program_id, _safe_program_traceability(program_id, db_name=db_name))
         return {
             "program_id": program_id,
             "program_name": summary["program_name"],
@@ -327,7 +383,27 @@ def build_executive_narrative(*, program_id: int | None = None, db_name: str | N
             "generated_at": summary["generated_at"],
         }
 
-    observatory = build_executive_observatory_v2(db_name=db_name).to_dict()
+    try:
+        observatory = build_executive_observatory_v2(db_name=db_name, persist=False).to_dict()
+    except Exception as exc:
+        logger.warning("executive_narrative_observatory_failed: %s", exc, exc_info=True)
+        observatory = {
+            "metrics": [],
+            "alignment_average": 0.0,
+            "high_risk_programs": [],
+            "medium_risk_programs": [],
+            "low_risk_programs": [],
+            "programs_analyzed": 0,
+            "critical_gaps": [],
+            "top_emerging_skills": [],
+            "top_recommendations": [],
+            "top_programs": [],
+            "at_risk_programs": [],
+            "executive_narrative": "El observatorio presenta una vista parcial mientras se recupera la evidencia de producción.",
+            "source_tables": ["program_intelligence", "executive_observatory"],
+            "confidence": 0.0,
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
     cached = _openai_chat_json(
         system_prompt=(
             "Eres un asistente ejecutivo académico. Responde SOLO en JSON válido y conciso. "
@@ -390,51 +466,65 @@ def _fetch_recommendation_row(recommendation_id: int, *, db_name: str | None = N
 
 
 def build_recommendation_explanation(recommendation_id: int, *, db_name: str | None = None) -> dict[str, Any]:
-    recommendation = _fetch_recommendation_row(recommendation_id, db_name=db_name)
-    payload = {
-        "task": "recommendation_explanation",
-        "recommendation": recommendation,
-    }
-    cached = _openai_chat_json(
-        system_prompt=(
-            "Eres un asistente ejecutivo académico. Responde SOLO en JSON válido y conciso. "
-            "No inventes métricas. Solo usa la evidencia suministrada. "
-            "Campos requeridos: explanation, why_this_recommendation, evidence_sources, confidence."
-        ),
-        user_payload=payload,
-        cache_prefix=f"recommendation_explanation:{recommendation_id}",
-    )
     base_evidence_sources = ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"]
-    if cached:
-        response = cached.response
-        explanation = str(response.get("explanation") or response.get("answer") or "").strip()
-        why_this = str(response.get("why_this_recommendation") or "").strip()
-        evidence_sources = response.get("evidence_sources") if isinstance(response.get("evidence_sources"), list) else base_evidence_sources
+    try:
+        recommendation = _fetch_recommendation_row(recommendation_id, db_name=db_name)
+        payload = {
+            "task": "recommendation_explanation",
+            "recommendation": recommendation,
+        }
+        cached = _openai_chat_json(
+            system_prompt=(
+                "Eres un asistente ejecutivo académico. Responde SOLO en JSON válido y conciso. "
+                "No inventes métricas. Solo usa la evidencia suministrada. "
+                "Campos requeridos: explanation, why_this_recommendation, evidence_sources, confidence."
+            ),
+            user_payload=payload,
+            cache_prefix=f"recommendation_explanation:{recommendation_id}",
+        )
+        if cached:
+            response = cached.response
+            explanation = str(response.get("explanation") or response.get("answer") or "").strip()
+            why_this = str(response.get("why_this_recommendation") or "").strip()
+            evidence_sources = response.get("evidence_sources") if isinstance(response.get("evidence_sources"), list) else base_evidence_sources
+            return {
+                "recommendation_id": recommendation_id,
+                "recommendation_title": str(recommendation.get("recommendation_type") or recommendation.get("target_role") or recommendation.get("target_company") or ""),
+                "explanation": explanation or str(recommendation.get("recommendation_reasoning") or ""),
+                "why_this_recommendation": why_this or str(recommendation.get("recommendation_reasoning") or ""),
+                "evidence_sources": evidence_sources,
+                "source_tables": evidence_sources,
+                "supporting_evidence": recommendation,
+                "confidence": float(response.get("confidence") or recommendation.get("recommendation_confidence") or 0.0),
+                "model": cached.model,
+                "generated_at": str(recommendation.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
+            }
         return {
             "recommendation_id": recommendation_id,
             "recommendation_title": str(recommendation.get("recommendation_type") or recommendation.get("target_role") or recommendation.get("target_company") or ""),
-            "explanation": explanation or str(recommendation.get("recommendation_reasoning") or ""),
-            "why_this_recommendation": why_this or str(recommendation.get("recommendation_reasoning") or ""),
-            "evidence_sources": evidence_sources,
-            "source_tables": evidence_sources,
+            "explanation": str(recommendation.get("recommendation_reasoning") or ""),
+            "why_this_recommendation": str(recommendation.get("recommendation_reasoning") or ""),
+            "evidence_sources": base_evidence_sources,
+            "source_tables": base_evidence_sources,
             "supporting_evidence": recommendation,
-            "confidence": float(response.get("confidence") or recommendation.get("recommendation_confidence") or 0.0),
-            "model": cached.model,
+            "confidence": float(recommendation.get("recommendation_confidence") or 0.0),
+            "model": "deterministic-fallback",
             "generated_at": str(recommendation.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
         }
-
-    return {
-        "recommendation_id": recommendation_id,
-        "recommendation_title": str(recommendation.get("recommendation_type") or recommendation.get("target_role") or recommendation.get("target_company") or ""),
-        "explanation": str(recommendation.get("recommendation_reasoning") or ""),
-        "why_this_recommendation": str(recommendation.get("recommendation_reasoning") or ""),
-        "evidence_sources": base_evidence_sources,
-        "source_tables": base_evidence_sources,
-        "supporting_evidence": recommendation,
-        "confidence": float(recommendation.get("recommendation_confidence") or 0.0),
-        "model": "deterministic-fallback",
-        "generated_at": str(recommendation.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
-    }
+    except Exception as exc:
+        logger.warning("recommendation_explanation_failed: %s", exc, exc_info=True)
+        return {
+            "recommendation_id": recommendation_id,
+            "recommendation_title": "Recomendación no disponible",
+            "explanation": "La explicación se encuentra en modo fallback mientras se recupera la evidencia completa.",
+            "why_this_recommendation": "Se conservó el análisis con la evidencia disponible.",
+            "evidence_sources": base_evidence_sources,
+            "source_tables": base_evidence_sources,
+            "supporting_evidence": {"reason": str(exc)},
+            "confidence": 0.0,
+            "model": "deterministic-fallback",
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
 
 
 def ask_observatory(question: str, *, program_id: int | None = None, recommendation_id: int | None = None, context: dict[str, Any] | None = None, db_name: str | None = None) -> dict[str, Any]:
@@ -447,11 +537,50 @@ def ask_observatory(question: str, *, program_id: int | None = None, recommendat
         "context": context,
     }
     if program_id is not None:
-        payload["program_summary"] = build_program_summary(program_id, db_name=db_name)
+        try:
+            payload["program_summary"] = build_program_summary(program_id, db_name=db_name)
+        except Exception as exc:
+            logger.warning("ask_observatory_program_summary_failed: %s", exc, exc_info=True)
+            payload["program_summary"] = _deterministic_program_summary(program_id, _safe_program_traceability(program_id, db_name=db_name))
     if recommendation_id is not None:
-        payload["recommendation"] = build_recommendation_explanation(recommendation_id, db_name=db_name)
+        try:
+            payload["recommendation"] = build_recommendation_explanation(recommendation_id, db_name=db_name)
+        except Exception as exc:
+            logger.warning("ask_observatory_recommendation_failed: %s", exc, exc_info=True)
+            payload["recommendation"] = {
+                "recommendation_id": recommendation_id,
+                "recommendation_title": "Recomendación no disponible",
+                "explanation": "Recomendación recuperada en modo fallback.",
+                "why_this_recommendation": "Se usó la evidencia disponible en el observatorio.",
+                "evidence_sources": ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"],
+                "source_tables": ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"],
+                "supporting_evidence": {"reason": str(exc)},
+                "confidence": 0.0,
+                "model": "deterministic-fallback",
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
     if not payload.get("program_summary"):
-        payload["executive_observatory"] = build_executive_observatory_v2(db_name=db_name).to_dict()
+        try:
+            payload["executive_observatory"] = build_executive_observatory_v2(db_name=db_name, persist=False).to_dict()
+        except Exception as exc:
+            logger.warning("ask_observatory_executive_failed: %s", exc, exc_info=True)
+            payload["executive_observatory"] = {
+                "metrics": [],
+                "alignment_average": 0.0,
+                "high_risk_programs": [],
+                "medium_risk_programs": [],
+                "low_risk_programs": [],
+                "programs_analyzed": 0,
+                "critical_gaps": [],
+                "top_emerging_skills": [],
+                "top_recommendations": [],
+                "top_programs": [],
+                "at_risk_programs": [],
+                "executive_narrative": "El observatorio presenta una vista parcial mientras se recupera la evidencia de producción.",
+                "source_tables": ["program_intelligence", "executive_observatory"],
+                "confidence": 0.0,
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
 
     cached = _openai_chat_json(
         system_prompt=(

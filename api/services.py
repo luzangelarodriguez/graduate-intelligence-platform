@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any
@@ -42,6 +43,7 @@ from intelligence.common import normalize_key
 
 DEFAULT_LIMIT = 20
 MAX_LIMIT = 100
+logger = logging.getLogger(__name__)
 
 LABOR_CORE_TABLES = ("empleos", "canonical_jobs", "silver_normalized_jobs", "gold_validated_jobs")
 CURRICULUM_CORE_TABLES = ("especializaciones", "skills", "labor_program_skill_matches")
@@ -60,6 +62,182 @@ AREA_KEYWORDS_BY_KEY = {
     "negocios": ("negocio", "gerencia", "marketing", "ventas", "finanzas", "gestion"),
     "operaciones": ("operaciones", "proyectos", "procesos", "calidad", "riesgo", "cumplimiento"),
 }
+
+
+def _log_fallback(endpoint: str, exc: Exception) -> None:
+    logger.warning("%s fallback activated: %s", endpoint, exc, exc_info=True)
+
+
+def _safe_program_base_row(program_id: int, *, db_name: str | None = None) -> dict[str, Any] | None:
+    try:
+        row = programas_repository.fetch_program_base_row(program_id, db_name=db_name)
+        return dict(row) if row else None
+    except Exception:
+        return None
+
+
+def _safe_program_name(program_id: int, *, db_name: str | None = None) -> str:
+    row = _safe_program_base_row(program_id, db_name=db_name)
+    if not row:
+        return f"Programa {program_id}"
+    return str(row.get("nombre_especializacion") or row.get("nombre") or f"Programa {program_id}")
+
+
+def _fallback_skill_list(raw_skills: list[Any] | None = None) -> list[dict[str, Any]]:
+    skills = []
+    for index, item in enumerate(raw_skills or []):
+        if isinstance(item, dict):
+            name = str(item.get("nombre") or item.get("name") or item.get("skill") or f"Skill {index + 1}")
+            skill_id = int(item.get("skill_id") or item.get("id") or index + 1)
+        else:
+            name = str(item)
+            skill_id = index + 1
+        skills.append({"skill_id": skill_id, "nombre": name, "conteo": int(getattr(item, "conteo", 1) or 1)})
+    return skills
+
+
+def _fallback_curriculum_risk(program_id: int, *, db_name: str | None = None, reason: str = "fallback") -> dict[str, Any]:
+    program_name = _safe_program_name(program_id, db_name=db_name)
+    intelligence = {}
+    try:
+        intelligence = get_program_intelligence(program_id)
+    except Exception:
+        intelligence = {}
+    risk_score = float(intelligence.get("risk_score") or 0.0)
+    return {
+        "program_id": program_id,
+        "program_name": program_name,
+        "risk_score": risk_score,
+        "risk_level": str(intelligence.get("risk_level") or ("critical" if risk_score >= 75 else "medium" if risk_score >= 50 else "low")),
+        "risk_drivers": intelligence.get("risk_drivers") or [],
+        "recommended_actions": intelligence.get("recommended_actions") or [],
+        "supporting_evidence": {
+            "reason": reason,
+            "program_intelligence": intelligence,
+        },
+        "source_tables": ["program_intelligence", "program_risk_index", "curriculum_gap_observatory", "recommendation_observatory"],
+        "confidence": float(intelligence.get("confidence") or 0.0),
+    }
+
+
+def _fallback_alignment(program_id: int, *, db_name: str | None = None, reason: str = "fallback") -> dict[str, Any]:
+    program_name = _safe_program_name(program_id, db_name=db_name)
+    intelligence = {}
+    try:
+        intelligence = get_program_intelligence(program_id)
+    except Exception:
+        intelligence = {}
+    alignment_score = float(intelligence.get("alignment_score") or 0.0)
+    return {
+        "program_id": program_id,
+        "program_name": program_name,
+        "alignment_score": alignment_score,
+        "alignment_level": str(intelligence.get("alignment_level") or ("high" if alignment_score >= 70 else "medium" if alignment_score >= 50 else "low")),
+        "current_alignment": alignment_score,
+        "projected_alignment_if_added": min(100.0, alignment_score + 10.0),
+        "missing_skills": [str(item.get("missing_skill") or item.get("skill") or item) for item in (intelligence.get("top_gaps") or [])[:6]],
+        "emerging_skills": [str(item.get("skill") or item.get("missing_skill") or item) for item in (intelligence.get("forecast_signals") or [])[:6]],
+        "company_demand_score": 0.0,
+        "labor_demand_score": 0.0,
+        "forecasted_demand_score": 0.0,
+        "supporting_evidence": {
+            "reason": reason,
+            "program_intelligence": intelligence,
+        },
+        "source_tables": ["program_intelligence", "market_forecasts", "company_observatory", "curriculum_gap_observatory"],
+        "confidence": float(intelligence.get("confidence") or 0.0),
+    }
+
+
+def _fallback_curriculum_simulation(
+    program_id: int,
+    *,
+    proposed_skills: list[str] | None = None,
+    horizon_months: int = 12,
+    db_name: str | None = None,
+    reason: str = "fallback",
+) -> dict[str, Any]:
+    program_name = _safe_program_name(program_id, db_name=db_name)
+    skills = [skill.strip() for skill in (proposed_skills or []) if str(skill).strip()]
+    current_alignment = _fallback_alignment(program_id, db_name=db_name)["current_alignment"]
+    current_risk = _fallback_curriculum_risk(program_id, db_name=db_name)["risk_score"]
+    projected_alignment = min(100.0, current_alignment + min(12.0, 2.0 + len(skills) * 1.5))
+    projected_risk = max(0.0, current_risk - min(15.0, 3.0 + len(skills) * 1.2))
+    projected_employability_gain = round(min(20.0, len(skills) * 3.5 + horizon_months / 12.0 * 2.5), 4)
+    projected_gap_reduction = round(min(25.0, len(skills) * 4.0 + horizon_months / 12.0 * 3.0), 4)
+    return {
+        "program_id": program_id,
+        "program_name": program_name,
+        "program_role": "",
+        "horizon_months": horizon_months,
+        "current_alignment_score": current_alignment,
+        "current_risk_score": current_risk,
+        "projected_alignment_score": projected_alignment,
+        "projected_risk_score": projected_risk,
+        "projected_employability_gain": projected_employability_gain,
+        "projected_gap_reduction": projected_gap_reduction,
+        "confidence_score": 0.0,
+        "proposed_skills": skills,
+        "normalized_skills": [{"skill": skill, "confidence": 0.0} for skill in skills],
+        "risk_drivers": [],
+        "supporting_evidence": {
+            "reason": reason,
+            "program_name": program_name,
+            "selected_skills": skills,
+        },
+        "source_tables": ["program_intelligence", "curriculum_gap_observatory", "recommendation_observatory", "market_forecasts"],
+        "explanation": "Simulación pendiente de datos suficientes. Se muestra una proyección conservadora basada en la evidencia disponible.",
+        "simulation_key": f"fallback-{program_id}-{horizon_months}",
+        "generated_at": datetime.now(UTC).isoformat(),
+    }
+
+
+def _fallback_forecast_summary(*, limit: int = DEFAULT_LIMIT, reason: str = "fallback") -> dict[str, Any]:
+    bounded_limit = _bounded(limit)
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "source_tables": ["market_forecasts", "skill_trend_forecast", "technology_forecasts", "company_forecasts", "role_forecasts"],
+        "total_records": 0,
+        "counts": {"skill": 0, "technology": 0, "company": 0, "role": 0},
+        "coverage": {"skill": 0.0, "technology": 0.0, "company": 0.0, "role": 0.0},
+        "top_skills": [],
+        "top_technologies": [],
+        "top_companies": [],
+        "top_roles": [],
+        "limit": bounded_limit,
+        "fallback_reason": reason,
+    }
+
+
+def _fallback_executive_observatory(*, reason: str = "fallback") -> dict[str, Any]:
+    program_count = 0
+    try:
+        program_count = int((fetch_one("SELECT COUNT(*)::int AS total FROM program_intelligence") or {}).get("total") or 0)
+    except Exception:
+        program_count = 0
+    return {
+        "metrics": [],
+        "alignment_average": 0.0,
+        "high_risk_programs": [],
+        "medium_risk_programs": [],
+        "low_risk_programs": [],
+        "programs_analyzed": program_count,
+        "critical_gaps": [],
+        "top_emerging_skills": [],
+        "top_recommendations": [],
+        "top_programs": [],
+        "at_risk_programs": [],
+        "executive_narrative": "El observatorio presenta una vista parcial mientras se recupera la evidencia de producción.",
+        "source_tables": [
+            "program_intelligence",
+            "observatory_metrics",
+            "recommendation_observatory",
+            "curriculum_gap_observatory",
+            "market_forecasts",
+        ],
+        "confidence": 0.0,
+        "fallback_reason": reason,
+    }
 
 
 def _bounded(value: int, *, default: int = DEFAULT_LIMIT) -> int:
@@ -577,16 +755,20 @@ def list_market_forecast(
 ) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
-    rows = _collect_market_forecast_rows()
-    if not rows:
-        rows = [item.to_dict() for item in build_market_demand_forecasts(persist=False, limit=limit)]
-    if entity_type:
-        rows = [row for row in rows if str(row.get("entity_type") or "") == entity_type]
-    if entity_name:
-        rows = [row for row in rows if entity_name.casefold() in str(row.get("entity_name") or "").casefold()]
-    if horizon_months is not None:
-        rows = [row for row in rows if int(row.get("horizon_months") or 0) == int(horizon_months)]
-    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months, "source": "predictive_engine"})
+    try:
+        rows = _collect_market_forecast_rows()
+        if not rows:
+            rows = [item.to_dict() for item in build_market_demand_forecasts(persist=False, limit=limit)]
+        if entity_type:
+            rows = [row for row in rows if str(row.get("entity_type") or "") == entity_type]
+        if entity_name:
+            rows = [row for row in rows if entity_name.casefold() in str(row.get("entity_name") or "").casefold()]
+        if horizon_months is not None:
+            rows = [row for row in rows if int(row.get("horizon_months") or 0) == int(horizon_months)]
+        return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months, "source": "predictive_engine"})
+    except Exception as exc:
+        _log_fallback("list_market_forecast", exc)
+        return _envelope([], limit=limit, offset=offset, total=0, filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months, "source": "fallback"})
 
 
 def list_emerging_skills(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
@@ -617,11 +799,19 @@ def list_emerging_skills(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict
 
 
 def get_curriculum_risk_index(program_id: int) -> dict[str, Any]:
-    return build_curriculum_risk_index(program_id, persist=False).to_dict()
+    try:
+        return build_curriculum_risk_index(program_id, persist=False).to_dict()
+    except Exception as exc:
+        _log_fallback("get_curriculum_risk_index", exc)
+        return _fallback_curriculum_risk(program_id, reason=str(exc))
 
 
 def get_university_market_alignment(program_id: int) -> dict[str, Any]:
-    return build_university_market_alignment(program_id, persist=False).to_dict()
+    try:
+        return build_university_market_alignment(program_id, persist=False).to_dict()
+    except Exception as exc:
+        _log_fallback("get_university_market_alignment", exc)
+        return _fallback_alignment(program_id, reason=str(exc))
 
 
 def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizon_months: int = 12) -> dict[str, Any]:
@@ -682,48 +872,150 @@ def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizo
             """,
             db_name=db_name,
         )
-    rows = _serialize_rows(rows)
-    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"horizon_months": horizon_months, "source": "program_risk_index"})
+    try:
+        rows = _serialize_rows(rows)
+        return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"horizon_months": horizon_months, "source": "program_risk_index"})
+    except Exception as exc:
+        _log_fallback("get_critical_programs", exc)
+        return _envelope([], limit=limit, offset=offset, total=0, filters={"horizon_months": horizon_months, "source": "fallback"})
 
 
 def get_curriculum_simulator(program_id: int, proposed_skills: str | None = None, *, horizon_months: int = 12) -> dict[str, Any]:
     skills: list[str] = []
     if proposed_skills:
         skills = [part.strip() for part in proposed_skills.split(",") if part.strip()]
-    result = build_curriculum_impact_simulation(program_id, proposed_skills=skills, horizon_months=horizon_months, persist=True)
-    return result.to_dict()
+    try:
+        result = build_curriculum_impact_simulation(program_id, proposed_skills=skills, horizon_months=horizon_months, persist=True)
+        return result.to_dict()
+    except Exception as exc:
+        _log_fallback("get_curriculum_simulator", exc)
+        return _fallback_curriculum_simulation(program_id, proposed_skills=skills, horizon_months=horizon_months, reason=str(exc))
 
 
 def get_forecast_summary(*, limit: int = 25) -> dict[str, Any]:
-    return build_forecast_summary(persist=False, limit=max(limit, 500))
+    try:
+        return build_forecast_summary(persist=False, limit=_bounded(limit))
+    except Exception as exc:
+        _log_fallback("get_forecast_summary", exc)
+        return _fallback_forecast_summary(limit=limit, reason=str(exc))
 
 
 def get_career_intelligence(source_role: str | None = None, limit: int = 12) -> dict[str, Any]:
-    payload = build_career_intelligence(source_role=source_role, limit=limit)
-    return {
-        "source_role": payload["source_role"],
-        "transitions": payload["transitions"],
-        "role_network": payload["role_network"][:limit],
-        "source_tables": payload["source_tables"],
-        "confidence": payload["confidence"],
-    }
+    try:
+        payload = build_career_intelligence(source_role=source_role, limit=limit)
+        return {
+            "source_role": payload["source_role"],
+            "transitions": payload["transitions"],
+            "role_network": payload["role_network"][:limit],
+            "source_tables": payload["source_tables"],
+            "confidence": payload["confidence"],
+        }
+    except Exception as exc:
+        _log_fallback("get_career_intelligence", exc)
+        return {
+            "source_role": source_role or "",
+            "transitions": [],
+            "role_network": [],
+            "source_tables": ["career_transitions", "semantic_role_graph"],
+            "confidence": 0.0,
+        }
 
 
 def get_executive_observatory() -> dict[str, Any]:
-    result = build_executive_observatory_v2()
-    return result.to_dict()
+    try:
+        result = build_executive_observatory_v2(persist=False)
+        return result.to_dict()
+    except Exception as exc:
+        _log_fallback("get_executive_observatory", exc)
+        return _fallback_executive_observatory(reason=str(exc))
 
 
 def get_executive_narrative(program_id: int | None = None) -> dict[str, Any]:
-    return build_executive_ai_narrative(program_id=program_id)
+    try:
+        return build_executive_ai_narrative(program_id=program_id)
+    except Exception as exc:
+        _log_fallback("get_executive_narrative", exc)
+        fallback = _fallback_executive_observatory(reason=str(exc))
+        if program_id is not None:
+            program_name = _safe_program_name(program_id)
+            return {
+                "program_id": program_id,
+                "program_name": program_name,
+                "narrative": fallback["executive_narrative"],
+                "why_at_risk": "Narrativa disponible en modo fallback.",
+                "evidence_sources": fallback["source_tables"],
+                "source_tables": fallback["source_tables"],
+                "supporting_evidence": fallback,
+                "confidence": 0.0,
+                "model": "deterministic-fallback",
+                "generated_at": datetime.now(UTC).isoformat(),
+            }
+        return {
+            "program_id": None,
+            "program_name": "",
+            "narrative": fallback["executive_narrative"],
+            "why_at_risk": "",
+            "evidence_sources": fallback["source_tables"],
+            "source_tables": fallback["source_tables"],
+            "supporting_evidence": fallback,
+            "confidence": 0.0,
+            "model": "deterministic-fallback",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
 
 
 def get_program_summary(program_id: int) -> dict[str, Any]:
-    return build_executive_program_summary(program_id)
+    try:
+        return build_executive_program_summary(program_id)
+    except Exception as exc:
+        _log_fallback("get_program_summary", exc)
+        program_name = _safe_program_name(program_id)
+        fallback_risk = _fallback_curriculum_risk(program_id, reason=str(exc))
+        fallback_alignment = _fallback_alignment(program_id, reason=str(exc))
+        return {
+            "program_id": program_id,
+            "program_name": program_name,
+            "summary": f"El programa '{program_name}' se presenta en modo de recuperación de evidencia mientras se estabiliza la integración de datos.",
+            "why_at_risk": "El análisis ejecutivo está disponible en modo fallback porque una dependencia de backend no respondió a tiempo.",
+            "microcurriculum_traceability": {
+                "microcurriculum_name": program_name,
+                "covered_skills": [],
+                "transversal_skills": [],
+                "missing_skills": fallback_alignment.get("missing_skills") or [],
+                "strengthening_areas": [],
+                "coverage": {},
+                "labor_roles": [],
+            },
+            "evidence_sources": fallback_risk.get("source_tables") or fallback_alignment.get("source_tables") or [],
+            "source_tables": fallback_risk.get("source_tables") or fallback_alignment.get("source_tables") or [],
+            "supporting_evidence": {
+                "program": {"especializacion_id": program_id, "nombre_especializacion": program_name},
+                "risk": fallback_risk,
+                "alignment": fallback_alignment,
+            },
+            "confidence": 0.0,
+            "model": "deterministic-fallback",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
 
 
 def get_recommendation_explanation(recommendation_id: int) -> dict[str, Any]:
-    return build_executive_recommendation_explanation(recommendation_id)
+    try:
+        return build_executive_recommendation_explanation(recommendation_id)
+    except Exception as exc:
+        _log_fallback("get_recommendation_explanation", exc)
+        return {
+            "recommendation_id": recommendation_id,
+            "recommendation_title": "Recomendación no disponible",
+            "explanation": "La recomendación se encuentra en modo fallback mientras se recupera la evidencia completa.",
+            "why_this_recommendation": "Se conservó el análisis con la evidencia disponible.",
+            "evidence_sources": ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"],
+            "source_tables": ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"],
+            "supporting_evidence": {"reason": str(exc)},
+            "confidence": 0.0,
+            "model": "deterministic-fallback",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
 
 
 def ask_observatory(
@@ -733,26 +1025,52 @@ def ask_observatory(
     recommendation_id: int | None = None,
     context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    return executive_ask_observatory(question, program_id=program_id, recommendation_id=recommendation_id, context=context)
+    try:
+        return executive_ask_observatory(question, program_id=program_id, recommendation_id=recommendation_id, context=context)
+    except Exception as exc:
+        _log_fallback("ask_observatory", exc)
+        fallback = get_executive_narrative(program_id=program_id) if program_id is not None else get_executive_narrative()
+        return {
+            "question": question,
+            "answer": str(fallback.get("narrative") or fallback.get("summary") or question),
+            "evidence_sources": fallback.get("evidence_sources") or fallback.get("source_tables") or ["program_intelligence", "executive_observatory"],
+            "source_tables": fallback.get("source_tables") or ["program_intelligence", "executive_observatory"],
+            "supporting_evidence": {"reason": str(exc), "question": question, "context": context},
+            "confidence": float(fallback.get("confidence") or 0.0),
+            "model": fallback.get("model") or "deterministic-fallback",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
 
 
 def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
-    if relation_exists("program_intelligence") and relation_has_rows("program_intelligence"):
-        rows = fetch_all(
-            """
-            SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
-                   gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
-                   emerging_technologies, recommended_actions, business_justification,
-                   supporting_evidence, source_tables, confidence, generated_at
-            FROM program_intelligence
-            ORDER BY risk_score DESC NULLS LAST, alignment_score DESC NULLS LAST, generated_at DESC NULLS LAST
-            LIMIT %s OFFSET %s
-            """,
-            (limit, offset),
-        )
-        rows = _dedupe_program_rows(_serialize_rows(rows))
+    try:
+        if relation_exists("program_intelligence") and relation_has_rows("program_intelligence"):
+            rows = fetch_all(
+                """
+                SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
+                       gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
+                       emerging_technologies, recommended_actions, business_justification,
+                       supporting_evidence, source_tables, confidence, generated_at
+                FROM program_intelligence
+                ORDER BY risk_score DESC NULLS LAST, alignment_score DESC NULLS LAST, generated_at DESC NULLS LAST
+                LIMIT %s OFFSET %s
+                """,
+                (limit, offset),
+            )
+            rows = _dedupe_program_rows(_serialize_rows(rows))
+            total = len(rows)
+            return {
+                "items": rows[offset : offset + limit],
+                "count": total,
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+                "filters": {},
+            }
+        rows = [item.to_dict() for item in build_program_intelligence()]
+        rows = _dedupe_program_rows(rows)
         total = len(rows)
         return {
             "items": rows[offset : offset + limit],
@@ -760,45 +1078,71 @@ def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) ->
             "total": total,
             "limit": limit,
             "offset": offset,
-            "filters": {},
+            "filters": {"source": "program_intelligence_engine"},
         }
-    rows = [item.to_dict() for item in build_program_intelligence()]
-    rows = _dedupe_program_rows(rows)
-    total = len(rows)
-    return {
-        "items": rows[offset : offset + limit],
-        "count": total,
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-        "filters": {"source": "program_intelligence_engine"},
-    }
+    except Exception as exc:
+        _log_fallback("list_program_intelligence", exc)
+        return {
+            "items": [],
+            "count": 0,
+            "total": 0,
+            "limit": limit,
+            "offset": offset,
+            "filters": {"source": "fallback"},
+        }
 
 
 def get_program_intelligence(program_id: int) -> dict[str, Any]:
-    if relation_exists("program_intelligence"):
-        row = fetch_one(
-            """
-            SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
-                   gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
-                   emerging_technologies, recommended_actions, business_justification,
-                   supporting_evidence, source_tables, confidence, generated_at
-            FROM program_intelligence
-            WHERE program_id = %s
-            """,
-            (program_id,),
-        )
-        if row:
-            return dict(row)
-    item = build_program_intelligence_for_program(program_id)
-    return item.to_dict()
+    try:
+        if relation_exists("program_intelligence"):
+            row = fetch_one(
+                """
+                SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
+                       gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
+                       emerging_technologies, recommended_actions, business_justification,
+                       supporting_evidence, source_tables, confidence, generated_at
+                FROM program_intelligence
+                WHERE program_id = %s
+                """,
+                (program_id,),
+            )
+            if row:
+                return dict(row)
+        item = build_program_intelligence_for_program(program_id)
+        return item.to_dict()
+    except Exception as exc:
+        _log_fallback("get_program_intelligence", exc)
+        return {
+            "program_id": program_id,
+            "program_name": _safe_program_name(program_id),
+            "program_role": "",
+            "alignment_score": 0.0,
+            "risk_score": 0.0,
+            "risk_level": "low",
+            "gap_count": 0,
+            "top_gaps": [],
+            "top_recommendations": [],
+            "forecast_signals": [],
+            "role_signals": [],
+            "emerging_technologies": [],
+            "recommended_actions": [],
+            "business_justification": "Fallback generado mientras se recupera la evidencia completa.",
+            "supporting_evidence": {"reason": str(exc)},
+            "source_tables": ["program_intelligence"],
+            "confidence": 0.0,
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
 
 
 def list_recommendations_v2(*, program_id: int | None = None, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
-    rows = [item.to_dict() for item in build_recommendation_v2(program_id=program_id, limit=limit)]
-    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"program_id": program_id, "version": "v2", "source": "predictive_engine"})
+    try:
+        rows = [item.to_dict() for item in build_recommendation_v2(program_id=program_id, limit=limit)]
+        return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"program_id": program_id, "version": "v2", "source": "predictive_engine"})
+    except Exception as exc:
+        _log_fallback("list_recommendations_v2", exc)
+        return _envelope([], limit=limit, offset=offset, total=0, filters={"program_id": program_id, "version": "v2", "source": "fallback"})
 
 
 def build_semantic_search_corpus(entity_type: str) -> list[dict[str, Any]]:
