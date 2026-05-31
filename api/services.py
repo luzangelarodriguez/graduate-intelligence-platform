@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time
+from decimal import Decimal
 from typing import Any
+from uuid import UUID
 
 from backend.repositories import microcurriculum_context_repository, programas_repository
 from backend.repositories import matches_repository, skills_repository
@@ -269,12 +271,39 @@ def _serialize_rows(rows: Iterable[Any]) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     for row in rows:
         if hasattr(row, "to_dict"):
-            result.append(dict(row.to_dict()))
+            result.append(_serialize_json_value(dict(row.to_dict())))
         elif isinstance(row, dict):
-            result.append(dict(row))
+            result.append(_serialize_json_value(dict(row)))
         else:
-            result.append(dict(row))
+            result.append(_serialize_json_value(dict(row)))
     return result
+
+
+def _serialize_json_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: _serialize_json_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_serialize_json_value(item) for item in value]
+    if isinstance(value, tuple):
+        return [_serialize_json_value(item) for item in value]
+    if isinstance(value, (datetime, date, time)):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    if isinstance(value, Decimal):
+        try:
+            return float(value)
+        except Exception:
+            return str(value)
+    if isinstance(value, UUID):
+        return str(value)
+    return value
+
+
+def _serialize_program_intelligence_payload(row: Any) -> dict[str, Any]:
+    payload = _serialize_json_value(dict(row))
+    return payload
 
 
 def _column_exists(table: str, column: str) -> bool:
@@ -814,7 +843,13 @@ def get_university_market_alignment(program_id: int) -> dict[str, Any]:
         return _fallback_alignment(program_id, reason=str(exc))
 
 
-def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizon_months: int = 12) -> dict[str, Any]:
+def get_critical_programs(
+    *,
+    limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
+    horizon_months: int = 12,
+    db_name: str | None = None,
+) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
     rows: list[dict[str, Any]] = []
@@ -830,7 +865,7 @@ def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizo
                 COALESCE(pr.risk_level, pi.risk_level, 'aligned') AS risk_level,
                 COALESCE(pi.gap_count, 0) AS gap_count,
                 COALESCE((pi.top_gaps->0->>'missing_skill'), '') AS main_gap_driver,
-                COALESCE((pi.recommended_actions->0), '') AS recommended_action,
+                COALESCE((pi.recommended_actions->>0), '') AS recommended_action,
                 COALESCE(pei.employability_gain, 0) AS projected_employability_gain,
                 COALESCE(pr.horizon_months, 12) AS horizon_months,
                 COALESCE(pr.source_payload, pi.supporting_evidence, '{}'::jsonb) AS supporting_evidence,
@@ -859,7 +894,7 @@ def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizo
                 risk_level,
                 gap_count,
                 COALESCE((top_gaps->0->>'missing_skill'), '') AS main_gap_driver,
-                COALESCE((top_recommendations->0->>'recommendation_reasoning'), COALESCE((recommended_actions->0), '')) AS recommended_action,
+                COALESCE((top_recommendations->0->>'recommendation_reasoning'), COALESCE((recommended_actions->>0), '')) AS recommended_action,
                 0 AS projected_employability_gain,
                 12 AS horizon_months,
                 COALESCE(supporting_evidence, '{}'::jsonb) AS supporting_evidence,
@@ -1059,7 +1094,7 @@ def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) ->
                 """,
                 (limit, offset),
             )
-            rows = _dedupe_program_rows(_serialize_rows(rows))
+            rows = _dedupe_program_rows([_serialize_program_intelligence_payload(row) for row in rows])
             total = len(rows)
             return {
                 "items": rows[offset : offset + limit],
@@ -1107,9 +1142,10 @@ def get_program_intelligence(program_id: int) -> dict[str, Any]:
                 (program_id,),
             )
             if row:
-                return dict(row)
+                return _serialize_program_intelligence_payload(row)
         item = build_program_intelligence_for_program(program_id)
-        return item.to_dict()
+        payload = item.to_dict()
+        return _serialize_program_intelligence_payload(payload)
     except Exception as exc:
         _log_fallback("get_program_intelligence", exc)
         return {

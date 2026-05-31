@@ -1,8 +1,9 @@
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, BarChart3 } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
-import { AcademicCopilotPanel } from '../components/executive-ai/AcademicCopilotPanel';
+import { AcademicCopilotPanel, type AcademicCopilotBriefing } from '../components/executive-ai/AcademicCopilotPanel';
 import { LoadingState } from '../components/LoadingState';
 import {
   ForecastHorizonCard,
@@ -54,6 +55,10 @@ function firstText(value: unknown, fallback = 'Sin información suficiente') {
   return items[0] ?? fallback;
 }
 
+function uniqueStrings(values: Array<string | undefined | null>) {
+  return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
+}
+
 function recommendationSkills(value: unknown) {
   if (!value || typeof value !== 'object') return [];
   const record = value as Record<string, unknown>;
@@ -92,20 +97,8 @@ export function ProgramIntelligenceDetailPage() {
     isLoading: executiveAiLoading,
     error: executiveAiError,
   } = useExecutiveAi(programId);
-  const selectedSkills = suggestedSkills.slice(0, 5);
+  const selectedSkills = useMemo(() => suggestedSkills.slice(0, 5), [suggestedSkills]);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
-
-  if (!programId) {
-    return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
-  }
-
-  if (isLoading) {
-    return <LoadingState label="Cargando inteligencia del programa..." />;
-  }
-
-  if (error) {
-    return <EmptyState title="No fue posible cargar el programa" body={error} />;
-  }
 
   const currentAlignment =
     alignment?.current_alignment ?? alignment?.alignment_score ?? programIntelligence?.alignment_score ?? program?.promedio_match_mercado ?? 0;
@@ -119,6 +112,115 @@ export function ProgramIntelligenceDetailPage() {
     executiveObservatory?.executive_narrative ||
     'La inteligencia del programa se genera con señales reales de mercado, brechas curriculares y evidencia de observatorio.';
   const updatedAt = programIntelligence?.generated_at || executiveObservatory?.metrics?.[0]?.metric_period || 'Datos vivos';
+  const copilotBriefing = useMemo<AcademicCopilotBriefing>(() => {
+    const programName = program?.nombre_especializacion || programIntelligence?.program_name || 'Programa en análisis';
+    const programAlignment = `${currentAlignment.toFixed(1)}%`;
+    const programRisk = `${riskScore.toFixed(1)}%`;
+    const gaps = topGaps.map((gap, index) => {
+      const record = gap as Record<string, unknown>;
+      const skill = firstText(record.skill ?? record.missing_skill ?? record.canonical_skill ?? record.name, `Brecha ${index + 1}`);
+      const cluster = firstText(record.cluster_name ?? record.occupational_cluster ?? record.cluster, 'Cluster no definido');
+      return `${skill} — ${cluster}`;
+    });
+    const recommendations = topRecommendations.map((recommendation, index) => {
+      const record = recommendation as Record<string, unknown>;
+      const title = firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, `Recomendación ${index + 1}`);
+      const reasoning = getText(record.recommendation_reasoning ?? record.business_justification, 'Recomendación basada en señales reales del mercado.');
+      return `${title} — ${reasoning}`;
+    });
+    const forecast = [6, 12, 24]
+      .map((horizon) => simulations[horizon])
+      .filter(Boolean)
+      .map((simulation) =>
+        `${simulation?.horizon_months ?? 0} meses: alineación ${simulation?.projected_alignment_score.toFixed(1)}%, riesgo ${simulation?.projected_risk_score.toFixed(1)}%, empleabilidad +${simulation?.projected_employability_gain.toFixed(1)}%`,
+      );
+    const simulationImpact = forecast.length
+      ? forecast
+      : ['Simulación pendiente de datos suficientes.'];
+    const evidence = uniqueStrings([
+      ...(executiveNarrative?.evidence_sources || []),
+      ...(programSummary?.evidence_sources || []),
+      ...(curriculumRisk?.source_tables || []),
+      ...(alignment?.source_tables || []),
+      ...(forecastSummary?.source_tables || []),
+      ...(executiveObservatory?.source_tables || []),
+      ...(programIntelligence?.source_tables || []),
+    ]);
+
+    return {
+      diagnosis:
+        programSummary?.summary?.trim() ||
+        executiveNarrative?.narrative?.trim() ||
+        narrative,
+      priorityPrograms: [
+        `${programName} — alineación ${programAlignment} · riesgo ${programRisk}`,
+        ...(executiveObservatory?.high_risk_programs || [])
+          .slice(0, 3)
+          .map((item) => `${String((item as Record<string, unknown>).program_name || (item as Record<string, unknown>).program || programName)} — ${String((item as Record<string, unknown>).risk_level || 'riesgo observado')}`),
+      ],
+      criticalGaps: gaps.length ? gaps : ['No hay microcurrículo detallado cargado para este programa. El análisis se basa en competencias y skills del programa.'],
+      recommendedActions: recommendations.length ? recommendations : ['No hay recomendaciones priorizadas con evidencia suficiente.'],
+      expectedImpact: simulationImpact,
+      evidence,
+      programContext: {
+        name: programName,
+        alignment: programAlignment,
+        risk: programRisk,
+        gaps: topGaps.map((gap) => {
+          const record = gap as Record<string, unknown>;
+          return firstText(record.skill ?? record.missing_skill ?? record.canonical_skill ?? record.name, 'Brecha no tipificada');
+        }),
+        recommendations: topRecommendations.map((recommendation) => {
+          const record = recommendation as Record<string, unknown>;
+          return firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, 'Recomendación priorizada');
+        }),
+        forecast,
+        simulation: simulationImpact,
+        note: programSummary?.microcurriculum_traceability
+          ? 'El análisis conserva trazabilidad hacia microcurrículo, competencia y evidencia laboral.'
+          : 'No hay un microcurrículo específico cargado. El análisis se basa en competencias y skills del programa.',
+      },
+      model: executiveNarrative?.model || programSummary?.model || undefined,
+      fallbackNote:
+        executiveNarrative?.model === 'deterministic-fallback' || programSummary?.model === 'deterministic-fallback'
+          ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+          : undefined,
+    };
+  }, [
+    alignment?.source_tables,
+    currentAlignment,
+    curriculumRisk?.source_tables,
+    executiveNarrative?.evidence_sources,
+    executiveNarrative?.model,
+    executiveNarrative?.narrative,
+    executiveObservatory?.high_risk_programs,
+    executiveObservatory?.source_tables,
+    forecastSummary?.source_tables,
+    narrative,
+    program?.nombre_especializacion,
+    programIntelligence?.program_name,
+    programIntelligence?.source_tables,
+    programSummary?.evidence_sources,
+    programSummary?.microcurriculum_traceability,
+    programSummary?.model,
+    programSummary?.summary,
+    riskScore,
+    simulations,
+    topGaps,
+    topRecommendations,
+  ]);
+
+  if (!programId) {
+    return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
+  }
+
+  if (isLoading) {
+    return <LoadingState label="Cargando inteligencia del programa..." />;
+  }
+
+  if (error) {
+    return <EmptyState title="No fue posible cargar el programa" body={error} />;
+  }
 
   return (
     <div className="space-y-5">
@@ -387,8 +489,10 @@ export function ProgramIntelligenceDetailPage() {
       />
 
       <AcademicCopilotPanel
-        title="Copiloto académico"
-        subtitle="Pregunta sobre brechas, programas, skills o impacto esperado. La respuesta se construye con evidencia real del observatorio."
+        title="Análisis ejecutivo generado por IA"
+        subtitle="Síntesis automática sobre pertinencia académica, brechas curriculares y señales de mercado."
+        briefing={copilotBriefing}
+        briefingLoading={executiveAiLoading}
         answer={observatoryAnswer || null}
         loading={executiveAiLoading}
         error={executiveAiError}

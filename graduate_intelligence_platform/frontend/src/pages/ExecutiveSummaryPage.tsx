@@ -3,7 +3,7 @@ import { BarChart3, Building2, CalendarClock, CircleAlert, GraduationCap, Layers
 
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
-import { AcademicCopilotPanel } from '../components/executive-ai/AcademicCopilotPanel';
+import { AcademicCopilotPanel, type AcademicCopilotBriefing } from '../components/executive-ai/AcademicCopilotPanel';
 import {
   AttentionProgramList,
   FindingsFooter,
@@ -485,6 +485,86 @@ export function ExecutiveSummaryPage() {
     ];
   }, [emergingSkills, executiveObservatory?.critical_gaps, executiveObservatory?.high_risk_programs, forecasts, metrics.criticalPrograms, scenario]);
 
+  const copilotBriefing = useMemo<AcademicCopilotBriefing>(() => {
+    const priorityPrograms = [
+      ...attentionPrograms.slice(0, 5).map(
+        (program) =>
+          `${program.programName} — alineación ${program.alignment.toFixed(1)}% · riesgo ${program.riskLevel} · ${program.mainGapDriver}`,
+      ),
+      ...((executiveObservatory?.high_risk_programs || []) as Array<Record<string, unknown>>).slice(0, 3).map((item) => {
+        const name = String(item.program_name || item.program || item.nombre_especializacion || 'Programa prioritario');
+        const alignment = Number(item.alignment_score ?? item.alignment ?? 0);
+        const risk = String(item.risk_level || item.risk || 'N/D');
+        return `${name} — alineación ${alignment.toFixed(1)}% · riesgo ${risk}`;
+      }),
+    ];
+
+    const criticalGaps = uniqueStrings([
+      ...((executiveObservatory?.critical_gaps || []) as Array<Record<string, unknown>>).slice(0, 6).map((item) =>
+        String(item.missing_skill || item.skill || item.canonical_skill || item.gap || ''),
+      ),
+      ...comparisonRows.slice(0, 4).map((row) => `${row.label} · ${row.marketDemand}`),
+    ]);
+
+    const recommendedActions = uniqueStrings([
+      ...recommendationCards.slice(0, 5).map((item) => `${item.title} — ${item.academicRationale}`),
+      ...(executiveObservatory?.top_recommendations || []).slice(0, 3).map((item) =>
+        String((item as Record<string, unknown>).recommendation_reasoning || (item as Record<string, unknown>).recommendation || ''),
+      ),
+    ]);
+
+    const expectedImpact = uniqueStrings([
+      scenario
+        ? `Si se aplican las recomendaciones, la alineación podría pasar de ${scenario.currentAlignment.toFixed(1)}% a ${scenario.projectedAlignment.toFixed(1)}%.`
+        : 'La simulación todavía no consolida una proyección completa por horizonte.',
+      scenario ? `La mejora esperada equivale a +${scenario.expectedImprovement.toFixed(1)} puntos de alineación.` : 'El impacto curricular se calculará cuando la simulación tenga suficiente evidencia.',
+      ...findings.slice(0, 2),
+    ]);
+
+    const evidence = uniqueStrings([
+      ...((executiveObservatory?.source_tables || []) as string[]),
+      ...programIntelligence.slice(0, 4).flatMap((program) => program.source_tables || []),
+      ...programIntelligence.slice(0, 4).map((program) => program.program_name),
+      ...((executiveObservatory?.top_emerging_skills || []) as Array<Record<string, unknown>>)
+        .slice(0, 4)
+        .map((item) => String(item.skill_name || item.skill || '')),
+      ...marketSignals.emergingSkillItems.slice(0, 2).map((item) => item.label),
+      ...marketSignals.technologyItems.slice(0, 2).map((item) => item.label),
+      ...marketSignals.companyItems.slice(0, 2).map((item) => item.label),
+      ...marketSignals.forecastItems.slice(0, 2).map((item) => `${item.label} · ${item.value}`),
+    ]);
+
+    return {
+      diagnosis: aiNarrative,
+      priorityPrograms,
+      criticalGaps,
+      recommendedActions,
+      expectedImpact,
+      evidence,
+      model: executiveNarrative?.model || (executiveObservatory?.executive_narrative ? 'deterministic-fallback' : undefined),
+      fallbackNote:
+        executiveNarrative?.model === 'deterministic-fallback'
+          ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+          : undefined,
+    };
+  }, [
+    aiNarrative,
+    attentionPrograms,
+    comparisonRows,
+    executiveNarrative?.model,
+    executiveObservatory?.critical_gaps,
+    executiveObservatory?.executive_narrative,
+    executiveObservatory?.high_risk_programs,
+    executiveObservatory?.source_tables,
+    executiveObservatory?.top_emerging_skills,
+    executiveObservatory?.top_recommendations,
+    findings,
+    marketSignals,
+    programIntelligence,
+    recommendationCards,
+    scenario,
+  ]);
+
   const topEmergingSkillRows = marketSignals.emergingSkillItems;
   const topTechnologiesRows = marketSignals.technologyItems;
   const topCompaniesRows = marketSignals.companyItems;
@@ -565,8 +645,10 @@ export function ExecutiveSummaryPage() {
         </SectionPanel>
 
         <AcademicCopilotPanel
-          title="Consultas ejecutivas guiadas"
-          subtitle="Preguntas institucionales sobre programas, brechas, impacto esperado y evidencia de mercado. Las respuestas se generan sobre datos vivos y, cuando aplica, con OpenAI en modo explicativo."
+          title="Análisis ejecutivo generado por IA"
+          subtitle="Síntesis automática sobre pertinencia académica, brechas curriculares y señales de mercado."
+          briefing={copilotBriefing}
+          briefingLoading={executiveAiLoading}
           loading={executiveAiLoading}
           error={executiveAiError}
           answer={observatoryAnswer}

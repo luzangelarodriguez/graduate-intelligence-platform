@@ -9,7 +9,6 @@ import {
   getProgramas,
   getProgramAlignment,
   getProgramIntelligenceDetail,
-  getPrograma,
 } from '../services/api';
 import type {
   CriticalProgramItem,
@@ -154,6 +153,21 @@ function buildFallbackProgramIntelligence(program: Program): ProgramIntelligence
   };
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs = 3500): Promise<T | undefined> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(undefined), timeoutMs);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(() => {
+        clearTimeout(timer);
+        resolve(undefined);
+      });
+  });
+}
+
 export function useProgramIntelligenceData(programId: number | null) {
   const [state, setState] = useState<ProgramIntelligenceDataState>({
     criticalPrograms: [],
@@ -175,59 +189,43 @@ export function useProgramIntelligenceData(programId: number | null) {
     async function load() {
       try {
         setIsLoading(true);
-        const results = await Promise.allSettled([
-          getPrograma(currentProgramId),
-          getProgramIntelligenceDetail(currentProgramId),
-          getCurriculumRisk(currentProgramId),
-          getProgramAlignment(currentProgramId),
-          getForecastSummary(25),
-          getExecutiveObservatory(),
-          getCriticalPrograms(12, 12),
-          getProgramas(100),
-        ]);
+        const programsPage = await withTimeout(getProgramas(100), 12000);
+        const fallbackProgram = programsPage?.items.find((item) => item.especializacion_id === currentProgramId);
+        const baseProgram: Program | undefined = fallbackProgram || undefined;
 
         const [
-          programResult,
-          programIntelligenceResult,
-          curriculumRiskResult,
-          alignmentResult,
-          forecastSummaryResult,
-          executiveObservatoryResult,
-          criticalProgramsResult,
-          programsPageResult,
-        ] =
-          results;
-
-        const programsPage = programsPageResult.status === 'fulfilled' ? programsPageResult.value : undefined;
-        const fallbackProgram = programsPage?.items.find((item) => item.especializacion_id === currentProgramId);
-        const program = programResult.status === 'fulfilled' ? programResult.value : fallbackProgram;
-        const programIntelligence =
-          programIntelligenceResult.status === 'fulfilled'
-            ? programIntelligenceResult.value
-            : program
-              ? buildFallbackProgramIntelligence(program)
-              : undefined;
-        const curriculumRisk = curriculumRiskResult.status === 'fulfilled' ? curriculumRiskResult.value : undefined;
-        const alignment = alignmentResult.status === 'fulfilled' ? alignmentResult.value : undefined;
-        const forecastSummary = forecastSummaryResult.status === 'fulfilled' ? forecastSummaryResult.value : undefined;
-        const executiveObservatory = executiveObservatoryResult.status === 'fulfilled' ? executiveObservatoryResult.value : undefined;
-        const criticalPrograms = criticalProgramsResult.status === 'fulfilled' ? criticalProgramsResult.value : { items: [] };
-
-        if (cancelled) return;
-
-        setState({
-          program,
           programIntelligence,
           curriculumRisk,
           alignment,
           forecastSummary,
           executiveObservatory,
-          criticalPrograms: criticalPrograms.items,
+          criticalPrograms,
+        ] = await Promise.all([
+          withTimeout(getProgramIntelligenceDetail(currentProgramId)),
+          withTimeout(getCurriculumRisk(currentProgramId)),
+          withTimeout(getProgramAlignment(currentProgramId)),
+          withTimeout(getForecastSummary(25)),
+          withTimeout(getExecutiveObservatory()),
+          withTimeout(getCriticalPrograms(12, 12)),
+        ]);
+
+        const resolvedProgram = baseProgram;
+        const resolvedProgramIntelligence =
+          programIntelligence ||
+          (resolvedProgram ? buildFallbackProgramIntelligence(resolvedProgram) : undefined);
+
+        if (cancelled) return;
+
+        setState({
+          program: resolvedProgram,
+          programIntelligence: resolvedProgramIntelligence,
+          curriculumRisk,
+          alignment,
+          forecastSummary,
+          executiveObservatory,
+          criticalPrograms: criticalPrograms?.items || [],
         });
-        const failures = [
-          program ? '' : 'program',
-          programIntelligence ? '' : 'program-intelligence',
-        ].filter(Boolean);
+        const failures = [resolvedProgram ? '' : 'program', resolvedProgramIntelligence ? '' : 'program-intelligence'].filter(Boolean);
         setError(failures.length >= 2 ? 'No se pudo cargar la inteligencia base del programa.' : null);
       } catch (cause) {
         if (!cancelled) {
@@ -275,6 +273,9 @@ export function useProgramSimulations(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const skillSignature = useMemo(() => uniqueStrings(proposedSkills).map((skill) => normalizeText(skill)).join('|'), [proposedSkills]);
+  const normalizedHorizons = useMemo(() => {
+    return [...new Set(horizons.filter((horizon) => Number.isFinite(horizon) && horizon > 0))].sort((left, right) => left - right);
+  }, [horizons.join('|')]);
 
   useEffect(() => {
     if (!programId || !skillSignature) {
@@ -291,7 +292,7 @@ export function useProgramSimulations(
         setIsLoading(true);
         const uniqueSkills = uniqueStrings(proposedSkills);
         const results = await Promise.all(
-          horizons.map(async (horizon) => {
+          normalizedHorizons.map(async (horizon) => {
             const data = await getCurriculumSimulator(currentProgramId, uniqueSkills, horizon);
             return [horizon, data] as const;
           }),
@@ -315,7 +316,7 @@ export function useProgramSimulations(
     return () => {
       cancelled = true;
     };
-  }, [horizons, programId, skillSignature, proposedSkills]);
+  }, [normalizedHorizons, programId, skillSignature, proposedSkills]);
 
   return { simulations, isLoading, error };
 }

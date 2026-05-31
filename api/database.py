@@ -41,40 +41,40 @@ def connection():
         _pool().putconn(conn)
 
 
-def fetch_all(sql: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
+def fetch_all(sql: str, params: tuple[Any, ...] = (), *, db_name: str | None = None) -> list[dict[str, Any]]:
     with connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(sql, params)
             return list(cur.fetchall())
 
 
-def fetch_one(sql: str, params: tuple[Any, ...] = ()) -> dict[str, Any] | None:
+def fetch_one(sql: str, params: tuple[Any, ...] = (), *, db_name: str | None = None) -> dict[str, Any] | None:
     with connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(sql, params)
             return cur.fetchone()
 
 
-def relation_exists(name: str) -> bool:
-    row = fetch_one("SELECT to_regclass(%s) IS NOT NULL AS exists", (name,))
+def relation_exists(name: str, *, db_name: str | None = None) -> bool:
+    row = fetch_one("SELECT to_regclass(%s) IS NOT NULL AS exists", (name,), db_name=db_name)
     return bool(row and row.get("exists"))
 
 
-def relation_has_rows(name: str) -> bool:
-    if not relation_exists(name):
+def relation_has_rows(name: str, *, db_name: str | None = None) -> bool:
+    if not relation_exists(name, db_name=db_name):
         return False
-    row = fetch_one(f"SELECT EXISTS (SELECT 1 FROM {name} LIMIT 1) AS has_rows")
+    row = fetch_one(f"SELECT EXISTS (SELECT 1 FROM {name} LIMIT 1) AS has_rows", db_name=db_name)
     return bool(row and row.get("has_rows"))
 
 
-def table_row_count(name: str) -> int:
-    if not relation_exists(name):
+def table_row_count(name: str, *, db_name: str | None = None) -> int:
+    if not relation_exists(name, db_name=db_name):
         return 0
-    row = fetch_one(f"SELECT COUNT(*)::int AS total FROM {name}")
+    row = fetch_one(f"SELECT COUNT(*)::int AS total FROM {name}", db_name=db_name)
     return int((row or {}).get("total") or 0)
 
 
-def startup_validate(required_relations: tuple[str, ...] = ()) -> dict[str, Any]:
+def startup_validate(required_relations: tuple[str, ...] = (), *, db_name: str | None = None) -> dict[str, Any]:
     health = {"database": False, "required_relations": {}, "dsn": "configured"}
     with connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -82,5 +82,5 @@ def startup_validate(required_relations: tuple[str, ...] = ()) -> dict[str, Any]
             row = cur.fetchone() or {}
             health["database"] = bool(row.get("ok"))
     for relation in required_relations:
-        health["required_relations"][relation] = relation_exists(relation)
+        health["required_relations"][relation] = relation_exists(relation, db_name=db_name)
     return health

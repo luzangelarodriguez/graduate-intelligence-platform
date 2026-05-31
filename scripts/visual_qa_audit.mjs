@@ -159,7 +159,7 @@ async function main() {
   });
 
   const page = await context.newPage();
-  await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
   log.pages.executive_summary = {
     title: await page.locator('h1, h2').first().innerText().catch(() => ''),
@@ -167,7 +167,7 @@ async function main() {
   };
   await capture(page, '01-executive-summary');
 
-  await page.goto(`${BASE_URL}/programas`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/programas`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
   const firstProgramHref = await page.locator('a[href^="/programs/"]').first().getAttribute('href').catch(() => null);
   const firstProgramName = await page.locator('a[href^="/programs/"] h4, a[href^="/programs/"] strong').first().innerText().catch(() => '');
@@ -183,7 +183,7 @@ async function main() {
     throw new Error('No se pudo resolver un programa válido desde /programas');
   }
 
-  await page.goto(`${BASE_URL}/programs/${programId}`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/programs/${programId}`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1400);
   log.pages.program_detail = {
     title: await page.locator('h2').first().innerText().catch(() => ''),
@@ -192,9 +192,41 @@ async function main() {
   await capture(page, '03-program-detail');
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)).catch(() => {});
   await page.waitForTimeout(700);
+  await page.waitForFunction(
+    () => {
+      const text = document.body?.innerText || '';
+      return (
+        text.includes('Diagnóstico institucional') ||
+        text.includes('Programas prioritarios') ||
+        text.includes('Brechas críticas') ||
+        text.includes('Preguntar al observatorio') ||
+        text.includes('No fue posible cargar el programa')
+      );
+    },
+    { timeout: 15000 },
+  );
+  const copilotBody = await page.locator('body').innerText().catch(() => '');
+  const copilotSignals = [
+    'Diagnóstico institucional',
+    'Programas prioritarios',
+    'Brechas críticas',
+    'Acciones recomendadas',
+    'Impacto esperado',
+    'Evidencia utilizada',
+    'Preguntar al observatorio',
+  ];
+  const matchedSignals = copilotSignals.filter((signal) => copilotBody.includes(signal));
+  if (matchedSignals.length < 4) {
+    throw new Error(`El copiloto no muestra el briefing ejecutivo automático esperado. Señales encontradas: ${matchedSignals.join(', ') || 'ninguna'}`);
+  }
+  log.pages.copilot = {
+    heading: await page.locator('h3').first().innerText().catch(() => ''),
+    matchedSignals,
+    bodyLength: copilotBody.length,
+  };
   await capture(page, '07-copilot');
 
-  await page.goto(`${BASE_URL}/programs/${programId}/microcurriculum`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/programs/${programId}/microcurriculum`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1400);
   log.pages.microcurriculum = {
     title: await page.locator('h2').first().innerText().catch(() => ''),
@@ -202,7 +234,7 @@ async function main() {
   };
   await capture(page, '04-microcurriculum');
 
-  await page.goto(`${BASE_URL}/programs/${programId}/forecast`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/programs/${programId}/forecast`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1400);
   log.pages.forecast = {
     title: await page.locator('h2').first().innerText().catch(() => ''),
@@ -210,7 +242,7 @@ async function main() {
   };
   await capture(page, '05-forecast');
 
-  await page.goto(`${BASE_URL}/programs/${programId}/simulation`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/programs/${programId}/simulation`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1400);
   const customSkillInput = page.locator('input[type="text"]').first();
   const addSkillButton = page.getByRole('button', { name: 'Agregar skill' });
