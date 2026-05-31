@@ -192,6 +192,7 @@ export function ProgramMicrocurriculumPage() {
         }
         evidenceSources={programSummary?.evidence_sources}
         confidence={programSummary?.confidence}
+        model={programSummary?.model}
         loading={executiveAiLoading}
         error={executiveAiError}
         emptyTitle="No fue posible cargar la trazabilidad ejecutiva"

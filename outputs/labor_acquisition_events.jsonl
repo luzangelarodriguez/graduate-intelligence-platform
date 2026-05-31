@@ -333,3 +333,8 @@
 {"ts": 1780233173.1710207, "correlation_id": "lap-fb0cd8f8208649e4", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
 {"ts": 1780233173.1930842, "correlation_id": "lap-fb0cd8f8208649e4", "event": "deduplication_completed", "before": 1, "after": 1}
 {"ts": 1780233176.5348835, "correlation_id": "lap-fb0cd8f8208649e4", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}
+{"ts": 1780241993.8260617, "correlation_id": "lap-d78fa5a38d394b29", "event": "labor_acquisition_started", "sources": ["unit"], "execute_network": false, "workers": 1, "resume_from": ""}
+{"ts": 1780241993.8661635, "correlation_id": "lap-d78fa5a38d394b29", "event": "source_started", "source": "unit"}
+{"ts": 1780241993.876939, "correlation_id": "lap-d78fa5a38d394b29", "event": "source_finished", "source": "unit", "results": 1, "errors": []}
+{"ts": 1780241993.909337, "correlation_id": "lap-d78fa5a38d394b29", "event": "deduplication_completed", "before": 1, "after": 1}
+{"ts": 1780241996.6554089, "correlation_id": "lap-d78fa5a38d394b29", "event": "labor_acquisition_finished", "results": 1, "errors": 0, "market": {"skill_universe": 49, "occupational_clusters": 9, "covered_skills": 14, "missing_skills": 0, "emerging_skills": 0, "market_skills": 49, "warehouse_verification": {}, "analytics_reports": {}}}

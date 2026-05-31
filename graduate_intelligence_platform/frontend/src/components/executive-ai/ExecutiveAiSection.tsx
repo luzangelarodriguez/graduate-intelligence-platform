@@ -8,6 +8,7 @@ interface ExecutiveAiSectionProps {
   body?: string;
   evidenceSources?: string[];
   confidence?: number | null;
+  model?: string | null;
   loading?: boolean;
   error?: string | null;
   emptyTitle: string;
@@ -28,6 +29,7 @@ export function ExecutiveAiSection({
   body,
   evidenceSources = [],
   confidence,
+  model,
   loading = false,
   error = null,
   emptyTitle,
@@ -42,21 +44,7 @@ export function ExecutiveAiSection({
     );
   }
 
-  if (error) {
-    return (
-      <section className="panel space-y-4">
-        <EmptyState title={emptyTitle} body={error} />
-      </section>
-    );
-  }
-
-  if (!body) {
-    return (
-      <section className="panel space-y-4">
-        <EmptyState title={emptyTitle} body={emptyBody} />
-      </section>
-    );
-  }
+  const fallbackMode = Boolean(error) || model === 'deterministic-fallback';
 
   return (
     <section className="panel space-y-4">
@@ -69,8 +57,29 @@ export function ExecutiveAiSection({
         <span className="rounded-full border border-line bg-slate-50 px-3 py-1 text-xs font-medium text-muted">
           Confianza {toPercent(confidence)}
         </span>
+        {model === 'deterministic-fallback' ? (
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
+            Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.
+          </span>
+        ) : null}
+        {error ? (
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
+            Respuesta explicada con datos disponibles mientras se recupera OpenAI.
+          </span>
+        ) : null}
       </div>
-      <p className="text-sm leading-7 text-ink">{body}</p>
+      {body ? (
+        <p className="text-sm leading-7 text-ink">{body}</p>
+      ) : (
+        <EmptyState
+          title={emptyTitle}
+          body={
+            fallbackMode
+              ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+              : emptyBody
+          }
+        />
+      )}
       <div className="flex flex-wrap gap-2">
         {evidenceSources.length ? (
           evidenceSources.slice(0, 6).map((source) => (

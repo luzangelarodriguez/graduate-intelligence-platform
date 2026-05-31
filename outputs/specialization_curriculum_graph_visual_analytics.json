@@ -294,14 +294,14 @@
     "toma de decisiones": 5
   },
   "raw_concept_frequency": {
-    "visualizacion": 28,
-    "inteligencia artificial": 15,
     "resultados de aprendizaje": 11,
+    "inteligencia artificial": 15,
+    "visualizacion": 28,
     "big data": 33,
-    "bases de datos": 19,
     "visual analytics": 9,
-    "toma de decisiones": 5,
+    "bases de datos": 19,
     "analitica": 7,
+    "toma de decisiones": 5,
     "business intelligence": 6
   }
 }

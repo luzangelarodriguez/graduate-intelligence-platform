@@ -61,6 +61,29 @@ export function ProgramSimulationPage() {
 
   const proposedSkills = useMemo(() => selectedSkills, [selectedSkills]);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, proposedSkills, [6, 12, 24]);
+  const currentSimulation = simulations[12];
+
+  useEffect(() => {
+    if (!programId || !selectedSkills.length) {
+      return;
+    }
+    const question = `¿Qué ocurre si actualizamos el currículo con ${selectedSkills.slice(0, 4).join(', ')}?`;
+    void runQuery(question, {
+      selected_skills: selectedSkills,
+      current_alignment: currentSimulation?.current_alignment_score,
+      projected_alignment: currentSimulation?.projected_alignment_score,
+      projected_risk: currentSimulation?.projected_risk_score,
+      projected_employability: currentSimulation?.projected_employability_gain,
+    });
+  }, [
+    currentSimulation?.current_alignment_score,
+    currentSimulation?.projected_alignment_score,
+    currentSimulation?.projected_employability_gain,
+    currentSimulation?.projected_risk_score,
+    programId,
+    runQuery,
+    selectedSkills,
+  ]);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -68,10 +91,6 @@ export function ProgramSimulationPage() {
 
   if (isLoading) {
     return <LoadingState label="Cargando simulación curricular..." />;
-  }
-
-  if (error) {
-    return <EmptyState title="No fue posible cargar la simulación" body={error} />;
   }
 
   const currentAlignment = alignment?.current_alignment ?? alignment?.alignment_score ?? program?.promedio_match_mercado ?? 0;
@@ -102,32 +121,14 @@ export function ProgramSimulationPage() {
     setDraftSkill('');
   }
 
-  const currentSimulation = simulations[12];
-
-  useEffect(() => {
-    if (!programId || !selectedSkills.length) {
-      return;
-    }
-    const question = `¿Qué ocurre si actualizamos el currículo con ${selectedSkills.slice(0, 4).join(', ')}?`;
-    void runQuery(question, {
-      selected_skills: selectedSkills,
-      current_alignment: currentSimulation?.current_alignment_score,
-      projected_alignment: currentSimulation?.projected_alignment_score,
-      projected_risk: currentSimulation?.projected_risk_score,
-      projected_employability: currentSimulation?.projected_employability_gain,
-    });
-  }, [
-    currentSimulation?.current_alignment_score,
-    currentSimulation?.projected_alignment_score,
-    currentSimulation?.projected_employability_gain,
-    currentSimulation?.projected_risk_score,
-    programId,
-    runQuery,
-    selectedSkills,
-  ]);
-
   return (
     <div className="space-y-5">
+      {error ? (
+        <section className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          No fue posible cargar toda la inteligencia base del programa. La pantalla continúa con la evidencia disponible.
+        </section>
+      ) : null}
+
       <ProgramPageHeader
         programId={programId}
         title={program?.nombre_especializacion || 'Simulación curricular'}
@@ -199,7 +200,11 @@ export function ProgramSimulationPage() {
         </div>
       </article>
 
-      {simulationsError && <EmptyState title="No se pudo calcular la simulación" body={simulationsError} />}
+      {simulationsError ? (
+        <section className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          No se pudo calcular toda la simulación en este momento. Se muestran estados de respaldo con la información disponible.
+        </section>
+      ) : null}
       {simulationsLoading && <LoadingState label="Calculando impacto curricular..." />}
 
       {!simulationsLoading && !simulationsError && (
@@ -288,18 +293,23 @@ export function ProgramSimulationPage() {
             </article>
           </section>
 
-          <ExecutiveAiSection
-            title="Simulación explicada por IA"
-            subtitle="La explicación conecta las skills seleccionadas con la evidencia curricular y el impacto proyectado."
-            body={selectedSkills.length ? observatoryAnswer?.answer : undefined}
-            evidenceSources={observatoryAnswer?.evidence_sources}
-            confidence={observatoryAnswer?.confidence}
-            loading={executiveAiLoading}
-            error={executiveAiError}
-            emptyTitle="No fue posible generar la explicación de simulación"
-            emptyBody="La explicación ejecutiva todavía no está disponible, pero la simulación numérica sigue operativa."
-            badgeLabel="Simulation AI"
-          />
+      <ExecutiveAiSection
+        title="Simulación explicada por IA"
+        subtitle="La explicación conecta las skills seleccionadas con la evidencia curricular y el impacto proyectado."
+        body={
+          selectedSkills.length
+            ? observatoryAnswer?.answer
+            : 'Simulación pendiente de datos suficientes. Selecciona skills para calcular impacto.'
+        }
+        evidenceSources={selectedSkills.length ? observatoryAnswer?.evidence_sources : []}
+        confidence={selectedSkills.length ? observatoryAnswer?.confidence : null}
+        model={selectedSkills.length ? observatoryAnswer?.model : 'deterministic-fallback'}
+        loading={executiveAiLoading && selectedSkills.length > 0}
+        error={selectedSkills.length ? executiveAiError : null}
+        emptyTitle="No fue posible generar la explicación de simulación"
+        emptyBody="La explicación ejecutiva todavía no está disponible, pero la simulación numérica sigue operativa."
+        badgeLabel="Simulation AI"
+      />
 
           <section className="rounded-lg border border-line bg-white px-4 py-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-ink">

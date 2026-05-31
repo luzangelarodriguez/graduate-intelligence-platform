@@ -28,18 +28,11 @@ export function useExecutiveAi(programId: number | null, recommendationId: numbe
   useEffect(() => {
     let cancelled = false;
 
-    if (!programId) {
-      setState({ isLoading: false });
-      return () => {
-        cancelled = true;
-      };
-    }
-
     setState((current) => ({ ...current, isLoading: true, error: undefined }));
 
     Promise.all([
-      getProgramSummary(programId),
-      getExecutiveNarrative(programId),
+      programId ? getProgramSummary(programId) : Promise.resolve(undefined),
+      getExecutiveNarrative(programId ?? undefined),
       recommendationId ? getRecommendationExplanation(recommendationId) : Promise.resolve(null),
     ])
       .then(([programSummary, executiveNarrative, recommendationExplanation]) => {
@@ -47,7 +40,7 @@ export function useExecutiveAi(programId: number | null, recommendationId: numbe
           return;
         }
         setState({
-          programSummary,
+          programSummary: programSummary || undefined,
           executiveNarrative,
           recommendationExplanation: recommendationExplanation || undefined,
           isLoading: false,
@@ -70,14 +63,11 @@ export function useExecutiveAi(programId: number | null, recommendationId: numbe
 
   const runQuery = useCallback(
     async (question: string, context?: Record<string, unknown>) => {
-      if (!programId) {
-        return null;
-      }
       setState((current) => ({ ...current, isLoading: true, error: undefined }));
       try {
         const observatoryAnswer = await askObservatory({
           question,
-          program_id: programId,
+          program_id: programId ?? undefined,
           recommendation_id: recommendationId ?? undefined,
           context: context ?? {},
         });
