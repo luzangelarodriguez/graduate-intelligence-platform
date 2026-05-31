@@ -33,6 +33,8 @@ MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "019_labor_observatory_layer.sql",
     ROOT_DIR / "database" / "migrations" / "020_predictive_intelligence_layer.sql",
     ROOT_DIR / "database" / "migrations" / "021_program_intelligence.sql",
+    ROOT_DIR / "database" / "migrations" / "022_program_intelligence_dedup.sql",
+    ROOT_DIR / "database" / "migrations" / "023_program_intelligence_table.sql",
 ]
 ANALYTICS_DIR = ROOT_DIR / "outputs" / "analytics"
 
@@ -475,7 +477,7 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
         )
         persisted_local = persist_intelligence(payload) if persist else {}
         program_intelligence_records = build_program_intelligence()
-        program_intelligence_count = persist_program_intelligence(program_intelligence_records) if persist else 0
+        program_intelligence_count = persist_program_intelligence(program_intelligence_records, replace_existing=True) if persist else 0
         persisted_local["program_intelligence"] = program_intelligence_count
         executive_observatory = build_executive_observatory_v2(persist=False)
         persisted_local["executive_observatory_metrics"] = persist_executive_observatory_metrics(executive_observatory.metrics) if persist else 0

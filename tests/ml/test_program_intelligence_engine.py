@@ -121,6 +121,48 @@ def test_build_program_intelligence_from_observatory_rows(monkeypatch) -> None:
     assert item.supporting_evidence["program_skills"]
 
 
+def test_build_program_intelligence_deduplicates_program_names(monkeypatch) -> None:
+    monkeypatch.setattr(
+        engine.dashboard_service,
+        "list_programs_base",
+        lambda db_name=None: [
+            {
+                "especializacion_id": 18,
+                "nombre_especializacion": "Especialización en Derechos Humanos",
+                "rol": "Human Rights Specialist",
+                "promedio_match_mercado": 61.0,
+                "porcentaje_match": 61.0,
+                "total_skills_programa": 4,
+                "source_url": "https://example.edu/a",
+                "plan_estudios": "pdf-a",
+            },
+            {
+                "especializacion_id": 99,
+                "nombre_especializacion": "especialización en derechos humanos",
+                "rol": "Human Rights Specialist",
+                "promedio_match_mercado": 59.0,
+                "porcentaje_match": 59.0,
+                "total_skills_programa": 2,
+                "source_url": "",
+                "plan_estudios": "",
+            },
+        ],
+    )
+    monkeypatch.setattr(
+        engine.programas_repository,
+        "fetch_program_skill_rows",
+        lambda program_id, db_name=None: [{"skill_id": 1, "nombre": "DD.HH."}],
+    )
+    monkeypatch.setattr(engine, "relation_exists", lambda name, db_name=None: False)
+    monkeypatch.setattr(engine, "fetch_all", lambda *args, **kwargs: [])
+
+    items = engine.build_program_intelligence()
+
+    assert len(items) == 1
+    assert items[0].program_id == 18
+    assert items[0].program_name == "Especialización en Derechos Humanos"
+
+
 def test_persist_program_intelligence_uses_upsert(monkeypatch) -> None:
     monkeypatch.setattr(engine, "relation_exists", lambda name, db_name=None: True)
 

@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
+import json
 from typing import Any
 
 from psycopg2.extras import Json, execute_values
@@ -32,6 +34,25 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, (datetime,)):
+        return value.isoformat()
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    return value
+
+
 def _as_list(value: Any) -> list[str]:
     if value is None:
         return []
@@ -51,6 +72,43 @@ def _unique(sequence: list[str]) -> list[str]:
             continue
         seen.add(key)
         ordered.append(item)
+    return ordered
+
+
+def _program_canonical_key(program: dict[str, Any]) -> str:
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    program_id = str(program.get("especializacion_id") or program.get("id") or "").strip()
+    canonical_name = normalize_key(program_name)
+    if canonical_name:
+        return canonical_name
+    return f"id {program_id}" if program_id else ""
+
+
+def _program_quality_score(program: dict[str, Any]) -> tuple[int, int, int, int, int]:
+    has_source = 1 if (str(program.get("source_url") or "").strip() or str(program.get("plan_estudios") or "").strip()) else 0
+    total_skills = int(program.get("total_skills_programa") or 0)
+    has_role = 1 if str(program.get("rol") or "").strip() else 0
+    capitalized = 1 if str(program.get("nombre_especializacion") or program.get("nombre") or "").strip().startswith(tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑ")) else 0
+    program_id = int(program.get("especializacion_id") or program.get("id") or 0)
+    return has_source, total_skills, has_role, capitalized, -program_id
+
+
+def _dedupe_program_rows(programs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    for program in programs:
+        key = _program_canonical_key(program)
+        if not key:
+            key = f"id {int(program.get('especializacion_id') or program.get('id') or 0)}"
+        current = grouped.get(key)
+        if current is None or _program_quality_score(program) > _program_quality_score(current):
+            grouped[key] = program
+    ordered = sorted(
+        grouped.values(),
+        key=lambda item: (
+            normalize_key(str(item.get("nombre_especializacion") or item.get("nombre") or "")),
+            int(item.get("especializacion_id") or item.get("id") or 0),
+        ),
+    )
     return ordered
 
 
@@ -204,7 +262,8 @@ def _pick_top(rows: list[dict[str, Any]], key: str, limit: int = 5) -> list[dict
 
 def _program_view_rows(db_name: str | None = None) -> list[dict[str, Any]]:
     rows = _program_rows(db_name=db_name)
-    return [dashboard_service.normalize_program_row(row) for row in rows]
+    normalized = [dashboard_service.normalize_program_row(row) for row in rows]
+    return _dedupe_program_rows(normalized)
 
 
 def _match_rows_for_program(program: dict[str, Any], observatory: dict[str, list[dict[str, Any]]]) -> dict[str, list[dict[str, Any]]]:
@@ -409,7 +468,7 @@ def build_program_intelligence(program_id: int | None = None, *, db_name: str | 
     if program_id is not None:
         programs = [program for program in programs if int(program.get("especializacion_id") or program.get("id") or 0) == int(program_id)]
     items = [_build_item(program, observatory) for program in programs]
-    return sorted(items, key=lambda item: (item.risk_score, item.alignment_score), reverse=True)
+    return sorted(items, key=lambda value: (value.risk_score, value.alignment_score), reverse=True)
 
 
 def build_program_intelligence_for_program(program_id: int, *, db_name: str | None = None) -> ProgramIntelligenceItem:
@@ -419,28 +478,29 @@ def build_program_intelligence_for_program(program_id: int, *, db_name: str | No
     return items[0]
 
 
-def persist_program_intelligence(records: list[ProgramIntelligenceItem], *, db_name: str | None = None) -> int:
+def persist_program_intelligence(records: list[ProgramIntelligenceItem], *, db_name: str | None = None, replace_existing: bool = False) -> int:
     if not records or not relation_exists("program_intelligence", db_name=db_name):
         return 0
     now = datetime.now(UTC)
     rows = [
         (
             record.program_id,
+            normalize_key(record.program_name),
             record.program_name,
             record.program_role,
             record.alignment_score,
             record.risk_score,
             record.risk_level,
             record.gap_count,
-            Json(record.top_gaps),
-            Json(record.top_recommendations),
-            Json(record.forecast_signals),
-            Json(record.role_signals),
-            Json(record.emerging_technologies),
-            Json(record.recommended_actions),
+            Json(_json_safe(record.top_gaps), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.top_recommendations), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.forecast_signals), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.role_signals), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.emerging_technologies), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.recommended_actions), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
             record.business_justification,
-            Json(record.supporting_evidence),
-            Json(record.source_tables),
+            Json(_json_safe(record.supporting_evidence), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
+            Json(_json_safe(record.source_tables), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
             record.confidence,
             now,
             now,
@@ -449,16 +509,19 @@ def persist_program_intelligence(records: list[ProgramIntelligenceItem], *, db_n
     ]
     with get_conn() as conn:
         with conn.cursor() as cur:
+            if replace_existing:
+                cur.execute("TRUNCATE TABLE program_intelligence")
             execute_values(
                 cur,
                 """
                 INSERT INTO program_intelligence
-                    (program_id, program_name, program_role, alignment_score, risk_score, risk_level,
+                    (program_id, canonical_program_key, program_name, program_role, alignment_score, risk_score, risk_level,
                      gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
                      emerging_technologies, recommended_actions, business_justification,
                      supporting_evidence, source_tables, confidence, generated_at, updated_at)
                 VALUES %s
-                ON CONFLICT (program_id) DO UPDATE SET
+                ON CONFLICT (canonical_program_key) DO UPDATE SET
+                    program_id = EXCLUDED.program_id,
                     program_name = EXCLUDED.program_name,
                     program_role = EXCLUDED.program_role,
                     alignment_score = EXCLUDED.alignment_score,

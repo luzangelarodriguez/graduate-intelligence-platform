@@ -29,6 +29,7 @@ from intelligence.program_intelligence_engine import (
 )
 from intelligence.semantic_search_engine import semantic_search
 from ml.labor.market_skill_intelligence_engine import build_market_skill_intelligence_map
+from intelligence.common import normalize_key
 
 
 DEFAULT_LIMIT = 20
@@ -545,10 +546,10 @@ def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) ->
             """,
             (limit, offset),
         )
-        count_row = fetch_one("SELECT COUNT(*)::int AS total FROM program_intelligence")
-        total = int((count_row or {}).get("total") or 0)
+        rows = _dedupe_program_rows(_serialize_rows(rows))
+        total = len(rows)
         return {
-            "items": _serialize_rows(rows),
+            "items": rows[offset : offset + limit],
             "count": total,
             "total": total,
             "limit": limit,
@@ -556,6 +557,7 @@ def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) ->
             "filters": {},
         }
     rows = [item.to_dict() for item in build_program_intelligence()]
+    rows = _dedupe_program_rows(rows)
     total = len(rows)
     return {
         "items": rows[offset : offset + limit],
@@ -696,6 +698,39 @@ def _program_limit(value: int) -> int:
     except Exception:
         integer = 25
     return max(1, min(integer, MAX_LIMIT))
+
+
+def _dedupe_program_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        key = normalize_key(str(row.get("program_name") or row.get("nombre_especializacion") or row.get("nombre") or ""))
+        if not key:
+            key = f"id {int(row.get('program_id') or row.get('especializacion_id') or row.get('id') or 0)}"
+        current = grouped.get(key)
+        if current is None:
+            grouped[key] = row
+            continue
+        current_score = (
+            float(current.get("risk_score") or 0),
+            float(current.get("alignment_score") or 0),
+            int(current.get("gap_count") or 0),
+        )
+        candidate_score = (
+            float(row.get("risk_score") or 0),
+            float(row.get("alignment_score") or 0),
+            int(row.get("gap_count") or 0),
+        )
+        if candidate_score > current_score:
+            grouped[key] = row
+    return sorted(
+        grouped.values(),
+        key=lambda item: (
+            float(item.get("risk_score") or 0),
+            float(item.get("alignment_score") or 0),
+            int(item.get("program_id") or item.get("especializacion_id") or item.get("id") or 0),
+        ),
+        reverse=True,
+    )
 
 
 def list_programas_compatibility(*, limit: int = 25, offset: int = 0) -> dict[str, Any]:
