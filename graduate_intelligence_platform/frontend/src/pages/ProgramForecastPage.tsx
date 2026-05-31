@@ -92,6 +92,7 @@ export function ProgramForecastPage() {
         body={[executiveNarrative?.narrative, executiveNarrative?.why_at_risk].filter(Boolean).join(' ')}
         evidenceSources={executiveNarrative?.evidence_sources}
         confidence={executiveNarrative?.confidence}
+        model={executiveNarrative?.model}
         loading={executiveAiLoading}
         error={executiveAiError}
         emptyTitle="No fue posible cargar la lectura ejecutiva"

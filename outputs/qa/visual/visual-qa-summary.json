@@ -1,0 +1,234 @@
+{
+  "baseUrl": "http://127.0.0.1:4173",
+  "programId": 99,
+  "pages": {
+    "executive_summary": {
+      "title": "Universidad Internacional de La Rioja - Colombia",
+      "bodyLength": 4254
+    },
+    "programs": {
+      "firstProgramHref": "/programs/99",
+      "firstProgramName": "Especialización en Derechos Humanos",
+      "bodyLength": 10203
+    },
+    "program_detail": {
+      "title": "Lectura institucional",
+      "bodyLength": 3129
+    },
+    "microcurriculum": {
+      "title": "Skills cubiertas",
+      "bodyLength": 1956
+    },
+    "forecast": {
+      "title": "Lectura ejecutiva del forecast",
+      "bodyLength": 2062
+    },
+    "simulation_interaction": {
+      "selectedSkillsText": "SKILLS SELECCIONADAS",
+      "bodyHasAzure": true
+    },
+    "simulation": {
+      "title": "Skills recomendadas para simular",
+      "bodyLength": 1193
+    }
+  },
+  "console_errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+    }
+  ],
+  "page_errors": []
+}

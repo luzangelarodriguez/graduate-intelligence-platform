@@ -3,6 +3,7 @@ import { BarChart3, Building2, CalendarClock, CircleAlert, GraduationCap, Layers
 
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
+import { AcademicCopilotPanel } from '../components/executive-ai/AcademicCopilotPanel';
 import {
   AttentionProgramList,
   FindingsFooter,
@@ -23,6 +24,7 @@ import {
   type RecommendationItem,
   type SignalItem,
 } from '../components/executive-summary/ExecutiveSummaryBlocks';
+import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useExecutiveSummaryData } from '../hooks/useExecutiveSummaryData';
 import type {
   CompanyIntelligenceItem,
@@ -334,6 +336,7 @@ function buildRecommendationCards(
 export function ExecutiveSummaryPage() {
   const { executiveObservatory, programs, programIntelligence, recommendations, emergingSkills, companies, forecasts, isLoading, error, refresh } =
     useExecutiveSummaryData();
+  const { executiveNarrative, observatoryAnswer, runQuery, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(null);
 
   const metrics = useMemo(() => buildMetrics(programIntelligence, executiveObservatory), [programIntelligence, executiveObservatory]);
 
@@ -428,6 +431,7 @@ export function ExecutiveSummaryPage() {
       }),
     [emergingSkills, executiveObservatory?.critical_gaps, executiveObservatory?.executive_narrative, executiveObservatory?.high_risk_programs, executiveObservatory?.top_emerging_skills, metrics.programsAnalyzed, metrics.criticalPrograms],
   );
+  const aiNarrative = executiveNarrative?.narrative?.trim() || executiveObservatory?.executive_narrative || narrative;
 
   const attentionPrograms = useMemo(() => buildAttentionPrograms(programIntelligence), [programIntelligence]);
   const marketSignals = useMemo(
@@ -557,8 +561,24 @@ export function ExecutiveSummaryPage() {
         {error ? <InlineAlert message={error} /> : null}
 
         <SectionPanel title="Estado Institucional" subtitle="Lectura ejecutiva construida exclusivamente a partir de datos vivos del observatorio y del mercado laboral.">
-          <NarrativeCard title="Narrativa ejecutiva" narrative={narrative} caption="La síntesis se recalcula con la última información disponible en producción." />
+          <NarrativeCard title="Narrativa ejecutiva" narrative={aiNarrative} caption="La síntesis se recalcula con la última información disponible en producción y puede incluir explicación generada por IA." />
         </SectionPanel>
+
+        <AcademicCopilotPanel
+          title="Consultas ejecutivas guiadas"
+          subtitle="Preguntas institucionales sobre programas, brechas, impacto esperado y evidencia de mercado. Las respuestas se generan sobre datos vivos y, cuando aplica, con OpenAI en modo explicativo."
+          loading={executiveAiLoading}
+          error={executiveAiError}
+          answer={observatoryAnswer}
+          onAsk={runQuery}
+          suggestedQuestions={[
+            '¿Qué programas requieren actualización inmediata?',
+            '¿Qué competencias faltan en Visual Analytics?',
+            '¿Qué habilidades están creciendo más rápido?',
+            '¿Qué empresas demandan estas capacidades?',
+            '¿Qué pasa si agregamos Azure y Databricks?',
+          ]}
+        />
 
         <SectionPanel title="Estado institucional resumido" subtitle="Tres indicadores para dirección académica y comité ejecutivo.">
           <div className="grid gap-4 lg:grid-cols-3">

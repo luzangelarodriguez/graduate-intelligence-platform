@@ -6,6 +6,7 @@ import {
   getCurriculumSimulator,
   getExecutiveObservatory,
   getForecastSummary,
+  getProgramas,
   getProgramAlignment,
   getProgramIntelligenceDetail,
   getPrograma,
@@ -115,6 +116,44 @@ function extractRecommendationSkills(item: unknown): string[] {
   return candidates;
 }
 
+function buildFallbackProgramIntelligence(program: Program): ProgramIntelligenceItem {
+  const alignment = Number(program.promedio_match_mercado) || Number(program.porcentaje_match) || 0;
+  const risk = Math.max(0, 100 - alignment);
+  const gapCount = Math.max(1, Math.round(risk / 8));
+  return {
+    program_id: program.especializacion_id,
+    program_name: program.nombre_especializacion,
+    program_role: program.rol,
+    alignment_score: alignment,
+    risk_score: risk,
+    risk_level: alignment >= 70 ? 'low' : alignment >= 50 ? 'medium' : 'critical',
+    gap_count: gapCount,
+    top_gaps: [],
+    top_recommendations: [],
+    forecast_signals: [],
+    role_signals: [],
+    emerging_technologies: [],
+    recommended_actions: [
+      alignment >= 70
+        ? 'Mantener seguimiento y ajustar el currículo con señales emergentes.'
+        : 'Priorizar actualización curricular sobre skills de mercado y evidencia laboral.',
+    ],
+    business_justification:
+      alignment >= 70
+        ? 'El programa mantiene una base curricular aceptable con oportunidad de vigilancia.'
+        : 'El programa presenta presión de actualización curricular frente a la demanda laboral observada.',
+    supporting_evidence: {
+      source: 'programas',
+      program_id: program.especializacion_id,
+      alignment_score: alignment,
+      total_empleos_relacionados: program.total_empleos_relacionados,
+    },
+    source_tables: ['programas'],
+    confidence: alignment > 0 ? 0.65 : 0.35,
+    generated_at: new Date().toISOString(),
+  };
+}
+
 export function useProgramIntelligenceData(programId: number | null) {
   const [state, setState] = useState<ProgramIntelligenceDataState>({
     criticalPrograms: [],
@@ -136,16 +175,43 @@ export function useProgramIntelligenceData(programId: number | null) {
     async function load() {
       try {
         setIsLoading(true);
-        const [program, programIntelligence, curriculumRisk, alignment, forecastSummary, executiveObservatory, criticalPrograms] =
-          await Promise.all([
-            getPrograma(currentProgramId),
-            getProgramIntelligenceDetail(currentProgramId),
-            getCurriculumRisk(currentProgramId),
-            getProgramAlignment(currentProgramId),
-            getForecastSummary(25),
-            getExecutiveObservatory(),
-            getCriticalPrograms(12, 12),
-          ]);
+        const results = await Promise.allSettled([
+          getPrograma(currentProgramId),
+          getProgramIntelligenceDetail(currentProgramId),
+          getCurriculumRisk(currentProgramId),
+          getProgramAlignment(currentProgramId),
+          getForecastSummary(25),
+          getExecutiveObservatory(),
+          getCriticalPrograms(12, 12),
+          getProgramas(100),
+        ]);
+
+        const [
+          programResult,
+          programIntelligenceResult,
+          curriculumRiskResult,
+          alignmentResult,
+          forecastSummaryResult,
+          executiveObservatoryResult,
+          criticalProgramsResult,
+          programsPageResult,
+        ] =
+          results;
+
+        const programsPage = programsPageResult.status === 'fulfilled' ? programsPageResult.value : undefined;
+        const fallbackProgram = programsPage?.items.find((item) => item.especializacion_id === currentProgramId);
+        const program = programResult.status === 'fulfilled' ? programResult.value : fallbackProgram;
+        const programIntelligence =
+          programIntelligenceResult.status === 'fulfilled'
+            ? programIntelligenceResult.value
+            : program
+              ? buildFallbackProgramIntelligence(program)
+              : undefined;
+        const curriculumRisk = curriculumRiskResult.status === 'fulfilled' ? curriculumRiskResult.value : undefined;
+        const alignment = alignmentResult.status === 'fulfilled' ? alignmentResult.value : undefined;
+        const forecastSummary = forecastSummaryResult.status === 'fulfilled' ? forecastSummaryResult.value : undefined;
+        const executiveObservatory = executiveObservatoryResult.status === 'fulfilled' ? executiveObservatoryResult.value : undefined;
+        const criticalPrograms = criticalProgramsResult.status === 'fulfilled' ? criticalProgramsResult.value : { items: [] };
 
         if (cancelled) return;
 
@@ -158,7 +224,11 @@ export function useProgramIntelligenceData(programId: number | null) {
           executiveObservatory,
           criticalPrograms: criticalPrograms.items,
         });
-        setError(null);
+        const failures = [
+          program ? '' : 'program',
+          programIntelligence ? '' : 'program-intelligence',
+        ].filter(Boolean);
+        setError(failures.length >= 2 ? 'No se pudo cargar la inteligencia base del programa.' : null);
       } catch (cause) {
         if (!cancelled) {
           setError(cause instanceof Error ? cause.message : 'No fue posible cargar la inteligencia del programa.');

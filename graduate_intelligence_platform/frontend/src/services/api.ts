@@ -42,6 +42,10 @@ import type {
 const envBaseUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL) as string | undefined;
 let accessToken = window.localStorage.getItem('gi_access_token') || '';
 
+if (import.meta.env.DEV) {
+  console.info('API Base URL:', envBaseUrl || '/');
+}
+
 export const apiClient = axios.create({
   baseURL: envBaseUrl || '',
   timeout: 15000,
@@ -53,6 +57,9 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if ((envBaseUrl === '/api' || envBaseUrl?.endsWith('/api')) && typeof config.url === 'string' && config.url.startsWith('/api/')) {
+    config.url = config.url.replace(/^\/api/, '');
   }
   return config;
 });

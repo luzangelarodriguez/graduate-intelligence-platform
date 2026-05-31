@@ -103,12 +103,12 @@ export function useExecutiveSummaryData(): ExecutiveSummaryData {
       forecasts: forecastsResult.status === 'fulfilled' ? forecastsResult.value.items : [],
     });
 
-    setError(
-      stringifyError(
-        '',
-        failures,
-      ),
-    );
+    const coreFailures = [
+      executiveObservatoryResult.status === 'rejected' ? 'executive-observatory' : '',
+      programIntelligenceResult.status === 'rejected' ? 'program-intelligence' : '',
+      programsResult.status === 'rejected' ? 'api/programas' : '',
+    ].filter(Boolean);
+    setError(coreFailures.length >= 2 ? stringifyError('', failures) : null);
 
     setIsLoading(false);
   }, []);

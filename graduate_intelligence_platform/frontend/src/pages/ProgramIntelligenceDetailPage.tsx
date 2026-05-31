@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, BarChart3 } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
+import { AcademicCopilotPanel } from '../components/executive-ai/AcademicCopilotPanel';
 import { LoadingState } from '../components/LoadingState';
 import {
   ForecastHorizonCard,
@@ -83,7 +84,14 @@ export function ProgramIntelligenceDetailPage() {
   const programId = programIdFromParam(programIdParam);
   const { program, programIntelligence, curriculumRisk, alignment, forecastSummary, executiveObservatory, isLoading, error, suggestedSkills } =
     useProgramIntelligenceData(programId);
-  const { programSummary, executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
+  const {
+    programSummary,
+    executiveNarrative,
+    observatoryAnswer,
+    runQuery,
+    isLoading: executiveAiLoading,
+    error: executiveAiError,
+  } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 5);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
 
@@ -370,11 +378,27 @@ export function ProgramIntelligenceDetailPage() {
         }
         evidenceSources={executiveNarrative?.evidence_sources || programSummary?.evidence_sources}
         confidence={executiveNarrative?.confidence || programSummary?.confidence}
+        model={executiveNarrative?.model || programSummary?.model}
         loading={executiveAiLoading}
         error={executiveAiError}
         emptyTitle="No fue posible cargar la explicación ejecutiva"
         emptyBody="La narrativa ejecutiva todavía no está disponible, pero el análisis del programa sigue operativo."
         badgeLabel="Narrativa AI"
+      />
+
+      <AcademicCopilotPanel
+        title="Copiloto académico"
+        subtitle="Pregunta sobre brechas, programas, skills o impacto esperado. La respuesta se construye con evidencia real del observatorio."
+        answer={observatoryAnswer || null}
+        loading={executiveAiLoading}
+        error={executiveAiError}
+        onAsk={async (question) => runQuery(question)}
+        suggestedQuestions={[
+          '¿Qué competencias faltan en este programa?',
+          '¿Qué empresas demandan estas capacidades?',
+          '¿Qué pasaría si agregamos Azure y Databricks?',
+          '¿Qué recomendación es prioritaria para este programa?',
+        ]}
       />
     </div>
   );
