@@ -15,6 +15,7 @@ from ml.curriculum.specialization_curriculum_graph_engine import build_specializ
 from ml.curriculum.specialization_skill_affinity_engine import calculate_skill_affinity
 from ml.labor.labor_market_skill_extraction_engine import LaborSkillEvidence, build_labor_market_skill_universe
 from ml.labor.occupational_skill_cluster_engine import build_occupational_skill_clusters, classify_skill_cluster
+from scrapers.normalization.visual_analytics_skill_taxonomy import normalize_text
 from scrapers.normalization.visual_analytics_skill_taxonomy import SKILL_DEFINITIONS as LEGACY_SKILL_DEFINITIONS
 
 REPORT_PATH = ROOT_DIR / "outputs" / "visual_analytics_market_skill_intelligence.md"
@@ -41,6 +42,54 @@ EMERGING_SKILLS = {
     "BigQuery",
     "MLOps",
     "data governance",
+}
+
+SUPPORTING_SKILLS = {
+    "communication",
+    "comunicacion",
+    "work in team",
+    "trabajo en equipo",
+    "problem solving",
+    "resolucion de problemas",
+    "leadership",
+    "liderazgo",
+    "english",
+    "ingles",
+    "agile",
+    "scrum",
+    "kanban",
+    "stakeholder management",
+    "gestion de stakeholders",
+    "presentation",
+    "executive reporting",
+    "reporting",
+    "kpis",
+    "bi",
+    "power bi",
+    "tableau",
+    "qlik",
+    "aws",
+    "azure",
+    "gcp",
+    "postgresql",
+    "mysql",
+    "nosql",
+    "sql server",
+    "oracle",
+    "spark",
+    "hadoop",
+    "etl",
+    "elt",
+    "api",
+    "llm",
+    "rag",
+    "copilot bi",
+    "mlflow",
+    "pandas",
+    "scikit learn",
+    "kafka",
+    "ssis",
+    "pl/sql",
 }
 
 
@@ -100,9 +149,15 @@ def _coverage_status(skill: str, affinity_status: str, market_confidence: str, c
     if affinity_status == "partial":
         return "partial"
     if affinity_status == "irrelevant":
+        normalized_skill = normalize_text(skill).strip()
+        if normalized_skill in SUPPORTING_SKILLS:
+            return "partial"
         return "irrelevant"
     if (skill in EMERGING_SKILLS or cluster_name in {"Cloud Analytics", "DataOps", "GenAI Analytics"}) and market_confidence in {"high", "medium", "emerging"}:
         return "emerging"
+    normalized_skill = normalize_text(skill).strip()
+    if normalized_skill in SUPPORTING_SKILLS:
+        return "partial"
     if market_confidence in {"high", "medium"}:
         return "missing"
     return "irrelevant"

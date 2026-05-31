@@ -61,12 +61,12 @@ def test_emerging_market_skill_becomes_gap_when_not_in_curriculum(monkeypatch) -
     assert result.recommended_updates
 
 
-def test_portal_taxonomy_remains_weak_signal(monkeypatch) -> None:
+def test_transversal_support_skill_is_not_discarded(monkeypatch) -> None:
     from ml.labor import market_skill_intelligence_engine as engine
     from ml.labor.labor_market_skill_extraction_engine import build_labor_market_skill_universe
 
     universe = build_labor_market_skill_universe(
-        [_evidence("Copilot BI", "portal_taxonomy", title="Skills")],
+        [_evidence("communication", "portal_taxonomy", title="Skills")],
         include_database=False,
         write_output=False,
     )
@@ -76,4 +76,21 @@ def test_portal_taxonomy_remains_weak_signal(monkeypatch) -> None:
 
     signal = result.market_skills[0]
     assert signal.market_signal_confidence == "weak"
+    assert signal.coverage_status == "partial"
+
+
+def test_non_support_irrelevant_skill_stays_irrelevant(monkeypatch) -> None:
+    from ml.labor import market_skill_intelligence_engine as engine
+    from ml.labor.labor_market_skill_extraction_engine import build_labor_market_skill_universe
+
+    universe = build_labor_market_skill_universe(
+        [_evidence("Cableado estructurado", "portal_taxonomy", title="Skills")],
+        include_database=False,
+        write_output=False,
+    )
+    monkeypatch.setattr(engine, "build_labor_market_skill_universe", lambda include_database=True, write_output=True: universe)
+
+    result = engine.build_market_skill_intelligence_map(include_database=False, write_output=False)
+
+    signal = result.market_skills[0]
     assert signal.coverage_status == "irrelevant"

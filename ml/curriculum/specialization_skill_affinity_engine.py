@@ -13,6 +13,54 @@ from ml.curriculum.specialization_curriculum_graph_engine import SpecializationC
 from ml.labor.occupational_skill_cluster_engine import classify_skill_cluster
 from scrapers.normalization.visual_analytics_skill_taxonomy import normalize_text
 
+SUPPORTING_SKILLS = {
+    "communication",
+    "comunicacion",
+    "work in team",
+    "trabajo en equipo",
+    "problem solving",
+    "resolucion de problemas",
+    "leadership",
+    "liderazgo",
+    "english",
+    "ingles",
+    "agile",
+    "scrum",
+    "kanban",
+    "stakeholder management",
+    "gestion de stakeholders",
+    "presentation",
+    "executive reporting",
+    "reporting",
+    "kpis",
+    "bi",
+    "power bi",
+    "tableau",
+    "qlik",
+    "aws",
+    "azure",
+    "gcp",
+    "postgresql",
+    "mysql",
+    "nosql",
+    "sql server",
+    "oracle",
+    "spark",
+    "hadoop",
+    "etl",
+    "elt",
+    "api",
+    "llm",
+    "rag",
+    "copilot bi",
+    "mlflow",
+    "pandas",
+    "scikit learn",
+    "kafka",
+    "ssis",
+    "pl/sql",
+}
+
 
 @dataclass(frozen=True)
 class SkillAffinityResult:
@@ -27,6 +75,10 @@ class SkillAffinityResult:
 
 def _similarity(left: str, right: str) -> float:
     return SequenceMatcher(None, normalize_text(left), normalize_text(right)).ratio()
+
+
+def _is_supporting_skill(skill: str) -> bool:
+    return normalize_text(skill).strip() in SUPPORTING_SKILLS
 
 
 def calculate_skill_affinity(skill: str, graph: SpecializationCurriculumGraph) -> SkillAffinityResult:
@@ -76,6 +128,17 @@ def calculate_skill_affinity(skill: str, graph: SpecializationCurriculumGraph) -
             reason="Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa.",
         )
 
+    if _is_supporting_skill(skill):
+        return SkillAffinityResult(
+            skill=skill,
+            specialization_id=graph.specialization_id,
+            affinity_score=0.35,
+            coverage_status="partial",
+            matched_curriculum_skill=best_skill,
+            cluster_name=cluster_name,
+            reason="Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo.",
+        )
+
     return SkillAffinityResult(
         skill=skill,
         specialization_id=graph.specialization_id,
@@ -85,4 +148,3 @@ def calculate_skill_affinity(skill: str, graph: SpecializationCurriculumGraph) -
         cluster_name=cluster_name,
         reason="Skill con baja relacion semantica frente al grafo curricular de la especializacion.",
     )
-
