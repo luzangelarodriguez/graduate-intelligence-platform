@@ -13,12 +13,14 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.db import get_conn  # noqa: E402
-from crawlers.storage.postgres_warehouse import load_environment  # noqa: E402
+from backend.database_config import get_connection_parameters, test_connection  # noqa: E402
 from intelligence.career_path_engine import build_career_paths  # noqa: E402
 from intelligence.company_intelligence_engine import build_company_profiles  # noqa: E402
 from intelligence.company_resolution_engine import resolve_company  # noqa: E402
+from intelligence.executive_observatory_engine import build_executive_observatory_v2, persist_executive_observatory_metrics  # noqa: E402
 from intelligence.observatory_pipeline import run_observatory_layer  # noqa: E402
-from intelligence.market_forecasting_engine import forecast_skills  # noqa: E402
+from intelligence.program_intelligence_engine import build_program_intelligence, persist_program_intelligence  # noqa: E402
+from intelligence.predictive_intelligence_engine import build_executive_metrics, build_market_demand_forecasts, persist_executive_metrics  # noqa: E402
 from intelligence.recommendation_intelligence_engine import build_recommendations  # noqa: E402
 from intelligence.semantic_role_intelligence import build_role_intelligence, occupational_edges  # noqa: E402
 from intelligence.semantic_search_engine import semantic_search  # noqa: E402
@@ -29,8 +31,31 @@ MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "017_labor_intelligence_qa_feedback.sql",
     ROOT_DIR / "database" / "migrations" / "018_labor_curriculum_intelligence.sql",
     ROOT_DIR / "database" / "migrations" / "019_labor_observatory_layer.sql",
+    ROOT_DIR / "database" / "migrations" / "020_predictive_intelligence_layer.sql",
+    ROOT_DIR / "database" / "migrations" / "021_program_intelligence.sql",
 ]
 ANALYTICS_DIR = ROOT_DIR / "outputs" / "analytics"
+
+
+def _log_stage(step: str, total: int = 8) -> None:
+    print(f"[{step}/{total}]")
+
+
+def _log_stage_message(step: str, message: str, total: int = 8) -> None:
+    print(f"[{step}/{total}] {message}")
+
+
+def _stage_count(label: str, items: list[Any]) -> None:
+    print(f"{label}: {len(items)}")
+
+
+def _run_stage(step: int, title: str, func):
+    try:
+        _log_stage_message(step, title)
+        return func()
+    except Exception:
+        print(f"[{step}/8] Stage failed: {title}")
+        raise
 
 
 def apply_migrations(cur: Any) -> None:
@@ -40,7 +65,6 @@ def apply_migrations(cur: Any) -> None:
 
 
 def fetch_jobs(limit: int = 500) -> list[dict[str, Any]]:
-    load_environment()
     with get_conn() as conn:
         with conn.cursor() as cur:
             apply_migrations(cur)
@@ -71,7 +95,6 @@ def fetch_jobs(limit: int = 500) -> list[dict[str, Any]]:
 
 
 def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
-    load_environment()
     with get_conn() as conn:
         with conn.cursor() as cur:
             apply_migrations(cur)
@@ -224,32 +247,76 @@ def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
                     """,
                     transition_rows,
                 )
-            forecast_rows = [
-                (
-                    item.entity_type,
-                    item.entity_name,
-                    item.growth_velocity,
-                    item.forecast_confidence,
-                    item.market_phase,
-                    Json(item.evidence),
-                )
-                for item in payload["forecasts"]
-            ]
-            if forecast_rows:
+            cur.execute(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'market_forecasts'
+                      AND column_name = 'horizon_months'
+                ) AS exists
+                """
+            )
+            horizon_exists = bool((cur.fetchone() or {}).get("exists"))
+            forecast_source = payload["forecasts"] if horizon_exists else [item for item in payload["forecasts"] if int(getattr(item, "horizon_months", 12) or 12) == 12] or payload["forecasts"][:1]
+            if forecast_source:
                 execute_values(
                     cur,
-                    """
-                    INSERT INTO market_forecasts
-                        (entity_type, entity_name, growth_velocity, forecast_confidence, market_phase, evidence)
-                    VALUES %s
-                    ON CONFLICT (entity_type, entity_name) DO UPDATE SET
-                        growth_velocity = EXCLUDED.growth_velocity,
-                        forecast_confidence = EXCLUDED.forecast_confidence,
-                        market_phase = EXCLUDED.market_phase,
-                        evidence = EXCLUDED.evidence,
-                        updated_at = now()
-                    """,
-                    forecast_rows,
+                    (
+                        """
+                        INSERT INTO market_forecasts
+                            (entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence, market_phase, first_seen_at, last_seen_at, evidence)
+                        VALUES %s
+                        ON CONFLICT (entity_type, entity_name, horizon_months) DO UPDATE SET
+                            growth_velocity = EXCLUDED.growth_velocity,
+                            forecast_confidence = EXCLUDED.forecast_confidence,
+                            market_phase = EXCLUDED.market_phase,
+                            first_seen_at = LEAST(COALESCE(market_forecasts.first_seen_at, EXCLUDED.first_seen_at), COALESCE(EXCLUDED.first_seen_at, market_forecasts.first_seen_at)),
+                            last_seen_at = GREATEST(COALESCE(market_forecasts.last_seen_at, EXCLUDED.last_seen_at), COALESCE(EXCLUDED.last_seen_at, market_forecasts.last_seen_at)),
+                            evidence = EXCLUDED.evidence,
+                            updated_at = now()
+                        """
+                        if horizon_exists
+                        else """
+                        INSERT INTO market_forecasts
+                            (entity_type, entity_name, growth_velocity, forecast_confidence, market_phase, first_seen_at, last_seen_at, evidence)
+                        VALUES %s
+                        ON CONFLICT (entity_type, entity_name) DO UPDATE SET
+                            growth_velocity = EXCLUDED.growth_velocity,
+                            forecast_confidence = EXCLUDED.forecast_confidence,
+                            market_phase = EXCLUDED.market_phase,
+                            first_seen_at = LEAST(COALESCE(market_forecasts.first_seen_at, EXCLUDED.first_seen_at), COALESCE(EXCLUDED.first_seen_at, market_forecasts.first_seen_at)),
+                            last_seen_at = GREATEST(COALESCE(market_forecasts.last_seen_at, EXCLUDED.last_seen_at), COALESCE(EXCLUDED.last_seen_at, market_forecasts.last_seen_at)),
+                            evidence = EXCLUDED.evidence,
+                            updated_at = now()
+                        """
+                    ),
+                    [
+                        (
+                            item.entity_type,
+                            item.entity_name,
+                            item.horizon_months,
+                            item.growth_velocity,
+                            item.forecast_confidence,
+                            item.market_phase,
+                            item.first_seen_at,
+                            item.last_seen_at,
+                            Json(item.evidence),
+                        )
+                        if horizon_exists
+                        else (
+                            item.entity_type,
+                            item.entity_name,
+                            item.growth_velocity,
+                            item.forecast_confidence,
+                            item.market_phase,
+                            item.first_seen_at,
+                            item.last_seen_at,
+                            Json(item.evidence),
+                        )
+                        for item in forecast_source
+                    ],
                 )
         conn.commit()
     return {
@@ -258,6 +325,7 @@ def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
         "role_signals": len(payload["role_signals"]),
         "career_transitions": len(payload["career_transitions"]),
         "forecasts": len(payload["forecasts"]),
+        "executive_metrics": len(payload.get("executive_metrics", [])),
     }
 
 
@@ -314,7 +382,7 @@ def write_reports(payload: dict[str, Any], persisted: dict[str, int]) -> dict[st
             "# Emerging Market Forecast",
             "",
             *[
-                f"- {item.entity_name}: {item.market_phase}; velocity={item.growth_velocity}; confidence={item.forecast_confidence}"
+                f"- {item.entity_type}:{item.entity_name} ({item.horizon_months}m): {item.market_phase}; velocity={item.growth_velocity}; confidence={item.forecast_confidence}"
                 for item in payload["forecasts"][:30]
             ],
         ],
@@ -336,38 +404,87 @@ def write_reports(payload: dict[str, Any], persisted: dict[str, int]) -> dict[st
 
 
 def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
-    jobs = fetch_jobs(limit=limit)
-    resolved_jobs = []
-    for job in jobs:
-        resolution = resolve_company(job.get("company"), context_text=" ".join([str(job.get("title") or ""), str(job.get("description") or "")]))
-        resolved = {**job, "company_resolution": resolution.to_dict()}
-        resolved_jobs.append(resolved)
-    company_profiles = build_company_profiles(resolved_jobs)
+    _log_stage_message(1, "Connection validated")
+
+    jobs = _run_stage(2, "Fetching jobs", lambda: fetch_jobs(limit=limit))
+    _stage_count("Fetched jobs", jobs)
+
+    def _resolve_jobs() -> list[dict[str, Any]]:
+        resolved: list[dict[str, Any]] = []
+        for job in jobs:
+            resolution = resolve_company(
+                job.get("company"),
+                context_text=" ".join([str(job.get("title") or ""), str(job.get("description") or "")]),
+            )
+            resolved.append({**job, "company_resolution": resolution.to_dict()})
+        return resolved
+
+    resolved_jobs = _run_stage(3, "Fetching skills", _resolve_jobs)
     market_skills = sorted({skill for job in resolved_jobs for skill in (job.get("skills") or [])})
-    emerging_skills = [skill for skill in market_skills if skill in {"Databricks", "Microsoft Fabric", "Synapse", "Copilot BI", "LLM", "RAG"}]
-    missing_skills = [skill for skill in market_skills if skill in {"data governance", "MLOps", "DataOps", "Azure", "AWS"}]
-    role_signals = build_role_intelligence(resolved_jobs)
+    _stage_count("Fetched skills", market_skills)
+
+    def _compute_curriculum_gaps() -> tuple[list[str], list[str], list[dict[str, Any]]]:
+        emerging = [skill for skill in market_skills if skill in {"Databricks", "Microsoft Fabric", "Synapse", "Copilot BI", "LLM", "RAG"}]
+        missing = [skill for skill in market_skills if skill in {"data governance", "MLOps", "DataOps", "Azure", "AWS"}]
+        role_signals_local = build_role_intelligence(resolved_jobs)
+        return missing, emerging, role_signals_local
+
+    missing_skills, emerging_skills, role_signals = _run_stage(4, "Computing curriculum gaps", _compute_curriculum_gaps)
+    _stage_count("Curriculum gaps", missing_skills)
+
+    def _compute_recommendations() -> tuple[list[Any], list[Any], list[Any], list[Any], list[Any]]:
+        company_profiles_local = build_company_profiles(resolved_jobs)
+        recommendations_local = build_recommendations(
+            company_profiles=company_profiles_local,
+            missing_skills=missing_skills,
+            emerging_skills=emerging_skills,
+        )
+        role_edges_local = occupational_edges(role_signals)
+        career_transitions_local = build_career_paths(role_signals, market_skills)
+        semantic_search_results_local = semantic_search("roles similares a Analytics Engineer", resolved_jobs, limit=10)
+        return company_profiles_local, recommendations_local, role_edges_local, career_transitions_local, semantic_search_results_local
+
+    company_profiles, recommendations, role_edges, career_transitions, semantic_search_results = _run_stage(5, "Computing recommendations", _compute_recommendations)
+    _stage_count("Recommendations", recommendations)
+
+    forecasts = _run_stage(6, "Computing forecasts", lambda: build_market_demand_forecasts(persist=False))
+    _stage_count("Forecasts", forecasts)
+
     payload = {
         "jobs": resolved_jobs,
         "company_profiles": company_profiles,
-        "recommendations": build_recommendations(company_profiles=company_profiles, missing_skills=missing_skills, emerging_skills=emerging_skills),
+        "recommendations": recommendations,
         "role_signals": role_signals,
-        "role_edges": occupational_edges(role_signals),
-        "career_transitions": build_career_paths(role_signals, market_skills),
-        "forecasts": forecast_skills(resolved_jobs),
-        "semantic_search_results": semantic_search("roles similares a Analytics Engineer", resolved_jobs, limit=10),
+        "role_edges": role_edges,
+        "career_transitions": career_transitions,
+        "forecasts": forecasts,
+        "semantic_search_results": semantic_search_results,
+        "executive_metrics": build_executive_metrics(),
     }
-    observatory = run_observatory_layer(
-        jobs=resolved_jobs,
-        company_profiles=company_profiles,
-        role_signals=role_signals,
-        forecasts=payload["forecasts"],
-        career_transitions=payload["career_transitions"],
-        persist=persist,
-        write_output=True,
-    )
-    persisted = persist_intelligence(payload) if persist else {}
-    reports = write_reports(payload, persisted)
+
+    def _persist_results() -> tuple[dict[str, Any], dict[str, int], dict[str, str]]:
+        persist_executive_metrics(payload["executive_metrics"])
+        observatory_local = run_observatory_layer(
+            jobs=resolved_jobs,
+            company_profiles=company_profiles,
+            role_signals=role_signals,
+            forecasts=payload["forecasts"],
+            career_transitions=payload["career_transitions"],
+            persist=persist,
+            write_output=True,
+        )
+        persisted_local = persist_intelligence(payload) if persist else {}
+        program_intelligence_records = build_program_intelligence()
+        program_intelligence_count = persist_program_intelligence(program_intelligence_records) if persist else 0
+        persisted_local["program_intelligence"] = program_intelligence_count
+        executive_observatory = build_executive_observatory_v2(persist=False)
+        persisted_local["executive_observatory_metrics"] = persist_executive_observatory_metrics(executive_observatory.metrics) if persist else 0
+        reports_local = write_reports(payload, persisted_local)
+        persisted_local["executive_observatory"] = executive_observatory.to_dict()
+        return observatory_local, persisted_local, reports_local
+
+    observatory, persisted, reports = _run_stage(7, "Persisting results", _persist_results)
+    _log_stage_message(8, "Pipeline completed")
     return {
         "jobs_analyzed": len(jobs),
         "persisted": persisted,
@@ -378,11 +495,25 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
     }
 
 
+def _print_database_banner() -> None:
+    diagnostics = get_connection_parameters()
+    print("=================================")
+    print("INTELLIGENCE PIPELINE")
+    print("=====================")
+    print(f"Database mode: {diagnostics['mode']}")
+    print(f"Database: {diagnostics['database']}")
+    print(f"Host: {diagnostics['host']}")
+    print("============================")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run semantic labor and curriculum intelligence layer.")
     parser.add_argument("--limit", type=int, default=500)
     parser.add_argument("--no-persist", action="store_true")
     args = parser.parse_args()
+    _print_database_banner()
+    diagnostics = test_connection()
+    print(f"Connection source: {diagnostics['connection_source']}")
     print(json.dumps(run_intelligence(limit=args.limit, persist=not args.no_persist), indent=2, ensure_ascii=False))
 
 

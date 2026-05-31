@@ -133,3 +133,173 @@ class ObservatoryStatusResponse(BaseModel):
     missing_tables: list[str] = Field(default_factory=list)
     completion_percentage: float = 0.0
     status: str = "partial_observatory"
+
+
+class RiskDriver(BaseModel):
+    driver: str
+    value: float = 0.0
+    impact: float = 0.0
+    evidence: list[str] = Field(default_factory=list)
+
+
+class CurriculumRiskResponse(BaseModel):
+    program_id: int
+    program_name: str
+    risk_score: float = 0.0
+    risk_level: str = ""
+    risk_drivers: list[RiskDriver] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class UniversityMarketAlignmentResponse(BaseModel):
+    program_id: int
+    program_name: str
+    alignment_score: float = 0.0
+    alignment_level: str = ""
+    current_alignment: float = 0.0
+    projected_alignment_if_added: float = 0.0
+    missing_skills: list[str] = Field(default_factory=list)
+    emerging_skills: list[str] = Field(default_factory=list)
+    company_demand_score: float = 0.0
+    labor_demand_score: float = 0.0
+    forecasted_demand_score: float = 0.0
+    emerging_technology_score: float = 0.0
+    explanation: str = ""
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class MarketForecastItem(BaseModel):
+    entity_type: str
+    entity_name: str
+    horizon_months: int = 12
+    growth_velocity: float = 0.0
+    forecast_confidence: float = 0.0
+    market_phase: str = ""
+    first_seen_at: datetime | None = None
+    last_seen_at: datetime | None = None
+    evidence: dict[str, Any] = Field(default_factory=dict)
+
+
+class MarketForecastPageResponse(BaseModel):
+    items: list[MarketForecastItem] = Field(default_factory=list)
+    count: int = 0
+    limit: int = 0
+    offset: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
+
+
+class EmergingSkillSignal(BaseModel):
+    skill_name: str
+    growth_rate: float = 0.0
+    confidence_score: float = 0.0
+    first_seen_date: str | None = None
+    last_seen_date: str | None = None
+    supporting_companies: list[str] = Field(default_factory=list)
+    supporting_roles: list[str] = Field(default_factory=list)
+    evidence: dict[str, Any] = Field(default_factory=dict)
+
+
+class CareerTransitionInsight(BaseModel):
+    source_role: str
+    target_role: str
+    required_skills: list[str] = Field(default_factory=list)
+    difficulty_score: float = 0.0
+    estimated_salary_progression: float = 0.0
+    transition_probability: float = 0.0
+    source_family: str = ""
+    target_family: str = ""
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+
+
+class CareerIntelligenceResponse(BaseModel):
+    source_role: str = ""
+    transitions: list[CareerTransitionInsight] = Field(default_factory=list)
+    role_network: list[dict[str, Any]] = Field(default_factory=list)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class RecommendationV2(BaseModel):
+    recommendation_type: str
+    target_entity: str
+    target_company: str
+    recommendation_score: float = 0.0
+    priority: str = ""
+    business_justification: str = ""
+    expected_impact: str = ""
+    confidence: float = 0.0
+    estimated_alignment_increase: float = 0.0
+    recommendation_evidence: dict[str, Any] = Field(default_factory=dict)
+    recommendation_reasoning: str = ""
+
+
+class RecommendationV2PageResponse(BaseModel):
+    items: list[RecommendationV2] = Field(default_factory=list)
+    count: int = 0
+    limit: int = 0
+    offset: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExecutiveMetric(BaseModel):
+    metric_name: str
+    metric_category: str
+    metric_value: float = 0.0
+    metric_period: str = ""
+    confidence_score: float = 0.0
+    source_tables: list[str] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExecutiveObservatoryResponse(BaseModel):
+    metrics: list[ExecutiveMetric] = Field(default_factory=list)
+    alignment_average: float = 0.0
+    high_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    medium_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    low_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    programs_analyzed: int = 0
+    critical_gaps: list[dict[str, Any]] = Field(default_factory=list)
+    top_emerging_skills: list[dict[str, Any]] = Field(default_factory=list)
+    top_recommendations: list[dict[str, Any]] = Field(default_factory=list)
+    top_programs: list[dict[str, Any]] = Field(default_factory=list)
+    at_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    executive_narrative: str = ""
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class ProgramIntelligenceItem(BaseModel):
+    program_id: int
+    program_name: str = ""
+    program_role: str = ""
+    alignment_score: float = 0.0
+    risk_score: float = 0.0
+    risk_level: str = ""
+    gap_count: int = 0
+    top_gaps: list[dict[str, Any]] = Field(default_factory=list)
+    top_recommendations: list[dict[str, Any]] = Field(default_factory=list)
+    forecast_signals: list[dict[str, Any]] = Field(default_factory=list)
+    role_signals: list[dict[str, Any]] = Field(default_factory=list)
+    emerging_technologies: list[dict[str, Any]] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+    business_justification: str = ""
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+    generated_at: str = ""
+
+
+class ProgramIntelligencePageResponse(BaseModel):
+    items: list[ProgramIntelligenceItem] = Field(default_factory=list)
+    count: int = 0
+    total: int = 0
+    limit: int = 0
+    offset: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0

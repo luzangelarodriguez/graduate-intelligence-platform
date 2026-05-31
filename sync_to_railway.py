@@ -31,6 +31,19 @@ CURRICULAR_TABLES = [
     "especializacion_habilidades_blandas",
 ]
 
+NATURAL_CONFLICT_COLUMNS: dict[str, list[str]] = {
+    "observatory_metrics": ["metric_name", "metric_period"],
+    "curriculum_gap_observatory": ["specialization", "missing_skill"],
+    "recommendation_observatory": ["recommendation_type", "target_role", "target_company", "metric_period"],
+    "semantic_role_graph": ["source_role", "target_role", "metric_period"],
+    "company_observatory": ["company", "metric_period"],
+    "emerging_technology_observatory": ["technology", "metric_period"],
+    "career_transitions": ["source_role", "target_role"],
+    "market_forecasts": ["entity_type", "entity_name"],
+}
+
+IDLESS_UPSERT_TABLES = set(NATURAL_CONFLICT_COLUMNS)
+
 
 @dataclass(frozen=True)
 class DbConfig:
@@ -41,7 +54,7 @@ class DbConfig:
     user: str
     password: str
     sslmode: str = "prefer"
-    connect_timeout: int = 15
+    connect_timeout: int = 60
 
     def redacted(self) -> str:
         return f"{self.label}: {self.user}@{self.host}:{self.port}/{self.dbname} sslmode={self.sslmode}"
@@ -124,6 +137,7 @@ def config_from_prefixed_env(
         user=str(values["user"]),
         password=str(values["password"]),
         sslmode=str(values["sslmode"]),
+        connect_timeout=int(os.getenv(f"{prefix}DB_CONNECT_TIMEOUT", os.getenv("SYNC_CONNECT_TIMEOUT", "60"))),
     )
 
 
@@ -261,18 +275,34 @@ def count_rows(conn, table: str) -> int:
 
 
 def choose_conflict_columns(conn, table: str, common_columns: list[str]) -> list[str]:
+    if table in NATURAL_CONFLICT_COLUMNS:
+        override = [col for col in NATURAL_CONFLICT_COLUMNS[table] if col in common_columns]
+        if len(override) == len(NATURAL_CONFLICT_COLUMNS[table]):
+            return override
+    unique_candidates = [
+        unique_columns
+        for unique_columns in fetch_unique_constraints(conn, table)
+        if unique_columns and set(unique_columns).issubset(common_columns)
+    ]
+    if unique_candidates:
+        unique_candidates.sort(key=lambda cols: (len(cols), 0 if "id" not in cols else 1, ",".join(cols)))
+        return unique_candidates[0]
     primary_key = fetch_primary_key(conn, table)
     if primary_key and set(primary_key).issubset(common_columns):
         return primary_key
-    for unique_columns in fetch_unique_constraints(conn, table):
-        if unique_columns and set(unique_columns).issubset(common_columns):
-            return unique_columns
     raise SyncError(f"railway: public.{table} no tiene PK/UNIQUE usable para UPSERT.")
 
 
 def upsert_batch(target_conn, table: str, columns: list[str], conflict_columns: list[str], rows: list[tuple]) -> int:
     if not rows:
         return 0
+    conflict_indexes = [columns.index(col) for col in conflict_columns if col in columns]
+    if conflict_indexes:
+        deduped: dict[tuple, tuple] = {}
+        for row in rows:
+            key = tuple(row[index] for index in conflict_indexes)
+            deduped[key] = row
+        rows = list(deduped.values())
     adapted_rows = [
         tuple(Json(value) if isinstance(value, (dict, list)) else value for value in row)
         for row in rows
@@ -297,6 +327,14 @@ def upsert_batch(target_conn, table: str, columns: list[str], conflict_columns: 
     with target_conn.cursor() as cur:
         execute_values(cur, statement.as_string(target_conn), adapted_rows, page_size=len(adapted_rows))
     return len(adapted_rows)
+
+
+def build_sync_columns(table: str, source_columns: list[str], target_columns: list[str]) -> tuple[list[str], list[str]]:
+    common_columns = [col for col in source_columns if col in target_columns]
+    if table in IDLESS_UPSERT_TABLES and "id" in common_columns:
+        common_columns = [col for col in common_columns if col != "id"]
+    conflict_columns = [col for col in NATURAL_CONFLICT_COLUMNS.get(table, []) if col in common_columns]
+    return common_columns, conflict_columns
 
 
 def reset_sequence(target_conn, table: str) -> None:
@@ -328,11 +366,11 @@ def sync_table(source_conn, target_conn, table: str, batch_size: int) -> dict[st
 
     source_columns = fetch_columns(source_conn, table)
     target_columns = fetch_columns(target_conn, table)
-    common_columns = [col for col in source_columns if col in target_columns]
+    common_columns, conflict_override = build_sync_columns(table, source_columns, target_columns)
     if not common_columns:
         raise SyncError(f"public.{table}: no hay columnas comunes entre local y Railway.")
 
-    conflict_columns = choose_conflict_columns(target_conn, table, common_columns)
+    conflict_columns = conflict_override or choose_conflict_columns(target_conn, table, common_columns)
     local_count = count_rows(source_conn, table)
     logging.info("Migrando public.%s | origen=%s | columnas=%s", table, local_count, ", ".join(common_columns))
 
@@ -374,11 +412,11 @@ def inspect_table_for_sync(source_conn, target_conn, table: str) -> dict[str, in
 
     source_columns = fetch_columns(source_conn, table)
     target_columns = fetch_columns(target_conn, table)
-    common_columns = [col for col in source_columns if col in target_columns]
+    common_columns, conflict_override = build_sync_columns(table, source_columns, target_columns)
     if not common_columns:
         raise SyncError(f"public.{table}: no hay columnas comunes entre local y Railway.")
 
-    conflict_columns = choose_conflict_columns(target_conn, table, common_columns)
+    conflict_columns = conflict_override or choose_conflict_columns(target_conn, table, common_columns)
     return {
         "table": table,
         "source_rows": count_rows(source_conn, table),
