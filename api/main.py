@@ -14,6 +14,7 @@ from api.contracts import (
     CriticalProgramPageResponse,
     CurriculumSimulationResponse,
     CurriculumRiskResponse,
+    ExecutiveNarrativeResponse,
     ExecutiveObservatoryResponse,
     ForecastSummaryResponse,
     HealthResponse,
@@ -24,8 +25,12 @@ from api.contracts import (
     ProgramIntelligencePageResponse,
     Program,
     ProgramDashboardResponse,
+    ProgramSummaryResponse,
     ProgramPageResponse,
     RecommendationV2PageResponse,
+    RecommendationExplanationResponse,
+    AskObservatoryRequest,
+    AskObservatoryResponse,
     SearchResponse,
     UniversityMarketAlignmentResponse,
 )
@@ -261,6 +266,31 @@ def career_intelligence(source_role: str | None = Query(default=None), limit: in
 @app.get("/executive-observatory", response_model=ExecutiveObservatoryResponse, tags=["predictive"])
 def executive_observatory() -> dict[str, Any]:
     return services.get_executive_observatory()
+
+
+@app.get("/executive-narrative", response_model=ExecutiveNarrativeResponse, tags=["predictive"])
+def executive_narrative(program_id: int | None = Query(default=None, ge=1)) -> dict[str, Any]:
+    return services.get_executive_narrative(program_id=program_id)
+
+
+@app.get("/program-summary/{program_id}", response_model=ProgramSummaryResponse, tags=["predictive"])
+def program_summary(program_id: int) -> dict[str, Any]:
+    return services.get_program_summary(program_id)
+
+
+@app.get("/recommendation-explanation/{recommendation_id}", response_model=RecommendationExplanationResponse, tags=["predictive"])
+def recommendation_explanation(recommendation_id: int) -> dict[str, Any]:
+    return services.get_recommendation_explanation(recommendation_id)
+
+
+@app.post("/ask-observatory", response_model=AskObservatoryResponse, tags=["predictive"])
+def ask_observatory(payload: AskObservatoryRequest) -> dict[str, Any]:
+    return services.ask_observatory(
+        payload.question,
+        program_id=payload.program_id,
+        recommendation_id=payload.recommendation_id,
+        context=payload.context,
+    )
 
 
 @app.get("/program-intelligence", response_model=ProgramIntelligencePageResponse, tags=["predictive"])

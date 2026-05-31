@@ -5,6 +5,8 @@ import type {
   AlumniRegistrationResponse,
   AuthUser,
   CompanyIntelligenceItem,
+  AskObservatoryRequest,
+  AskObservatoryResponse,
   DashboardKpisResponse,
   CriticalProgramPageResponse,
   CurriculumRiskResponse,
@@ -29,8 +31,11 @@ import type {
   RecommendationProgram,
   RecommendationV2,
   ExecutiveObservatoryResponse,
+  ExecutiveNarrativeResponse,
   UniversityMarketAlignmentResponse,
   CurriculumSimulationResponse,
+  ProgramSummaryResponse,
+  RecommendationExplanationResponse,
   TokenPair,
 } from '../types/api';
 
@@ -117,6 +122,28 @@ export async function getDashboardKpis() {
 
 export async function getExecutiveObservatory() {
   const { data } = await apiClient.get<ExecutiveObservatoryResponse>('/executive-observatory');
+  return data;
+}
+
+export async function getExecutiveNarrative(programId?: number) {
+  const { data } = await apiClient.get<ExecutiveNarrativeResponse>('/executive-narrative', {
+    params: programId ? { program_id: programId } : undefined,
+  });
+  return data;
+}
+
+export async function getProgramSummary(programId: number) {
+  const { data } = await apiClient.get<ProgramSummaryResponse>(`/program-summary/${programId}`);
+  return data;
+}
+
+export async function getRecommendationExplanation(recommendationId: number) {
+  const { data } = await apiClient.get<RecommendationExplanationResponse>(`/recommendation-explanation/${recommendationId}`);
+  return data;
+}
+
+export async function askObservatory(payload: AskObservatoryRequest) {
+  const { data } = await apiClient.post<AskObservatoryResponse>('/ask-observatory', payload);
   return data;
 }
 

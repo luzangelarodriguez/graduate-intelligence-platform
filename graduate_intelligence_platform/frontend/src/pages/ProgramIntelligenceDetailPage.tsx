@@ -11,7 +11,9 @@ import {
   ProgramTabs,
   SectionTitle,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
+import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 
 function toNumber(value: unknown, fallback = 0) {
   const parsed = Number(value);
@@ -81,6 +83,7 @@ export function ProgramIntelligenceDetailPage() {
   const programId = programIdFromParam(programIdParam);
   const { program, programIntelligence, curriculumRisk, alignment, forecastSummary, executiveObservatory, isLoading, error, suggestedSkills } =
     useProgramIntelligenceData(programId);
+  const { programSummary, executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 5);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
 
@@ -353,6 +356,26 @@ export function ProgramIntelligenceDetailPage() {
           </span>
         </div>
       </section>
+
+      <ExecutiveAiSection
+        title="Estado institucional explicado"
+        subtitle="Narrativa ejecutiva construida desde program intelligence, microcurriculum, gaps, recomendaciones y forecast productivo."
+        body={
+          [
+            executiveNarrative?.narrative || programSummary?.summary,
+            executiveNarrative?.why_at_risk || programSummary?.why_at_risk,
+          ]
+            .filter(Boolean)
+            .join(' ')
+        }
+        evidenceSources={executiveNarrative?.evidence_sources || programSummary?.evidence_sources}
+        confidence={executiveNarrative?.confidence || programSummary?.confidence}
+        loading={executiveAiLoading}
+        error={executiveAiError}
+        emptyTitle="No fue posible cargar la explicación ejecutiva"
+        emptyBody="La narrativa ejecutiva todavía no está disponible, pero el análisis del programa sigue operativo."
+        badgeLabel="Narrativa AI"
+      />
     </div>
   );
 }

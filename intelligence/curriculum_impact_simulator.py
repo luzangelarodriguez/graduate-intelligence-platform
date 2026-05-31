@@ -497,17 +497,52 @@ def build_curriculum_impact_simulation(
 
     matched_gap_count = len(matched_gap_rows)
     total_gap_count = max(len(gap_rows), len(gap_lookup), 1)
-    projected_gap_reduction = round(clamp((matched_gap_count / total_gap_count) * 100.0), 4)
+    horizon_weight = {6: 0.35, 12: 0.65, 24: 1.0}.get(int(horizon_months), max(0.25, min(1.0, horizon_months / 24.0)))
+    horizon_momentum = {6: 0.55, 12: 0.8, 24: 1.0}.get(int(horizon_months), max(0.25, min(1.0, horizon_months / 24.0)))
+    projected_gap_reduction = round(
+        clamp(((matched_gap_count / total_gap_count) * 100.0) * horizon_momentum + (len(normalized_skills) * 1.5), 0.0, 100.0),
+        4,
+    )
 
     market_pressure = mean([_safe_float(row.get("market_demand_score")) for row in matched_gap_rows]) if matched_gap_rows else 0.0
     forecast_pressure = mean([_safe_float(row.get("growth_velocity")) for row in matched_forecasts]) if matched_forecasts else 0.0
     urgency_pressure = mean([_safe_float(row.get("urgency_score")) for row in matched_gap_rows]) if matched_gap_rows else 0.0
     normalized_confidence = mean([_safe_float(row.get("confidence_score")) for row in normalized_skills]) if normalized_skills else 0.0
 
-    projected_alignment_gain = round(clamp(((projected_gap_reduction * 0.55) + (market_pressure * 0.25) + (forecast_pressure * 20.0) + (urgency_pressure * 0.10)) / 1.2), 4)
+    projected_alignment_gain = round(
+        clamp(
+            (
+                (projected_gap_reduction * 0.10)
+                + (market_pressure * 0.05)
+                + (forecast_pressure * 0.25)
+                + (urgency_pressure * 0.05)
+            )
+            * horizon_weight,
+            0.0,
+            100.0,
+        ),
+        4,
+    )
     projected_alignment_score = round(min(100.0, current_alignment + projected_alignment_gain), 4)
-    projected_risk_score = round(max(0.0, current_risk - ((projected_gap_reduction * 0.45) + (forecast_pressure * 12.0) + (normalized_confidence * 4.0))), 4)
-    projected_employability_gain = round(clamp(projected_alignment_gain * 0.9 + (forecast_pressure * 15.0) + (market_pressure * 0.1), 0.0, 100.0), 4)
+    projected_risk_score = round(
+        max(
+            0.0,
+            current_risk
+            - (
+                (
+                    (projected_gap_reduction * 0.08)
+                    + (forecast_pressure * 0.20)
+                    + (normalized_confidence * 2.0)
+                )
+                * horizon_weight
+            ),
+        ),
+        4,
+    )
+    projected_employability_gain = round(
+        clamp(projected_alignment_gain * 0.8 + (forecast_pressure * 0.35 * horizon_weight) + (market_pressure * 0.08), 0.0, 100.0),
+        4,
+    )
     confidence_score = round(clamp((normalized_confidence * 0.45) + (min(len(normalized_skills), 8) / 10.0) + (len(matched_gap_rows) / max(total_gap_count, 1) * 0.35) + (len(matched_forecasts) / max(len(normalized_skills), 1) * 0.2), 0.15, 0.98), 4)
 
     risk_drivers = _build_risk_drivers(
@@ -539,6 +574,12 @@ def build_curriculum_impact_simulation(
         "normalized_skills": normalized_skills[:10],
         "gap_samples": matched_gap_rows[:5],
         "forecast_samples": matched_forecasts[:5],
+        "horizon_months": horizon_months,
+        "horizon_weight": horizon_weight,
+        "horizon_momentum": horizon_momentum,
+        "projected_alignment_delta": projected_alignment_gain,
+        "projected_risk_delta": round(max(0.0, current_risk - projected_risk_score), 4),
+        "projected_employability_delta": projected_employability_gain,
         "source_tables": source_tables,
     }
     simulation_key = normalize_key(f"program:{program_id}:horizon:{horizon_months}:{','.join([str(item.get('canonical_skill') or '') for item in normalized_skills])}")

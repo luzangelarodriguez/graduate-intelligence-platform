@@ -12,6 +12,8 @@ import {
   SectionTitle,
   SkillRail,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
+import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
 
 function programIdFromParam(value?: string) {
@@ -47,6 +49,7 @@ export function ProgramSimulationPage() {
   const { programId: programIdParam } = useParams();
   const programId = programIdFromParam(programIdParam);
   const { program, programIntelligence, curriculumRisk, alignment, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
+  const { observatoryAnswer, runQuery, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [draftSkill, setDraftSkill] = useState('');
 
@@ -100,6 +103,28 @@ export function ProgramSimulationPage() {
   }
 
   const currentSimulation = simulations[12];
+
+  useEffect(() => {
+    if (!programId || !selectedSkills.length) {
+      return;
+    }
+    const question = `¿Qué ocurre si actualizamos el currículo con ${selectedSkills.slice(0, 4).join(', ')}?`;
+    void runQuery(question, {
+      selected_skills: selectedSkills,
+      current_alignment: currentSimulation?.current_alignment_score,
+      projected_alignment: currentSimulation?.projected_alignment_score,
+      projected_risk: currentSimulation?.projected_risk_score,
+      projected_employability: currentSimulation?.projected_employability_gain,
+    });
+  }, [
+    currentSimulation?.current_alignment_score,
+    currentSimulation?.projected_alignment_score,
+    currentSimulation?.projected_employability_gain,
+    currentSimulation?.projected_risk_score,
+    programId,
+    runQuery,
+    selectedSkills,
+  ]);
 
   return (
     <div className="space-y-5">
@@ -262,6 +287,19 @@ export function ProgramSimulationPage() {
               </div>
             </article>
           </section>
+
+          <ExecutiveAiSection
+            title="Simulación explicada por IA"
+            subtitle="La explicación conecta las skills seleccionadas con la evidencia curricular y el impacto proyectado."
+            body={selectedSkills.length ? observatoryAnswer?.answer : undefined}
+            evidenceSources={observatoryAnswer?.evidence_sources}
+            confidence={observatoryAnswer?.confidence}
+            loading={executiveAiLoading}
+            error={executiveAiError}
+            emptyTitle="No fue posible generar la explicación de simulación"
+            emptyBody="La explicación ejecutiva todavía no está disponible, pero la simulación numérica sigue operativa."
+            badgeLabel="Simulation AI"
+          />
 
           <section className="rounded-lg border border-line bg-white px-4 py-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-ink">

@@ -120,6 +120,7 @@ export interface Program {
   total_empleos_relacionados: number;
   skills_cubiertas?: number;
   skills?: Skill[];
+  microcurriculum_context?: Record<string, unknown> | null;
 }
 
 export interface Skill {
@@ -189,6 +190,64 @@ export interface ExecutiveObservatoryResponse {
   executive_narrative: string;
   source_tables: string[];
   confidence: number;
+}
+
+export interface ExecutiveNarrativeResponse {
+  program_id?: number | null;
+  program_name: string;
+  narrative: string;
+  why_at_risk: string;
+  evidence_sources: string[];
+  source_tables: string[];
+  supporting_evidence: Record<string, unknown>;
+  confidence: number;
+  model: string;
+  generated_at: string;
+}
+
+export interface ProgramSummaryResponse {
+  program_id: number;
+  program_name: string;
+  summary: string;
+  why_at_risk: string;
+  microcurriculum_traceability: Record<string, unknown>;
+  evidence_sources: string[];
+  source_tables: string[];
+  supporting_evidence: Record<string, unknown>;
+  confidence: number;
+  model: string;
+  generated_at: string;
+}
+
+export interface RecommendationExplanationResponse {
+  recommendation_id: number;
+  recommendation_title: string;
+  explanation: string;
+  why_this_recommendation: string;
+  evidence_sources: string[];
+  source_tables: string[];
+  supporting_evidence: Record<string, unknown>;
+  confidence: number;
+  model: string;
+  generated_at: string;
+}
+
+export interface AskObservatoryRequest {
+  question: string;
+  program_id?: number | null;
+  recommendation_id?: number | null;
+  context?: Record<string, unknown>;
+}
+
+export interface AskObservatoryResponse {
+  question: string;
+  answer: string;
+  evidence_sources: string[];
+  source_tables: string[];
+  supporting_evidence: Record<string, unknown>;
+  confidence: number;
+  model: string;
+  generated_at: string;
 }
 
 export interface ProgramIntelligenceItem {

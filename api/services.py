@@ -11,6 +11,12 @@ from backend.services import recommendation_service
 from backend.services.normalization_service import basic_text_key, normalize_program_row
 
 from api.database import fetch_all, fetch_one, relation_exists, relation_has_rows, startup_validate, table_row_count
+from services.executive_ai_service import (
+    ask_observatory as executive_ask_observatory,
+    build_executive_narrative as build_executive_ai_narrative,
+    build_program_summary as build_executive_program_summary,
+    build_recommendation_explanation as build_executive_recommendation_explanation,
+)
 from intelligence.predictive_intelligence_engine import (
     build_career_intelligence,
     build_curriculum_risk_index,
@@ -706,6 +712,28 @@ def get_career_intelligence(source_role: str | None = None, limit: int = 12) -> 
 def get_executive_observatory() -> dict[str, Any]:
     result = build_executive_observatory_v2()
     return result.to_dict()
+
+
+def get_executive_narrative(program_id: int | None = None) -> dict[str, Any]:
+    return build_executive_ai_narrative(program_id=program_id)
+
+
+def get_program_summary(program_id: int) -> dict[str, Any]:
+    return build_executive_program_summary(program_id)
+
+
+def get_recommendation_explanation(recommendation_id: int) -> dict[str, Any]:
+    return build_executive_recommendation_explanation(recommendation_id)
+
+
+def ask_observatory(
+    question: str,
+    *,
+    program_id: int | None = None,
+    recommendation_id: int | None = None,
+    context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return executive_ask_observatory(question, program_id=program_id, recommendation_id=recommendation_id, context=context)
 
 
 def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
