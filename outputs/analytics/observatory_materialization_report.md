@@ -6,12 +6,12 @@
 
 ## Table counts
 
-- observatory_metrics: 11
-- curriculum_gap_observatory: 4
-- recommendation_observatory: 7
-- semantic_role_graph: 6
-- company_observatory: 0
-- emerging_technology_observatory: 5
+- observatory_metrics: 34
+- curriculum_gap_observatory: 41
+- recommendation_observatory: 14
+- semantic_role_graph: 2221
+- company_observatory: 11
+- emerging_technology_observatory: 7
 
 ## Missing tables
 

@@ -246,6 +246,66 @@ class RecommendationV2PageResponse(BaseModel):
     filters: dict[str, Any] = Field(default_factory=dict)
 
 
+class CriticalProgramItem(BaseModel):
+    program_id: int
+    program_name: str = ""
+    program_role: str = ""
+    alignment_score: float = 0.0
+    risk_score: float = 0.0
+    risk_level: str = ""
+    gap_count: int = 0
+    main_gap_driver: str = ""
+    recommended_action: str = ""
+    projected_employability_gain: float = 0.0
+    horizon_months: int = 12
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+    generated_at: str = ""
+
+
+class CriticalProgramPageResponse(BaseModel):
+    items: list[CriticalProgramItem] = Field(default_factory=list)
+    count: int = 0
+    limit: int = 0
+    offset: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
+
+
+class CurriculumSimulationResponse(BaseModel):
+    program_id: int
+    program_name: str = ""
+    program_role: str = ""
+    horizon_months: int = 12
+    current_alignment_score: float = 0.0
+    current_risk_score: float = 0.0
+    projected_alignment_score: float = 0.0
+    projected_risk_score: float = 0.0
+    projected_employability_gain: float = 0.0
+    projected_gap_reduction: float = 0.0
+    confidence_score: float = 0.0
+    proposed_skills: list[str] = Field(default_factory=list)
+    normalized_skills: list[dict[str, Any]] = Field(default_factory=list)
+    risk_drivers: list[dict[str, Any]] = Field(default_factory=list)
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    explanation: str = ""
+    simulation_key: str = ""
+    generated_at: str = ""
+
+
+class ForecastSummaryResponse(BaseModel):
+    generated_at: str = ""
+    source_tables: list[str] = Field(default_factory=list)
+    total_records: int = 0
+    counts: dict[str, int] = Field(default_factory=dict)
+    coverage: dict[str, float] = Field(default_factory=dict)
+    top_skills: list[MarketForecastItem] = Field(default_factory=list)
+    top_technologies: list[MarketForecastItem] = Field(default_factory=list)
+    top_companies: list[MarketForecastItem] = Field(default_factory=list)
+    top_roles: list[MarketForecastItem] = Field(default_factory=list)
+
+
 class ExecutiveMetric(BaseModel):
     metric_name: str
     metric_category: str

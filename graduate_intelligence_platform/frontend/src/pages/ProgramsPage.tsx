@@ -1,4 +1,5 @@
 import { ArrowUpRight, BarChart3, BriefcaseBusiness, GraduationCap, Layers3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
@@ -64,12 +65,12 @@ export function ProgramsPage() {
             const jobs = Number(program.total_empleos_relacionados || 0);
 
             return (
-              <article className="curriculum-list-item" key={program.especializacion_id}>
-                <div className="curriculum-rank">{String(index + 1).padStart(2, '0')}</div>
-                <div className="curriculum-item-main">
-                  <strong>{program.nombre_especializacion}</strong>
-                  <span>{program.rol || 'Perfil academico en analisis comparativo'}</span>
-                </div>
+            <Link className="curriculum-list-item" key={program.especializacion_id} to={`/programs/${program.especializacion_id}`}>
+              <div className="curriculum-rank">{String(index + 1).padStart(2, '0')}</div>
+              <div className="curriculum-item-main">
+                <strong>{program.nombre_especializacion}</strong>
+                <span>{program.rol || 'Perfil academico en analisis comparativo'}</span>
+              </div>
                 <div className="curriculum-item-metrics">
                   <span>
                     <Layers3 size={14} strokeWidth={1.8} />
@@ -81,12 +82,12 @@ export function ProgramsPage() {
                   </span>
                   <strong>{score.toFixed(1)}%</strong>
                 </div>
-                <ArrowUpRight className="curriculum-item-action" size={16} strokeWidth={1.8} />
-              </article>
-            );
-          })}
-        </div>
+              <ArrowUpRight className="curriculum-item-action" size={16} strokeWidth={1.8} />
+            </Link>
+          );
+        })}
       </div>
+    </div>
     </section>
   );
 }

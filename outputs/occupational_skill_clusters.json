@@ -1,13 +1,157 @@
 [
   {
+    "cluster_name": "Enterprise Analytics",
+    "skills": [
+      "Python",
+      "SQL",
+      "comunicacion",
+      "trabajo en equipo",
+      "resolucion de problemas",
+      "Oracle",
+      "Agile",
+      "pensamiento analitico",
+      "liderazgo",
+      "ingles",
+      "Redis",
+      "PostgreSQL",
+      "ITIL",
+      "scikit-learn",
+      "pandas",
+      "gestion de stakeholders",
+      "estadistica",
+      "Scrum",
+      "SSIS",
+      "SQL Server",
+      "PL/SQL",
+      "NoSQL",
+      "MySQL",
+      "MongoDB",
+      "MLflow",
+      "Kanban",
+      "Kafka",
+      "ELT"
+    ],
+    "total_weight": 5.9,
+    "evidence_count": 59,
+    "dominant_sources": {
+      "portal_taxonomy": 59
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": true
+  },
+  {
     "cluster_name": "Reporting & KPI",
     "skills": [
+      "KPIs",
+      "reporting",
+      "BI",
+      "executive reporting",
       "Copilot BI"
     ],
-    "total_weight": 0.1,
-    "evidence_count": 1,
+    "total_weight": 1.8,
+    "evidence_count": 18,
     "dominant_sources": {
-      "portal_taxonomy": 1
+      "portal_taxonomy": 18
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": true
+  },
+  {
+    "cluster_name": "Cloud Analytics",
+    "skills": [
+      "Azure",
+      "AWS",
+      "GCP"
+    ],
+    "total_weight": 0.9,
+    "evidence_count": 9,
+    "dominant_sources": {
+      "portal_taxonomy": 9
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "BI & Visualization",
+    "skills": [
+      "Power BI",
+      "Tableau",
+      "visualizacion analitica",
+      "Qlik"
+    ],
+    "total_weight": 0.8,
+    "evidence_count": 8,
+    "dominant_sources": {
+      "portal_taxonomy": 8
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "Data Engineering",
+    "skills": [
+      "ETL",
+      "Spark",
+      "Hadoop"
+    ],
+    "total_weight": 0.8,
+    "evidence_count": 8,
+    "dominant_sources": {
+      "portal_taxonomy": 8
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "Data Governance",
+    "skills": [
+      "data governance"
+    ],
+    "total_weight": 0.5,
+    "evidence_count": 5,
+    "dominant_sources": {
+      "portal_taxonomy": 5
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "AI Analytics",
+    "skills": [
+      "machine learning",
+      "AI"
+    ],
+    "total_weight": 0.4,
+    "evidence_count": 4,
+    "dominant_sources": {
+      "portal_taxonomy": 4
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "Software/Data Platform",
+    "skills": [
+      "APIs"
+    ],
+    "total_weight": 0.3,
+    "evidence_count": 3,
+    "dominant_sources": {
+      "portal_taxonomy": 3
+    },
+    "representative_roles": [],
+    "is_strong_market_signal": false
+  },
+  {
+    "cluster_name": "GenAI Analytics",
+    "skills": [
+      "RAG",
+      "LLM"
+    ],
+    "total_weight": 0.2,
+    "evidence_count": 2,
+    "dominant_sources": {
+      "portal_taxonomy": 2
     },
     "representative_roles": [],
     "is_strong_market_signal": false

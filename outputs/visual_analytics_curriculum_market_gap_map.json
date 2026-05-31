@@ -201,6 +201,34 @@
   ],
   "partial_skills": [
     {
+      "skill": "comunicacion",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.5,
+      "evidence_sources": {
+        "portal_taxonomy": 5
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar comunicacion mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "trabajo en equipo",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "recommendation": "Profundizar trabajo en equipo mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
       "skill": "APIs",
       "cluster_name": "Software/Data Platform",
       "coverage_status": "partial",
@@ -213,6 +241,90 @@
       "roles": [],
       "recommendation": "Profundizar APIs mediante actividades aplicadas vinculadas a Software/Data Platform.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "resolucion de problemas",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "recommendation": "Profundizar resolucion de problemas mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Oracle",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "data governance",
+      "roles": [],
+      "recommendation": "Profundizar Oracle mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Agile",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "recommendation": "Profundizar Agile mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "liderazgo",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar liderazgo mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ingles",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar ingles mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "PostgreSQL",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar PostgreSQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "PL/SQL",
@@ -255,25 +367,151 @@
       "roles": [],
       "recommendation": "Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "scikit-learn",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "recommendation": "Profundizar scikit-learn mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "pandas",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar pandas mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "gestion de stakeholders",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar gestion de stakeholders mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Scrum",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar Scrum mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SSIS",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar SSIS mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SQL Server",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar SQL Server mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "MLflow",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "recommendation": "Profundizar MLflow mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kanban",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "recommendation": "Profundizar Kanban mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kafka",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "recommendation": "Profundizar Kafka mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ELT",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "partial",
+      "evidence_weight": 0.1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "recommendation": "Profundizar ELT mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     }
   ],
   "missing_skills": [],
   "emerging_skills": [],
   "irrelevant_skills": [
-    {
-      "skill": "comunicacion",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.5,
-      "evidence_sources": {
-        "portal_taxonomy": 5
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
     {
       "skill": "Azure",
       "cluster_name": "Cloud Analytics",
@@ -317,91 +555,7 @@
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
-      "skill": "trabajo en equipo",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "Python",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "resolucion de problemas",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Oracle",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "data governance",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Agile",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "AI",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
       "skill": "pensamiento analitico",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "liderazgo",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ingles",
       "cluster_name": "Enterprise Analytics",
       "coverage_status": "irrelevant",
       "evidence_weight": 0.2,
@@ -424,20 +578,6 @@
       },
       "affinity_score": 0.08,
       "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "PostgreSQL",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
       "roles": [],
       "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
@@ -541,90 +681,6 @@
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
-      "skill": "scikit-learn",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "machine learning",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "pandas",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "gestion de stakeholders",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Scrum",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "SSIS",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "SQL Server",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
       "skill": "MongoDB",
       "cluster_name": "Enterprise Analytics",
       "coverage_status": "irrelevant",
@@ -634,62 +690,6 @@
       },
       "affinity_score": 0.08,
       "matched_curriculum_skill": "Python",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "MLflow",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kanban",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "Tableau",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kafka",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ELT",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "ETL",
       "roles": [],
       "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
@@ -856,11 +856,75 @@
   ],
   "recommended_curriculum_updates": [
     {
+      "skill": "comunicacion",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar comunicacion mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.5,
+      "roles": []
+    },
+    {
+      "skill": "trabajo en equipo",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar trabajo en equipo mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.4,
+      "roles": []
+    },
+    {
       "skill": "APIs",
       "cluster_name": "Software/Data Platform",
       "priority": "media",
       "action": "Profundizar APIs mediante actividades aplicadas vinculadas a Software/Data Platform.",
       "evidence_weight": 0.3,
+      "roles": []
+    },
+    {
+      "skill": "resolucion de problemas",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar resolucion de problemas mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.3,
+      "roles": []
+    },
+    {
+      "skill": "Oracle",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar Oracle mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.3,
+      "roles": []
+    },
+    {
+      "skill": "Agile",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar Agile mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.3,
+      "roles": []
+    },
+    {
+      "skill": "liderazgo",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar liderazgo mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.2,
+      "roles": []
+    },
+    {
+      "skill": "ingles",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar ingles mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.2,
+      "roles": []
+    },
+    {
+      "skill": "PostgreSQL",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar PostgreSQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.2,
       "roles": []
     },
     {
@@ -884,6 +948,30 @@
       "cluster_name": "Enterprise Analytics",
       "priority": "media",
       "action": "Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    },
+    {
+      "skill": "scikit-learn",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar scikit-learn mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    },
+    {
+      "skill": "pandas",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar pandas mediante actividades aplicadas vinculadas a Enterprise Analytics.",
+      "evidence_weight": 0.1,
+      "roles": []
+    },
+    {
+      "skill": "gestion de stakeholders",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "action": "Profundizar gestion de stakeholders mediante actividades aplicadas vinculadas a Enterprise Analytics.",
       "evidence_weight": 0.1,
       "roles": []
     }

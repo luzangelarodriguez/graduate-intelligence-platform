@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from statistics import mean
 from typing import Any, Iterable
 
@@ -108,6 +109,34 @@ def _confidence(total_mentions: int, total_companies: int, recent_mentions: int)
 
 def _top_items(counter: Counter[str], limit: int) -> list[str]:
     return [item for item, _count in counter.most_common(limit)]
+
+
+def _item_text(item: Any, *keys: str) -> str:
+    for key in keys:
+        if isinstance(item, dict):
+            value = item.get(key)
+        else:
+            value = getattr(item, key, None)
+        if value not in {None, ""}:
+            return str(value)
+    return ""
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_safe(inner) for key, inner in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, Decimal):
+        return float(value)
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    return value
 
 
 def _normalize_series(rows: list[dict[str, Any]], *, entity_key: str) -> list[dict[str, Any]]:
@@ -889,7 +918,7 @@ def persist_market_forecasts(records: list[MarketForecastRecord], *, db_name: st
                     record.market_phase,
                     record.first_seen_at,
                     record.last_seen_at,
-                    Json(record.evidence),
+                    Json(_json_safe(record.evidence)),
                 )
                 for record in records_to_store
             ]
@@ -921,7 +950,7 @@ def persist_market_forecasts(records: list[MarketForecastRecord], *, db_name: st
                     record.market_phase,
                     record.first_seen_at,
                     record.last_seen_at,
-                    Json(record.evidence),
+                    Json(_json_safe(record.evidence)),
                 )
                 for record in records_to_store
             ]
@@ -1200,35 +1229,63 @@ def build_recommendation_v2(*, program_id: int | None = None, db_name: str | Non
     return sorted(recommendations, key=lambda item: (item.recommendation_score, item.confidence), reverse=True)[:limit]
 
 
-def build_executive_metrics(*, db_name: str | None = None) -> list[ExecutiveMetric]:
-    program_rows = dashboard_service.list_programs_base(db_name=db_name)
+def build_executive_metrics(
+    *,
+    db_name: str | None = None,
+    program_rows: list[dict[str, Any]] | None = None,
+    emerging_skills: list[Any] | None = None,
+    market_forecasts: list[Any] | None = None,
+    top_skills: list[dict[str, Any]] | None = None,
+    top_companies: list[dict[str, Any]] | None = None,
+) -> list[ExecutiveMetric]:
+    if program_rows is None:
+        program_rows = dashboard_service.list_programs_base(db_name=db_name)
     alignment_scores = [clamp(_safe_float(row.get("promedio_match_mercado")) / 100.0) for row in program_rows]
-    risk_indexes = [build_curriculum_risk_index(int(row.get("especializacion_id") or 0), db_name=db_name, persist=False).risk_score for row in program_rows[:20]] if program_rows else []
-    emerging_skills = detect_emerging_skills(db_name=db_name, limit=20)
-    market_forecasts = _market_forecast_rows(db_name=db_name)
-    top_skills = fetch_all(
+    risk_indexes: list[float] = []
+    if program_rows and any("risk_score" in row for row in program_rows):
+        risk_indexes = [_safe_float(row.get("risk_score")) for row in program_rows[:20] if row.get("risk_score") is not None]
+    elif relation_exists("program_intelligence", db_name=db_name):
+        risk_rows = fetch_all(
+            """
+            SELECT program_id, risk_score
+            FROM program_intelligence
+            ORDER BY risk_score DESC NULLS LAST, program_id
+            LIMIT 20
+            """,
+            db_name=db_name,
+        )
+        risk_indexes = [_safe_float(row.get("risk_score")) for row in risk_rows]
+    elif program_rows:
+        risk_indexes = [round((1.0 - score) * 100.0, 2) for score in alignment_scores[:20]]
+    if emerging_skills is None:
+        emerging_skills = detect_emerging_skills(db_name=db_name, limit=20)
+    if market_forecasts is None:
+        market_forecasts = _market_forecast_rows(db_name=db_name)
+    if top_skills is None:
+        top_skills = fetch_all(
         """
-        SELECT s.nombre AS skill_name, COUNT(DISTINCT j.id)::int AS demand_count
+        SELECT js.canonical_skill AS skill_name, COUNT(DISTINCT j.id)::int AS demand_count
         FROM jobs j
         INNER JOIN job_skills js ON js.job_id = j.id
-        INNER JOIN skills s ON s.id = js.skill_id
         WHERE COALESCE(j.document_type, 'job_posting') = 'job_posting'
           AND COALESCE(j.is_real_job_posting, true) = true
-        GROUP BY s.nombre
+          AND COALESCE(js.canonical_skill, '') <> ''
+        GROUP BY js.canonical_skill
         ORDER BY demand_count DESC, skill_name
         LIMIT 10
         """,
-        db_name=db_name,
-    ) if relation_exists("skills", db_name=db_name) else []
-    top_companies = fetch_all(
+            db_name=db_name,
+        ) if relation_exists("jobs", db_name=db_name) and relation_exists("job_skills", db_name=db_name) else []
+    if top_companies is None:
+        top_companies = fetch_all(
         """
         SELECT company, hiring_velocity, technology_maturity, cloud_maturity_score, bi_maturity_score
         FROM company_observatory
         ORDER BY hiring_velocity DESC NULLS LAST, cloud_maturity_score DESC NULLS LAST
         LIMIT 10
         """,
-        db_name=db_name,
-    ) if relation_exists("company_observatory", db_name=db_name) else []
+            db_name=db_name,
+        ) if relation_exists("company_observatory", db_name=db_name) else []
     metrics = [
         ExecutiveMetric(
             metric_name="programs_at_risk",
@@ -1246,7 +1303,7 @@ def build_executive_metrics(*, db_name: str | None = None) -> list[ExecutiveMetr
             metric_period=datetime.now(UTC).strftime("%Y-%m"),
             confidence_score=0.88,
             source_tables=["jobs", "market_forecasts", "emerging_technology_observatory"],
-            supporting_evidence={"skills": [item.skill_name for item in emerging_skills[:10]]},
+            supporting_evidence={"skills": [_item_text(item, "skill_name", "entity_name") for item in emerging_skills[:10]]},
         ),
         ExecutiveMetric(
             metric_name="top_demanded_skills",
@@ -1318,7 +1375,7 @@ def persist_executive_metrics(metrics: list[ExecutiveMetric], *, db_name: str | 
             cur,
             """
             INSERT INTO observatory_metrics
-                (metric_name, metric_category, metric_value, metric_period, confidence_score, source_payload, generated_at, updated_at)
+                (metric_name, metric_category, metric_value, metric_period, confidence_score, source_payload)
             VALUES %s
             ON CONFLICT (metric_name, metric_period) DO UPDATE SET
                 metric_category = EXCLUDED.metric_category,

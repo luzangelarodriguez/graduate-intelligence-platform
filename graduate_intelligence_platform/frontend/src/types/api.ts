@@ -55,6 +55,44 @@ export interface ProgramDashboardResponse {
   source: string;
 }
 
+export interface CurriculumRiskDriver {
+  driver: string;
+  value: number;
+  impact: number;
+  evidence: string[];
+}
+
+export interface CurriculumRiskResponse {
+  program_id: number;
+  program_name: string;
+  risk_score: number;
+  risk_level: string;
+  risk_drivers: CurriculumRiskDriver[];
+  recommended_actions: string[];
+  supporting_evidence: Record<string, unknown>;
+  source_tables: string[];
+  confidence: number;
+}
+
+export interface UniversityMarketAlignmentResponse {
+  program_id: number;
+  program_name: string;
+  alignment_score: number;
+  alignment_level: string;
+  current_alignment: number;
+  projected_alignment_if_added: number;
+  missing_skills: string[];
+  emerging_skills: string[];
+  company_demand_score: number;
+  labor_demand_score: number;
+  forecasted_demand_score: number;
+  emerging_technology_score: number;
+  explanation: string;
+  supporting_evidence: Record<string, unknown>;
+  source_tables: string[];
+  confidence: number;
+}
+
 export interface RelatedUniversityProgram {
   competidor?: string;
   universidad: string;
@@ -220,6 +258,62 @@ export interface MarketForecastItem {
   first_seen_at?: string | null;
   last_seen_at?: string | null;
   evidence?: Record<string, unknown>;
+}
+
+export interface CriticalProgramItem {
+  program_id: number;
+  program_name: string;
+  program_role: string;
+  alignment_score: number;
+  risk_score: number;
+  risk_level: string;
+  gap_count: number;
+  main_gap_driver: string;
+  recommended_action: string;
+  projected_employability_gain: number;
+  horizon_months: number;
+  supporting_evidence: Record<string, unknown>;
+  source_tables: string[];
+  confidence: number;
+  generated_at: string;
+}
+
+export interface CriticalProgramPageResponse extends Page<CriticalProgramItem> {
+  filters: Record<string, unknown>;
+}
+
+export interface CurriculumSimulationResponse {
+  program_id: number;
+  program_name: string;
+  program_role: string;
+  horizon_months: number;
+  current_alignment_score: number;
+  current_risk_score: number;
+  projected_alignment_score: number;
+  projected_risk_score: number;
+  projected_employability_gain: number;
+  projected_gap_reduction: number;
+  confidence_score: number;
+  proposed_skills: string[];
+  normalized_skills: Record<string, unknown>[];
+  risk_drivers: Record<string, unknown>[];
+  supporting_evidence: Record<string, unknown>;
+  source_tables: string[];
+  explanation: string;
+  simulation_key: string;
+  generated_at: string;
+}
+
+export interface ForecastSummaryResponse {
+  generated_at: string;
+  source_tables: string[];
+  total_records: number;
+  counts: Record<string, number>;
+  coverage: Record<string, number>;
+  top_skills: MarketForecastItem[];
+  top_technologies: MarketForecastItem[];
+  top_companies: MarketForecastItem[];
+  top_roles: MarketForecastItem[];
 }
 
 export interface AlumniRegistrationPayload {

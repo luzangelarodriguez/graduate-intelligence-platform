@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, quote_plus, urlencode, urlparse, urlunparse, unquote
@@ -221,24 +222,34 @@ def test_connection() -> dict[str, Any]:
         "user": config["user"],
         "tables_found": 0,
     }
-    with psycopg2.connect(
-        host=config["host"],
-        port=config["port"],
-        dbname=config["database"],
-        user=config["user"],
-        password=config["password"],
-        sslmode=config["sslmode"],
-        connect_timeout=int(config["connect_timeout"]),
-        application_name=str(config["application_name"]),
-    ) as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*)::int AS total FROM information_schema.tables WHERE table_schema = 'public'")
-            row = cur.fetchone()
-            tables_found = _row_value(row, "total", index=0, default=0)
-            try:
-                diagnostics["tables_found"] = int(tables_found or 0)
-            except (TypeError, ValueError):
-                diagnostics["tables_found"] = 0
+    last_error: Exception | None = None
+    for attempt in range(1, 4):
+        try:
+            with psycopg2.connect(
+                host=config["host"],
+                port=config["port"],
+                dbname=config["database"],
+                user=config["user"],
+                password=config["password"],
+                sslmode=config["sslmode"],
+                connect_timeout=int(config["connect_timeout"]),
+                application_name=str(config["application_name"]),
+            ) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT COUNT(*)::int AS total FROM information_schema.tables WHERE table_schema = 'public'")
+                    row = cur.fetchone()
+                    tables_found = _row_value(row, "total", index=0, default=0)
+                    try:
+                        diagnostics["tables_found"] = int(tables_found or 0)
+                    except (TypeError, ValueError):
+                        diagnostics["tables_found"] = 0
+            last_error = None
+            break
+        except Exception as exc:  # pragma: no cover - defensive retry for production network paths
+            last_error = exc
+            if attempt >= 3:
+                raise
+            time.sleep(min(2 * attempt, 5))
     logger.info(
         "database_connection_test",
         extra={
@@ -247,6 +258,7 @@ def test_connection() -> dict[str, Any]:
             "database_host": diagnostics["host"],
             "database_name": diagnostics["database"],
             "tables_found": diagnostics["tables_found"],
+            "database_retry_attempts": 0 if last_error is None else 3,
         },
     )
     return diagnostics

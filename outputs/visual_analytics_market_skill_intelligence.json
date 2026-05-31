@@ -106,8 +106,8 @@
         "portal_taxonomy": 5
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "estadistica",
       "roles": [],
       "companies": [],
@@ -118,8 +118,8 @@
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
         "https://www.elempleo.com/co/ofertas-empleo/"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "Power BI",
@@ -199,7 +199,7 @@
         "portal_taxonomy": 4
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.55,
       "matched_curriculum_skill": "Spark",
       "roles": [],
@@ -210,7 +210,7 @@
         "https://ticjob.co/es/search/job/administrador-linux/8664",
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -223,7 +223,7 @@
         "portal_taxonomy": 4
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.55,
       "matched_curriculum_skill": "AI",
       "roles": [],
@@ -234,7 +234,7 @@
         "https://ticjob.co/es/search/job/administrador-linux/8664",
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -247,7 +247,7 @@
         "portal_taxonomy": 4
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.48,
       "matched_curriculum_skill": "big data processing",
       "roles": [],
@@ -258,7 +258,7 @@
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
         "https://www.elempleo.com/co/ofertas-empleo/"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -271,8 +271,8 @@
         "portal_taxonomy": 4
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "Python",
       "roles": [],
       "companies": [],
@@ -282,8 +282,8 @@
         "https://ticjob.co/es/search/job/administrador-linux/8664",
         "https://www.elempleo.com/co/ofertas-empleo/"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "APIs",
@@ -318,8 +318,8 @@
         "portal_taxonomy": 3
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "big data processing",
       "roles": [],
       "companies": [],
@@ -328,8 +328,8 @@
         "https://ticjob.co/es/search",
         "https://ticjob.co/es/search/job/administrador-linux/8664"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "Oracle",
@@ -341,8 +341,8 @@
         "portal_taxonomy": 3
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "data governance",
       "roles": [],
       "companies": [],
@@ -351,8 +351,8 @@
         "https://ticjob.co/es/search",
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "Agile",
@@ -364,8 +364,8 @@
         "portal_taxonomy": 3
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "AI",
       "roles": [],
       "companies": [],
@@ -374,8 +374,8 @@
         "https://ticjob.co/es/search",
         "https://www.elempleo.com/co/ofertas-empleo/"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "machine learning",
@@ -483,6 +483,72 @@
       "reason": "Skill presente directamente en microcurriculos o perfil curricular."
     },
     {
+      "skill": "liderazgo",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ingles",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "PostgreSQL",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
       "skill": "pensamiento analitico",
       "skill_type": "soft_skill",
       "occupational_cluster": "Enterprise Analytics",
@@ -505,50 +571,6 @@
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
     },
     {
-      "skill": "liderazgo",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ingles",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
       "skill": "Redis",
       "skill_type": "technology",
       "occupational_cluster": "Enterprise Analytics",
@@ -561,28 +583,6 @@
       "coverage_status": "irrelevant",
       "affinity_score": 0.08,
       "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "PostgreSQL",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
       "roles": [],
       "companies": [],
       "source_urls": [
@@ -729,7 +729,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.55,
       "matched_curriculum_skill": "AI",
       "roles": [],
@@ -737,7 +737,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -750,7 +750,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.55,
       "matched_curriculum_skill": "SQL",
       "roles": [],
@@ -758,7 +758,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -771,7 +771,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.55,
       "matched_curriculum_skill": "KPIs",
       "roles": [],
@@ -779,7 +779,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -792,7 +792,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.48,
       "matched_curriculum_skill": "machine learning",
       "roles": [],
@@ -800,7 +800,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -813,7 +813,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.48,
       "matched_curriculum_skill": "SQL",
       "roles": [],
@@ -821,7 +821,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -834,7 +834,7 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
+      "coverage_status": "partial",
       "affinity_score": 0.48,
       "matched_curriculum_skill": "BI",
       "roles": [],
@@ -842,7 +842,7 @@
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "recommendation": "Profundizar Copilot BI como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -855,16 +855,16 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "machine learning",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar scikit-learn como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "pandas",
@@ -876,16 +876,16 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "estadistica",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar pandas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "gestion de stakeholders",
@@ -897,16 +897,16 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "estadistica",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/office/seti-s-s/83"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar gestion de stakeholders como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "Scrum",
@@ -918,16 +918,16 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "SQL",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar Scrum como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "SSIS",
@@ -939,16 +939,16 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "estadistica",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar SSIS como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "SQL Server",
@@ -960,16 +960,100 @@
         "portal_taxonomy": 1
       },
       "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
       "matched_curriculum_skill": "SQL",
       "roles": [],
       "companies": [],
       "source_urls": [
         "https://ticjob.co/es/search"
       ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+      "recommendation": "Profundizar SQL Server como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "MLflow",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar MLflow como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kanban",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kanban como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kafka",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kafka como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ELT",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ELT como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "MongoDB",
@@ -984,90 +1068,6 @@
       "coverage_status": "irrelevant",
       "affinity_score": 0.08,
       "matched_curriculum_skill": "Python",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "MLflow",
-      "skill_type": "tool",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kanban",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "Tableau",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kafka",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ELT",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "ETL",
       "roles": [],
       "companies": [],
       "source_urls": [
@@ -1390,6 +1390,127 @@
   ],
   "partial_skills": [
     {
+      "skill": "comunicacion",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.5,
+      "evidence_count": 5,
+      "evidence_sources": {
+        "portal_taxonomy": 5
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Azure",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "Spark",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "AWS",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "reporting",
+      "skill_type": "explicit_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "trabajo en equipo",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
       "skill": "APIs",
       "skill_type": "technology",
       "occupational_cluster": "Software/Data Platform",
@@ -1411,6 +1532,141 @@
       ],
       "recommendation": "Profundizar APIs como capacidad aplicada dentro del cluster Software/Data Platform.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "resolucion de problemas",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664"
+      ],
+      "recommendation": "Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Oracle",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "data governance",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Agile",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "liderazgo",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ingles",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "PostgreSQL",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "PL/SQL",
@@ -1474,201 +1730,347 @@
       ],
       "recommendation": "Profundizar MySQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "RAG",
+      "skill_type": "technology",
+      "occupational_cluster": "GenAI Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "LLM",
+      "skill_type": "technology",
+      "occupational_cluster": "GenAI Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "GCP",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "KPIs",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "executive reporting",
+      "skill_type": "responsibility_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Qlik",
+      "skill_type": "tool",
+      "occupational_cluster": "BI & Visualization",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Copilot BI",
+      "skill_type": "technology",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "BI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Copilot BI como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "scikit-learn",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar scikit-learn como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "pandas",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar pandas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "gestion de stakeholders",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83"
+      ],
+      "recommendation": "Profundizar gestion de stakeholders como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Scrum",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Scrum como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SSIS",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar SSIS como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SQL Server",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar SQL Server como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "MLflow",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar MLflow como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kanban",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kanban como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kafka",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kafka como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ELT",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ELT como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     }
   ],
   "missing_skills": [],
   "emerging_skills": [],
   "irrelevant_skills": [
-    {
-      "skill": "comunicacion",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.5,
-      "evidence_count": 5,
-      "evidence_sources": {
-        "portal_taxonomy": 5
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Azure",
-      "skill_type": "technology",
-      "occupational_cluster": "Cloud Analytics",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.55,
-      "matched_curriculum_skill": "Spark",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "AWS",
-      "skill_type": "technology",
-      "occupational_cluster": "Cloud Analytics",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.55,
-      "matched_curriculum_skill": "AI",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "reporting",
-      "skill_type": "explicit_skill",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "trabajo en equipo",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "Python",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "resolucion de problemas",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.3,
-      "evidence_count": 3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Oracle",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.3,
-      "evidence_count": 3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "data governance",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Agile",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.3,
-      "evidence_count": 3,
-      "evidence_sources": {
-        "portal_taxonomy": 3
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "AI",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
     {
       "skill": "pensamiento analitico",
       "skill_type": "soft_skill",
@@ -1692,50 +2094,6 @@
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
     },
     {
-      "skill": "liderazgo",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ingles",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
       "skill": "Redis",
       "skill_type": "technology",
       "occupational_cluster": "Enterprise Analytics",
@@ -1748,28 +2106,6 @@
       "coverage_status": "irrelevant",
       "affinity_score": 0.08,
       "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83",
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "PostgreSQL",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
       "roles": [],
       "companies": [],
       "source_urls": [
@@ -1802,258 +2138,6 @@
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
     },
     {
-      "skill": "RAG",
-      "skill_type": "technology",
-      "occupational_cluster": "GenAI Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.55,
-      "matched_curriculum_skill": "AI",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "LLM",
-      "skill_type": "technology",
-      "occupational_cluster": "GenAI Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.55,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "GCP",
-      "skill_type": "technology",
-      "occupational_cluster": "Cloud Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.55,
-      "matched_curriculum_skill": "KPIs",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "executive reporting",
-      "skill_type": "responsibility_skill",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "machine learning",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "Qlik",
-      "skill_type": "tool",
-      "occupational_cluster": "BI & Visualization",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "Copilot BI",
-      "skill_type": "technology",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "BI",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "scikit-learn",
-      "skill_type": "tool",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "machine learning",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "pandas",
-      "skill_type": "tool",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "gestion de stakeholders",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/office/seti-s-s/83"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Scrum",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "SSIS",
-      "skill_type": "tool",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "SQL Server",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
       "skill": "MongoDB",
       "skill_type": "technology",
       "occupational_cluster": "Enterprise Analytics",
@@ -2066,90 +2150,6 @@
       "coverage_status": "irrelevant",
       "affinity_score": 0.08,
       "matched_curriculum_skill": "Python",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "MLflow",
-      "skill_type": "tool",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "SQL",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kanban",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "Tableau",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "Kafka",
-      "skill_type": "technology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
-    },
-    {
-      "skill": "ELT",
-      "skill_type": "methodology",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.1,
-      "evidence_count": 1,
-      "evidence_sources": {
-        "portal_taxonomy": 1
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "ETL",
       "roles": [],
       "companies": [],
       "source_urls": [
@@ -2320,6 +2320,127 @@
   ],
   "curriculum_gaps": [
     {
+      "skill": "comunicacion",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.5,
+      "evidence_count": 5,
+      "evidence_sources": {
+        "portal_taxonomy": 5
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Azure",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "Spark",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "AWS",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "reporting",
+      "skill_type": "explicit_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "trabajo en equipo",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.4,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "portal_taxonomy": 4
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Python",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
       "skill": "APIs",
       "skill_type": "technology",
       "occupational_cluster": "Software/Data Platform",
@@ -2341,6 +2462,141 @@
       ],
       "recommendation": "Profundizar APIs como capacidad aplicada dentro del cluster Software/Data Platform.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "resolucion de problemas",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664"
+      ],
+      "recommendation": "Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Oracle",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "data governance",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
+      ],
+      "recommendation": "Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Agile",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.3,
+      "evidence_count": 3,
+      "evidence_sources": {
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "liderazgo",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://www.elempleo.com/co/ofertas-empleo/"
+      ],
+      "recommendation": "Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ingles",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "PostgreSQL",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.2,
+      "evidence_count": 2,
+      "evidence_sources": {
+        "portal_taxonomy": 2
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83",
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     },
     {
       "skill": "PL/SQL",
@@ -2404,9 +2660,390 @@
       ],
       "recommendation": "Profundizar MySQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
       "reason": "Skill relacionada semanticamente con competencias o herramientas curriculares."
+    },
+    {
+      "skill": "RAG",
+      "skill_type": "technology",
+      "occupational_cluster": "GenAI Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "AI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "LLM",
+      "skill_type": "technology",
+      "occupational_cluster": "GenAI Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "GCP",
+      "skill_type": "technology",
+      "occupational_cluster": "Cloud Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.55,
+      "matched_curriculum_skill": "KPIs",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "executive reporting",
+      "skill_type": "responsibility_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Qlik",
+      "skill_type": "tool",
+      "occupational_cluster": "BI & Visualization",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "Copilot BI",
+      "skill_type": "technology",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "BI",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Copilot BI como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "scikit-learn",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar scikit-learn como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "pandas",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar pandas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "gestion de stakeholders",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/office/seti-s-s/83"
+      ],
+      "recommendation": "Profundizar gestion de stakeholders como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Scrum",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Scrum como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SSIS",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar SSIS como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "SQL Server",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar SQL Server como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "MLflow",
+      "skill_type": "tool",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "SQL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar MLflow como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kanban",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "Tableau",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kanban como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "Kafka",
+      "skill_type": "technology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar Kafka como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
+    },
+    {
+      "skill": "ELT",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 0.1,
+      "evidence_count": 1,
+      "evidence_sources": {
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.35,
+      "matched_curriculum_skill": "ETL",
+      "roles": [],
+      "companies": [],
+      "source_urls": [
+        "https://ticjob.co/es/search"
+      ],
+      "recommendation": "Profundizar ELT como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     }
   ],
   "recommended_updates": [
+    {
+      "skill": "comunicacion",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.5,
+      "action": "Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "Azure",
+      "cluster_name": "Cloud Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.4,
+      "action": "Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "AWS",
+      "cluster_name": "Cloud Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.4,
+      "action": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "reporting",
+      "cluster_name": "Reporting & KPI",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.4,
+      "action": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "roles": []
+    },
+    {
+      "skill": "trabajo en equipo",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.4,
+      "action": "Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
     {
       "skill": "APIs",
       "cluster_name": "Software/Data Platform",
@@ -2414,6 +3051,60 @@
       "market_signal_confidence": "weak",
       "market_weight": 0.3,
       "action": "Profundizar APIs como capacidad aplicada dentro del cluster Software/Data Platform.",
+      "roles": []
+    },
+    {
+      "skill": "resolucion de problemas",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.3,
+      "action": "Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "Oracle",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.3,
+      "action": "Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "Agile",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.3,
+      "action": "Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "liderazgo",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.2,
+      "action": "Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "ingles",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.2,
+      "action": "Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "PostgreSQL",
+      "cluster_name": "Enterprise Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.2,
+      "action": "Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
       "roles": []
     },
     {
@@ -2441,6 +3132,51 @@
       "market_signal_confidence": "weak",
       "market_weight": 0.1,
       "action": "Profundizar MySQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "RAG",
+      "cluster_name": "GenAI Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.1,
+      "action": "Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "LLM",
+      "cluster_name": "GenAI Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.1,
+      "action": "Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "GCP",
+      "cluster_name": "Cloud Analytics",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.1,
+      "action": "Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.",
+      "roles": []
+    },
+    {
+      "skill": "executive reporting",
+      "cluster_name": "Reporting & KPI",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.1,
+      "action": "Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "roles": []
+    },
+    {
+      "skill": "Qlik",
+      "cluster_name": "BI & Visualization",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 0.1,
+      "action": "Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.",
       "roles": []
     }
   ]
