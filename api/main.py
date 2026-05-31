@@ -42,6 +42,64 @@ configure_logging(os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("api.main")
 
 
+def _fallback_program_response(program_id: int) -> dict[str, Any]:
+    program_name = f"Programa {program_id}"
+    try:
+        program_name = services._safe_program_name(program_id)  # type: ignore[attr-defined]
+    except Exception:
+        pass
+    return {
+        "especializacion_id": program_id,
+        "nombre_especializacion": program_name,
+        "rol": "",
+        "total_skills_programa": 0,
+        "total_herramientas": 0,
+        "total_competencias": 0,
+        "total_habilidades_blandas": 0,
+        "promedio_match_mercado": 0.0,
+        "porcentaje_match": 0.0,
+        "max_match_mercado": 0.0,
+        "total_empleos_relacionados": 0,
+        "skills_cubiertas": 0,
+        "skills": [],
+        "microcurriculum_context": None,
+        "curricular_context_source": "fallback",
+        "narrativa_ia": "Análisis curricular pendiente de datos suficientes.",
+    }
+
+
+def _fallback_dashboard_response(program_id: int) -> dict[str, Any]:
+    program = _fallback_program_response(program_id)
+    return {
+        "program_id": program_id,
+        "program": program,
+        "kpis": {
+            "alignment_score": 0.0,
+            "missing_critical_skills": 0,
+            "high_demand_roles": 0,
+            "employability_trend": 0.0,
+            "digital_coverage": 0.0,
+            "curricular_update_signal": "Baja",
+        },
+        "status": {
+            "curricular_status": "Fallback",
+            "curricular_status_detail": "Vista de contingencia mientras se recupera la evidencia.",
+            "ai_signal": "Análisis institucional recuperado en modo fallback.",
+            "trend_label": "Sin señal suficiente",
+        },
+        "missing_skills": [],
+        "matches": [],
+        "recommendations": [],
+        "insights": {
+            "detected": "No se pudo construir el panel completo; se muestra el programa con evidencia base.",
+            "ai_recommends": [],
+            "emerging_gap": "Sin brecha prioritaria identificada en el modo fallback",
+            "critical_signal": "Fallback institucional",
+        },
+        "source": "fallback",
+    }
+
+
 def _cors_origins() -> list[str]:
     raw = os.getenv("CORS_ORIGINS") or os.getenv("API_CORS_ORIGINS") or "*"
     if raw.strip() == "*":
@@ -100,13 +158,28 @@ def health() -> dict[str, Any]:
     return services.get_health_snapshot()
 
 
+@app.get("/api/health", response_model=HealthResponse, tags=["system"], include_in_schema=False)
+def api_health() -> dict[str, Any]:
+    return services.get_health_snapshot()
+
+
 @app.get("/readiness", response_model=HealthResponse, tags=["system"])
 def readiness() -> dict[str, Any]:
     return services.get_readiness_snapshot()
 
 
+@app.get("/api/readiness", response_model=HealthResponse, tags=["system"], include_in_schema=False)
+def api_readiness() -> dict[str, Any]:
+    return services.get_readiness_snapshot()
+
+
 @app.get("/observatory-status", response_model=ObservatoryStatusResponse, tags=["system"])
 def observatory_status() -> dict[str, Any]:
+    return services.get_observatory_status()
+
+
+@app.get("/api/observatory-status", response_model=ObservatoryStatusResponse, tags=["system"], include_in_schema=False)
+def api_observatory_status() -> dict[str, Any]:
     return services.get_observatory_status()
 
 
@@ -130,7 +203,11 @@ def programas(
     limit: int = Query(25, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> dict[str, Any]:
-    return services.list_programas_compatibility(limit=limit, offset=offset)
+    try:
+        return services.list_programas_compatibility(limit=limit, offset=offset)
+    except Exception as exc:
+        logger.warning("programas_route_fallback: %s", exc, exc_info=True)
+        return {"items": [], "count": 0, "total": 0, "limit": limit, "offset": offset}
 
 
 @app.get("/api/programas/{program_id}", response_model=Program, tags=["programas"])
@@ -141,6 +218,9 @@ def programa(program_id: int) -> dict[str, Any]:
         from fastapi import HTTPException
 
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.warning("programa_route_fallback: %s", exc, exc_info=True)
+        return _fallback_program_response(program_id)
 
 
 @app.get("/api/dashboard/programa/{program_id}", response_model=ProgramDashboardResponse, tags=["dashboard"])
@@ -151,6 +231,9 @@ def dashboard_programa(program_id: int) -> dict[str, Any]:
         from fastapi import HTTPException
 
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.warning("dashboard_programa_route_fallback: %s", exc, exc_info=True)
+        return _fallback_dashboard_response(program_id)
 
 
 @app.get("/curriculum-gaps", response_model=PaginatedResponse, tags=["observatory"])
