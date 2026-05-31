@@ -1,7 +1,24 @@
 BEGIN;
 
-DROP MATERIALIZED VIEW IF EXISTS public.program_intelligence;
-DROP VIEW IF EXISTS public.program_intelligence;
+DO $$
+DECLARE
+    relkind CHAR;
+BEGIN
+    SELECT c.relkind
+    INTO relkind
+    FROM pg_class c
+    INNER JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'program_intelligence';
+
+    IF relkind = 'm' THEN
+        EXECUTE 'DROP MATERIALIZED VIEW IF EXISTS public.program_intelligence CASCADE';
+    ELSIF relkind = 'v' THEN
+        EXECUTE 'DROP VIEW IF EXISTS public.program_intelligence CASCADE';
+    ELSIF relkind = 'r' THEN
+        EXECUTE 'DROP TABLE IF EXISTS public.program_intelligence CASCADE';
+    END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS public.program_intelligence (
     program_id BIGINT PRIMARY KEY,

@@ -1,6 +1,6 @@
 technology,emergence_score,growth_velocity,adoption_trend,forecast_confidence,source_payload
-Synapse,0.201,0.04,stable,0.5,"{""aliases"": [""synapse"", ""azure synapse""], ""matched_forecasts"": [], ""matched_skills"": [""Azure""], ""metric_period"": ""2026-05""}"
-GenAI,0.188,0.02,stable,0.5,"{""aliases"": [""genai"", ""gen ai"", ""generative ai"", ""agentic ai""], ""matched_forecasts"": [], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
-AI Analytics,0.188,0.02,stable,0.5,"{""aliases"": [""ai analytics""], ""matched_forecasts"": [], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
-LLMOps,0.1815,0.01,stable,0.5,"{""aliases"": [""llmops"", ""llm ops""], ""matched_forecasts"": [], ""matched_skills"": [""LLM""], ""metric_period"": ""2026-05""}"
+GenAI,0.6857,0.5569,emerging,0.925,"{""aliases"": [""genai"", ""gen ai"", ""generative ai"", ""agentic ai""], ""matched_forecasts"": [""AI"", ""AI"", ""AI"", ""AI""], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
+AI Analytics,0.6857,0.5569,emerging,0.925,"{""aliases"": [""ai analytics""], ""matched_forecasts"": [""AI"", ""AI"", ""AI"", ""AI"", ""AI Analytics"", ""AI Analytics"", ""AI Analytics"", ""AI Analytics""], ""matched_skills"": [""AI""], ""metric_period"": ""2026-05""}"
+Synapse,0.6857,0.5569,emerging,0.925,"{""aliases"": [""synapse"", ""azure synapse""], ""matched_forecasts"": [""Azure"", ""Azure"", ""Azure"", ""Azure""], ""matched_skills"": [""Azure""], ""metric_period"": ""2026-05""}"
+LLMOps,0.6245,0.5569,emerging,0.75,"{""aliases"": [""llmops"", ""llm ops""], ""matched_forecasts"": [""LLM"", ""LLM"", ""LLM"", ""LLM""], ""matched_skills"": [""LLM""], ""metric_period"": ""2026-05""}"
 RAG,0.1815,0.01,stable,0.5,"{""aliases"": [""rag""], ""matched_forecasts"": [], ""matched_skills"": [""RAG""], ""metric_period"": ""2026-05""}"

@@ -11,8 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.auth import auth_router
 from api.contracts import (
     CareerIntelligenceResponse,
+    CriticalProgramPageResponse,
+    CurriculumSimulationResponse,
     CurriculumRiskResponse,
     ExecutiveObservatoryResponse,
+    ForecastSummaryResponse,
     HealthResponse,
     MarketForecastPageResponse,
     ObservatoryStatusResponse,
@@ -225,6 +228,29 @@ def curriculum_risk(program_id: int) -> dict[str, Any]:
 @app.get("/programas/{program_id}/alignment", response_model=UniversityMarketAlignmentResponse, tags=["predictive"])
 def curriculum_alignment(program_id: int) -> dict[str, Any]:
     return services.get_university_market_alignment(program_id)
+
+
+@app.get("/critical-programs", response_model=CriticalProgramPageResponse, tags=["predictive"])
+def critical_programs(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    horizon_months: int = Query(12, ge=1, le=24),
+) -> dict[str, Any]:
+    return services.get_critical_programs(limit=limit, offset=offset, horizon_months=horizon_months)
+
+
+@app.get("/curriculum-simulator", response_model=CurriculumSimulationResponse, tags=["predictive"])
+def curriculum_simulator(
+    program_id: int = Query(..., ge=1),
+    proposed_skills: str | None = Query(default=None),
+    horizon_months: int = Query(12, ge=1, le=24),
+) -> dict[str, Any]:
+    return services.get_curriculum_simulator(program_id, proposed_skills=proposed_skills, horizon_months=horizon_months)
+
+
+@app.get("/forecast-summary", response_model=ForecastSummaryResponse, tags=["predictive"])
+def forecast_summary(limit: int = Query(25, ge=1, le=50)) -> dict[str, Any]:
+    return services.get_forecast_summary(limit=limit)
 
 
 @app.get("/career-intelligence", response_model=CareerIntelligenceResponse, tags=["predictive"])

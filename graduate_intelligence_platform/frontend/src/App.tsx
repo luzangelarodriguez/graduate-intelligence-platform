@@ -9,6 +9,10 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
 import { LoginPage } from './pages/LoginPage';
 import { MicrocurriculumDemoPage } from './pages/MicrocurriculumDemoPage';
+import { ProgramForecastPage } from './pages/ProgramForecastPage';
+import { ProgramIntelligenceDetailPage } from './pages/ProgramIntelligenceDetailPage';
+import { ProgramMicrocurriculumPage } from './pages/ProgramMicrocurriculumPage';
+import { ProgramSimulationPage } from './pages/ProgramSimulationPage';
 import { ProgramsPage } from './pages/ProgramsPage';
 
 export default function App() {
@@ -24,6 +28,10 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
+              <Route path="/programs/:programId" element={<ProgramIntelligenceDetailPage />} />
+              <Route path="/programs/:programId/microcurriculum" element={<ProgramMicrocurriculumPage />} />
+              <Route path="/programs/:programId/forecast" element={<ProgramForecastPage />} />
+              <Route path="/programs/:programId/simulation" element={<ProgramSimulationPage />} />
               <Route path="/registro" element={<AlumniOnboardingPage />} />
             </Route>
           </Route>

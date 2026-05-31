@@ -6,12 +6,15 @@ import type {
   AuthUser,
   CompanyIntelligenceItem,
   DashboardKpisResponse,
+  CriticalProgramPageResponse,
+  CurriculumRiskResponse,
   EmergingSkillSignal,
   Job,
   LoginPayload,
   Match,
   MicroAnalysis,
   MicroDemoCase,
+  ForecastSummaryResponse,
   MarketForecastItem,
   SpecializationDocumentsResponse,
   SpecializationMicroAnalysis,
@@ -26,6 +29,8 @@ import type {
   RecommendationProgram,
   RecommendationV2,
   ExecutiveObservatoryResponse,
+  UniversityMarketAlignmentResponse,
+  CurriculumSimulationResponse,
   TokenPair,
 } from '../types/api';
 
@@ -112,6 +117,41 @@ export async function getDashboardKpis() {
 
 export async function getExecutiveObservatory() {
   const { data } = await apiClient.get<ExecutiveObservatoryResponse>('/executive-observatory');
+  return data;
+}
+
+export async function getCurriculumRisk(programId: number) {
+  const { data } = await apiClient.get<CurriculumRiskResponse>(`/programas/${programId}/curriculum-risk`);
+  return data;
+}
+
+export async function getProgramAlignment(programId: number) {
+  const { data } = await apiClient.get<UniversityMarketAlignmentResponse>(`/programas/${programId}/alignment`);
+  return data;
+}
+
+export async function getCurriculumSimulator(programId: number, proposedSkills: string[], horizonMonths = 12) {
+  const { data } = await apiClient.get<CurriculumSimulationResponse>('/curriculum-simulator', {
+    params: {
+      program_id: programId,
+      proposed_skills: proposedSkills.join(', '),
+      horizon_months: horizonMonths,
+    },
+  });
+  return data;
+}
+
+export async function getForecastSummary(limit = 25) {
+  const { data } = await apiClient.get<ForecastSummaryResponse>('/forecast-summary', {
+    params: { limit },
+  });
+  return data;
+}
+
+export async function getCriticalPrograms(limit = 20, horizonMonths = 12) {
+  const { data } = await apiClient.get<CriticalProgramPageResponse>('/critical-programs', {
+    params: { limit, offset: 0, horizon_months: horizonMonths },
+  });
   return data;
 }
 

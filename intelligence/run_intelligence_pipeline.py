@@ -15,15 +15,18 @@ if str(ROOT_DIR) not in sys.path:
 from backend.db import get_conn  # noqa: E402
 from backend.database_config import get_connection_parameters, test_connection  # noqa: E402
 from intelligence.career_path_engine import build_career_paths  # noqa: E402
+from intelligence.curriculum_impact_simulator import build_curriculum_impact_simulation  # noqa: E402
 from intelligence.company_intelligence_engine import build_company_profiles  # noqa: E402
 from intelligence.company_resolution_engine import resolve_company  # noqa: E402
 from intelligence.executive_observatory_engine import build_executive_observatory_v2, persist_executive_observatory_metrics  # noqa: E402
+from intelligence.forecast_expansion_engine import build_forecast_expansion, build_forecast_summary  # noqa: E402
 from intelligence.observatory_pipeline import run_observatory_layer  # noqa: E402
 from intelligence.program_intelligence_engine import build_program_intelligence, persist_program_intelligence  # noqa: E402
 from intelligence.predictive_intelligence_engine import build_executive_metrics, build_market_demand_forecasts, persist_executive_metrics  # noqa: E402
 from intelligence.recommendation_intelligence_engine import build_recommendations  # noqa: E402
 from intelligence.semantic_role_intelligence import build_role_intelligence, occupational_edges  # noqa: E402
 from intelligence.semantic_search_engine import semantic_search  # noqa: E402
+from intelligence.skill_normalization_engine import normalize_skill_batch  # noqa: E402
 
 MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "015_labor_acquisition_warehouse.sql",
@@ -35,6 +38,7 @@ MIGRATIONS = [
     ROOT_DIR / "database" / "migrations" / "021_program_intelligence.sql",
     ROOT_DIR / "database" / "migrations" / "022_program_intelligence_dedup.sql",
     ROOT_DIR / "database" / "migrations" / "023_program_intelligence_table.sql",
+    ROOT_DIR / "database" / "migrations" / "024_academic_intelligence_remediation.sql",
 ]
 ANALYTICS_DIR = ROOT_DIR / "outputs" / "analytics"
 
@@ -63,6 +67,30 @@ def _run_stage(step: int, title: str, func):
 def apply_migrations(cur: Any) -> None:
     for migration in MIGRATIONS:
         if migration.exists():
+            if migration.name == "023_program_intelligence_table.sql":
+                with get_conn() as check_conn:
+                    with check_conn.cursor() as check_cur:
+                        check_cur.execute(
+                            """
+                            SELECT EXISTS (
+                                SELECT 1
+                                FROM pg_class c
+                                INNER JOIN pg_namespace n ON n.oid = c.relnamespace
+                                WHERE n.nspname = 'public'
+                                  AND c.relname = 'program_intelligence'
+                            )
+                            """
+                        )
+                        exists_row = check_cur.fetchone()
+                        exists_value = False
+                        if isinstance(exists_row, dict):
+                            exists_value = bool(exists_row.get("exists") or exists_row.get("?column?") or next(iter(exists_row.values()), False))
+                        elif isinstance(exists_row, (list, tuple)):
+                            exists_value = bool(exists_row[0]) if exists_row else False
+                        elif exists_row is not None:
+                            exists_value = bool(exists_row)
+                        if exists_value:
+                            continue
             cur.execute(migration.read_text(encoding="utf-8"))
 
 
@@ -461,11 +489,9 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
         "career_transitions": career_transitions,
         "forecasts": forecasts,
         "semantic_search_results": semantic_search_results,
-        "executive_metrics": build_executive_metrics(),
     }
 
     def _persist_results() -> tuple[dict[str, Any], dict[str, int], dict[str, str]]:
-        persist_executive_metrics(payload["executive_metrics"])
         observatory_local = run_observatory_layer(
             jobs=resolved_jobs,
             company_profiles=company_profiles,
@@ -476,9 +502,56 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
             write_output=True,
         )
         persisted_local = persist_intelligence(payload) if persist else {}
+        recommendation_skill_candidates: list[str] = []
+        for recommendation in recommendations:
+            evidence = getattr(recommendation, "recommendation_evidence", None) or {}
+            if isinstance(evidence, dict):
+                recommendation_skill_candidates.extend([str(skill or "").strip() for skill in evidence.get("recommended_skills", []) if str(skill or "").strip()])
+        normalized_skill_results = normalize_skill_batch(
+            [*market_skills, *missing_skills, *emerging_skills, *recommendation_skill_candidates],
+            persist=persist,
+            source="intelligence_pipeline",
+        )
+        persisted_local["skill_normalization_mappings"] = len(normalized_skill_results)
+
         program_intelligence_records = build_program_intelligence()
         program_intelligence_count = persist_program_intelligence(program_intelligence_records, replace_existing=True) if persist else 0
         persisted_local["program_intelligence"] = program_intelligence_count
+
+        forecast_limit = max(limit, 500)
+        forecast_bundle = build_forecast_expansion(persist=persist, limit=forecast_limit)
+        persisted_local["forecast_expansion"] = {
+            "skill": len(forecast_bundle.skill),
+            "technology": len(forecast_bundle.technology),
+            "company": len(forecast_bundle.company),
+            "role": len(forecast_bundle.role),
+        }
+        persisted_local["forecast_summary"] = build_forecast_summary(persist=False, limit=forecast_limit)
+
+        executive_metrics = build_executive_metrics(
+            program_rows=[item.to_dict() for item in program_intelligence_records],
+            emerging_skills=[{"skill_name": record.entity_name} for record in forecast_bundle.technology[:20]],
+            market_forecasts=[record.to_dict() for record in (forecast_bundle.skill + forecast_bundle.technology + forecast_bundle.company + forecast_bundle.role)],
+            top_skills=[{"skill_name": skill} for skill in market_skills[:10]],
+            top_companies=[profile.to_dict() for profile in company_profiles[:10]],
+        )
+        payload["executive_metrics"] = executive_metrics
+        persist_executive_metrics(executive_metrics)
+
+        curriculum_simulations: list[dict[str, Any]] = []
+        for item in program_intelligence_records:
+            simulation = build_curriculum_impact_simulation(
+                item.program_id,
+                proposed_skills=item.top_gaps and [str(gap.get("missing_skill") or "") for gap in item.top_gaps if str(gap.get("missing_skill") or "").strip()] or None,
+                horizon_months=12,
+                persist=persist,
+            )
+            curriculum_simulations.append(simulation.to_dict())
+        persisted_local["curriculum_simulations"] = len(curriculum_simulations)
+
+        if persist and curriculum_simulations:
+            persisted_local["critical_programs"] = len([item for item in curriculum_simulations if float(item.get("projected_risk_score") or 0) >= 75])
+
         executive_observatory = build_executive_observatory_v2(persist=False)
         persisted_local["executive_observatory_metrics"] = persist_executive_observatory_metrics(executive_observatory.metrics) if persist else 0
         reports_local = write_reports(payload, persisted_local)

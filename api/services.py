@@ -22,6 +22,8 @@ from intelligence.predictive_intelligence_engine import (
     _safe_float as predictive_safe_float,
 )
 from intelligence.executive_observatory_engine import build_executive_observatory_v2
+from intelligence.curriculum_impact_simulator import build_curriculum_impact_simulation
+from intelligence.forecast_expansion_engine import build_forecast_summary
 from intelligence.program_intelligence_engine import (
     build_program_intelligence,
     build_program_intelligence_for_program,
@@ -301,7 +303,9 @@ def list_recommendations(*, limit: int = DEFAULT_LIMIT, offset: int = 0, recomme
             f"""
             SELECT recommendation_type, target_role, target_company,
                    recommendation_payload, recommendation_reasoning,
-                   recommendation_confidence, recommendation_evidence, metric_period, generated_at
+                   recommendation_confidence, recommendation_evidence,
+                   estimated_alignment_increase, estimated_employability_gain, estimated_risk_reduction,
+                   metric_period, generated_at
             FROM recommendation_observatory
             {where_sql}
             ORDER BY recommendation_confidence DESC NULLS LAST, target_role ASC
@@ -332,6 +336,9 @@ def list_recommendations(*, limit: int = DEFAULT_LIMIT, offset: int = 0, recomme
             "recommendation_reasoning": item.reason,
             "recommendation_confidence": item.market_weight,
             "recommendation_evidence": item.evidence_sources,
+            "estimated_alignment_increase": round(item.market_weight * 10.0, 4),
+            "estimated_employability_gain": round(item.market_weight * 8.0, 4),
+            "estimated_risk_reduction": round(min(15.0, item.market_weight * 10.0), 4),
         }
         for item in intelligence.recommended_updates
     ]
@@ -410,6 +417,150 @@ def list_career_paths(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[st
     return _envelope([], limit=limit, offset=offset, total=0, filters={})
 
 
+def _collect_market_forecast_rows(*, db_name: str | None = None) -> list[dict[str, Any]]:
+    combined: list[dict[str, Any]] = []
+
+    if relation_exists("market_forecasts", db_name=db_name) and relation_has_rows("market_forecasts", db_name=db_name):
+        rows = fetch_all(
+            """
+            SELECT entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence,
+                   market_phase, first_seen_at, last_seen_at, evidence, generated_at
+            FROM market_forecasts
+            ORDER BY horizon_months ASC NULLS LAST, growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
+            """,
+            db_name=db_name,
+        )
+        for row in _serialize_rows(rows):
+            if not row.get("horizon_months"):
+                row["horizon_months"] = 12
+            combined.append(row)
+
+    if relation_exists("skill_trend_forecast", db_name=db_name) and relation_has_rows("skill_trend_forecast", db_name=db_name):
+        rows = fetch_all(
+            """
+            SELECT canonical_skill_id, skill_name, horizon_months, growth_score, decline_score,
+                   confidence_score, first_seen_at, last_seen_at, source_payload
+            FROM skill_trend_forecast
+            ORDER BY growth_score DESC NULLS LAST, skill_name ASC
+            """,
+            db_name=db_name,
+        )
+        for row in _serialize_rows(rows):
+            combined.append(
+                {
+                    "entity_type": "skill",
+                    "entity_name": row.get("skill_name"),
+                    "horizon_months": row.get("horizon_months", 12),
+                    "growth_velocity": round(predictive_safe_float(row.get("growth_score")) / 100.0, 4),
+                    "forecast_confidence": predictive_safe_float(row.get("confidence_score")),
+                    "market_phase": "emerging" if predictive_safe_float(row.get("growth_score")) >= 70 else "growing" if predictive_safe_float(row.get("growth_score")) >= 50 else "stable",
+                    "first_seen_at": row.get("first_seen_at"),
+                    "last_seen_at": row.get("last_seen_at"),
+                    "evidence": row.get("source_payload") or {},
+                    "canonical_skill_id": row.get("canonical_skill_id"),
+                }
+            )
+
+    if relation_exists("technology_forecasts", db_name=db_name) and relation_has_rows("technology_forecasts", db_name=db_name):
+        rows = fetch_all(
+            """
+            SELECT entity_name, horizon_months, growth_velocity, forecast_confidence, market_phase,
+                   first_seen_at, last_seen_at, source_payload
+            FROM technology_forecasts
+            ORDER BY growth_velocity DESC NULLS LAST, entity_name ASC
+            """,
+            db_name=db_name,
+        )
+        for row in _serialize_rows(rows):
+            combined.append(
+                {
+                    "entity_type": "technology",
+                    "entity_name": row.get("entity_name"),
+                    "horizon_months": row.get("horizon_months", 12),
+                    "growth_velocity": row.get("growth_velocity", 0),
+                    "forecast_confidence": row.get("forecast_confidence", 0),
+                    "market_phase": row.get("market_phase", ""),
+                    "first_seen_at": row.get("first_seen_at"),
+                    "last_seen_at": row.get("last_seen_at"),
+                    "evidence": row.get("source_payload") or {},
+                }
+            )
+
+    if relation_exists("company_forecasts", db_name=db_name) and relation_has_rows("company_forecasts", db_name=db_name):
+        rows = fetch_all(
+            """
+            SELECT entity_name, horizon_months, growth_velocity, forecast_confidence, market_phase,
+                   first_seen_at, last_seen_at, source_payload
+            FROM company_forecasts
+            ORDER BY growth_velocity DESC NULLS LAST, entity_name ASC
+            """,
+            db_name=db_name,
+        )
+        for row in _serialize_rows(rows):
+            combined.append(
+                {
+                    "entity_type": "company",
+                    "entity_name": row.get("entity_name"),
+                    "horizon_months": row.get("horizon_months", 12),
+                    "growth_velocity": row.get("growth_velocity", 0),
+                    "forecast_confidence": row.get("forecast_confidence", 0),
+                    "market_phase": row.get("market_phase", ""),
+                    "first_seen_at": row.get("first_seen_at"),
+                    "last_seen_at": row.get("last_seen_at"),
+                    "evidence": row.get("source_payload") or {},
+                }
+            )
+
+    if relation_exists("role_forecasts", db_name=db_name) and relation_has_rows("role_forecasts", db_name=db_name):
+        rows = fetch_all(
+            """
+            SELECT entity_name, horizon_months, growth_velocity, forecast_confidence, market_phase,
+                   first_seen_at, last_seen_at, source_payload
+            FROM role_forecasts
+            ORDER BY growth_velocity DESC NULLS LAST, entity_name ASC
+            """,
+            db_name=db_name,
+        )
+        for row in _serialize_rows(rows):
+            combined.append(
+                {
+                    "entity_type": "role",
+                    "entity_name": row.get("entity_name"),
+                    "horizon_months": row.get("horizon_months", 12),
+                    "growth_velocity": row.get("growth_velocity", 0),
+                    "forecast_confidence": row.get("forecast_confidence", 0),
+                    "market_phase": row.get("market_phase", ""),
+                    "first_seen_at": row.get("first_seen_at"),
+                    "last_seen_at": row.get("last_seen_at"),
+                    "evidence": row.get("source_payload") or {},
+                }
+            )
+
+    seen: set[tuple[str, str, int]] = set()
+    deduped: list[dict[str, Any]] = []
+    for row in sorted(
+        combined,
+        key=lambda item: (
+            str(item.get("entity_type") or ""),
+            str(item.get("entity_name") or "").casefold(),
+            int(item.get("horizon_months") or 0),
+            predictive_safe_float(item.get("growth_velocity")),
+            predictive_safe_float(item.get("forecast_confidence")),
+        ),
+        reverse=True,
+    ):
+        key = (
+            str(row.get("entity_type") or ""),
+            str(row.get("entity_name") or "").casefold(),
+            int(row.get("horizon_months") or 0),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(row)
+    return deduped
+
+
 def list_market_forecast(
     *,
     limit: int = DEFAULT_LIMIT,
@@ -420,58 +571,11 @@ def list_market_forecast(
 ) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
-    if relation_exists("market_forecasts") and relation_has_rows("market_forecasts"):
-        horizon_exists = _column_exists("market_forecasts", "horizon_months")
-        clauses: list[str] = []
-        params: list[Any] = []
-        if entity_type:
-            clauses.append("entity_type = %s")
-            params.append(entity_type)
-        if entity_name:
-            clauses.append("entity_name ILIKE %s")
-            params.append(f"%{entity_name}%")
-        if horizon_months is not None and horizon_exists:
-            clauses.append("horizon_months = %s")
-            params.append(int(horizon_months))
-        where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-        select_columns = (
-            "entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence,"
-            " market_phase, first_seen_at, last_seen_at, evidence, generated_at"
-        ) if horizon_exists else (
-            "entity_type, entity_name, growth_velocity, forecast_confidence,"
-            " market_phase, first_seen_at, last_seen_at, evidence, generated_at"
-        )
-        rows = fetch_all(
-            f"""
-            SELECT {select_columns}
-            FROM market_forecasts
-            {where_sql}
-            ORDER BY {'horizon_months ASC,' if horizon_exists else ''} growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
-            LIMIT %s OFFSET %s
-            """,
-            tuple(params + [limit, offset]),
-        )
-        count_row = fetch_one(f"SELECT COUNT(*)::int AS total FROM market_forecasts {where_sql}", tuple(params))
-        rows = _serialize_rows(rows)
-        if not horizon_exists:
-            for row in rows:
-                row["horizon_months"] = 12
-        if horizon_months is not None and not horizon_exists:
-            rows = [row for row in rows if int(row.get("horizon_months") or 0) == int(horizon_months)]
-            total = len(rows)
-        else:
-            total = int((count_row or {}).get("total") or 0)
-        return _envelope(
-            rows,
-            limit=limit,
-            offset=offset,
-            total=total,
-            filters={"entity_type": entity_type, "entity_name": entity_name, "horizon_months": horizon_months},
-        )
-
-    rows = [item.to_dict() for item in build_market_demand_forecasts(persist=False, limit=limit)]
+    rows = _collect_market_forecast_rows()
+    if not rows:
+        rows = [item.to_dict() for item in build_market_demand_forecasts(persist=False, limit=limit)]
     if entity_type:
-        rows = [row for row in rows if row["entity_type"] == entity_type]
+        rows = [row for row in rows if str(row.get("entity_type") or "") == entity_type]
     if entity_name:
         rows = [row for row in rows if entity_name.casefold() in str(row.get("entity_name") or "").casefold()]
     if horizon_months is not None:
@@ -512,6 +616,80 @@ def get_curriculum_risk_index(program_id: int) -> dict[str, Any]:
 
 def get_university_market_alignment(program_id: int) -> dict[str, Any]:
     return build_university_market_alignment(program_id, persist=False).to_dict()
+
+
+def get_critical_programs(*, limit: int = DEFAULT_LIMIT, offset: int = 0, horizon_months: int = 12) -> dict[str, Any]:
+    limit = _bounded(limit)
+    offset = _offset(offset)
+    rows: list[dict[str, Any]] = []
+    if relation_exists("program_risk_index") and relation_has_rows("program_risk_index"):
+        rows = fetch_all(
+            """
+            SELECT
+                COALESCE(pr.program_id, pi.program_id) AS program_id,
+                COALESCE(pi.program_name, e.nombre, '') AS program_name,
+                COALESCE(pi.program_role, COALESCE(e.rol, '')) AS program_role,
+                COALESCE(pi.alignment_score, 0) AS alignment_score,
+                COALESCE(pr.risk_score, pi.risk_score, 0) AS risk_score,
+                COALESCE(pr.risk_level, pi.risk_level, 'aligned') AS risk_level,
+                COALESCE(pi.gap_count, 0) AS gap_count,
+                COALESCE((pi.top_gaps->0->>'missing_skill'), '') AS main_gap_driver,
+                COALESCE((pi.recommended_actions->0), '') AS recommended_action,
+                COALESCE(pei.employability_gain, 0) AS projected_employability_gain,
+                COALESCE(pr.horizon_months, 12) AS horizon_months,
+                COALESCE(pr.source_payload, pi.supporting_evidence, '{}'::jsonb) AS supporting_evidence,
+                COALESCE(pi.source_tables, '[]'::jsonb) AS source_tables,
+                COALESCE(pr.confidence_score, pi.confidence, 0) AS confidence,
+                COALESCE(pr.generated_at, pi.generated_at::timestamptz, now()) AS generated_at
+            FROM program_risk_index pr
+            LEFT JOIN program_intelligence pi ON pi.program_id = pr.program_id
+            LEFT JOIN especializaciones e ON e.id = pr.program_id
+            LEFT JOIN program_employability_index pei ON pei.program_id = pr.program_id
+            WHERE pr.horizon_months = %s
+              AND COALESCE(pr.risk_score, pi.risk_score, 0) >= 75
+            ORDER BY COALESCE(pr.risk_score, pi.risk_score, 0) DESC NULLS LAST, COALESCE(pi.alignment_score, 0) DESC NULLS LAST
+            """,
+            (horizon_months,),
+        )
+    if not rows and relation_exists("program_intelligence") and relation_has_rows("program_intelligence"):
+        rows = fetch_all(
+            """
+            SELECT
+                program_id,
+                program_name,
+                program_role,
+                alignment_score,
+                risk_score,
+                risk_level,
+                gap_count,
+                COALESCE((top_gaps->0->>'missing_skill'), '') AS main_gap_driver,
+                COALESCE((top_recommendations->0->>'recommendation_reasoning'), COALESCE((recommended_actions->0), '')) AS recommended_action,
+                0 AS projected_employability_gain,
+                12 AS horizon_months,
+                COALESCE(supporting_evidence, '{}'::jsonb) AS supporting_evidence,
+                COALESCE(source_tables, '[]'::jsonb) AS source_tables,
+                confidence,
+                generated_at
+            FROM program_intelligence
+            WHERE risk_score >= 75
+            ORDER BY risk_score DESC NULLS LAST, alignment_score DESC NULLS LAST
+            """,
+            db_name=db_name,
+        )
+    rows = _serialize_rows(rows)
+    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"horizon_months": horizon_months, "source": "program_risk_index"})
+
+
+def get_curriculum_simulator(program_id: int, proposed_skills: str | None = None, *, horizon_months: int = 12) -> dict[str, Any]:
+    skills: list[str] = []
+    if proposed_skills:
+        skills = [part.strip() for part in proposed_skills.split(",") if part.strip()]
+    result = build_curriculum_impact_simulation(program_id, proposed_skills=skills, horizon_months=horizon_months, persist=True)
+    return result.to_dict()
+
+
+def get_forecast_summary(*, limit: int = 25) -> dict[str, Any]:
+    return build_forecast_summary(persist=False, limit=max(limit, 500))
 
 
 def get_career_intelligence(source_role: str | None = None, limit: int = 12) -> dict[str, Any]:

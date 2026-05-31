@@ -138,7 +138,10 @@ def _program_rows(db_name: str | None = None) -> list[dict[str, Any]]:
 
 
 def _program_skill_rows(program_id: int, db_name: str | None = None) -> list[dict[str, Any]]:
-    rows = programas_repository.fetch_program_skill_rows(program_id, db_name=db_name)
+    try:
+        rows = programas_repository.fetch_program_skill_rows(program_id, db_name=db_name)
+    except Exception:
+        return []
     normalized = dashboard_service.normalize_skill_rows(rows)
     return normalized
 

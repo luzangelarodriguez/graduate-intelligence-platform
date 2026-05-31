@@ -3,10 +3,10 @@
 - Especializacion: Especialización en Visual Analytics y Big Data
 - Skills mercado: 49
 - Covered: 14
-- Partial: 4
+- Partial: 31
 - Missing: 0
 - Emerging: 0
-- Irrelevant: 31
+- Irrelevant: 4
 
 ## Top market skills
 
@@ -54,11 +54,11 @@
 - Cluster: Enterprise Analytics
 - Market weight: 0.5
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 5}
 - Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Afinidad: 0.35
+- Recomendacion: Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.
 
 ### Power BI
 - Cluster: BI & Visualization
@@ -94,41 +94,41 @@
 - Cluster: Cloud Analytics
 - Market weight: 0.4
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 4}
 - Roles asociados: sin cargo asociado
 - Afinidad: 0.55
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Recomendacion: Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.
 
 ### AWS
 - Cluster: Cloud Analytics
 - Market weight: 0.4
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 4}
 - Roles asociados: sin cargo asociado
 - Afinidad: 0.55
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Recomendacion: Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.
 
 ### reporting
 - Cluster: Reporting & KPI
 - Market weight: 0.4
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 4}
 - Roles asociados: sin cargo asociado
 - Afinidad: 0.48
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Recomendacion: Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
 
 ### trabajo en equipo
 - Cluster: Enterprise Analytics
 - Market weight: 0.4
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 4}
 - Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Afinidad: 0.35
+- Recomendacion: Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.
 
 ### APIs
 - Cluster: Software/Data Platform
@@ -144,31 +144,31 @@
 - Cluster: Enterprise Analytics
 - Market weight: 0.3
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 3}
 - Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Afinidad: 0.35
+- Recomendacion: Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.
 
 ### Oracle
 - Cluster: Enterprise Analytics
 - Market weight: 0.3
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 3}
 - Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Afinidad: 0.35
+- Recomendacion: Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.
 
 ### Agile
 - Cluster: Enterprise Analytics
 - Market weight: 0.3
 - Market signal confidence: weak
-- Coverage curricular: irrelevant
+- Coverage curricular: partial
 - Evidence sources: {"portal_taxonomy": 3}
 - Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+- Afinidad: 0.35
+- Recomendacion: Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.
 
 ### machine learning
 - Cluster: AI Analytics
@@ -220,6 +220,36 @@
 - Afinidad: 0.82
 - Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
 
+### liderazgo
+- Cluster: Enterprise Analytics
+- Market weight: 0.2
+- Market signal confidence: weak
+- Coverage curricular: partial
+- Evidence sources: {"portal_taxonomy": 2}
+- Roles asociados: sin cargo asociado
+- Afinidad: 0.35
+- Recomendacion: Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.
+
+### ingles
+- Cluster: Enterprise Analytics
+- Market weight: 0.2
+- Market signal confidence: weak
+- Coverage curricular: partial
+- Evidence sources: {"portal_taxonomy": 2}
+- Roles asociados: sin cargo asociado
+- Afinidad: 0.35
+- Recomendacion: Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.
+
+### PostgreSQL
+- Cluster: Enterprise Analytics
+- Market weight: 0.2
+- Market signal confidence: weak
+- Coverage curricular: partial
+- Evidence sources: {"portal_taxonomy": 2}
+- Roles asociados: sin cargo asociado
+- Afinidad: 0.35
+- Recomendacion: Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.
+
 ### pensamiento analitico
 - Cluster: Enterprise Analytics
 - Market weight: 0.2
@@ -230,37 +260,7 @@
 - Afinidad: 0.08
 - Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
 
-### liderazgo
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
-### ingles
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
 ### Redis
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
-### PostgreSQL
 - Cluster: Enterprise Analytics
 - Market weight: 0.2
 - Market signal confidence: weak
@@ -320,7 +320,23 @@
 
 ## Recommended updates
 
+- Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.
+- Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.
+- Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
+- Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar APIs como capacidad aplicada dentro del cluster Software/Data Platform.
+- Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar Oracle como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar Agile como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar PL/SQL como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar NoSQL como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar MySQL como capacidad aplicada dentro del cluster Enterprise Analytics.
+- Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.
+- Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.
+- Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.
+- Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.
+- Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.
