@@ -4,26 +4,32 @@ import type {
   AlumniRegistrationPayload,
   AlumniRegistrationResponse,
   AuthUser,
+  CompanyIntelligenceItem,
   DashboardKpisResponse,
+  EmergingSkillSignal,
   Job,
   LoginPayload,
   Match,
   MicroAnalysis,
   MicroDemoCase,
+  MarketForecastItem,
   SpecializationDocumentsResponse,
   SpecializationMicroAnalysis,
   SpecializationOption,
   SpecializationRewriteResponse,
   Page,
   Program,
+  ProgramIntelligencePageResponse,
   ProgramDashboardResponse,
   RelatedUniversityProgram,
   RegisterPayload,
   RecommendationProgram,
+  RecommendationV2,
+  ExecutiveObservatoryResponse,
   TokenPair,
 } from '../types/api';
 
-const envBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const envBaseUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL) as string | undefined;
 let accessToken = window.localStorage.getItem('gi_access_token') || '';
 
 export const apiClient = axios.create({
@@ -104,6 +110,11 @@ export async function getDashboardKpis() {
   return data;
 }
 
+export async function getExecutiveObservatory() {
+  const { data } = await apiClient.get<ExecutiveObservatoryResponse>('/executive-observatory');
+  return data;
+}
+
 export async function getProgramDashboard(programId: number) {
   const { data } = await apiClient.get<ProgramDashboardResponse>(`/api/dashboard/programa/${programId}`);
   return data;
@@ -123,6 +134,18 @@ export async function getSpecializations() {
 
 export async function getPrograma(programId: number) {
   const { data } = await apiClient.get<Program>(`/api/programas/${programId}`);
+  return data;
+}
+
+export async function getProgramIntelligence(limit = 100) {
+  const { data } = await apiClient.get<ProgramIntelligencePageResponse>('/program-intelligence', {
+    params: { limit, offset: 0 },
+  });
+  return data;
+}
+
+export async function getProgramIntelligenceDetail(programId: number) {
+  const { data } = await apiClient.get<ProgramIntelligencePageResponse['items'][number]>(`/program-intelligence/${programId}`);
   return data;
 }
 
@@ -165,6 +188,34 @@ export async function getProgramRecommendations(programId: number, limit = 5) {
 export async function getJobRecommendations(programId: number, limit = 8) {
   const { data } = await apiClient.get<Page<Match>>('/api/recommendations/jobs', {
     params: { program_id: programId, limit },
+  });
+  return data;
+}
+
+export async function getRecommendationsV2(programId?: number, limit = 12) {
+  const { data } = await apiClient.get<Page<RecommendationV2>>('/recommendations-v2', {
+    params: { program_id: programId ?? undefined, limit, offset: 0 },
+  });
+  return data;
+}
+
+export async function getEmergingSkills(limit = 12) {
+  const { data } = await apiClient.get<Page<EmergingSkillSignal>>('/emerging-skills', {
+    params: { limit, offset: 0 },
+  });
+  return data;
+}
+
+export async function getCompanyIntelligence(limit = 12) {
+  const { data } = await apiClient.get<Page<CompanyIntelligenceItem>>('/company-intelligence', {
+    params: { limit, offset: 0 },
+  });
+  return data;
+}
+
+export async function getMarketForecast(limit = 12) {
+  const { data } = await apiClient.get<Page<MarketForecastItem>>('/market-forecast', {
+    params: { limit, offset: 0 },
   });
   return data;
 }

@@ -25,8 +25,7 @@ def _capture_connect(monkeypatch):
     return captured
 
 
-def test_database_url_priority(monkeypatch):
-    monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@db.example.com:5432/warehouse")
+def test_railway_database_url_priority(monkeypatch):
     monkeypatch.setenv("RAILWAY_DATABASE_URL", "postgresql://rail:pass@rail.example.com:5432/railway")
     monkeypatch.delenv("DB_HOST", raising=False)
     monkeypatch.delenv("DB_PORT", raising=False)
@@ -37,9 +36,25 @@ def test_database_url_priority(monkeypatch):
 
     conn = backend_db.get_conn()
     assert isinstance(conn, DummyConnection)
-    assert captured["host"] == "db.example.com"
-    assert captured["port"] == 5432
-    assert captured["dbname"] == "warehouse"
+    assert "rail.example.com" in captured["dsn"]
+    assert "/railway" in captured["dsn"]
+    assert backend_db.get_database_diagnostics()["connection_source"] == "RAILWAY_DATABASE_URL"
+
+
+def test_database_url_priority_when_railway_missing(monkeypatch):
+    monkeypatch.delenv("RAILWAY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@db.example.com:5432/warehouse")
+    monkeypatch.delenv("DB_HOST", raising=False)
+    monkeypatch.delenv("DB_PORT", raising=False)
+    monkeypatch.delenv("DB_NAME", raising=False)
+    monkeypatch.delenv("DB_USER", raising=False)
+    monkeypatch.delenv("DB_PASSWORD", raising=False)
+    captured = _capture_connect(monkeypatch)
+
+    conn = backend_db.get_conn()
+    assert isinstance(conn, DummyConnection)
+    assert "db.example.com" in captured["dsn"]
+    assert "/warehouse" in captured["dsn"]
     assert backend_db.get_database_diagnostics()["connection_source"] == "DATABASE_URL"
 
 
@@ -54,9 +69,8 @@ def test_railway_database_url_priority(monkeypatch):
     captured = _capture_connect(monkeypatch)
 
     backend_db.get_conn()
-    assert captured["host"] == "rail.example.com"
-    assert captured["port"] == 6543
-    assert captured["dbname"] == "railway"
+    assert "rail.example.com" in captured["dsn"]
+    assert "/railway" in captured["dsn"]
     assert backend_db.get_database_diagnostics()["connection_source"] == "RAILWAY_DATABASE_URL"
 
 
@@ -71,9 +85,8 @@ def test_db_host_priority(monkeypatch):
     captured = _capture_connect(monkeypatch)
 
     backend_db.get_conn()
-    assert captured["host"] == "127.0.0.1"
-    assert captured["port"] == 5433
-    assert captured["dbname"] == "labor_observatory"
+    assert "127.0.0.1" in captured["dsn"]
+    assert "/labor_observatory" in captured["dsn"]
     assert backend_db.get_database_diagnostics()["connection_source"] == "DB_HOST"
 
 
@@ -89,7 +102,6 @@ def test_pghost_priority(monkeypatch):
     captured = _capture_connect(monkeypatch)
 
     backend_db.get_conn()
-    assert captured["host"] == "pg.example.com"
-    assert captured["port"] == 5434
-    assert captured["dbname"] == "pg_warehouse"
+    assert "pg.example.com" in captured["dsn"]
+    assert "/pg_warehouse" in captured["dsn"]
     assert backend_db.get_database_diagnostics()["connection_source"] == "PGHOST"

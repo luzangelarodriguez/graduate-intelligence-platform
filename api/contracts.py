@@ -258,5 +258,48 @@ class ExecutiveMetric(BaseModel):
 
 class ExecutiveObservatoryResponse(BaseModel):
     metrics: list[ExecutiveMetric] = Field(default_factory=list)
+    alignment_average: float = 0.0
+    high_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    medium_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    low_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    programs_analyzed: int = 0
+    critical_gaps: list[dict[str, Any]] = Field(default_factory=list)
+    top_emerging_skills: list[dict[str, Any]] = Field(default_factory=list)
+    top_recommendations: list[dict[str, Any]] = Field(default_factory=list)
+    top_programs: list[dict[str, Any]] = Field(default_factory=list)
+    at_risk_programs: list[dict[str, Any]] = Field(default_factory=list)
+    executive_narrative: str = ""
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class ProgramIntelligenceItem(BaseModel):
+    program_id: int
+    program_name: str = ""
+    program_role: str = ""
+    alignment_score: float = 0.0
+    risk_score: float = 0.0
+    risk_level: str = ""
+    gap_count: int = 0
+    top_gaps: list[dict[str, Any]] = Field(default_factory=list)
+    top_recommendations: list[dict[str, Any]] = Field(default_factory=list)
+    forecast_signals: list[dict[str, Any]] = Field(default_factory=list)
+    role_signals: list[dict[str, Any]] = Field(default_factory=list)
+    emerging_technologies: list[dict[str, Any]] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+    business_justification: str = ""
+    supporting_evidence: dict[str, Any] = Field(default_factory=dict)
+    source_tables: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+    generated_at: str = ""
+
+
+class ProgramIntelligencePageResponse(BaseModel):
+    items: list[ProgramIntelligenceItem] = Field(default_factory=list)
+    count: int = 0
+    total: int = 0
+    limit: int = 0
+    offset: int = 0
+    filters: dict[str, Any] = Field(default_factory=dict)
     source_tables: list[str] = Field(default_factory=list)
     confidence: float = 0.0

@@ -112,6 +112,116 @@ export interface RecommendationProgram {
   reason: string;
 }
 
+export interface RecommendationV2 {
+  recommendation_type: string;
+  target_entity: string;
+  target_company: string;
+  recommendation_score: number;
+  priority: string;
+  business_justification: string;
+  expected_impact: string;
+  confidence: number;
+  estimated_alignment_increase: number;
+  recommendation_evidence: Record<string, unknown>;
+  recommendation_reasoning: string;
+}
+
+export interface ExecutiveObservatoryMetric {
+  metric_name: string;
+  metric_category: string;
+  metric_value: number;
+  metric_period: string;
+  confidence_score: number;
+  source_tables: string[];
+  supporting_evidence: Record<string, unknown>;
+}
+
+export interface ExecutiveObservatoryResponse {
+  metrics: ExecutiveObservatoryMetric[];
+  alignment_average: number;
+  high_risk_programs: Record<string, unknown>[];
+  medium_risk_programs: Record<string, unknown>[];
+  low_risk_programs: Record<string, unknown>[];
+  programs_analyzed: number;
+  critical_gaps: Record<string, unknown>[];
+  top_emerging_skills: Record<string, unknown>[];
+  top_recommendations: Record<string, unknown>[];
+  top_programs: Record<string, unknown>[];
+  at_risk_programs: Record<string, unknown>[];
+  executive_narrative: string;
+  source_tables: string[];
+  confidence: number;
+}
+
+export interface ProgramIntelligenceItem {
+  program_id: number;
+  program_name: string;
+  program_role: string;
+  alignment_score: number;
+  risk_score: number;
+  risk_level: string;
+  gap_count: number;
+  top_gaps: Record<string, unknown>[];
+  top_recommendations: Record<string, unknown>[];
+  forecast_signals: Record<string, unknown>[];
+  role_signals: Record<string, unknown>[];
+  emerging_technologies: Record<string, unknown>[];
+  recommended_actions: string[];
+  business_justification: string;
+  supporting_evidence: Record<string, unknown>;
+  source_tables: string[];
+  confidence: number;
+  generated_at: string;
+}
+
+export interface ProgramIntelligencePageResponse extends Page<ProgramIntelligenceItem> {
+  total: number;
+  filters: Record<string, unknown>;
+  source_tables: string[];
+  confidence: number;
+}
+
+export interface EmergingSkillSignal {
+  skill_name: string;
+  growth_rate: number;
+  confidence_score: number;
+  first_seen_date?: string | null;
+  last_seen_date?: string | null;
+  supporting_companies?: string[];
+  supporting_roles?: string[];
+  evidence?: Record<string, unknown>;
+  skill?: string;
+  market_weight?: number;
+  market_signal_confidence?: number;
+  reason?: string;
+}
+
+export interface CompanyIntelligenceItem {
+  company: string;
+  dominant_stack?: string;
+  dominant_cluster?: string;
+  hiring_velocity?: number;
+  ai_adoption_score?: number;
+  cloud_maturity_score?: number;
+  bi_maturity_score?: number;
+  technology_maturity?: string;
+  top_skills?: string[];
+  top_clusters?: string[];
+  evidence?: Record<string, unknown>;
+}
+
+export interface MarketForecastItem {
+  entity_type: string;
+  entity_name: string;
+  horizon_months: number;
+  growth_velocity: number;
+  forecast_confidence: number;
+  market_phase: string;
+  first_seen_at?: string | null;
+  last_seen_at?: string | null;
+  evidence?: Record<string, unknown>;
+}
+
 export interface AlumniRegistrationPayload {
   nombre_completo: string;
   email: string;

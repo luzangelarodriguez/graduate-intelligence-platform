@@ -17,6 +17,8 @@ from api.contracts import (
     MarketForecastPageResponse,
     ObservatoryStatusResponse,
     PaginatedResponse,
+    ProgramIntelligenceItem,
+    ProgramIntelligencePageResponse,
     Program,
     ProgramDashboardResponse,
     ProgramPageResponse,
@@ -233,6 +235,24 @@ def career_intelligence(source_role: str | None = Query(default=None), limit: in
 @app.get("/executive-observatory", response_model=ExecutiveObservatoryResponse, tags=["predictive"])
 def executive_observatory() -> dict[str, Any]:
     return services.get_executive_observatory()
+
+
+@app.get("/program-intelligence", response_model=ProgramIntelligencePageResponse, tags=["predictive"])
+def program_intelligence(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> dict[str, Any]:
+    return services.list_program_intelligence(limit=limit, offset=offset)
+
+
+@app.get("/program-intelligence/{program_id}", response_model=ProgramIntelligenceItem, tags=["predictive"])
+def program_intelligence_detail(program_id: int) -> dict[str, Any]:
+    try:
+        return services.get_program_intelligence(program_id)
+    except KeyError as exc:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @app.get("/semantic-search", response_model=SearchResponse, tags=["search"])

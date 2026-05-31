@@ -21,6 +21,12 @@ from intelligence.predictive_intelligence_engine import (
     detect_emerging_skills,
     _safe_float as predictive_safe_float,
 )
+from intelligence.executive_observatory_engine import build_executive_observatory_v2
+from intelligence.program_intelligence_engine import (
+    build_program_intelligence,
+    build_program_intelligence_for_program,
+    persist_program_intelligence,
+)
 from intelligence.semantic_search_engine import semantic_search
 from ml.labor.market_skill_intelligence_engine import build_market_skill_intelligence_map
 
@@ -519,12 +525,65 @@ def get_career_intelligence(source_role: str | None = None, limit: int = 12) -> 
 
 
 def get_executive_observatory() -> dict[str, Any]:
-    metrics = [metric.to_dict() for metric in build_executive_metrics()]
+    result = build_executive_observatory_v2()
+    return result.to_dict()
+
+
+def list_program_intelligence(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
+    limit = _bounded(limit)
+    offset = _offset(offset)
+    if relation_exists("program_intelligence") and relation_has_rows("program_intelligence"):
+        rows = fetch_all(
+            """
+            SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
+                   gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
+                   emerging_technologies, recommended_actions, business_justification,
+                   supporting_evidence, source_tables, confidence, generated_at
+            FROM program_intelligence
+            ORDER BY risk_score DESC NULLS LAST, alignment_score DESC NULLS LAST, generated_at DESC NULLS LAST
+            LIMIT %s OFFSET %s
+            """,
+            (limit, offset),
+        )
+        count_row = fetch_one("SELECT COUNT(*)::int AS total FROM program_intelligence")
+        total = int((count_row or {}).get("total") or 0)
+        return {
+            "items": _serialize_rows(rows),
+            "count": total,
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+            "filters": {},
+        }
+    rows = [item.to_dict() for item in build_program_intelligence()]
+    total = len(rows)
     return {
-        "metrics": metrics,
-        "source_tables": sorted({table for metric in metrics for table in metric.get("source_tables", [])}),
-        "confidence": round(sum(float(metric.get("confidence_score", 0)) for metric in metrics) / max(len(metrics), 1), 4) if metrics else 0.0,
+        "items": rows[offset : offset + limit],
+        "count": total,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "filters": {"source": "program_intelligence_engine"},
     }
+
+
+def get_program_intelligence(program_id: int) -> dict[str, Any]:
+    if relation_exists("program_intelligence"):
+        row = fetch_one(
+            """
+            SELECT program_id, program_name, program_role, alignment_score, risk_score, risk_level,
+                   gap_count, top_gaps, top_recommendations, forecast_signals, role_signals,
+                   emerging_technologies, recommended_actions, business_justification,
+                   supporting_evidence, source_tables, confidence, generated_at
+            FROM program_intelligence
+            WHERE program_id = %s
+            """,
+            (program_id,),
+        )
+        if row:
+            return dict(row)
+    item = build_program_intelligence_for_program(program_id)
+    return item.to_dict()
 
 
 def list_recommendations_v2(*, program_id: int | None = None, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict[str, Any]:
