@@ -79,7 +79,10 @@ export function useDashboardData() {
             ? programsPage.items
             : programIntelligenceItems.map(mapProgramIntelligenceToProgram);
 
-        const preferred = fallbackPrograms.find((program) => program.total_empleos_relacionados > 0) ?? fallbackPrograms[0];
+        const preferred =
+          fallbackPrograms.find((program) => /visual analytics.*big data/i.test(program.nombre_especializacion || '')) ??
+          fallbackPrograms.find((program) => program.total_empleos_relacionados > 0) ??
+          fallbackPrograms[0];
         if (cancelled) return;
         setSelectedProgramId(preferred?.especializacion_id ?? null);
         setState((current) => ({

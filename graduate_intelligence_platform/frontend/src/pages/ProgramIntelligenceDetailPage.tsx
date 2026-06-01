@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight, BarChart3 } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
@@ -10,10 +10,12 @@ import {
   MetricCard,
   NarrativePanel,
   ProgramPageHeader,
+  ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
+import { useProgramCatalog } from '../hooks/useProgramCatalog';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 
@@ -86,7 +88,9 @@ function programIdFromParam(value?: string) {
 
 export function ProgramIntelligenceDetailPage() {
   const { programId: programIdParam } = useParams();
+  const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
+  const { programs: programCatalog } = useProgramCatalog();
   const { program, programIntelligence, curriculumRisk, alignment, forecastSummary, executiveObservatory, isLoading, error, suggestedSkills } =
     useProgramIntelligenceData(programId);
   const {
@@ -235,6 +239,13 @@ export function ProgramIntelligenceDetailPage() {
           { label: 'Empleabilidad derivada', value: `${employabilityIndex.toFixed(1)}%` },
           { label: 'Brechas activas', value: `${programIntelligence?.gap_count ?? topGaps.length}` },
         ]}
+      />
+
+      <ProgramSelectorStrip
+        programs={programCatalog}
+        selectedProgramId={programId}
+        onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}`)}
+        helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data; los demás programas se leen por competencias y skills del programa."
       />
 
       <ProgramTabs programId={programId} />

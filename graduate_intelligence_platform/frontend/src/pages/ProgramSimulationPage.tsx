@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FlaskConical, Plus } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
@@ -8,12 +8,14 @@ import {
   ForecastHorizonCard,
   MetricCard,
   ProgramPageHeader,
+  ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
   SkillRail,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
+import { useProgramCatalog } from '../hooks/useProgramCatalog';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
 
 function programIdFromParam(value?: string) {
@@ -47,7 +49,9 @@ function evidenceTablesLabel(value: unknown, fallback: string[]) {
 
 export function ProgramSimulationPage() {
   const { programId: programIdParam } = useParams();
+  const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
+  const { programs: programCatalog } = useProgramCatalog();
   const { program, programIntelligence, curriculumRisk, alignment, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
   const { observatoryAnswer, runQuery, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -140,6 +144,13 @@ export function ProgramSimulationPage() {
           { label: 'Empleabilidad base', value: `${currentEmployability.toFixed(1)}%` },
           { label: 'Skills seleccionadas', value: `${selectedSkills.length}` },
         ]}
+      />
+
+      <ProgramSelectorStrip
+        programs={programCatalog}
+        selectedProgramId={programId}
+        onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/simulation`)}
+        helper="Selecciona un programa para simularlo uno a uno. Si el programa no tiene microcurrículo detallado, la simulación se apoya en competencias y skills del programa."
       />
 
       <ProgramTabs programId={programId} />
