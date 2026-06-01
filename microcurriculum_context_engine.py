@@ -12,6 +12,8 @@ from typing import Any
 from psycopg2.extras import Json, RealDictCursor, execute_values
 
 from microcurriculum_engine.pipelines.process_microcurriculum import process_microcurriculum
+from intelligence.domain_benchmark_layer import build_domain_benchmark
+from intelligence.domain_taxonomy_layer import build_domain_taxonomy
 from sync_to_railway import connect, get_local_config, get_railway_config, load_dotenv_files
 
 
@@ -59,6 +61,89 @@ VISUAL_ANALYTICS_ROLES = [
     "Business Intelligence Architect",
 ]
 
+CRIMINOLOGY_MARKET_SKILLS = [
+    "criminal investigation",
+    "victimology",
+    "criminal profiling",
+    "criminal intelligence",
+    "criminal policy",
+    "crime prevention",
+    "public security",
+    "cybercrime",
+    "criminal analysis",
+    "forensic analysis",
+    "chain of custody",
+    "risk analysis",
+    "compliance",
+    "penitentiary systems",
+    "organized crime",
+    "financial crime",
+]
+
+CRIMINOLOGY_ROLES = [
+    "Forensic Analyst",
+    "Criminal Intelligence Analyst",
+    "Cybercrime Investigator",
+    "Victim Assistance Specialist",
+    "Public Security Advisor",
+    "Compliance Analyst",
+]
+
+CRIMINOLOGY_BENCHMARKING_REFERENCES = [
+    {
+        "source": "SNIES",
+        "institution": "Universidad Externado de Colombia",
+        "program": "Especializacion en Criminologia",
+        "modality": "Presencial / Virtual",
+        "score": 85,
+        "competencies": ["criminal investigation", "victimology", "forensic analysis", "public security"],
+        "curriculum_structure": ["fundamentos", "investigacion criminal", "forense", "prevencion", "inteligencia criminal"],
+        "graduate_profile": "Analista en investigacion criminal con capacidad de articular evidencia, prevencion y seguridad publica.",
+        "occupational_profile": "Forensic Analyst / Criminal Intelligence Analyst",
+    },
+    {
+        "source": "SNIES",
+        "institution": "Universidad Libre",
+        "program": "Criminalistica y Ciencias Forenses",
+        "modality": "Presencial",
+        "score": 82,
+        "competencies": ["forensic analysis", "chain of custody", "evidence handling"],
+        "curriculum_structure": ["criminalistica", "laboratorio", "evidencia", "cadena de custodia"],
+        "graduate_profile": "Profesional orientado al analisis forense y manejo de evidencia.",
+        "occupational_profile": "Forensic Analyst",
+    },
+    {
+        "source": "Benchmark",
+        "institution": "University of Leicester",
+        "program": "Criminology",
+        "modality": "Online / On campus",
+        "score": 76,
+        "competencies": ["criminal intelligence", "cybercrime", "organized crime"],
+        "curriculum_structure": ["criminology", "cybercrime", "intelligence", "organized crime"],
+        "graduate_profile": "Analista con enfoque en inteligencia criminal y crimen transnacional.",
+        "occupational_profile": "Criminal Intelligence Analyst",
+    },
+]
+
+
+def _slugify(name: str) -> str:
+    normalized = normalize_text(name)
+    return normalized.replace(" ", "_") if normalized else "microcurriculum"
+
+
+def _domain_config(domain_key: str) -> dict[str, Any]:
+    if domain_key == "criminology":
+        return {
+            "market_skills": CRIMINOLOGY_MARKET_SKILLS,
+            "roles": CRIMINOLOGY_ROLES,
+            "benchmarks": CRIMINOLOGY_BENCHMARKING_REFERENCES,
+        }
+    return {
+        "market_skills": VISUAL_ANALYTICS_MARKET_SKILLS,
+        "roles": VISUAL_ANALYTICS_ROLES,
+        "benchmarks": BENCHMARKING_REFERENCES,
+    }
+
 MARKET_SKILL_ALIASES = {
     "dashboards": ("dashboard", "dashboards", "tablero", "tableros", "cuadro de mando", "cuadros de mando"),
     "data visualization": ("visualizacion de datos", "visualización de datos", "visualizacion interactiva", "visual analytics"),
@@ -71,6 +156,16 @@ MARKET_SKILL_ALIASES = {
     "dataops": ("dataops", "operaciones de datos", "automatizacion de datos", "pipeline de datos"),
     "ia generativa": ("ia generativa", "inteligencia artificial generativa", "generative ai"),
     "power platform": ("power platform", "power apps", "power automate"),
+    "criminal investigation": ("investigacion criminal", "investigacion criminalistica", "investigacion judicial"),
+    "victimology": ("victimologia", "victimology", "atencion a victimas"),
+    "criminal profiling": ("perfilacion criminal", "perfilamiento criminal"),
+    "criminal intelligence": ("inteligencia criminal", "criminal intelligence"),
+    "crime prevention": ("prevencion del delito", "crime prevention"),
+    "public security": ("seguridad ciudadana", "seguridad publica", "public security"),
+    "cybercrime": ("ciberdelito", "delito informatico", "cybercrime"),
+    "forensic analysis": ("analisis forense", "criminalistica", "forensic analysis"),
+    "chain of custody": ("cadena de custodia", "chain of custody"),
+    "risk analysis": ("analisis de riesgo", "risk analysis"),
 }
 
 BENCHMARKING_REFERENCES = [
@@ -204,10 +299,10 @@ def classify_bucket(skill: dict[str, Any]) -> str:
     return "technical_skills"
 
 
-def extract_keywords(text: str, skills: list[str]) -> Counter[str]:
+def extract_keywords(text: str, skills: list[str], *, market_skills: list[str] | None = None) -> Counter[str]:
     counter: Counter[str] = Counter()
     normalized = normalize_text(text)
-    for phrase in VISUAL_ANALYTICS_MARKET_SKILLS:
+    for phrase in market_skills or VISUAL_ANALYTICS_MARKET_SKILLS:
         if normalize_text(phrase) in normalized:
             counter[phrase] += 2
     for canonical, aliases in MARKET_SKILL_ALIASES.items():
@@ -233,8 +328,24 @@ def detect_redundancies(subjects: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def build_narrative(shared: set[str], gaps: list[str], documents_count: int) -> str:
-    strengths = []
+def build_narrative(domain_key: str, shared: set[str], gaps: list[str], documents_count: int) -> str:
+    strengths: list[str] = []
+    if domain_key == "criminology":
+        if {"criminal investigation", "forensic analysis", "criminal analysis", "chain of custody"} & shared:
+            strengths.append("investigacion criminal y analisis forense")
+        if {"victimology", "crime prevention", "public security"} & shared:
+            strengths.append("victimologia, prevencion del delito y seguridad publica")
+        if {"cybercrime", "criminal intelligence", "risk analysis"} & shared:
+            strengths.append("inteligencia criminal, cibercrimen y analisis de riesgo")
+        if not strengths:
+            strengths.append("fundamentos de criminologia, seguridad y evidencia")
+        gap_text = ", ".join(gaps[:4]) if gaps else "profundizacion metodologica y evidencia aplicada"
+        return (
+            f"El programa fue analizado a partir de {documents_count} microcurriculos reales. "
+            f"Presenta una orientacion fuerte hacia {', '.join(strengths)}. "
+            f"Se identifican oportunidades de fortalecimiento en {gap_text}, manteniendo una lectura contextual "
+            "centrada en criminologia, seguridad publica y prevencion del delito."
+        )
     if {"power bi", "tableau", "data visualization", "dashboards"} & shared:
         strengths.append("visualización de datos y tableros ejecutivos")
     if {"sql", "etl", "big data"} & shared:
@@ -542,6 +653,13 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
         apply_schema(conn)
         specialization = resolve_specialization(conn, specialization_name)
 
+    specialization_domain = build_domain_taxonomy(program_name=specialization_name, program_role="", skills=[], subjects=[], real_market_gaps=[], strengthening_areas=[], labor_roles=[], keywords=[])
+    domain_key = specialization_domain.domain_key
+    domain_benchmark = build_domain_benchmark(domain_key)
+    domain_config = _domain_config(domain_key)
+    market_skills_pool = list(dict.fromkeys(domain_benchmark.market_skills or domain_config["market_skills"]))
+    market_skills_pool = market_skills_pool or list(domain_benchmark.priority_skills or domain_benchmark.comparison_terms)
+
     subjects: list[dict[str, Any]] = []
     counters = {
         "technical_skills": Counter(),
@@ -562,7 +680,7 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
             db_name=config.dbname,
             persist=False,
             persist_original=False,
-            market_skills=VISUAL_ANALYTICS_MARKET_SKILLS,
+            market_skills=market_skills_pool,
         )
         parsed = result["parsed"]
         skills = result["skills"]
@@ -576,9 +694,9 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
             counters["technologies"][name] += 1
         for item in parsed.get("bibliografia") or []:
             counters["bibliography"][item[:180]] += 1
-        keywords = extract_keywords(result["document"]["clean_text"], skill_names)
+        keywords = extract_keywords(result["document"]["clean_text"], skill_names, market_skills=market_skills_pool)
         counters["keywords"].update(keywords)
-        for canonical in VISUAL_ANALYTICS_MARKET_SKILLS:
+        for canonical in market_skills_pool:
             if keywords.get(canonical, 0) > 0:
                 counters["technologies"][canonical] += 1
         domain = result["domain_prediction"]["domain"]
@@ -614,21 +732,28 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
         )
 
     detected = {item["name"] for item in unique_sorted(counters["technologies"], limit=200)}
-    market = set(VISUAL_ANALYTICS_MARKET_SKILLS)
+    market = set(market_skills_pool)
     shared = detected & market
     gaps = sorted(market - detected)
     strengthening = sorted(skill for skill in shared if counters["technologies"][skill] <= 2)
     real_gaps = [
-        {"name": gap, "priority": "alta" if gap in {"mlops", "dataops", "ia generativa", "lakehouse"} else "media"}
+        {
+            "name": gap,
+            "priority": "alta"
+            if gap in {"mlops", "dataops", "ia generativa", "lakehouse", "cybercrime", "forensic analysis", "criminal intelligence", "risk analysis"}
+            else "media",
+        }
         for gap in gaps
     ]
+    detected_domain = specialization_domain.domain_key if domain_counter else domain_key
+    detected_subdomain = specialization_domain.subdomain or next(iter(domain_benchmark.curriculum_structure or []), "general")
     context = {
         "specialization_id": specialization["id"],
         "specialization_name": specialization["nombre"],
         "source_directory": str(source_dir),
         "documents_processed": len(subjects),
-        "detected_domain": domain_counter.most_common(1)[0][0] if domain_counter else "analitica",
-        "detected_subdomain": "visual_analytics_big_data",
+        "detected_domain": detected_domain,
+        "detected_subdomain": detected_subdomain,
         "confidence": round(sum(confidence_values) / max(1, len(confidence_values)), 4),
         "subjects": subjects,
         "technical_skills": unique_sorted(counters["technical_skills"], limit=60),
@@ -639,12 +764,12 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
         "technologies": unique_sorted(counters["technologies"], limit=80),
         "bibliography": unique_sorted(counters["bibliography"], limit=30),
         "keywords": unique_sorted(counters["keywords"], limit=80),
-        "occupational_profiles": VISUAL_ANALYTICS_ROLES,
+        "occupational_profiles": domain_benchmark.occupational_profile or domain_config["roles"],
         "real_market_gaps": real_gaps,
         "strengthening_areas": [{"name": item, "reason": "Detectado en el currículo, requiere mayor profundidad aplicada"} for item in strengthening],
         "redundancies": detect_redundancies(subjects),
-        "labor_roles": VISUAL_ANALYTICS_ROLES,
-        "benchmarking": BENCHMARKING_REFERENCES,
+        "labor_roles": domain_benchmark.labor_roles or domain_benchmark.occupational_profile or domain_config["roles"],
+        "benchmarking": domain_benchmark.benchmark_institutions or domain_config["benchmarks"],
         "scores": {
             "curricular_relevance": round((len(shared) / max(1, len(market))) * 100, 2),
             "market_skill_coverage": round((len(shared) / max(1, len(market))) * 100, 2),
@@ -652,7 +777,7 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
             "detected_market_skills": len(shared),
             "real_gap_count": len(real_gaps),
         },
-        "executive_narrative": build_narrative(shared, gaps, len(subjects)),
+        "executive_narrative": build_narrative(detected_domain, shared, gaps, len(subjects)),
     }
 
     if persist:
@@ -667,12 +792,13 @@ def index_specialization(source_dir: Path, specialization_name: str, *, target: 
                 raise
 
     OUTPUTS.mkdir(exist_ok=True)
-    (OUTPUTS / "visual_analytics_microcurriculum_context.json").write_text(
+    output_prefix = _slugify(specialization["nombre"] or specialization_name)
+    (OUTPUTS / f"{output_prefix}_microcurriculum_context.json").write_text(
         json.dumps(context, ensure_ascii=False, indent=2, default=str),
         encoding="utf-8",
     )
-    (OUTPUTS / "visual_analytics_microcurriculum_context.md").write_text(
-        "# Contexto curricular Visual Analytics y Big Data\n\n"
+    (OUTPUTS / f"{output_prefix}_microcurriculum_context.md").write_text(
+        f"# Contexto curricular {specialization['nombre']}\n\n"
         f"Documentos procesados: {context['documents_processed']}\n\n"
         f"{context['executive_narrative']}\n\n"
         "## Skills detectadas\n\n"
@@ -703,7 +829,7 @@ def main() -> int:
         "documents_processed": context["documents_processed"],
         "detected_domain": context["detected_domain"],
         "real_market_gaps": len(context["real_market_gaps"]),
-        "output": "outputs/visual_analytics_microcurriculum_context.json",
+        "output": f"outputs/{_slugify(context.get('specialization_name') or specialization_name)}_microcurriculum_context.json",
     }, ensure_ascii=False, indent=2))
     return 0
 
