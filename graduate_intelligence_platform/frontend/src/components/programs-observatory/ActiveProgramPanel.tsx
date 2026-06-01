@@ -1,21 +1,20 @@
-import { AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
+import { AlertCircle, Loader2, TrendingUp } from 'lucide-react';
+import { useProgramIntelligence } from '../../hooks/useProgramIntelligence';
 import type { Program } from '../../types/api';
 
 interface ActiveProgramPanelProps {
   program: Program | null;
-  alignment: number;
-  risk: number;
-  employability: number;
+  programId: number | null;
   onSelectProgram: (id: string | null) => void;
 }
 
 export function ActiveProgramPanel({
   program,
-  alignment,
-  risk,
-  employability,
+  programId,
   onSelectProgram,
 }: ActiveProgramPanelProps) {
+  const { summary, isLoading, error } = useProgramIntelligence(programId);
+
   if (!program) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
@@ -23,6 +22,30 @@ export function ActiveProgramPanel({
       </div>
     );
   }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 flex items-center justify-center gap-3">
+        <Loader2 size={20} className="animate-spin text-blue-600" />
+        <p className="text-slate-600">Loading program intelligence...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <p className="text-red-900 font-semibold">Error loading program data</p>
+        <p className="text-sm text-red-700 mt-2">{error.message}</p>
+      </div>
+    );
+  }
+
+  const alignment = summary?.kpis?.alignment_score ?? Number(program.promedio_match_mercado ?? 0) ?? 0;
+  const risk = summary?.kpis?.risk_score ?? 0;
+  const employability = summary?.kpis?.employability_score ?? 0;
+  const skillsCount = program.total_skills_programa ?? summary?.skills_count ?? 0;
+  const jobsCount = program.total_empleos_relacionados ?? summary?.jobs_count ?? 0;
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -40,33 +63,30 @@ export function ActiveProgramPanel({
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {/* Alignment Score */}
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase text-blue-700">Alignment</span>
             <TrendingUp size={16} className="text-blue-600" />
           </div>
-          <div className="text-3xl font-bold text-blue-900">{alignment.toFixed(1)}%</div>
+          <div className="text-3xl font-bold text-blue-900">{alignment !== null ? alignment.toFixed(1) : 'N/D'}%</div>
           <p className="text-xs text-blue-600 mt-2">Market relevance</p>
         </div>
 
-        {/* Risk Score */}
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase text-red-700">Risk</span>
             <AlertCircle size={16} className="text-red-600" />
           </div>
-          <div className="text-3xl font-bold text-red-900">{risk.toFixed(1)}%</div>
+          <div className="text-3xl font-bold text-red-900">{risk !== null ? risk.toFixed(1) : 'N/D'}%</div>
           <p className="text-xs text-red-600 mt-2">Curriculum gap</p>
         </div>
 
-        {/* Employability */}
         <div className="rounded-lg border border-green-200 bg-green-50 p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase text-green-700">Employability</span>
             <TrendingUp size={16} className="text-green-600" />
           </div>
-          <div className="text-3xl font-bold text-green-900">{employability.toFixed(1)}%</div>
+          <div className="text-3xl font-bold text-green-900">{employability !== null ? employability.toFixed(1) : 'N/D'}%</div>
           <p className="text-xs text-green-600 mt-2">Graduate prospects</p>
         </div>
       </div>
@@ -74,11 +94,11 @@ export function ActiveProgramPanel({
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="p-3 bg-slate-50 rounded border border-slate-200">
           <p className="text-xs text-slate-600 uppercase font-semibold">Skills Visible</p>
-          <p className="text-lg font-semibold text-slate-900 mt-1">{program.total_skills_programa || 0}</p>
+          <p className="text-lg font-semibold text-slate-900 mt-1">{skillsCount !== null ? skillsCount : 'N/D'}</p>
         </div>
         <div className="p-3 bg-slate-50 rounded border border-slate-200">
           <p className="text-xs text-slate-600 uppercase font-semibold">Related Jobs</p>
-          <p className="text-lg font-semibold text-slate-900 mt-1">{program.total_empleos_relacionados || 0}</p>
+          <p className="text-lg font-semibold text-slate-900 mt-1">{jobsCount !== null ? jobsCount : 'N/D'}</p>
         </div>
       </div>
     </div>

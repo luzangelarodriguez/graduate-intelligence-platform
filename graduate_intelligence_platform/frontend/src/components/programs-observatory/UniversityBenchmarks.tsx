@@ -1,7 +1,7 @@
 import type { RelatedUniversityProgram } from '../../types/api';
 
 interface UniversityBenchmarksProps {
-  programs: RelatedUniversityProgram[];
+  programId: number | null;
 }
 
 export function UniversityBenchmarks({ programs }: UniversityBenchmarksProps) {

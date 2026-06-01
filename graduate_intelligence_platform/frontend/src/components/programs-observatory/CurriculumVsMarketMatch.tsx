@@ -2,9 +2,7 @@ import type { Program } from '../../types/api';
 
 interface CurriculumMatchProps {
   program: Program | null;
-  academicSkills: number;
-  laborSkills: number;
-  gaps: number;
+  programId: number | null;
 }
 
 export function CurriculumVsMarketMatch({

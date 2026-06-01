@@ -6,8 +6,7 @@ interface Recommendation {
 }
 
 interface AIRecommendationsProps {
-  recommendations: Recommendation[];
-  loading?: boolean;
+  programId: number | null;
 }
 
 export function AIRecommendations({ recommendations, loading = false }: AIRecommendationsProps) {

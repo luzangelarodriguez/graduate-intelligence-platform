@@ -1,7 +1,7 @@
 import type { Match } from '../../types/api';
 
 interface RelatedJobsPanelProps {
-  matches: Match[];
+  programId: number | null;
 }
 
 export function RelatedJobsPanel({ matches }: RelatedJobsPanelProps) {

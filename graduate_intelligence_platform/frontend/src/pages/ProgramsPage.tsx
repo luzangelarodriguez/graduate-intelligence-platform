@@ -91,52 +91,6 @@ export function ProgramsPage() {
   // Check if selected program is Criminology (program_id=108)
   const isCriminologyProgram = selectedProgram?.especializacion_id === 108;
 
-  // AI recommendations mock data
-  const recommendations = [
-    {
-      finding: 'Update data analysis modules',
-      evidence: '3 new job postings requiring advanced analytics skills',
-      impact: 'Increase alignment by 5-8%',
-      priority: 'high' as const,
-    },
-    {
-      finding: 'Integrate cloud computing curriculum',
-      evidence: '45% of related jobs mention AWS or Azure',
-      impact: 'Improve employability by 12%',
-      priority: 'high' as const,
-    },
-    {
-      finding: 'Add project management certification track',
-      evidence: 'Market signal shows PMP/CAPM demand',
-      impact: 'Reduce risk by 3%',
-      priority: 'medium' as const,
-    },
-    {
-      finding: 'Enhance communication skills integration',
-      evidence: 'Employer feedback in job descriptions',
-      impact: 'Overall competitiveness +4%',
-      priority: 'medium' as const,
-    },
-    {
-      finding: 'Review emerging technologies coverage',
-      evidence: 'AI/ML skills mentioned in 28% of roles',
-      impact: 'Future-proof curriculum',
-      priority: 'low' as const,
-    },
-  ];
-
-  // Simulation metrics
-  const simulationMetrics = {
-    currentAlignment: selectedProgramAlignment,
-    projectedAlignment: Math.min(100, selectedProgramAlignment + 12),
-    currentRisk: selectedProgramRisk,
-    projectedRisk: Math.max(0, selectedProgramRisk - 8),
-    currentEmployability: selectedProgramEmployability,
-    projectedEmployability: Math.min(100, selectedProgramEmployability + 15),
-    currentGaps: Math.max(0, Math.round((100 - selectedProgramAlignment) / 10)),
-    projectedGaps: Math.max(0, Math.round((100 - (selectedProgramAlignment + 12)) / 10)),
-  };
-
   if (isLoading) return <LoadingState label="Cargando inteligencia de programas..." />;
   if (!rankedPrograms.length) return <EmptyState title="Sin programas analizados" body={error || 'No se encontró información suficiente para construir el ranking ejecutivo.'} />;
 
@@ -175,34 +129,30 @@ export function ProgramsPage() {
           {/* Section 1: Active Program Panel */}
           <ActiveProgramPanel
             program={selectedProgram}
-            alignment={selectedProgramAlignment}
-            risk={selectedProgramRisk}
-            employability={selectedProgramEmployability}
+            programId={selectedProgramId}
             onSelectProgram={() => setSelectedProgramId(null)}
           />
 
           {/* Section 2: Curriculum vs Market Match */}
           <CurriculumVsMarketMatch
             program={selectedProgram}
-            academicSkills={selectedProgram.total_skills_programa || 0}
-            laborSkills={selectedProgram.total_empleos_relacionados || 0}
-            gaps={Math.max(0, Math.round((100 - selectedProgramAlignment) / 10))}
+            programId={selectedProgramId}
           />
 
           {/* Section 3: University Benchmarks */}
-          <UniversityBenchmarks programs={relatedUniversityPrograms} />
+          <UniversityBenchmarks programId={selectedProgramId} />
 
           {/* Section 4: Related Jobs Panel */}
-          <RelatedJobsPanel matches={matches} />
+          <RelatedJobsPanel programId={selectedProgramId} />
 
           {/* Section 5: Microcurriculum Modules */}
           <MicrocurriculumModules program={selectedProgram} />
 
           {/* Section 6: AI Recommendations */}
-          <AIRecommendations recommendations={recommendations} loading={executiveAiLoading} />
+          <AIRecommendations programId={selectedProgramId} />
 
           {/* Section 7: Simulation Dashboard */}
-          <SimulationDashboard metrics={simulationMetrics} />
+          <SimulationDashboard programId={selectedProgramId} />
 
           {/* Section 8: Criminology Validation (if applicable) */}
           <CriminologyValidation program={selectedProgram} isCriminologyProgram={isCriminologyProgram} />
