@@ -3,10 +3,12 @@ import { Layers3 } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
-import { MetricCard, ProgramPageHeader, ProgramTabs, SectionTitle } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { MetricCard, ProgramPageHeader, ProgramSelectorStrip, ProgramTabs, SectionTitle } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
+import { useProgramCatalog } from '../hooks/useProgramCatalog';
 import { useProgramIntelligenceData } from '../hooks/useProgramIntelligenceData';
+import { useNavigate } from 'react-router-dom';
 
 function programIdFromParam(value?: string) {
   const parsed = Number.parseInt(value ?? '', 10);
@@ -29,7 +31,9 @@ function skillLabel(value: unknown) {
 
 export function ProgramMicrocurriculumPage() {
   const { programId: programIdParam } = useParams();
+  const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
+  const { programs: programCatalog } = useProgramCatalog();
   const { program, programIntelligence, curriculumRisk, alignment, isLoading, error } = useProgramIntelligenceData(programId);
   const { programSummary, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
 
@@ -66,6 +70,13 @@ export function ProgramMicrocurriculumPage() {
           { label: 'Gap score', value: `${gapScore.toFixed(1)}%` },
           { label: 'Recomendaciones', value: `${recommendationCount}` },
         ]}
+      />
+
+      <ProgramSelectorStrip
+        programs={programCatalog}
+        selectedProgramId={programId}
+        onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/microcurriculum`)}
+        helper="Cambia de programa para comparar uno por uno. La trazabilidad microcurricular detallada real solo está cargada para Visual Analytics and Big Data."
       />
 
       <ProgramTabs programId={programId} />

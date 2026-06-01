@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { ArrowRight, BarChart3, BookOpen, FlaskConical, LineChart, Target } from 'lucide-react';
 import type { ReactNode } from 'react';
+import type { Program } from '../../types/api';
 
 interface ProgramHeaderProps {
   programId: number;
@@ -46,6 +47,15 @@ interface ProgramTabItem {
   label: string;
   icon: typeof Target;
   end?: boolean;
+}
+
+interface ProgramSelectorStripProps {
+  programs: Program[];
+  selectedProgramId: number | null;
+  onChange: (programId: number) => void;
+  note?: string;
+  helper?: string;
+  label?: string;
 }
 
 const toneClass: Record<NonNullable<MetricCardProps['tone']>, string> = {
@@ -132,6 +142,70 @@ export function ProgramTabs({ programId }: { programId: number }) {
         );
       })}
     </nav>
+  );
+}
+
+export function ProgramSelectorStrip({
+  programs,
+  selectedProgramId,
+  onChange,
+  note,
+  helper = 'Selecciona un programa para revisar su evidencia, brechas y análisis uno a uno.',
+  label = 'Selector de programas',
+}: ProgramSelectorStripProps) {
+  const selectedProgram = programs.find((program) => program.especializacion_id === selectedProgramId) || programs[0] || null;
+  const detailedMicrocurriculum = Boolean(
+    selectedProgram?.microcurriculum_context || /visual analytics.*big data/i.test(selectedProgram?.nombre_especializacion || ''),
+  );
+
+  return (
+    <article className="panel space-y-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-1">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{label}</span>
+          <h3 className="text-lg font-semibold text-ink">{selectedProgram?.nombre_especializacion || 'Programa en análisis'}</h3>
+          <p className="max-w-3xl text-sm leading-6 text-muted">{helper}</p>
+        </div>
+        <label className="flex min-w-[280px] flex-col gap-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Programa activo</span>
+          <select
+            className="rounded-xl border border-line bg-white px-4 py-3 text-sm font-medium text-ink outline-none transition focus:border-brand"
+            value={selectedProgramId ?? ''}
+            onChange={(event) => onChange(Number(event.target.value))}
+          >
+            {programs.map((program) => (
+              <option key={program.especializacion_id} value={program.especializacion_id}>
+                {program.nombre_especializacion}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted">
+        <span className="rounded-full border border-line bg-slate-50 px-2.5 py-1">
+          {selectedProgram?.rol || 'Rol académico no disponible'}
+        </span>
+        <span className="rounded-full border border-line bg-slate-50 px-2.5 py-1">
+          {selectedProgram?.total_empleos_relacionados ?? 0} señales laborales
+        </span>
+        <span className={`rounded-full border px-2.5 py-1 ${detailedMicrocurriculum ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
+          {detailedMicrocurriculum ? 'Microcurrículo real disponible' : 'Microcurrículo detallado parcial'}
+        </span>
+      </div>
+
+      <div className="rounded-xl border border-line bg-slate-50 px-4 py-3 text-sm leading-6 text-muted">
+        {detailedMicrocurriculum
+          ? 'Este programa cuenta con microcurrículo real y puede compararse contra skills de mercado, vacantes y brechas.'
+          : 'El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data. Los demás programas se analizan con competencias, skills del programa y señales de mercado.'}
+      </div>
+
+      {note ? (
+        <div className="rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm leading-6 text-brand">
+          {note}
+        </div>
+      ) : null}
+    </article>
   );
 }
 

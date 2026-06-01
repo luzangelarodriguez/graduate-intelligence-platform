@@ -155,6 +155,8 @@ export function ProgramsPage() {
   const selectedProgramEmployability = Math.max(0, 100 - selectedProgramRisk);
   const selectedProgramName = selectedProgram?.nombre_especializacion ?? 'Programa en análisis';
   const selectedProgramSkills = selectedProgram?.skills ?? [];
+  const hasDetailedMicrocurriculum =
+    Boolean(selectedProgram?.microcurriculum_context) || /visual analytics.*big data/i.test(selectedProgramName);
   const missingSkills = programDashboard?.missing_skills ?? [];
   const topMatches = matches.slice(0, 6);
   const universityAverage = relatedUniversityPrograms.length
@@ -220,6 +222,9 @@ export function ProgramsPage() {
                     </option>
                   ))}
                 </select>
+                <p className="text-xs leading-5 text-muted">
+                  Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data.
+                </p>
               </label>
             </div>
 
@@ -295,6 +300,11 @@ export function ProgramsPage() {
                 {selectedProgramSkills.length} cubiertas · {missingSkills.length} faltantes
               </span>
             </div>
+            {!hasDetailedMicrocurriculum ? (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+                El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data. En este programa, el match se apoya en competencias y skills visibles del programa, no en una malla microcurricular completa.
+              </div>
+            ) : null}
             <div className="mt-4 space-y-3">
               {selectedProgramSkills.length ? (
                 selectedProgramSkills.slice(0, 8).map((skill) => (

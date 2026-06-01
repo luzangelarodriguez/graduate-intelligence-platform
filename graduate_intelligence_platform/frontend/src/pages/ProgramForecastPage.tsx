@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Activity, CalendarRange, Building2, Sparkles } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
@@ -7,11 +7,13 @@ import {
   ForecastHorizonCard,
   MetricCard,
   ProgramPageHeader,
+  ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
+import { useProgramCatalog } from '../hooks/useProgramCatalog';
 import { useProgramIntelligenceData, useProgramSimulations } from '../hooks/useProgramIntelligenceData';
 
 function programIdFromParam(value?: string) {
@@ -26,7 +28,9 @@ function toNumber(value: unknown, fallback = 0) {
 
 export function ProgramForecastPage() {
   const { programId: programIdParam } = useParams();
+  const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
+  const { programs: programCatalog } = useProgramCatalog();
   const { program, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
   const { executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 6);
@@ -61,6 +65,13 @@ export function ProgramForecastPage() {
           { label: 'Empleabilidad actual', value: `${currentEmployability.toFixed(1)}%` },
           { label: 'Horizontes', value: '6 / 12 / 24 meses' },
         ]}
+      />
+
+      <ProgramSelectorStrip
+        programs={programCatalog}
+        selectedProgramId={programId}
+        onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/forecast`)}
+        helper="Selecciona un programa para comparar horizontes 6/12/24 meses. El análisis de microcurrículo real sigue concentrado en Visual Analytics and Big Data."
       />
 
       <ProgramTabs programId={programId} />
