@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
+import json
 from statistics import mean
 from typing import Any
 
@@ -9,6 +10,8 @@ from psycopg2.extras import Json, execute_values
 
 from backend.repositories import programas_repository
 from backend.repositories.base import cursor, fetch_all, fetch_one, relation_exists
+from intelligence.domain_benchmark_layer import build_domain_benchmark
+from intelligence.domain_taxonomy_layer import build_domain_taxonomy_from_program
 from intelligence.common import clamp, normalize_key
 from intelligence.program_intelligence_engine import build_program_intelligence_for_program
 from intelligence.skill_normalization_engine import normalize_skill_batch
@@ -50,6 +53,25 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return float(value)
     except Exception:
         return default
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_safe(item) for item in value]
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    try:
+        json.dumps(value)
+        return value
+    except Exception:
+        return str(value)
 
 
 def _unique(values: list[str]) -> list[str]:
@@ -139,7 +161,7 @@ def _load_skill_forecasts(*, db_name: str | None = None) -> list[dict[str, Any]]
         rows = fetch_all(
             """
             SELECT entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence,
-                   market_phase, first_seen_at, last_seen_at, evidence, generated_at
+                   market_phase, first_seen_at, last_seen_at, evidence, updated_at AS generated_at
             FROM market_forecasts
             WHERE entity_type = 'skill'
             ORDER BY growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
@@ -258,13 +280,16 @@ def _persist_gap_mappings(
                 urgency,
                 confidence,
                 Json(
-                    {
-                        "specialization": row.get("specialization"),
-                        "evidence": row.get("evidence"),
-                        "recommendation": row.get("recommendation"),
-                        "emergence_score": emergence,
-                        "normalized_skill": normalized,
-                    }
+                    _json_safe(
+                        {
+                            "specialization": row.get("specialization"),
+                            "evidence": row.get("evidence"),
+                            "recommendation": row.get("recommendation"),
+                            "emergence_score": emergence,
+                            "normalized_skill": normalized,
+                        }
+                    ),
+                    dumps=lambda obj: json.dumps(obj, ensure_ascii=False),
                 ),
             )
         )
@@ -324,11 +349,14 @@ def _persist_program_market_pressure(
                 round(clamp((skill_count / max(len(gap_rows), 1)) * 100.0), 4),
                 round(min(1.0, max(0.35, mean([_safe_float(row.get("forecast_confidence")) for row in matched_forecasts]) if matched_forecasts else 0.5)), 4),
                 Json(
-                    {
-                        "projected_risk_score": projected_risk_score,
-                        "matched_forecasts": matched_forecasts[:10],
-                        "normalized_skills": normalized_skills[:10],
-                    }
+                    _json_safe(
+                        {
+                            "projected_risk_score": projected_risk_score,
+                            "matched_forecasts": matched_forecasts[:10],
+                            "normalized_skills": normalized_skills[:10],
+                        }
+                    ),
+                    dumps=lambda obj: json.dumps(obj, ensure_ascii=False),
                 ),
             )
         )
@@ -376,7 +404,7 @@ def _persist_program_employability(
             round(max(0.0, current_alignment_score - projected_alignment_score), 4),
             round(max(0.0, projected_alignment_score - current_alignment_score), 4),
             round(confidence_score, 4),
-            Json(supporting_evidence),
+            Json(_json_safe(supporting_evidence), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
         )
     ]
     with cursor(db_name=db_name) as cur:
@@ -424,7 +452,7 @@ def _persist_program_risk(
                 _risk_level(risk_score),
                 explanation,
                 round(confidence_score, 4),
-                Json(supporting_evidence),
+                Json(_json_safe(supporting_evidence), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
             )
         )
     with cursor(db_name=db_name) as cur:
@@ -461,6 +489,26 @@ def build_curriculum_impact_simulation(
     intelligence = _load_program_intelligence(program_id, db_name=db_name) or build_program_intelligence_for_program(program_id, db_name=db_name).to_dict()
     program_name = str(intelligence.get("program_name") or program.get("nombre_especializacion") or program.get("nombre") or "").strip()
     program_role = str(intelligence.get("program_role") or program.get("rol") or "").strip()
+    base_evidence = intelligence.get("supporting_evidence") or {}
+    domain_taxonomy = build_domain_taxonomy_from_program(
+        program_name=program_name,
+        program_role=program_role,
+        microcurriculum_context={
+            "detected_domain": str(base_evidence.get("domain_taxonomy", {}).get("domain_key") or "").strip(),
+            "detected_subdomain": str(base_evidence.get("domain_taxonomy", {}).get("subdomain") or "").strip(),
+            "technical_skills": list(base_evidence.get("program_skills") or []),
+            "transversal_skills": [],
+            "subjects": [],
+            "tools": [],
+            "technologies": [],
+            "keywords": [],
+            "labor_roles": [program_role] if program_role else [],
+            "real_market_gaps": [str(item.get("missing_skill") or "") for item in intelligence.get("top_gaps", []) if str(item.get("missing_skill") or "").strip()],
+            "strengthening_areas": intelligence.get("recommended_actions") or [],
+        },
+        skills=list(base_evidence.get("program_skills") or []),
+    )
+    domain_benchmark = build_domain_benchmark(domain_taxonomy.domain_key)
     current_alignment = _safe_float(intelligence.get("alignment_score") or program.get("promedio_match_mercado") or 0.0) * 1.0
     current_risk = _safe_float(intelligence.get("risk_score") or 0.0)
 
@@ -554,7 +602,8 @@ def build_curriculum_impact_simulation(
     explanation = (
         f"El programa '{program_name}' presenta {len(gap_rows)} brechas observadas y {len(normalized_skills)} habilidades propuestas. "
         f"La simulación proyecta una alineación de {projected_alignment_score:.1f}% y una reducción de riesgo de {current_risk - projected_risk_score:.1f} puntos "
-        f"si se incorporan las habilidades priorizadas."
+        f"si se incorporan las habilidades priorizadas. "
+        f"Dominio académico inferido: {domain_taxonomy.domain_label} / {domain_taxonomy.subdomain or 'general'}."
     )
     source_tables = [
         "especializaciones",
@@ -580,6 +629,8 @@ def build_curriculum_impact_simulation(
         "projected_alignment_delta": projected_alignment_gain,
         "projected_risk_delta": round(max(0.0, current_risk - projected_risk_score), 4),
         "projected_employability_delta": projected_employability_gain,
+        "domain_taxonomy": domain_taxonomy.to_dict(),
+        "domain_benchmark": domain_benchmark.to_dict(),
         "source_tables": source_tables,
     }
     simulation_key = normalize_key(f"program:{program_id}:horizon:{horizon_months}:{','.join([str(item.get('canonical_skill') or '') for item in normalized_skills])}")
@@ -643,14 +694,14 @@ def persist_curriculum_simulation(result: CurriculumImpactSimulation, *, db_name
     row = (
         result.simulation_key,
         result.program_id,
-        Json(result.proposed_skills),
+        Json(_json_safe(result.proposed_skills), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
         result.projected_alignment_score,
         result.projected_risk_score,
         result.projected_employability_gain,
         result.projected_gap_reduction,
         result.confidence_score,
         result.explanation,
-        Json(result.supporting_evidence),
+        Json(_json_safe(result.supporting_evidence), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
         datetime.now(UTC),
         datetime.now(UTC),
     )

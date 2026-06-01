@@ -77,6 +77,34 @@ def classify_program_domain(name: str, description: str = "") -> DomainClassific
     if "derecho digital" in normalized or "derecho informatico" in normalized:
         return DomainClassification("legal-tech", ("legal",), max(classification.confidence, 0.9), ("derecho digital",))
 
+    criminology_terms = (
+        "criminologia",
+        "criminology",
+        "criminalistica",
+        "criminalistics",
+        "investigacion criminal",
+        "investigacion criminalistica",
+        "forense",
+        "forensic",
+        "victimologia",
+        "victimology",
+        "inteligencia criminal",
+        "criminal intelligence",
+        "prevencion del delito",
+        "crime prevention",
+        "seguridad ciudadana",
+        "public security",
+        "ciberdelito",
+        "cybercrime",
+        "cadena de custodia",
+        "chain of custody",
+        "crimen organizado",
+        "organized crime",
+    )
+    if any(term in normalized for term in criminology_terms):
+        evidence = tuple(dict.fromkeys(("criminologia", "forense", "investigacion criminal", *classification.evidence)))
+        return DomainClassification("criminology", ("law",), max(classification.confidence, 0.92), evidence[:6])
+
     return classification
 
 
@@ -96,6 +124,8 @@ def is_domain_compatible(source_domain: str | None, target_domain: str | None) -
     compatible_groups = (
         {"ambiental", "energia"},
         {"legal", "legal-tech"},
+        {"criminology", "legal"},
+        {"criminology", "legal-tech"},
         {"analitica", "ti"},
         {"management", "gestion_humana", "logistica", "finanzas", "marketing"},
     )

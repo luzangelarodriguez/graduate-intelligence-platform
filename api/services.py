@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import Iterable
 from datetime import UTC, date, datetime, time
@@ -33,6 +34,8 @@ from intelligence.predictive_intelligence_engine import (
 from intelligence.executive_observatory_engine import build_executive_observatory_v2
 from intelligence.curriculum_impact_simulator import build_curriculum_impact_simulation
 from intelligence.forecast_expansion_engine import build_forecast_summary
+from intelligence.domain_benchmark_layer import build_domain_benchmark
+from intelligence.domain_taxonomy_layer import build_domain_taxonomy_from_program
 from intelligence.program_intelligence_engine import (
     build_program_intelligence,
     build_program_intelligence_for_program,
@@ -76,6 +79,157 @@ def _safe_program_base_row(program_id: int, *, db_name: str | None = None) -> di
         return dict(row) if row else None
     except Exception:
         return None
+
+
+def _normalize_skill_list(values: Iterable[Any]) -> list[str]:
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        key = normalize_key(str(value or ""))
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(key)
+    return sorted(normalized)
+
+
+def _parsed_json(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+    return {}
+
+
+def _row_to_market_forecast_item(row: dict[str, Any]) -> dict[str, Any]:
+    evidence = row.get("evidence") or row.get("source_payload") or {}
+    if isinstance(evidence, str):
+        try:
+            evidence = json.loads(evidence)
+        except Exception:
+            evidence = {"raw": evidence}
+    return {
+        "entity_type": row.get("entity_type") or "",
+        "entity_name": row.get("entity_name") or "",
+        "horizon_months": int(row.get("horizon_months") or 12),
+        "growth_velocity": predictive_safe_float(row.get("growth_velocity")),
+        "forecast_confidence": predictive_safe_float(row.get("forecast_confidence")),
+        "market_phase": row.get("market_phase") or "",
+        "first_seen_at": row.get("first_seen_at"),
+        "last_seen_at": row.get("last_seen_at"),
+        "evidence": evidence if isinstance(evidence, dict) else {},
+    }
+
+
+def _row_to_recommendation_v2_item(row: dict[str, Any]) -> dict[str, Any]:
+    payload = row.get("recommendation_payload") or {}
+    evidence = row.get("recommendation_evidence") or {}
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except Exception:
+            payload = {}
+    if isinstance(evidence, str):
+        try:
+            evidence = json.loads(evidence)
+        except Exception:
+            evidence = {}
+    target_entity = row.get("target_entity") or row.get("target_role") or payload.get("target_role") or ""
+    business_justification = row.get("business_justification") or row.get("recommendation_reasoning") or payload.get("why_recommended")
+    if isinstance(business_justification, list):
+        business_justification = " ".join(str(item) for item in business_justification if str(item).strip())
+    if not business_justification:
+        business_justification = row.get("recommendation_reasoning") or ""
+    expected_impact = row.get("expected_impact") or payload.get("why_recommended") or row.get("recommendation_reasoning") or ""
+    if isinstance(expected_impact, list):
+        expected_impact = " ".join(str(item) for item in expected_impact if str(item).strip())
+    return {
+        "recommendation_type": row.get("recommendation_type") or "",
+        "target_entity": str(target_entity),
+        "target_company": row.get("target_company") or payload.get("target_company") or "",
+        "recommendation_score": predictive_safe_float(row.get("recommendation_score") or payload.get("market_alignment_score") or row.get("recommendation_confidence")),
+        "priority": row.get("priority") or ("high" if predictive_safe_float(row.get("recommendation_confidence")) >= 0.8 else "medium"),
+        "business_justification": str(business_justification),
+        "expected_impact": str(expected_impact),
+        "confidence": predictive_safe_float(row.get("recommendation_confidence") or row.get("confidence")),
+        "estimated_alignment_increase": predictive_safe_float(row.get("estimated_alignment_increase") or payload.get("estimated_alignment_increase")),
+        "recommendation_evidence": evidence if isinstance(evidence, dict) else {},
+        "recommendation_reasoning": str(row.get("recommendation_reasoning") or payload.get("why_recommended") or ""),
+    }
+
+
+def _read_persisted_forecast_summary(*, limit: int, db_name: str | None = None) -> dict[str, Any]:
+    counts: dict[str, int] = {"skill": 0, "technology": 0, "company": 0, "role": 0}
+    skill_rows: list[dict[str, Any]] = []
+    technology_rows: list[dict[str, Any]] = []
+    company_rows: list[dict[str, Any]] = []
+    role_rows: list[dict[str, Any]] = []
+
+    if relation_exists("market_forecasts", db_name=db_name):
+        count_rows = fetch_all(
+            """
+            SELECT entity_type, COUNT(*)::int AS total
+            FROM market_forecasts
+            GROUP BY entity_type
+            """,
+            db_name=db_name,
+        )
+        for row in count_rows:
+            entity_type = str((row or {}).get("entity_type") or "").lower()
+            if entity_type in counts:
+                counts[entity_type] = int((row or {}).get("total") or 0)
+
+        for entity_type, target in (("skill", skill_rows), ("technology", technology_rows), ("company", company_rows), ("role", role_rows)):
+            rows = fetch_all(
+                """
+                SELECT entity_type, entity_name, horizon_months, growth_velocity, forecast_confidence,
+                       market_phase, first_seen_at, last_seen_at, evidence
+                FROM market_forecasts
+                WHERE entity_type = %s
+                ORDER BY growth_velocity DESC NULLS LAST, forecast_confidence DESC NULLS LAST
+                LIMIT %s
+                """,
+                (entity_type, limit),
+                db_name=db_name,
+            )
+            target.extend(dict(row) for row in rows)
+
+    total_records = sum(counts.values())
+    skill_items = [_row_to_market_forecast_item(row) for row in skill_rows]
+    technology_items = [_row_to_market_forecast_item(row) for row in technology_rows]
+    company_items = [_row_to_market_forecast_item(row) for row in company_rows]
+    role_items = [_row_to_market_forecast_item(row) for row in role_rows]
+
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "source_tables": [
+            "market_forecasts",
+            "skill_trend_forecast",
+            "technology_forecasts",
+            "company_forecasts",
+            "role_forecasts",
+            "emerging_technology_observatory",
+            "company_observatory",
+            "semantic_role_graph",
+            "career_transitions",
+        ],
+        "total_records": total_records,
+        "counts": counts,
+        "top_skills": skill_items,
+        "top_technologies": technology_items,
+        "top_companies": company_items,
+        "top_roles": role_items,
+        "coverage": {
+            "skill": round(len(skill_items) / max(total_records, 1), 4),
+            "technology": round(len(technology_items) / max(total_records, 1), 4),
+            "company": round(len(company_items) / max(total_records, 1), 4),
+            "role": round(len(role_items) / max(total_records, 1), 4),
+        },
+    }
 
 
 def _safe_program_name(program_id: int, *, db_name: str | None = None) -> str:
@@ -303,6 +457,16 @@ def _serialize_json_value(value: Any) -> Any:
 
 def _serialize_program_intelligence_payload(row: Any) -> dict[str, Any]:
     payload = _serialize_json_value(dict(row))
+    supporting_evidence = payload.get("supporting_evidence")
+    if isinstance(supporting_evidence, dict) and not supporting_evidence.get("domain_taxonomy"):
+        program_name = str(payload.get("program_name") or "")
+        program_role = str(payload.get("program_role") or "")
+        domain_taxonomy = build_domain_taxonomy_from_program(program_name=program_name, program_role=program_role, microcurriculum_context={})
+        domain_benchmark = build_domain_benchmark(domain_taxonomy.domain_key)
+        supporting_evidence = dict(supporting_evidence)
+        supporting_evidence.setdefault("domain_taxonomy", domain_taxonomy.to_dict())
+        supporting_evidence.setdefault("domain_benchmark", domain_benchmark.to_dict())
+        payload["supporting_evidence"] = supporting_evidence
     return payload
 
 
@@ -465,15 +629,24 @@ def list_observatory_metrics(*, limit: int = DEFAULT_LIMIT, offset: int = 0, met
     return _envelope(_serialize_rows(rows), limit=limit, offset=offset, total=int((count_row or {}).get("total") or 0), filters={"metric_category": metric_category, "metric_name": metric_name})
 
 
-def list_curriculum_gaps(*, limit: int = DEFAULT_LIMIT, offset: int = 0, specialization: str | None = None) -> dict[str, Any]:
+def list_curriculum_gaps(
+    *,
+    limit: int = DEFAULT_LIMIT,
+    offset: int = 0,
+    specialization: str | None = None,
+    program_id: int | None = None,
+) -> dict[str, Any]:
     limit = _bounded(limit)
     offset = _offset(offset)
+    resolved_specialization = specialization
+    if resolved_specialization is None and program_id is not None:
+        resolved_specialization = _safe_program_name(program_id)
     if relation_exists("curriculum_gap_observatory") and relation_has_rows("curriculum_gap_observatory"):
         clauses: list[str] = []
         params: list[Any] = []
-        if specialization:
+        if resolved_specialization:
             clauses.append("specialization ILIKE %s")
-            params.append(f"%{specialization}%")
+            params.append(f"%{resolved_specialization}%")
         where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
         rows = fetch_all(
             f"""
@@ -490,13 +663,25 @@ def list_curriculum_gaps(*, limit: int = DEFAULT_LIMIT, offset: int = 0, special
             f"SELECT COUNT(*)::int AS total FROM curriculum_gap_observatory {where_sql}",
             tuple(params),
         )
-        return _envelope(_serialize_rows(rows), limit=limit, offset=offset, total=int((count_row or {}).get("total") or 0), filters={"specialization": specialization})
+        return _envelope(
+            _serialize_rows(rows),
+            limit=limit,
+            offset=offset,
+            total=int((count_row or {}).get("total") or 0),
+            filters={"specialization": resolved_specialization, "program_id": program_id},
+        )
 
     intelligence = build_market_skill_intelligence_map(include_database=True, write_output=False)
     rows = [gap.to_dict() for gap in intelligence.curriculum_gaps]
-    if specialization:
-        rows = [row for row in rows if specialization.casefold() in str(row.get("specialization") or "").casefold()]
-    return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"specialization": specialization, "source": "market_skill_intelligence"})
+    if resolved_specialization:
+        rows = [row for row in rows if resolved_specialization.casefold() in str(row.get("specialization") or "").casefold()]
+    return _envelope(
+        rows,
+        limit=limit,
+        offset=offset,
+        total=len(rows),
+        filters={"specialization": resolved_specialization, "program_id": program_id, "source": "market_skill_intelligence"},
+    )
 
 
 def list_recommendations(*, limit: int = DEFAULT_LIMIT, offset: int = 0, recommendation_type: str | None = None, target_company: str | None = None) -> dict[str, Any]:
@@ -589,13 +774,21 @@ def list_semantic_roles(*, limit: int = DEFAULT_LIMIT, offset: int = 0, role_fam
         clauses: list[str] = []
         params: list[Any] = []
         if role_family:
-            clauses.append("(source_role ILIKE %s OR target_role ILIKE %s)")
-            params.extend([f"%{role_family}%", f"%{role_family}%"])
+            normalized_family = role_family.casefold()
+            search_terms = [role_family]
+            if "criminolog" in normalized_family or "criminal" in normalized_family:
+                search_terms.extend(["criminal", "forensic", "victim", "public safety", "compliance", "risk", "cybercrime"])
+            search_clauses = []
+            for term in dict.fromkeys(search_terms):
+                search_clauses.append("(source_role ILIKE %s OR target_role ILIKE %s OR cluster_affinity ILIKE %s OR evidence::text ILIKE %s)")
+                params.extend([f"%{term}%", f"%{term}%", f"%{term}%", f"%{term}%"])
+            clauses.append(f"({' OR '.join(search_clauses)})")
         where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
         rows = fetch_all(
             f"""
             SELECT source_role, target_role, similarity_score, transition_probability,
-                   shared_skills, cluster_affinity, created_at
+                   shared_skills, cluster_affinity,
+                   COALESCE(generated_at, updated_at) AS created_at
             FROM semantic_role_graph
             {where_sql}
             ORDER BY similarity_score DESC NULLS LAST, source_role ASC
@@ -920,6 +1113,54 @@ def get_curriculum_simulator(program_id: int, proposed_skills: str | None = None
     if proposed_skills:
         skills = [part.strip() for part in proposed_skills.split(",") if part.strip()]
     try:
+        requested_signature = _normalize_skill_list(skills)
+        if relation_exists("curriculum_simulations") and relation_has_rows("curriculum_simulations"):
+            cached_row = fetch_one(
+                """
+                SELECT simulation_key, program_id, proposed_skills, projected_alignment_score,
+                       projected_risk_score, projected_employability_gain, projected_gap_reduction,
+                       confidence_score, explanation, source_payload, generated_at
+                FROM curriculum_simulations
+                WHERE program_id = %s
+                  AND COALESCE((source_payload->>'horizon_months')::int, 12) = %s
+                ORDER BY generated_at DESC NULLS LAST
+                LIMIT 1
+                """,
+                (program_id, horizon_months),
+            )
+            if cached_row:
+                cached = dict(cached_row)
+                cached_skills = cached.get("proposed_skills") or []
+                if isinstance(cached_skills, str):
+                    try:
+                        cached_skills = json.loads(cached_skills)
+                    except Exception:
+                        cached_skills = []
+                cached_signature = _normalize_skill_list(cached_skills if isinstance(cached_skills, (list, tuple, set)) else [])
+                if not requested_signature or cached_signature == requested_signature:
+                    payload = _parsed_json(cached.get("source_payload"))
+                    program = _safe_program_base_row(program_id) or {}
+                    return {
+                        "program_id": program_id,
+                        "program_name": str(program.get("nombre_especializacion") or program.get("nombre") or ""),
+                        "program_role": str(program.get("rol") or ""),
+                        "horizon_months": int(payload.get("horizon_months") or horizon_months),
+                        "current_alignment_score": predictive_safe_float(payload.get("current_alignment_score")),
+                        "current_risk_score": predictive_safe_float(payload.get("current_risk_score")),
+                        "projected_alignment_score": predictive_safe_float(cached.get("projected_alignment_score")),
+                        "projected_risk_score": predictive_safe_float(cached.get("projected_risk_score")),
+                        "projected_employability_gain": predictive_safe_float(cached.get("projected_employability_gain")),
+                        "projected_gap_reduction": predictive_safe_float(cached.get("projected_gap_reduction")),
+                        "confidence_score": predictive_safe_float(cached.get("confidence_score")),
+                        "proposed_skills": list(cached_skills) if isinstance(cached_skills, (list, tuple, set)) else [],
+                        "normalized_skills": payload.get("normalized_skills") or [],
+                        "risk_drivers": payload.get("risk_drivers") or [],
+                        "supporting_evidence": payload,
+                        "source_tables": payload.get("source_tables") or ["curriculum_simulations"],
+                        "explanation": str(cached.get("explanation") or ""),
+                        "simulation_key": str(cached.get("simulation_key") or ""),
+                        "generated_at": str(cached.get("generated_at") or ""),
+                    }
         result = build_curriculum_impact_simulation(program_id, proposed_skills=skills, horizon_months=horizon_months, persist=True)
         return result.to_dict()
     except Exception as exc:
@@ -929,7 +1170,7 @@ def get_curriculum_simulator(program_id: int, proposed_skills: str | None = None
 
 def get_forecast_summary(*, limit: int = 25) -> dict[str, Any]:
     try:
-        return build_forecast_summary(persist=False, limit=_bounded(limit))
+        return _read_persisted_forecast_summary(limit=_bounded(limit))
     except Exception as exc:
         _log_fallback("get_forecast_summary", exc)
         return _fallback_forecast_summary(limit=limit, reason=str(exc))
@@ -1174,6 +1415,35 @@ def list_recommendations_v2(*, program_id: int | None = None, limit: int = DEFAU
     limit = _bounded(limit)
     offset = _offset(offset)
     try:
+        if relation_exists("recommendation_observatory") and relation_has_rows("recommendation_observatory"):
+            clauses: list[str] = []
+            params: list[Any] = []
+            if program_id:
+                program_name = _safe_program_name(program_id)
+                if program_name:
+                    clauses.append("(target_role ILIKE %s OR recommendation_payload::text ILIKE %s OR recommendation_reasoning ILIKE %s)")
+                    params.extend([f"%{program_name}%", f"%{program_name}%", f"%{program_name}%"])
+            where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+            rows = fetch_all(
+                f"""
+                SELECT recommendation_type, target_role, target_company, recommendation_payload,
+                       recommendation_reasoning, recommendation_confidence, recommendation_evidence,
+                       estimated_alignment_increase, estimated_employability_gain, estimated_risk_reduction,
+                       metric_period, generated_at
+                FROM recommendation_observatory
+                {where_sql}
+                ORDER BY recommendation_confidence DESC NULLS LAST, generated_at DESC NULLS LAST
+                LIMIT %s OFFSET %s
+                """,
+                tuple(params + [limit, offset]),
+            )
+            count_row = fetch_one(
+                f"SELECT COUNT(*)::int AS total FROM recommendation_observatory {where_sql}",
+                tuple(params),
+            )
+            mapped_rows = [_row_to_recommendation_v2_item(dict(row)) for row in rows]
+            return _envelope(mapped_rows, limit=limit, offset=offset, total=int((count_row or {}).get("total") or 0), filters={"program_id": program_id, "version": "v2", "source": "recommendation_observatory"})
+
         rows = [item.to_dict() for item in build_recommendation_v2(program_id=program_id, limit=limit)]
         return _envelope(rows, limit=limit, offset=offset, total=len(rows), filters={"program_id": program_id, "version": "v2", "source": "predictive_engine"})
     except Exception as exc:

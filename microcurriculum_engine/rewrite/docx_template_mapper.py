@@ -106,6 +106,41 @@ def extract_template_sections(path: str | Path) -> dict[str, str]:
 
 def assignment_focus(name: str) -> str:
     key = unicodedata.normalize("NFKD", name or "").encode("ascii", "ignore").decode("ascii").casefold()
+    if any(
+        term in key
+        for term in (
+            "criminologia",
+            "criminalistica",
+            "criminalistics",
+            "investigacion criminal",
+            "investigacion criminalistica",
+            "forense",
+            "forensic",
+            "victimologia",
+            "victimology",
+            "inteligencia criminal",
+            "criminal intelligence",
+            "prevencion del delito",
+            "crime prevention",
+            "seguridad ciudadana",
+            "public security",
+            "ciberdelito",
+            "cybercrime",
+            "cadena de custodia",
+            "chain of custody",
+            "crimen organizado",
+            "organized crime",
+        )
+    ):
+        if "ciberdelito" in key or "cybercrime" in key:
+            return "criminology_cybercrime"
+        if "victim" in key:
+            return "criminology_victimology"
+        if "forens" in key or "criminalistic" in key:
+            return "criminology_forensic_analysis"
+        if "prevencion" in key or "security" in key or "seguridad" in key:
+            return "criminology_public_security"
+        return "criminology_criminal_investigation"
     if "visualizacion" in key or "interactiva" in key:
         return "visualizacion_interactiva"
     if "inteligencia artificial" in key or "aprendizaje automatico" in key or "tecnicas de inteligencia" in key:

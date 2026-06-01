@@ -42,6 +42,42 @@ GENERIC_TYPES = {
     "javascript": "herramienta",
 }
 
+CRIMINOLOGY_PATTERNS = {
+    "criminal investigation": ("investigacion criminal", "criminal investigation", "investigacion criminalistica", "investigacion judicial"),
+    "victimology": ("victimologia", "victimology", "victim assistance", "atencion a victimas"),
+    "criminal profiling": ("perfilacion criminal", "perfilamiento criminal", "criminal profiling"),
+    "criminal intelligence": ("inteligencia criminal", "criminal intelligence", "analisis de inteligencia criminal"),
+    "criminal policy": ("politica criminal", "criminal policy"),
+    "crime prevention": ("prevencion del delito", "crime prevention"),
+    "public security": ("seguridad ciudadana", "seguridad publica", "public security", "public safety"),
+    "cybercrime": ("ciberdelito", "delito informatico", "cybercrime", "computer crime"),
+    "criminal analysis": ("analisis criminal", "analisis criminologico", "criminal analysis"),
+    "forensic analysis": ("analisis forense", "criminalistica", "criminalistics", "forensic analysis", "forensic science", "forensics"),
+    "chain of custody": ("cadena de custodia", "chain of custody", "custodia de evidencia"),
+    "risk analysis": ("analisis de riesgo", "risk analysis", "risk assessment"),
+    "penitentiary systems": ("sistemas penitenciarios", "penitentiary systems", "prison systems"),
+    "organized crime": ("crimen organizado", "organized crime"),
+    "financial crime": ("delito financiero", "financial crime", "fraude financiero", "money laundering"),
+}
+
+CRIMINOLOGY_TYPES = {
+    "criminal investigation": "technical_skill",
+    "victimology": "technical_skill",
+    "criminal profiling": "technical_skill",
+    "criminal intelligence": "technical_skill",
+    "criminal policy": "technical_skill",
+    "crime prevention": "technical_skill",
+    "public security": "technical_skill",
+    "cybercrime": "technical_skill",
+    "criminal analysis": "technical_skill",
+    "forensic analysis": "technical_skill",
+    "chain of custody": "technical_skill",
+    "risk analysis": "technical_skill",
+    "penitentiary systems": "technical_skill",
+    "organized crime": "technical_skill",
+    "financial crime": "technical_skill",
+}
+
 ENTITY_TYPE_TO_SKILL_TYPE = {
     "technical_skill": "technical_skill",
     "transversal_skill": "transversal_skill",
@@ -63,6 +99,38 @@ def _contains(text: str, alias: str) -> bool:
 def extract_microcurriculum_skills(text: str, *, title: str = "") -> dict[str, Any]:
     prediction = predict_domain(title=title, description=text, skills=[])
     normalized_context = normalize_text(f"{title} {text[:2000]}")
+    criminology_terms = (
+        "criminologia",
+        "criminalistica",
+        "criminalistics",
+        "investigacion criminal",
+        "investigacion criminalistica",
+        "forense",
+        "forensic",
+        "victimologia",
+        "victimology",
+        "inteligencia criminal",
+        "criminal intelligence",
+        "prevencion del delito",
+        "crime prevention",
+        "seguridad ciudadana",
+        "public security",
+        "ciberdelito",
+        "cybercrime",
+        "cadena de custodia",
+        "chain of custody",
+        "crimen organizado",
+        "organized crime",
+    )
+    if any(term in normalized_context for term in criminology_terms):
+        prediction = type(prediction)(
+            domain="criminology",
+            confidence=max(prediction.confidence, 0.91),
+            confidence_level="high",
+            blocked=False,
+            model_name=f"microcurriculum_rule_{prediction.model_name}",
+            scores={**prediction.scores, "criminology": max(prediction.scores.get("criminology", 0), 0.91)},
+        )
     if any(term in normalized_context for term in ("ingenieria de software", "desarrollo de software", "arquitectura de software")):
         prediction = type(prediction)(
             domain="ti",
@@ -121,6 +189,19 @@ def extract_microcurriculum_skills(text: str, *, title: str = "") -> dict[str, A
                 "skill_domain": definition.domain if definition else domain,
                 "tipo_skill": GENERIC_TYPES.get(canonical, "tecnica"),
                 "confianza_extraccion": 0.74,
+                "source": "microcurriculum_pattern",
+            }
+    for canonical, aliases in CRIMINOLOGY_PATTERNS.items():
+        normalized_canonical = normalize_skill(canonical)
+        if normalized_canonical in skills:
+            continue
+        if any(_contains(normalized_text, alias) for alias in aliases):
+            skills[normalized_canonical] = {
+                "skill_original": canonical,
+                "skill_normalized": normalized_canonical,
+                "skill_domain": "criminology",
+                "tipo_skill": CRIMINOLOGY_TYPES.get(canonical, "technical_skill"),
+                "confianza_extraccion": 0.86,
                 "source": "microcurriculum_pattern",
             }
     for entity in extract_curriculum_entities(text):

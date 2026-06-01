@@ -35,6 +35,7 @@ export function ProgramForecastPage() {
   const { executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 6);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
+  const resolvedProgram = program ?? programCatalog.find((item) => item.especializacion_id === programId);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -42,10 +43,6 @@ export function ProgramForecastPage() {
 
   if (isLoading) {
     return <LoadingState label="Cargando forecast del programa..." />;
-  }
-
-  if (error) {
-    return <EmptyState title="No fue posible cargar el forecast" body={error} />;
   }
 
   const currentAlignment = alignment?.current_alignment ?? alignment?.alignment_score ?? program?.promedio_match_mercado ?? 0;
@@ -75,6 +72,12 @@ export function ProgramForecastPage() {
       />
 
       <ProgramTabs programId={programId} />
+
+      {error ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+          {error}. La vista sigue mostrando la evidencia disponible para no cortar el an?lisis ejecutivo.
+        </div>
+      ) : null}
 
       <section className="grid gap-4 xl:grid-cols-3">
         <MetricCard

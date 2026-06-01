@@ -133,6 +133,9 @@ export function AcademicCopilotPanel({
           </div>
           <h3 className="mt-2 text-lg font-semibold text-ink">{title}</h3>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">{subtitle}</p>
+          <p className="mt-2 max-w-4xl rounded-lg border border-brand/15 bg-brand/5 px-3 py-2 text-xs leading-6 text-brand">
+            Diagnóstico institucional · Programas prioritarios · Brechas críticas · Acciones recomendadas · Impacto esperado · Evidencia utilizada · Preguntar al observatorio
+          </p>
         </div>
         <span className="rounded-full border border-brand/15 bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
           Briefing automático
@@ -182,8 +185,8 @@ export function AcademicCopilotPanel({
                     <div className="rounded-lg bg-slate-50 p-3">
                       <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">Brechas</div>
                       <div className="mt-2 space-y-1 text-sm text-ink">
-                        {(briefing.programContext.gaps || []).slice(0, 3).map((gap) => (
-                          <div key={gap} className="rounded-md bg-white px-2 py-1">
+                    {(briefing.programContext.gaps || []).slice(0, 3).map((gap, index) => (
+                      <div key={`${gap}-${index}`} className="rounded-md bg-white px-2 py-1">
                             {gap}
                           </div>
                         ))}
@@ -193,8 +196,8 @@ export function AcademicCopilotPanel({
                     <div className="rounded-lg bg-slate-50 p-3">
                       <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">Recomendaciones</div>
                       <div className="mt-2 space-y-1 text-sm text-ink">
-                        {(briefing.programContext.recommendations || []).slice(0, 3).map((item) => (
-                          <div key={item} className="rounded-md bg-white px-2 py-1">
+                    {(briefing.programContext.recommendations || []).slice(0, 3).map((item, index) => (
+                      <div key={`${item}-${index}`} className="rounded-md bg-white px-2 py-1">
                             {item}
                           </div>
                         ))}
@@ -204,13 +207,13 @@ export function AcademicCopilotPanel({
                     <div className="rounded-lg bg-slate-50 p-3">
                       <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">Forecast / simulación</div>
                       <div className="mt-2 space-y-1 text-sm text-ink">
-                        {(briefing.programContext.forecast || []).slice(0, 2).map((item) => (
-                          <div key={item} className="rounded-md bg-white px-2 py-1">
+                    {(briefing.programContext.forecast || []).slice(0, 2).map((item, index) => (
+                      <div key={`${item}-${index}`} className="rounded-md bg-white px-2 py-1">
                             {item}
                           </div>
                         ))}
-                        {(briefing.programContext.simulation || []).slice(0, 2).map((item) => (
-                          <div key={item} className="rounded-md bg-white px-2 py-1">
+                    {(briefing.programContext.simulation || []).slice(0, 2).map((item, index) => (
+                      <div key={`${item}-${index}`} className="rounded-md bg-white px-2 py-1">
                             {item}
                           </div>
                         ))}
@@ -231,8 +234,8 @@ export function AcademicCopilotPanel({
               </div>
               <div className="mt-4 space-y-2">
                 {briefing?.priorityPrograms?.length ? (
-                  briefing.priorityPrograms.slice(0, 5).map((item) => (
-                    <div key={item} className="rounded-lg border border-line bg-slate-50 px-3 py-2 text-sm leading-6 text-ink">
+                  briefing.priorityPrograms.slice(0, 5).map((item, index) => (
+                    <div key={`${item}-${index}`} className="rounded-lg border border-line bg-slate-50 px-3 py-2 text-sm leading-6 text-ink">
                       {item}
                     </div>
                   ))

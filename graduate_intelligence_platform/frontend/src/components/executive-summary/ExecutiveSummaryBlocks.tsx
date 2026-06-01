@@ -219,7 +219,7 @@ export function SignalColumn({
       {items.length ? (
         <div className="mt-4 space-y-4">
           {items.map((item) => (
-            <div key={`${item.label}-${item.value}`} className="space-y-2">
+          <div key={`${item.label}-${item.value}-${item.detail}`} className="space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-medium text-[#1E293B]">{item.label}</p>
@@ -370,10 +370,10 @@ export function RecommendationStack({ items }: { items: RecommendationItem[] }) 
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
-      {items.slice(0, 3).map((item) => {
-        const tone: Tone = item.priority.toLowerCase().includes('alta') ? 'red' : item.priority.toLowerCase().includes('media') ? 'amber' : 'green';
-        return (
-          <article key={`${item.priority}-${item.affectedProgram}-${item.title}`} className="rounded-2xl border border-slate-200 bg-white p-5">
+        {items.slice(0, 3).map((item, index) => {
+          const tone: Tone = item.priority.toLowerCase().includes('alta') ? 'red' : item.priority.toLowerCase().includes('media') ? 'amber' : 'green';
+          return (
+          <article key={`${item.priority}-${item.affectedProgram}-${item.title}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between gap-2">
               <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${badgeToneClasses[tone]}`}>{item.priority}</span>
               <ChevronRight size={17} className="text-[#64748B]" />
@@ -417,8 +417,8 @@ export function FindingsFooter({ findings }: { findings: string[] }) {
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em]">Hallazgos ejecutivos</h2>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {findings.slice(0, 4).map((item) => (
-          <div key={item} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-[#1E293B]">
+        {findings.slice(0, 4).map((item, index) => (
+          <div key={`${item}-${index}`} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-[#1E293B]">
             {item}
           </div>
         ))}

@@ -433,7 +433,7 @@ def write_reports(payload: dict[str, Any], persisted: dict[str, int]) -> dict[st
     return paths
 
 
-def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
+def run_intelligence(limit: int = 500, persist: bool = True, program_id: int | None = None) -> dict[str, Any]:
     _log_stage_message(1, "Connection validated")
 
     jobs = _run_stage(2, "Fetching jobs", lambda: fetch_jobs(limit=limit))
@@ -514,8 +514,15 @@ def run_intelligence(limit: int = 500, persist: bool = True) -> dict[str, Any]:
         )
         persisted_local["skill_normalization_mappings"] = len(normalized_skill_results)
 
-        program_intelligence_records = build_program_intelligence()
-        program_intelligence_count = persist_program_intelligence(program_intelligence_records, replace_existing=True) if persist else 0
+        program_intelligence_records = build_program_intelligence(program_id=program_id)
+        program_intelligence_count = (
+            persist_program_intelligence(
+                program_intelligence_records,
+                replace_existing=program_id is None,
+            )
+            if persist
+            else 0
+        )
         persisted_local["program_intelligence"] = program_intelligence_count
 
         forecast_limit = max(limit, 500)
@@ -585,11 +592,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run semantic labor and curriculum intelligence layer.")
     parser.add_argument("--limit", type=int, default=500)
     parser.add_argument("--no-persist", action="store_true")
+    parser.add_argument("--program-id", type=int, default=None)
     args = parser.parse_args()
     _print_database_banner()
     diagnostics = test_connection()
     print(f"Connection source: {diagnostics['connection_source']}")
-    print(json.dumps(run_intelligence(limit=args.limit, persist=not args.no_persist), indent=2, ensure_ascii=False))
+    print(json.dumps(run_intelligence(limit=args.limit, persist=not args.no_persist, program_id=args.program_id), indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

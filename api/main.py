@@ -241,8 +241,9 @@ def curriculum_gaps(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     specialization: str | None = Query(default=None),
+    program_id: int | None = Query(default=None, ge=1),
 ) -> dict[str, Any]:
-    return services.list_curriculum_gaps(limit=limit, offset=offset, specialization=specialization)
+    return services.list_curriculum_gaps(limit=limit, offset=offset, specialization=specialization, program_id=program_id)
 
 
 @app.get("/recommendations", response_model=PaginatedResponse, tags=["observatory"])

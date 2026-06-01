@@ -209,6 +209,84 @@ TEMPLATE_CATALOG: dict[str, dict[str, dict[str, str]]] = {
             "impact": "medio",
         },
     },
+    "criminology/forensic_analysis": {
+        "criminal investigation": {
+            "module": "Investigacion criminal aplicada",
+            "action": "Fortalecer el componente practico de investigacion criminal con analisis de evidencia, entrevistas y reconstruccion de casos.",
+            "justification": "La investigacion criminal es el nucleo disciplinar que conecta la teoria criminologica con casos reales y evidencia verificable.",
+            "impact": "alto",
+        },
+        "forensic analysis": {
+            "module": "Criminalistica y analisis forense",
+            "action": "Incorporar practica de cadena de custodia, analisis forense y manejo de evidencia documental y fisica.",
+            "justification": "La trazabilidad de evidencia es indispensable para la pertinencia laboral en criminalistica y ciencias forenses.",
+            "impact": "alto",
+        },
+        "criminal intelligence": {
+            "module": "Inteligencia criminal y analisis de riesgo",
+            "action": "Integrar modelos de inteligencia criminal, analisis de patrones y evaluacion de riesgo delictivo.",
+            "justification": "La empleabilidad en criminologia aumenta cuando el egresado puede convertir hallazgos en inteligencia accionable.",
+            "impact": "alto",
+        },
+        "victimology": {
+            "module": "Victimologia y atencion a victimas",
+            "action": "Incluir protocolos de atencion, seguimiento y enfoque diferencial para victimas.",
+            "justification": "La perspectiva de victima fortalece la dimension etica, social y aplicada del programa.",
+            "impact": "medio",
+        },
+        "chain of custody": {
+            "module": "Cadena de custodia y gestion de evidencia",
+            "action": "Formalizar procedimientos de recoleccion, rotulado, almacenamiento y trazabilidad de evidencia.",
+            "justification": "La cadena de custodia es una evidencia operativa que conecta academia, justicia y laboratorio.",
+            "impact": "alto",
+        },
+    },
+    "criminology/public_security": {
+        "crime prevention": {
+            "module": "Prevencion del delito y analisis territorial",
+            "action": "Incorporar diagnosticos situacionales, mapas de riesgo y estrategias de prevencion basadas en evidencia.",
+            "justification": "La prevencion del delito exige lectura territorial, priorizacion y accion interinstitucional.",
+            "impact": "alto",
+        },
+        "public security": {
+            "module": "Seguridad publica y politicas de intervencion",
+            "action": "Desarrollar un componente de seguridad publica con enfoque de politicas, indicadores y coordinacion institucional.",
+            "justification": "La seguridad publica es una salida profesional clave y un campo natural de impacto del programa.",
+            "impact": "alto",
+        },
+        "organized crime": {
+            "module": "Crimen organizado y analisis de redes",
+            "action": "Incluir analisis de redes criminales, modalidades de crimen organizado y factores de expansion territorial.",
+            "justification": "El estudio del crimen organizado permite interpretar escenarios complejos y riesgos emergentes.",
+            "impact": "alto",
+        },
+        "financial crime": {
+            "module": "Delito financiero y cumplimiento",
+            "action": "Agregar deteccion de fraude, lavado de activos y tipologias de delito financiero.",
+            "justification": "El delito financiero conecta criminologia, compliance y analisis de riesgo en contextos reales.",
+            "impact": "alto",
+        },
+    },
+    "criminology/cybercrime": {
+        "cybercrime": {
+            "module": "Ciberdelito y evidencia digital",
+            "action": "Incorporar analisis de incidentes, rastreo de evidencia digital y tipologias de ciberdelito.",
+            "justification": "El ciberdelito es una de las señales de mayor crecimiento y requiere una ruta aplicada propia.",
+            "impact": "alto",
+        },
+        "forensic analysis": {
+            "module": "Forensia digital",
+            "action": "Agregar forensia digital, preservacion de evidencia y procedimientos de analisis tecnico.",
+            "justification": "La evidencia digital es cada vez mas relevante en investigacion criminal y judicial.",
+            "impact": "alto",
+        },
+        "criminal intelligence": {
+            "module": "Inteligencia criminal aplicada a ciberdelito",
+            "action": "Conectar analisis de amenazas, patrones de ataque y criminalidad digital con inteligencia accionable.",
+            "justification": "La interseccion entre inteligencia criminal y tecnologia exige capacidades especificas de analisis.",
+            "impact": "alto",
+        },
+    },
 }
 
 BLOCKED_BY_SUBDOMAIN = {
@@ -223,6 +301,12 @@ def infer_subdomain(domain: str, comparison: MarketComparison) -> str:
         return "management/finanzas"
     if domain == "analitica" and signals & {"ia", "machine learning", "mlops", "scikit-learn", "notebooks"}:
         return "analitica/inteligencia_artificial"
+    if domain == "criminology":
+        if signals & {"cybercrime", "forensic analysis", "digital forensics", "chain of custody"}:
+            return "criminology/cybercrime"
+        if signals & {"public security", "crime prevention", "organized crime", "financial crime"}:
+            return "criminology/public_security"
+        return "criminology/forensic_analysis"
     if domain == "management" and signals & {"innovacion", "vigilancia tecnologica", "inteligencia competitiva", "design thinking"}:
         return "management/innovacion"
     if domain == "ti":

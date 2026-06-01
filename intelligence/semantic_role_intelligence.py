@@ -15,6 +15,8 @@ ROLE_FAMILIES = {
     "AI Analytics": {"machine learning", "ai", "mlops", "predictive", "nlp", "llm", "rag"},
     "Governance & Quality": {"governance", "quality", "lineage", "metadata", "privacy", "compliance"},
     "Software/Data Platform": {"backend", "api", "microservices", "java", ".net", "platform", "developer"},
+    "Criminal Justice & Forensics": {"criminology", "criminal", "criminalistic", "forensic", "victim", "cybercrime", "evidence", "custody", "intelligence", "security", "prevention", "penitentiary", "compliance"},
+    "Public Security & Prevention": {"public security", "public safety", "crime prevention", "risk analysis", "organized crime", "security advisor"},
 }
 
 
@@ -35,6 +37,9 @@ def infer_role_family(title: str, skills: list[str] | None = None) -> tuple[str,
     text_tokens = token_set(" ".join([title or "", " ".join(skills or [])]))
     best_family = "Enterprise Analytics"
     best_score = 0.0
+    title_key = normalize_key(title)
+    if any(term in title_key for term in ("criminolog", "criminalistic", "forensic", "victim", "cibercrime", "cybercrime", "seguridad publica", "public security")):
+        return "Criminal Justice & Forensics", 0.94
     for family, terms in ROLE_FAMILIES.items():
         score = jaccard(text_tokens, token_set(terms))
         if score > best_score:
@@ -44,6 +49,8 @@ def infer_role_family(title: str, skills: list[str] | None = None) -> tuple[str,
         return "Analytics Engineering", 0.92
     if "bi analyst" in normalize_key(title) or "power bi" in normalize_key(title):
         return "BI & Visualization", max(best_score, 0.88)
+    if "security advisor" in title_key or "public security" in title_key:
+        return "Public Security & Prevention", max(best_score, 0.9)
     return best_family, clamp(best_score * 2.8)
 
 

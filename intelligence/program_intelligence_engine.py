@@ -10,9 +10,12 @@ from typing import Any
 from psycopg2.extras import Json, execute_values
 
 from backend.db import get_conn
+from backend.repositories import microcurriculum_context_repository
 from backend.repositories import matches_repository, programas_repository
 from backend.repositories.base import fetch_all, relation_exists
 from backend.services import dashboard_service
+from intelligence.domain_benchmark_layer import build_domain_benchmark
+from intelligence.domain_taxonomy_layer import build_domain_taxonomy_from_program
 from intelligence.common import clamp, normalize_key
 
 
@@ -112,8 +115,10 @@ def _dedupe_program_rows(programs: list[dict[str, Any]]) -> list[dict[str, Any]]
     return ordered
 
 
-def _tokenize_program(program_name: str, program_role: str) -> list[str]:
+def _tokenize_program(program_name: str, program_role: str, extra_terms: list[str] | None = None) -> list[str]:
     raw_tokens = [program_name, program_role]
+    if extra_terms:
+        raw_tokens.extend(extra_terms)
     tokens: list[str] = []
     for raw in raw_tokens:
         normalized = normalize_key(raw)
@@ -269,25 +274,117 @@ def _program_view_rows(db_name: str | None = None) -> list[dict[str, Any]]:
     return _dedupe_program_rows(normalized)
 
 
-def _match_rows_for_program(program: dict[str, Any], observatory: dict[str, list[dict[str, Any]]]) -> dict[str, list[dict[str, Any]]]:
+def _program_microcurriculum_context(program: dict[str, Any], db_name: str | None = None) -> dict[str, Any]:
+    program_id = int(program.get("especializacion_id") or program.get("id") or 0)
+    if not program_id:
+        return {}
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    try:
+        context = microcurriculum_context_repository.fetch_program_context(
+            program_id,
+            specialization_name=program_name,
+            db_name=db_name,
+        )
+    except Exception:
+        return {}
+    return dict(context) if context else {}
+
+
+def _context_terms(program_context: dict[str, Any]) -> list[str]:
+    terms: list[str] = []
+    terms.extend(_as_list(program_context.get("technical_skills")))
+    terms.extend(_as_list(program_context.get("transversal_skills")))
+    terms.extend(_as_list(program_context.get("methodologies")))
+    terms.extend(_as_list(program_context.get("tools")))
+    terms.extend(_as_list(program_context.get("platforms")))
+    terms.extend(_as_list(program_context.get("technologies")))
+    terms.extend(_as_list(program_context.get("keywords")))
+    terms.extend(_as_list(program_context.get("labor_roles")))
+    terms.extend(_as_list(program_context.get("occupational_profiles")))
+    terms.extend(_as_list(program_context.get("strengthening_areas")))
+    terms.extend(_as_list(program_context.get("real_market_gaps")))
+    subjects = program_context.get("subjects") or []
+    if isinstance(subjects, dict):
+        subjects = [subjects]
+    if not isinstance(subjects, list):
+        subjects = []
+    for subject in subjects:
+        if isinstance(subject, dict):
+            terms.extend(_as_list(subject.get("competencias")))
+            terms.extend(_as_list(subject.get("resultados_aprendizaje")))
+            terms.extend(_as_list(subject.get("contenidos")))
+            terms.extend(_as_list(subject.get("metodologias")))
+            terms.extend(_as_list(subject.get("herramientas")))
+    return _unique([str(term) for term in terms if str(term).strip()])
+
+
+def _row_match_score(text: str, curriculum_terms: set[str], benchmark_terms: set[str], labor_terms: set[str]) -> int:
+    normalized = normalize_key(text)
+    if not normalized:
+        return 0
+    score = 0
+    if any(term in normalized for term in curriculum_terms):
+        score += 3
+    if any(term in normalized for term in benchmark_terms):
+        score += 2
+    if any(term in normalized for term in labor_terms):
+        score += 1
+    return score
+
+
+def _match_rows_for_program(
+    program: dict[str, Any],
+    observatory: dict[str, list[dict[str, Any]]],
+    *,
+    program_context: dict[str, Any] | None = None,
+    domain_benchmark: dict[str, Any] | None = None,
+) -> dict[str, list[dict[str, Any]]]:
     program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
     program_role = str(program.get("rol") or "").strip()
-    tokens = _tokenize_program(program_name, program_role)
+    context_terms = _context_terms(program_context or {})
+    benchmark_terms = list(domain_benchmark.get("comparison_terms") or []) if domain_benchmark else []
+    if domain_benchmark:
+        benchmark_terms.extend(list(domain_benchmark.get("priority_skills") or []))
+        benchmark_terms.extend(list(domain_benchmark.get("core_competencies") or []))
+        benchmark_terms.extend(list(domain_benchmark.get("market_skills") or []))
+        benchmark_terms.extend([str(item.get("institution") or "") for item in domain_benchmark.get("benchmark_institutions") or []])
+        benchmark_terms.extend(list(domain_benchmark.get("occupational_profile") or []))
+    tokens = _tokenize_program(program_name, program_role, benchmark_terms + context_terms)
     skill_rows = _program_skill_rows(int(program.get("especializacion_id") or program.get("id") or 0))
     skill_names = [str(row.get("nombre") or "").strip() for row in skill_rows if str(row.get("nombre") or "").strip()]
+    curriculum_terms = {normalize_key(term) for term in context_terms if normalize_key(term)}
+    benchmark_term_set = {normalize_key(term) for term in benchmark_terms if normalize_key(term)}
+    labor_term_set = {
+        *{normalize_key(skill) for skill in skill_names if normalize_key(skill)},
+        *{normalize_key(term) for term in _as_list(program_context.get("labor_roles")) if normalize_key(term)},
+    } if program_context else {normalize_key(skill) for skill in skill_names if normalize_key(skill)}
     gap_rows = observatory["curriculum_gap_observatory"]
     recommendation_rows = observatory["recommendation_observatory"]
     forecast_rows = observatory["market_forecasts"]
     role_rows = observatory["semantic_role_graph"]
     emerging_rows = observatory["emerging_technology_observatory"]
 
-    matched_gaps = [
-        row
-        for row in gap_rows
-        if _matches_text(str(row.get("specialization") or ""), tokens)
-        or _matches_text(str(row.get("missing_skill") or ""), tokens)
-        or any(normalize_key(skill) == normalize_key(row.get("missing_skill") or "") for skill in skill_names)
-    ]
+    scored_gaps = []
+    for row in gap_rows:
+        score = _row_match_score(
+            " ".join(
+                [
+                    str(row.get("specialization") or ""),
+                    str(row.get("missing_skill") or ""),
+                    str(row.get("recommendation") or ""),
+                    str(row.get("evidence") or ""),
+                ]
+            ),
+            curriculum_terms,
+            benchmark_term_set,
+            labor_term_set,
+        )
+        if any(normalize_key(skill) == normalize_key(row.get("missing_skill") or "") for skill in skill_names):
+            score += 2
+        if score:
+            scored_gaps.append((score, row))
+    scored_gaps.sort(key=lambda item: (item[0], _safe_float(item[1].get("urgency_score"))), reverse=True)
+    matched_gaps = [row for _score, row in scored_gaps]
     if not matched_gaps and gap_rows:
         matched_gaps = gap_rows[:5]
 
@@ -305,8 +402,13 @@ def _match_rows_for_program(program: dict[str, Any], observatory: dict[str, list
                 " ".join(payload_skills),
             ]
         )
-        if _matches_text(reason_text, tokens) or any(normalize_key(skill) in {normalize_key(item) for item in skill_names + missing_skill_names} for skill in payload_skills):
-            matched_recommendations.append(row)
+        score = _row_match_score(reason_text, curriculum_terms, benchmark_term_set, labor_term_set)
+        if any(normalize_key(skill) in {normalize_key(item) for item in skill_names + missing_skill_names} for skill in payload_skills):
+            score += 2
+        if score:
+            matched_recommendations.append((score, row))
+    matched_recommendations.sort(key=lambda item: (item[0], _safe_float(item[1].get("recommendation_confidence"))), reverse=True)
+    matched_recommendations = [row for _score, row in matched_recommendations]
     if not matched_recommendations and recommendation_rows:
         matched_recommendations = recommendation_rows[:5]
 
@@ -314,22 +416,45 @@ def _match_rows_for_program(program: dict[str, Any], observatory: dict[str, list
     skill_focus = {normalize_key(item) for item in skill_names + missing_skill_names}
     for row in forecast_rows:
         entity_name = str(row.get("entity_name") or "")
-        if _matches_text(entity_name, tokens) or normalize_key(entity_name) in skill_focus or _matches_text(str(row.get("entity_type") or ""), tokens):
-            matched_forecasts.append(row)
+        score = _row_match_score(entity_name + " " + str(row.get("entity_type") or ""), curriculum_terms, benchmark_term_set, labor_term_set)
+        if normalize_key(entity_name) in skill_focus:
+            score += 2
+        if score:
+            matched_forecasts.append((score, row))
+    matched_forecasts.sort(key=lambda item: (item[0], _safe_float(item[1].get("growth_velocity"))), reverse=True)
+    matched_forecasts = [row for _score, row in matched_forecasts]
     if not matched_forecasts and forecast_rows:
         matched_forecasts = forecast_rows[:5]
 
     matched_roles = []
     for row in role_rows:
-        if _matches_text(str(row.get("source_role") or ""), tokens) or _matches_text(str(row.get("target_role") or ""), tokens):
-            matched_roles.append(row)
+        score = _row_match_score(
+            f"{row.get('source_role') or ''} {row.get('target_role') or ''} {row.get('cluster_affinity') or ''}",
+            curriculum_terms,
+            benchmark_term_set,
+            labor_term_set,
+        )
+        if score:
+            matched_roles.append((score, row))
+    matched_roles.sort(key=lambda item: (item[0], _safe_float(item[1].get("similarity_score"))), reverse=True)
+    matched_roles = [row for _score, row in matched_roles]
     if not matched_roles and role_rows:
         matched_roles = role_rows[:5]
 
     matched_emerging = []
     for row in emerging_rows:
-        if _matches_text(str(row.get("technology") or ""), tokens) or normalize_key(str(row.get("technology") or "")) in skill_focus:
-            matched_emerging.append(row)
+        score = _row_match_score(
+            str(row.get("technology") or ""),
+            curriculum_terms,
+            benchmark_term_set,
+            labor_term_set,
+        )
+        if normalize_key(str(row.get("technology") or "")) in skill_focus:
+            score += 2
+        if score:
+            matched_emerging.append((score, row))
+    matched_emerging.sort(key=lambda item: (item[0], _safe_float(item[1].get("growth_velocity"))), reverse=True)
+    matched_emerging = [row for _score, row in matched_emerging]
     if not matched_emerging and emerging_rows:
         matched_emerging = emerging_rows[:5]
 
@@ -344,13 +469,161 @@ def _match_rows_for_program(program: dict[str, Any], observatory: dict[str, list
 
 
 def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, Any]]]) -> ProgramIntelligenceItem:
-    matches = _match_rows_for_program(program, observatory)
+    program_context = _program_microcurriculum_context(program)
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    program_role = str(program.get("rol") or "").strip()
+    domain_taxonomy = build_domain_taxonomy_from_program(
+        program_name=program_name,
+        program_role=program_role,
+        microcurriculum_context=program_context,
+        skills=list(program_context.get("technical_skills") or []) + list(program_context.get("transversal_skills") or []),
+    )
+    domain_benchmark = build_domain_benchmark(domain_taxonomy.domain_key)
+    matches = _match_rows_for_program(
+        program,
+        observatory,
+        program_context=program_context,
+        domain_benchmark=domain_benchmark.to_dict(),
+    )
     skill_rows = matches["skill_rows"]
     gap_rows = matches["gap_rows"]
     recommendation_rows = matches["recommendation_rows"]
     forecast_rows = matches["forecast_rows"]
     role_rows = matches["role_rows"]
     emerging_rows = matches["emerging_rows"]
+
+    if domain_taxonomy.domain_key == "criminology":
+        context_gap_rows = []
+
+        def _context_gap_row(name: str, priority: str, reason: str, coverage_status: str = "missing") -> dict[str, Any]:
+            urgency_score = {
+                "alta": 0.93,
+                "media": 0.76,
+                "baja": 0.58,
+            }.get(priority, 0.7)
+            market_demand_score = {
+                "alta": 0.91,
+                "media": 0.78,
+                "baja": 0.61,
+            }.get(priority, 0.72)
+            curriculum_coverage_score = {
+                "missing": 0.12,
+                "partial": 0.34,
+                "covered": 0.56,
+            }.get(coverage_status, 0.22)
+            emergence_score = {
+                "alta": 0.91,
+                "media": 0.72,
+                "baja": 0.48,
+            }.get(priority, 0.6)
+            return {
+                "missing_skill": name,
+                "urgency_score": urgency_score,
+                "specialization": program_name,
+                "market_demand_score": market_demand_score,
+                "curriculum_coverage_score": curriculum_coverage_score,
+                "emergence_score": emergence_score,
+                "recommendation": reason,
+                "evidence": {
+                    "source": "microcurriculum_context",
+                    "priority": priority or "media",
+                    "coverage_status": coverage_status,
+                    "benchmark_used": domain_benchmark.reference_program,
+                    "domain_confidence": domain_taxonomy.confidence,
+                },
+            }
+
+        for item in _as_list(program_context.get("real_market_gaps")):
+            if not isinstance(item, dict):
+                continue
+            gap_name = str(item.get("name") or "").strip()
+            if not gap_name:
+                continue
+            priority = str(item.get("priority") or "").strip().casefold() or "media"
+            context_gap_rows.append(
+                _context_gap_row(
+                    gap_name,
+                    priority,
+                    f"Fortalecer {gap_name} a partir del benchmark de {domain_benchmark.domain_label}.",
+                    "missing",
+                )
+            )
+
+        for item in _as_list(program_context.get("strengthening_areas")):
+            if not isinstance(item, dict):
+                continue
+            gap_name = str(item.get("name") or "").strip()
+            if not gap_name:
+                continue
+            context_gap_rows.append(
+                _context_gap_row(
+                    gap_name,
+                    "media",
+                    f"Profundizar la aplicación de {gap_name} dentro del currículo criminológico.",
+                    "partial",
+                )
+            )
+
+        if context_gap_rows:
+            gap_rows = sorted(context_gap_rows, key=lambda row: (_safe_float(row.get("urgency_score")), _safe_float(row.get("market_demand_score"))), reverse=True)
+
+        criminology_markers = {
+            "criminal",
+            "forensic",
+            "forensics",
+            "victim",
+            "victimology",
+            "crime",
+            "cybercrime",
+            "security",
+            "public security",
+            "public safety",
+            "chain of custody",
+            "compliance",
+            "penitentiary",
+            "intelligence",
+            "risk analysis",
+        }
+
+        def _looks_criminology(text: str) -> bool:
+            normalized = normalize_key(text)
+            return bool(normalized and any(marker in normalized for marker in criminology_markers))
+
+        if gap_rows:
+            recommendation_rows = [
+                {
+                    "recommendation_type": "domain",
+                    "target_role": domain_benchmark.occupational_profile[0] if domain_benchmark.occupational_profile else "Forensic Analyst",
+                    "target_company": "market",
+                    "recommendation_confidence": 0.9,
+                    "recommendation_reasoning": (
+                        f"Fortalecer {str(gap_row.get('missing_skill') or '').strip()} "
+                        f"porque aparece como brecha observada del programa y conecta con el benchmark de {domain_benchmark.domain_label}."
+                    ),
+                    "recommendation_payload": {
+                        "recommended_skills": [str(gap_row.get("missing_skill") or "").strip()],
+                        "evidence": {
+                            "gap": gap_row,
+                            "benchmark_used": domain_benchmark.reference_program,
+                            "domain_confidence": domain_taxonomy.confidence,
+                        },
+                    },
+                }
+                for gap_row in gap_rows[:5]
+                if str(gap_row.get("missing_skill") or "").strip()
+            ]
+        else:
+            recommendation_rows = []
+
+        role_rows = [
+            row for row in role_rows if _looks_criminology(
+                f"{row.get('source_role') or ''} {row.get('target_role') or ''} {row.get('cluster_affinity') or ''}"
+            )
+        ]
+
+        forecast_rows = [row for row in forecast_rows if _looks_criminology(str(row.get("entity_name") or ""))]
+
+        emerging_rows = [row for row in emerging_rows if _looks_criminology(str(row.get("technology") or ""))]
 
     alignment = _safe_float(program.get("promedio_match_mercado") or program.get("porcentaje_match") or 0.0)
     coverage = clamp(alignment / 100.0)
@@ -359,11 +632,20 @@ def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, A
     emerging_pressure = clamp(max((_safe_float(row.get("emergence_score")) for row in emerging_rows), default=0.0))
     role_pressure = clamp(max((_safe_float(row.get("similarity_score")) for row in role_rows), default=0.0))
 
-    risk_score = round(clamp(((1.0 - coverage) * 0.45) + (gap_pressure * 0.2) + (forecast_pressure * 0.15) + (emerging_pressure * 0.1) + ((1.0 - role_pressure) * 0.1)) * 100.0, 2)
+    weights = domain_benchmark.analysis_weights or {"coverage": 0.45, "gap": 0.2, "forecast": 0.15, "emerging": 0.1, "role": 0.1}
+    risk_score = round(
+        clamp(
+            ((1.0 - coverage) * float(weights.get("coverage", 0.45)))
+            + (gap_pressure * float(weights.get("gap", 0.2)))
+            + (forecast_pressure * float(weights.get("forecast", 0.15)))
+            + (emerging_pressure * float(weights.get("emerging", 0.1)))
+            + ((1.0 - role_pressure) * float(weights.get("role", 0.1)))
+        )
+        * 100.0,
+        2,
+    )
     gap_count = len(gap_rows)
     risk_level = _risk_level(risk_score)
-    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
-    program_role = str(program.get("rol") or "").strip()
 
     top_gap_names = [str(row.get("missing_skill") or "").strip() for row in gap_rows if str(row.get("missing_skill") or "").strip()]
     top_gap_names = _unique(top_gap_names)
@@ -374,12 +656,17 @@ def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, A
         recommended_actions.append(f"Incorporar señales emergentes: {', '.join(_unique([str(row.get('technology') or '').strip() for row in emerging_rows if str(row.get('technology') or '').strip()])[:5])}.")
     if forecast_rows:
         recommended_actions.append("Ajustar resultados de aprendizaje alineando la oferta con la demanda proyectada.")
+    if domain_benchmark.core_competencies:
+        recommended_actions.append(
+            f"Alinear el programa al benchmark de {domain_benchmark.domain_label}: {', '.join(domain_benchmark.core_competencies[:3])}."
+        )
     if not recommended_actions:
         recommended_actions.append("Mantener seguimiento de mercado y ampliar evidencia observatory.")
 
     justification_parts = [
         f"El programa '{program_name}' muestra {alignment:.1f}% de alineación laboral.",
         f"Se identifican {gap_count} brechas relevantes con presión de mercado.",
+        f"Taxonomía de dominio detectada: {domain_taxonomy.domain_label} / {domain_taxonomy.subdomain or 'general'}.",
     ]
     if forecast_rows:
         justification_parts.append(f"Hay {len(forecast_rows)} señales de forecast relevantes para skills/roles del programa.")
@@ -403,6 +690,18 @@ def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, A
         "forecasts": forecast_rows[:10],
         "role_signals": role_rows[:10],
         "emerging_technologies": emerging_rows[:10],
+        "domain_taxonomy": domain_taxonomy.to_dict(),
+        "domain_benchmark": domain_benchmark.to_dict(),
+        "microcurriculum_context": program_context,
+        "domain_confidence": domain_taxonomy.confidence,
+        "domain_evidence": domain_taxonomy.evidence,
+        "benchmark_used": {
+            "reference_program": domain_benchmark.reference_program,
+            "benchmark_institutions": domain_benchmark.benchmark_institutions[:5],
+            "curriculum_structure": domain_benchmark.curriculum_structure[:5],
+            "graduate_profile": domain_benchmark.graduate_profile[:5],
+            "occupational_profile": domain_benchmark.occupational_profile[:5],
+        },
     }
     confidence = round(clamp((coverage + (1.0 - gap_pressure) + max(forecast_pressure, emerging_pressure, role_pressure)) / 3.0), 4)
 

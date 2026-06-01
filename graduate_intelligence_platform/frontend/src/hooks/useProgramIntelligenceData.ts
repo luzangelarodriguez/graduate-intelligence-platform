@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import {
-  getCriticalPrograms,
   getCurriculumRisk,
   getCurriculumSimulator,
   getExecutiveObservatory,
@@ -199,14 +198,12 @@ export function useProgramIntelligenceData(programId: number | null) {
           alignment,
           forecastSummary,
           executiveObservatory,
-          criticalPrograms,
         ] = await Promise.all([
           withTimeout(getProgramIntelligenceDetail(currentProgramId)),
           withTimeout(getCurriculumRisk(currentProgramId)),
           withTimeout(getProgramAlignment(currentProgramId)),
           withTimeout(getForecastSummary(25)),
           withTimeout(getExecutiveObservatory()),
-          withTimeout(getCriticalPrograms(12, 12)),
         ]);
 
         const resolvedProgram = baseProgram;
@@ -223,7 +220,7 @@ export function useProgramIntelligenceData(programId: number | null) {
           alignment,
           forecastSummary,
           executiveObservatory,
-          criticalPrograms: criticalPrograms?.items || [],
+          criticalPrograms: (executiveObservatory?.high_risk_programs || []) as unknown as CriticalProgramItem[],
         });
         const failures = [resolvedProgram ? '' : 'program', resolvedProgramIntelligence ? '' : 'program-intelligence'].filter(Boolean);
         setError(failures.length >= 2 ? 'No se pudo cargar la inteligencia base del programa.' : null);
@@ -276,6 +273,7 @@ export function useProgramSimulations(
   const normalizedHorizons = useMemo(() => {
     return [...new Set(horizons.filter((horizon) => Number.isFinite(horizon) && horizon > 0))].sort((left, right) => left - right);
   }, [horizons.join('|')]);
+  const normalizedSkills = useMemo(() => uniqueStrings(proposedSkills), [skillSignature]);
 
   useEffect(() => {
     if (!programId || !skillSignature) {
@@ -290,10 +288,9 @@ export function useProgramSimulations(
     async function load() {
       try {
         setIsLoading(true);
-        const uniqueSkills = uniqueStrings(proposedSkills);
         const results = await Promise.all(
           normalizedHorizons.map(async (horizon) => {
-            const data = await getCurriculumSimulator(currentProgramId, uniqueSkills, horizon);
+            const data = await getCurriculumSimulator(currentProgramId, normalizedSkills, horizon);
             return [horizon, data] as const;
           }),
         );
@@ -316,7 +313,7 @@ export function useProgramSimulations(
     return () => {
       cancelled = true;
     };
-  }, [normalizedHorizons, programId, skillSignature, proposedSkills]);
+  }, [normalizedHorizons, normalizedSkills, programId, skillSignature]);
 
   return { simulations, isLoading, error };
 }
