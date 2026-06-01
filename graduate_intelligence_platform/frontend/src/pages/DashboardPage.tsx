@@ -13,6 +13,7 @@ import {
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
 import { ProgramObservatoryCards } from '../components/ProgramObservatoryCards';
+import { ProgramSelectorStrip } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { Link } from 'react-router-dom';
 import { useDashboardData } from '../hooks/useDashboardData';
 
@@ -208,36 +209,49 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-5">
-      <section className="program-context-header">
-        <div className="program-context-copy">
+      <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4 rounded-3xl border border-line bg-white p-6 shadow-sm">
           <div className="institutional-mark">
             <BarChart3 size={17} strokeWidth={1.8} />
-            <span>Observatorio ejecutivo de pertinencia acadÃ©mica</span>
+            <span>Observatorio ejecutivo de pertinencia académica</span>
           </div>
-          <h2>{programName}</h2>
-          <p>
-            Lectura institucional de alineaciÃ³n curricular, demanda laboral y brechas de habilidades para orientar
-            decisiones acadÃ©micas.
-          </p>
-        </div>
-        <label className="program-switcher">
-          <span>Programa activo</span>
-          <select value={selectedProgramId ?? ''} onChange={(event) => setSelectedProgramId(Number(event.target.value))}>
-            {programs.map((program) => (
-              <option key={program.especializacion_id} value={program.especializacion_id}>
-                {program.nombre_especializacion}
-              </option>
-            ))}
-          </select>
-          {selectedProgramId && (
+          <div className="space-y-3">
+            <h2 className="text-balance text-3xl font-semibold leading-tight text-ink md:text-4xl">{programName}</h2>
+            <p className="max-w-3xl text-sm leading-7 text-muted md:text-base">
+              Lectura institucional de alineación curricular, demanda laboral y brechas de habilidades para orientar
+              decisiones académicas.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
             <Link
-              className="inline-flex items-center justify-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:border-brand/40 hover:bg-brand/5"
-              to={`/programs/${selectedProgramId}`}
+              className="inline-flex items-center justify-center rounded-full border border-brand/15 bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand/90"
+              to="/programas"
             >
-              Abrir detalle ejecutivo
+              Explorar ranking
             </Link>
-          )}
-        </label>
+            {selectedProgramId && (
+              <Link
+                className="inline-flex items-center justify-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
+                to={`/programs/${selectedProgramId}`}
+              >
+                Abrir detalle ejecutivo
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <ProgramSelectorStrip
+          programs={programs}
+          selectedProgramId={selectedProgramId ?? programs[0]?.especializacion_id ?? null}
+          onChange={setSelectedProgramId}
+          label="Especialización seleccionada"
+          helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data."
+          note="El análisis de los demás programas se hace con competencias, skills del programa y señales de mercado."
+          primaryActionLabel="Analizar especialización"
+          primaryActionHref={selectedProgramId ? `/programs/${selectedProgramId}` : undefined}
+          secondaryActionLabel="Generar microcurrículo actualizado"
+          secondaryActionHref={selectedProgramId ? `/programs/${selectedProgramId}/microcurriculum` : undefined}
+        />
       </section>
 
       {isProgramLoading && <div className="context-refresh">Actualizando lectura contextual del programa...</div>}
@@ -393,5 +407,6 @@ export function DashboardPage() {
     </div>
   );
 }
+
 
 

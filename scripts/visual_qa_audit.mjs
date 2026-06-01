@@ -178,7 +178,10 @@ async function main() {
   };
   await capture(page, '02-programs-ranking');
 
-  const programId = Number((firstProgramHref || '').match(/\/programs\/(\d+)/)?.[1] || 0);
+  const resolvedProgramId = Number(process.env.VISUAL_QA_PROGRAM_ID || 108);
+  const programId = Number.isFinite(resolvedProgramId) && resolvedProgramId > 0
+    ? resolvedProgramId
+    : Number((firstProgramHref || '').match(/\/programs\/(\d+)/)?.[1] || 0);
   if (!Number.isFinite(programId) || programId <= 0) {
     throw new Error('No se pudo resolver un programa válido desde /programas');
   }

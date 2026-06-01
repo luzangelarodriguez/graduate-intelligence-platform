@@ -17,6 +17,16 @@ CAREER_ORDER = [
     "Data Architect",
 ]
 
+CRIMINOLOGY_CAREER_ORDER = [
+    "Criminal Research Assistant",
+    "Forensic Analyst",
+    "Victim Assistance Specialist",
+    "Criminal Intelligence Analyst",
+    "Cybercrime Investigator",
+    "Public Security Advisor",
+    "Criminal Policy Analyst",
+]
+
 
 @dataclass(frozen=True)
 class CareerTransition:
@@ -32,11 +42,16 @@ class CareerTransition:
 
 def build_career_paths(role_signals: list[RoleSignal], market_skills: list[str]) -> list[CareerTransition]:
     present_titles = {signal.role_title.casefold(): signal.role_title for signal in role_signals}
+    criminology_markers = {"criminal investigation", "forensic analysis", "victimology", "criminal intelligence", "crime prevention", "public security", "cybercrime", "chain of custody", "organized crime", "financial crime"}
+    selected_order = CRIMINOLOGY_CAREER_ORDER if {skill.casefold() for skill in market_skills} & criminology_markers or any("criminal" in signal.role_family.casefold() or "forensic" in signal.role_family.casefold() for signal in role_signals) else CAREER_ORDER
     transitions: list[CareerTransition] = []
-    for left, right in zip(CAREER_ORDER, CAREER_ORDER[1:]):
+    for left, right in zip(selected_order, selected_order[1:]):
         source = present_titles.get(left.casefold(), left)
         target = present_titles.get(right.casefold(), right)
-        gaps = [skill for skill in ("SQL", "Power BI", "Python", "ETL", "Azure", "Databricks", "data governance") if skill in market_skills]
+        if selected_order is CRIMINOLOGY_CAREER_ORDER:
+            gaps = [skill for skill in ("criminal investigation", "forensic analysis", "victimology", "criminal intelligence", "crime prevention", "public security", "cybercrime", "chain of custody", "risk analysis", "compliance") if skill in market_skills]
+        else:
+            gaps = [skill for skill in ("SQL", "Power BI", "Python", "ETL", "Azure", "Databricks", "data governance") if skill in market_skills]
         probability = 0.45
         if source in present_titles.values() or target in present_titles.values():
             probability += 0.20

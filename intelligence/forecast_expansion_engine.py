@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from statistics import mean
+import json
 from typing import Any
 
 from psycopg2.extras import Json, execute_values
@@ -42,6 +43,25 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return float(value)
     except Exception:
         return default
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, tuple):
+        return [_json_safe(item) for item in value]
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            return str(value)
+    try:
+        json.dumps(value)
+        return value
+    except Exception:
+        return str(value)
 
 
 def _market_phase(velocity: float, confidence: float) -> str:
@@ -339,7 +359,7 @@ def _persist_named_forecasts(table_name: str, records: list[MarketForecastRecord
                 record.market_phase,
                 record.first_seen_at,
                 record.last_seen_at,
-                Json(record.evidence),
+                Json(_json_safe(record.evidence), dumps=lambda obj: json.dumps(obj, ensure_ascii=False)),
             )
         )
     with cursor(db_name=db_name) as cur:

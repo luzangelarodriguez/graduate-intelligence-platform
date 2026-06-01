@@ -12,10 +12,12 @@ from urllib.request import Request, urlopen
 
 from backend.repositories import microcurriculum_context_repository, programas_repository
 from backend.repositories.base import fetch_one, relation_exists
+from intelligence.curriculum_analysis_engine import build_curriculum_analysis
 from intelligence.curriculum_impact_simulator import build_curriculum_impact_simulation
+from intelligence.domain_benchmark_layer import DomainBenchmarkProfile
+from intelligence.domain_prompt_layer import build_domain_prompt_payload, build_domain_system_prompt
+from intelligence.domain_taxonomy_layer import DomainTaxonomyResult
 from intelligence.executive_observatory_engine import build_executive_observatory_v2
-from intelligence.forecast_expansion_engine import build_forecast_summary
-from intelligence.predictive_intelligence_engine import build_curriculum_risk_index, build_university_market_alignment
 from intelligence.program_intelligence_engine import build_program_intelligence_for_program
 from intelligence.common import normalize_key
 
@@ -25,6 +27,7 @@ OPENAI_BASE_URL = (os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1").
 OPENAI_API_KEY = (os.getenv("OPENAI_API_KEY") or "").strip()
 CACHE_TTL_SECONDS = int(os.getenv("EXECUTIVE_AI_CACHE_TTL_SECONDS") or "21600")
 OPENAI_TIMEOUT_SECONDS = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "10")
+OPENAI_EXECUTIVE_SYNC = (os.getenv("OPENAI_EXECUTIVE_SYNC") or "").strip() == "1"
 logger = logging.getLogger(__name__)
 
 _CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
@@ -81,6 +84,10 @@ def _cache_set(key: str, value: dict[str, Any]) -> None:
 
 def _openai_enabled() -> bool:
     return bool(OPENAI_API_KEY)
+
+
+def _openai_sync_enabled() -> bool:
+    return OPENAI_EXECUTIVE_SYNC and _openai_enabled()
 
 
 def _strip_json_fence(content: str) -> str:
@@ -172,25 +179,35 @@ def _program_base(program_id: int, db_name: str | None = None) -> dict[str, Any]
 
 
 def _program_intelligence(program_id: int, db_name: str | None = None) -> dict[str, Any]:
+    try:
+        row = fetch_one(
+            """
+            SELECT *
+            FROM program_intelligence
+            WHERE program_id = %s
+            ORDER BY generated_at DESC NULLS LAST
+            LIMIT 1
+            """,
+            (program_id,),
+            db_name=db_name,
+        )
+        if row:
+            return dict(row)
+    except Exception:
+        pass
     item = build_program_intelligence_for_program(program_id, db_name=db_name)
     return item.to_dict()
 
 
 def _program_traceability(program_id: int, db_name: str | None = None) -> dict[str, Any]:
-    program = _program_base(program_id, db_name=db_name)
-    intelligence = _program_intelligence(program_id, db_name=db_name)
-    context = _microcurriculum_context(program_id, str(program.get("nombre_especializacion") or ""), db_name=db_name)
-    risk = build_curriculum_risk_index(program_id, persist=False, db_name=db_name).to_dict()
-    alignment = build_university_market_alignment(program_id, persist=False, db_name=db_name).to_dict()
-    forecast = build_forecast_summary(db_name=db_name, persist=False, limit=20)
-    return {
-        "program": program,
-        "program_intelligence": intelligence,
-        "microcurriculum_context": context,
-        "curriculum_risk": risk,
-        "alignment": alignment,
-        "forecast_summary": forecast,
-    }
+    analysis = build_curriculum_analysis(program_id, db_name=db_name)
+    analysis.setdefault("program", _program_base(program_id, db_name=db_name))
+    analysis.setdefault("program_intelligence", _program_intelligence(program_id, db_name=db_name))
+    analysis.setdefault(
+        "microcurriculum_context",
+        _microcurriculum_context(program_id, str(analysis["program"].get("nombre_especializacion") or ""), db_name=db_name),
+    )
+    return analysis
 
 
 def _safe_program_traceability(program_id: int, db_name: str | None = None) -> dict[str, Any]:
@@ -199,24 +216,19 @@ def _safe_program_traceability(program_id: int, db_name: str | None = None) -> d
     except Exception:
         program = {"especializacion_id": program_id, "nombre_especializacion": f"Programa {program_id}", "rol": ""}
     try:
-        intelligence = _program_intelligence(program_id, db_name=db_name)
+        analysis = build_curriculum_analysis(program_id, db_name=db_name)
+        intelligence = analysis.get("program_intelligence") or {}
+        context = analysis.get("microcurriculum_context") or {}
+        risk = analysis.get("curriculum_risk") or {}
+        alignment = analysis.get("alignment") or {}
+        forecast = analysis.get("forecast_summary") or {}
+        domain_taxonomy = analysis.get("domain_taxonomy") or {}
+        domain_benchmark = analysis.get("domain_benchmark") or {}
     except Exception:
         intelligence = {}
-    try:
-        context = _microcurriculum_context(program_id, str(program.get("nombre_especializacion") or ""), db_name=db_name)
-    except Exception:
         context = {}
-    try:
-        risk = build_curriculum_risk_index(program_id, persist=False, db_name=db_name).to_dict()
-    except Exception:
         risk = {}
-    try:
-        alignment = build_university_market_alignment(program_id, persist=False, db_name=db_name).to_dict()
-    except Exception:
         alignment = {}
-    try:
-        forecast = build_forecast_summary(db_name=db_name, persist=False, limit=20)
-    except Exception:
         forecast = {
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source_tables": [],
@@ -228,6 +240,8 @@ def _safe_program_traceability(program_id: int, db_name: str | None = None) -> d
             "top_companies": [],
             "top_roles": [],
         }
+        domain_taxonomy = {}
+        domain_benchmark = {}
     return {
         "program": program,
         "program_intelligence": intelligence,
@@ -235,6 +249,60 @@ def _safe_program_traceability(program_id: int, db_name: str | None = None) -> d
         "curriculum_risk": risk,
         "alignment": alignment,
         "forecast_summary": forecast,
+        "domain_taxonomy": domain_taxonomy,
+        "domain_benchmark": domain_benchmark,
+    }
+
+
+def _light_program_summary_payload(program_id: int, db_name: str | None = None) -> dict[str, Any]:
+    program = _program_base(program_id, db_name=db_name)
+    intelligence = _program_intelligence(program_id, db_name=db_name)
+    program_name = str(program.get("nombre_especializacion") or "")
+    embedded_context = {}
+    supporting_evidence = intelligence.get("supporting_evidence")
+    if isinstance(supporting_evidence, dict):
+        embedded_context = supporting_evidence.get("microcurriculum_context") if isinstance(supporting_evidence.get("microcurriculum_context"), dict) else {}
+        if not intelligence.get("domain_taxonomy") and isinstance(supporting_evidence.get("domain_taxonomy"), dict):
+            intelligence["domain_taxonomy"] = dict(supporting_evidence.get("domain_taxonomy") or {})
+        if not intelligence.get("domain_benchmark") and isinstance(supporting_evidence.get("domain_benchmark"), dict):
+            intelligence["domain_benchmark"] = dict(supporting_evidence.get("domain_benchmark") or {})
+    context = embedded_context or _microcurriculum_context(program_id, program_name, db_name=db_name)
+    domain_taxonomy = intelligence.get("domain_taxonomy") or context.get("domain_taxonomy") or {}
+    domain_benchmark = intelligence.get("domain_benchmark") or context.get("domain_benchmark") or {}
+    alignment_score = float(intelligence.get("alignment_score") or context.get("scores", {}).get("market_skill_coverage") or 0.0)
+    risk_score = float(intelligence.get("risk_score") or 0.0)
+    top_gaps = intelligence.get("top_gaps") or []
+    top_recommendations = intelligence.get("top_recommendations") or []
+    forecast_signals = intelligence.get("forecast_signals") or []
+    risk = {
+        "risk_score": risk_score,
+        "risk_level": intelligence.get("risk_level") or ("high" if risk_score >= 70 else "moderate" if risk_score >= 50 else "low"),
+        "risk_drivers": top_gaps,
+        "source_tables": intelligence.get("source_tables") or ["program_intelligence", "microcurriculum_program_contexts"],
+    }
+    alignment = {
+        "alignment_score": alignment_score,
+        "missing_skills": [str(item.get("missing_skill") or "").strip() for item in top_gaps if str(item.get("missing_skill") or "").strip()],
+        "emerging_skills": [str(item.get("entity_name") or item.get("skill") or "").strip() for item in forecast_signals if str(item.get("entity_name") or item.get("skill") or "").strip()],
+        "source_tables": intelligence.get("source_tables") or ["program_intelligence", "microcurriculum_program_contexts"],
+    }
+    forecast_summary = {
+        "source_tables": intelligence.get("source_tables") or ["program_intelligence", "market_forecasts"],
+        "top_skills": forecast_signals[:10],
+        "top_technologies": [item for item in forecast_signals if str(item.get("entity_type") or "").casefold() == "technology"][:10],
+        "top_companies": [item for item in forecast_signals if str(item.get("entity_type") or "").casefold() == "company"][:10],
+        "top_roles": [item for item in forecast_signals if str(item.get("entity_type") or "").casefold() == "role"][:10],
+    }
+    return {
+        "program": program,
+        "microcurriculum_context": context,
+        "program_intelligence": intelligence,
+        "curriculum_risk": risk,
+        "alignment": alignment,
+        "forecast_summary": forecast_summary,
+        "domain_taxonomy": domain_taxonomy,
+        "domain_benchmark": domain_benchmark,
+        "top_recommendations": top_recommendations,
     }
 
 
@@ -245,12 +313,17 @@ def _deterministic_program_summary(program_id: int, payload: dict[str, Any]) -> 
     risk = payload["curriculum_risk"]
     alignment = payload["alignment"]
     forecast_summary = payload["forecast_summary"]
+    domain_taxonomy = payload.get("domain_taxonomy") or {}
+    domain_benchmark = payload.get("domain_benchmark") or {}
+    domain_label = str(domain_taxonomy.get("domain_label") or "Data Analytics")
+    subdomain = str(domain_taxonomy.get("subdomain") or "general")
     risk_score = float(risk.get("risk_score") or intelligence.get("risk_score") or 0)
     alignment_score = float(alignment.get("alignment_score") or intelligence.get("alignment_score") or 0)
     narrative = (
         f"El programa '{program.get('nombre_especializacion')}' muestra una alineación de {alignment_score:.1f}% y un riesgo curricular de {risk_score:.1f}%. "
         f"Las brechas más relevantes están asociadas a {', '.join([str(item.get('missing_skill') or '') for item in intelligence.get('top_gaps', [])[:3] if str(item.get('missing_skill') or '').strip()]) or 'las competencias priorizadas por el observatorio'}. "
-        f"El contexto microcurricular detecta {len(context.get('technical_skills') or [])} skills técnicas y {len(context.get('transversal_skills') or [])} competencias transversales."
+        f"El contexto microcurricular detecta {len(context.get('technical_skills') or [])} skills técnicas y {len(context.get('transversal_skills') or [])} competencias transversales. "
+        f"Dominio académico inferido: {domain_label} / {subdomain}."
     )
     why_at_risk = (
         f"El riesgo se explica por {len(risk.get('risk_drivers') or intelligence.get('top_gaps') or [])} señales activas, "
@@ -272,6 +345,8 @@ def _deterministic_program_summary(program_id: int, payload: dict[str, Any]) -> 
         "alignment": alignment,
         "program_intelligence": intelligence,
         "forecast_summary": forecast_summary,
+        "domain_taxonomy": domain_taxonomy,
+        "domain_benchmark": domain_benchmark,
     }
     return {
         "program_id": program_id,
@@ -298,32 +373,52 @@ def _deterministic_program_summary(program_id: int, payload: dict[str, Any]) -> 
 
 def build_program_summary(program_id: int, *, db_name: str | None = None) -> dict[str, Any]:
     try:
-        payload = _program_traceability(program_id, db_name=db_name)
+        payload = _light_program_summary_payload(program_id, db_name=db_name)
     except Exception as exc:
         logger.warning("program_summary_traceability_failed: %s", exc, exc_info=True)
         payload = _safe_program_traceability(program_id, db_name=db_name)
+    if not _openai_sync_enabled():
+        return _deterministic_program_summary(program_id, payload)
     program = payload["program"]
     context = payload["microcurriculum_context"]
     intelligence = payload["program_intelligence"]
     risk = payload["curriculum_risk"]
     alignment = payload["alignment"]
     forecast_summary = payload["forecast_summary"]
+    domain_taxonomy_payload = payload.get("domain_taxonomy") or {}
+    domain_benchmark_payload = payload.get("domain_benchmark") or {}
+    domain_taxonomy = DomainTaxonomyResult(**domain_taxonomy_payload) if isinstance(domain_taxonomy_payload, dict) and domain_taxonomy_payload else DomainTaxonomyResult(domain_key="data_analytics", domain_label="Data Analytics", subdomain="", confidence=0.0)
+    domain_benchmark = DomainBenchmarkProfile(**domain_benchmark_payload) if isinstance(domain_benchmark_payload, dict) and domain_benchmark_payload else DomainBenchmarkProfile(domain_key="data_analytics", domain_label="Data Analytics", reference_program="Benchmark de analítica de datos")
+
+    evidence_sources = ["program_intelligence", "executive_observatory", "curriculum_gap_observatory", "recommendation_observatory", "market_forecasts"]
+    if not _openai_sync_enabled():
+        fallback = build_executive_narrative(program_id=program_id, db_name=db_name) if program_id is not None else build_executive_narrative(db_name=db_name)
+        return {
+            "question": question,
+            "answer": str(fallback.get("narrative") or question),
+            "evidence_sources": fallback.get("evidence_sources") or evidence_sources,
+            "source_tables": fallback.get("source_tables") or evidence_sources,
+            "supporting_evidence": payload,
+            "confidence": float(fallback.get("confidence") or 0.0),
+            "model": fallback.get("model") or "deterministic-fallback",
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
 
     cached = _openai_chat_json(
-        system_prompt=(
-            "Eres un asistente ejecutivo académico. Responde SOLO en JSON válido y conciso. "
-            "No inventes métricas. Solo usa la evidencia suministrada. "
-            "Campos requeridos: summary, why_at_risk, evidence_sources, confidence."
+        system_prompt=build_domain_system_prompt(task="program_summary", domain=domain_taxonomy, benchmark=domain_benchmark),
+        user_payload=build_domain_prompt_payload(
+            task="program_summary",
+            domain=domain_taxonomy,
+            benchmark=domain_benchmark,
+            evidence={
+                "program": program,
+                "microcurriculum_context": context,
+                "program_intelligence": intelligence,
+                "curriculum_risk": risk,
+                "alignment": alignment,
+                "forecast_summary": forecast_summary,
+            },
         ),
-        user_payload={
-            "task": "program_summary",
-            "program": program,
-            "microcurriculum_context": context,
-            "program_intelligence": intelligence,
-            "curriculum_risk": risk,
-            "alignment": alignment,
-            "forecast_summary": forecast_summary,
-        },
         cache_prefix=f"program_summary:{program_id}",
     )
     if cached:
@@ -354,6 +449,8 @@ def build_program_summary(program_id: int, *, db_name: str | None = None) -> dic
                 "curriculum_risk": risk,
                 "alignment": alignment,
                 "forecast_summary": forecast_summary,
+                "domain_taxonomy": domain_taxonomy.to_dict(),
+                "domain_benchmark": domain_benchmark.to_dict(),
             },
             "confidence": float(response.get("confidence") or 0.0),
             "model": cached.model,
@@ -381,6 +478,41 @@ def build_executive_narrative(*, program_id: int | None = None, db_name: str | N
             "confidence": summary["confidence"],
             "model": summary["model"],
             "generated_at": summary["generated_at"],
+        }
+
+    if not _openai_sync_enabled():
+        try:
+            observatory = build_executive_observatory_v2(db_name=db_name, persist=False).to_dict()
+        except Exception as exc:
+            logger.warning("executive_narrative_observatory_failed: %s", exc, exc_info=True)
+            observatory = {
+                "metrics": [],
+                "alignment_average": 0.0,
+                "high_risk_programs": [],
+                "medium_risk_programs": [],
+                "low_risk_programs": [],
+                "programs_analyzed": 0,
+                "critical_gaps": [],
+                "top_emerging_skills": [],
+                "top_recommendations": [],
+                "top_programs": [],
+                "at_risk_programs": [],
+                "executive_narrative": "El observatorio presenta una vista parcial mientras se recupera la evidencia de producción.",
+                "source_tables": ["program_intelligence", "executive_observatory"],
+                "confidence": 0.0,
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
+        return {
+            "program_id": None,
+            "program_name": "",
+            "narrative": str(observatory.get("executive_narrative") or ""),
+            "why_at_risk": "",
+            "evidence_sources": list(observatory.get("source_tables") or []),
+            "source_tables": list(observatory.get("source_tables") or []),
+            "supporting_evidence": observatory,
+            "confidence": float(observatory.get("confidence") or 0.0),
+            "model": "deterministic-fallback",
+            "generated_at": str(observatory.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
         }
 
     try:
@@ -469,6 +601,19 @@ def build_recommendation_explanation(recommendation_id: int, *, db_name: str | N
     base_evidence_sources = ["recommendation_observatory", "curriculum_gap_observatory", "market_forecasts", "program_intelligence"]
     try:
         recommendation = _fetch_recommendation_row(recommendation_id, db_name=db_name)
+        if not _openai_sync_enabled():
+            return {
+                "recommendation_id": recommendation_id,
+                "recommendation_title": str(recommendation.get("recommendation_type") or recommendation.get("target_role") or recommendation.get("target_company") or ""),
+                "explanation": str(recommendation.get("recommendation_reasoning") or ""),
+                "why_this_recommendation": str(recommendation.get("recommendation_reasoning") or ""),
+                "evidence_sources": base_evidence_sources,
+                "source_tables": base_evidence_sources,
+                "supporting_evidence": recommendation,
+                "confidence": float(recommendation.get("recommendation_confidence") or 0.0),
+                "model": "deterministic-fallback",
+                "generated_at": str(recommendation.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
+            }
         payload = {
             "task": "recommendation_explanation",
             "recommendation": recommendation,
