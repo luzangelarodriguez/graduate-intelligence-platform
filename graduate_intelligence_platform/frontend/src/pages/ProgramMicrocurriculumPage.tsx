@@ -3,7 +3,7 @@ import { Layers3 } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
-import { MetricCard, ProgramPageHeader, ProgramSelectorStrip, ProgramTabs, SectionTitle } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { MetricCard, ProgramPageHeader, ProgramSelectorStrip, ProgramTabs, SectionTitle, getProgramDomainContext } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramCatalog } from '../hooks/useProgramCatalog';
@@ -36,6 +36,7 @@ export function ProgramMicrocurriculumPage() {
   const { programs: programCatalog } = useProgramCatalog();
   const { program, programIntelligence, curriculumRisk, alignment, isLoading, error } = useProgramIntelligenceData(programId);
   const { programSummary, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
+  const domainContext = getProgramDomainContext(programIntelligence);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -76,6 +77,9 @@ export function ProgramMicrocurriculumPage() {
         programs={programCatalog}
         selectedProgramId={programId}
         onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/microcurriculum`)}
+        domainLabel={domainContext.domainLabel}
+        subdomainLabel={domainContext.subdomainLabel}
+        benchmarkLabel={domainContext.benchmarkLabel}
         helper="Cambia de programa para comparar uno por uno. La trazabilidad microcurricular detallada real solo está cargada para Visual Analytics and Big Data."
       />
 

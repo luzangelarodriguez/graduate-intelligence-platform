@@ -13,9 +13,10 @@ import {
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
 import { ProgramObservatoryCards } from '../components/ProgramObservatoryCards';
-import { ProgramSelectorStrip } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { ProgramSelectorStrip, getProgramDomainContext } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { Link } from 'react-router-dom';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { useProgramIntelligenceData } from '../hooks/useProgramIntelligenceData';
 
 type DrilldownId = 'pertinence' | 'skills' | 'roles' | 'trend' | 'digital' | 'update' | 'ranking';
 
@@ -64,7 +65,9 @@ export function DashboardPage() {
     isProgramLoading,
     error,
   } = useDashboardData();
+  const { programIntelligence: selectedProgramIntelligence } = useProgramIntelligenceData(selectedProgramId ?? null);
   const [activeDrilldown, setActiveDrilldown] = useState<DrilldownId | null>(null);
+  const selectedDomain = getProgramDomainContext(selectedProgramIntelligence);
 
   const contextualKpis = programDashboard?.kpis;
   const contextualInsights = programDashboard?.insights;
@@ -160,10 +163,6 @@ export function DashboardPage() {
     return <LoadingState />;
   }
 
-  if (error) {
-    return <EmptyState title="No fue posible cargar el observatorio" body={error} />;
-  }
-
   const strategicKpis = [
     {
       id: 'skills',
@@ -209,6 +208,12 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-5">
+      {error ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+          {error}. La vista continúa mostrando el selector, el ranking y la evidencia disponible.
+        </div>
+      ) : null}
+
       <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4 rounded-3xl border border-line bg-white p-6 shadow-sm">
           <div className="institutional-mark">
@@ -244,6 +249,9 @@ export function DashboardPage() {
           programs={programs}
           selectedProgramId={selectedProgramId ?? programs[0]?.especializacion_id ?? null}
           onChange={setSelectedProgramId}
+          domainLabel={selectedDomain.domainLabel}
+          subdomainLabel={selectedDomain.subdomainLabel}
+          benchmarkLabel={selectedDomain.benchmarkLabel}
           label="Especialización seleccionada"
           helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data."
           note="El análisis de los demás programas se hace con competencias, skills del programa y señales de mercado."

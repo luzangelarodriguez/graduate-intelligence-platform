@@ -3,11 +3,12 @@ import { ArrowUpRight, BarChart3, BriefcaseBusiness, GraduationCap, Layers3, Shi
 import { Link } from 'react-router-dom';
 
 import { EmptyState } from '../components/EmptyState';
-import { ProgramSelectorStrip } from '../components/program-intelligence/ProgramIntelligenceBlocks';
+import { ProgramSelectorStrip, getProgramDomainContext } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { LoadingState } from '../components/LoadingState';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { useProgramIntelligenceData } from '../hooks/useProgramIntelligenceData';
 import type { Program } from '../types/api';
 
 function toNumber(value: unknown, fallback = 0) {
@@ -132,6 +133,8 @@ export function ProgramsPage() {
     isLoading: executiveAiLoading,
     error: executiveAiError,
   } = useExecutiveAi(selectedProgramId ?? null);
+  const { programIntelligence: selectedProgramIntelligence } = useProgramIntelligenceData(selectedProgramId ?? null);
+  const selectedDomain = getProgramDomainContext(selectedProgramIntelligence);
 
   const rankedPrograms = useMemo(() => buildRankedPrograms(programs), [programs]);
   const alignedPrograms = useMemo(() => [...rankedPrograms].sort((a, b) => b.alignment - a.alignment), [rankedPrograms]);
@@ -244,13 +247,16 @@ export function ProgramsPage() {
           </article>
 
           <article className="space-y-4 rounded-2xl border border-line bg-white p-4 shadow-sm">
-            <ProgramSelectorStrip
-              programs={programs}
-              selectedProgramId={selectedProgramId ?? programs[0]?.especializacion_id ?? null}
-              onChange={setSelectedProgramId}
-              label="Especialización seleccionada"
-              helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data."
-              note="Los demás programas se analizan con competencias, skills del programa y señales de mercado."
+          <ProgramSelectorStrip
+            programs={programs}
+            selectedProgramId={selectedProgramId ?? programs[0]?.especializacion_id ?? null}
+            onChange={setSelectedProgramId}
+            domainLabel={selectedDomain.domainLabel}
+            subdomainLabel={selectedDomain.subdomainLabel}
+            benchmarkLabel={selectedDomain.benchmarkLabel}
+            label="Especialización seleccionada"
+            helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data."
+            note="Los demás programas se analizan con competencias, skills del programa y señales de mercado."
               primaryActionLabel="Analizar especialización"
               primaryActionHref={selectedProgramId ? `/programs/${selectedProgramId}` : undefined}
               secondaryActionLabel="Generar microcurrículo actualizado"
