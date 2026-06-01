@@ -167,18 +167,20 @@ export function ProgramSelectorStrip({
   );
 
   return (
-    <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-sm">
       <div className="space-y-2">
         <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{label}</span>
-        <h3 className="text-lg font-semibold text-ink">{selectedProgram?.nombre_especializacion || 'Programa en análisis'}</h3>
+        <h3 className="text-xl font-semibold leading-tight text-ink">
+          {selectedProgram?.nombre_especializacion || 'Programa en análisis'}
+        </h3>
         <p className="max-w-3xl text-sm leading-6 text-muted">{helper}</p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-brand/10 bg-slate-50 p-3">
+      <div className="mt-5 rounded-2xl border border-brand/10 bg-slate-50 p-3.5">
         <label className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Especialización seleccionada</span>
           <select
-            className="h-14 rounded-none border border-brand/40 bg-white px-4 text-base font-medium text-ink outline-none transition focus:border-brand"
+            className="h-16 rounded-none border border-brand/40 bg-white px-4 text-[1.05rem] font-medium text-ink outline-none transition focus:border-brand"
             value={selectedProgramId ?? ''}
             onChange={(event) => onChange(Number(event.target.value))}
           >
@@ -195,7 +197,7 @@ export function ProgramSelectorStrip({
         {primaryActionHref ? (
           <Link
             to={primaryActionHref}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-900"
           >
             {primaryActionLabel}
           </Link>
