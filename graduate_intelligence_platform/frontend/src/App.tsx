@@ -20,12 +20,12 @@ export default function App() {
     <AppProvider>
       <AuthProvider>
         <Routes>
-          <Route index element={<ExecutiveSummaryPage />} />
           <Route path="/observatorio-institucional" element={<ExecutiveSummaryPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/microcurriculum-demo" element={<MicrocurriculumDemoPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
+              <Route index element={<DashboardPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
               <Route path="/programs/:programId" element={<ProgramIntelligenceDetailPage />} />

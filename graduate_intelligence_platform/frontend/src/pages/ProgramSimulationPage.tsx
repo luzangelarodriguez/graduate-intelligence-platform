@@ -12,6 +12,7 @@ import {
   ProgramTabs,
   SectionTitle,
   SkillRail,
+  getProgramDomainContext,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
@@ -56,6 +57,7 @@ export function ProgramSimulationPage() {
   const { observatoryAnswer, runQuery, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [draftSkill, setDraftSkill] = useState('');
+  const domainContext = getProgramDomainContext(programIntelligence);
 
   useEffect(() => {
     if (!selectedSkills.length && suggestedSkills.length) {
@@ -150,6 +152,9 @@ export function ProgramSimulationPage() {
         programs={programCatalog}
         selectedProgramId={programId}
         onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/simulation`)}
+        domainLabel={domainContext.domainLabel}
+        subdomainLabel={domainContext.subdomainLabel}
+        benchmarkLabel={domainContext.benchmarkLabel}
         helper="Selecciona un programa para simularlo uno a uno. Si el programa no tiene microcurrículo detallado, la simulación se apoya en competencias y skills del programa."
       />
 

@@ -227,3 +227,66 @@ def test_persist_program_intelligence_uses_upsert(monkeypatch) -> None:
     assert count == 1
     assert "INSERT INTO program_intelligence" in captured["sql"]
     assert captured["rows"][0][0] == 1
+
+
+def test_build_program_intelligence_adds_domain_context(monkeypatch) -> None:
+    monkeypatch.setattr(
+        engine.dashboard_service,
+        "list_programs_base",
+        lambda db_name=None: [
+            {
+                "especializacion_id": 7,
+                "nombre_especializacion": "Especialización en Derecho Digital",
+                "rol": "Legal Analyst",
+                "promedio_match_mercado": 51.0,
+                "porcentaje_match": 51.0,
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        engine.programas_repository,
+        "fetch_program_skill_rows",
+        lambda program_id, db_name=None: [{"skill_id": 1, "nombre": "Compliance"}, {"skill_id": 2, "nombre": "Regulation"}],
+    )
+    monkeypatch.setattr(
+        engine.microcurriculum_context_repository,
+        "fetch_program_context",
+        lambda program_id, specialization_name=None, db_name=None: {
+            "detected_domain": "law",
+            "detected_subdomain": "legal_compliance",
+            "technical_skills": ["Compliance", "Regulation"],
+            "transversal_skills": ["Ethics"],
+            "subjects": ["Derecho Digital"],
+            "tools": [],
+            "technologies": [],
+            "keywords": ["legal"],
+            "labor_roles": ["Legal Analyst"],
+            "real_market_gaps": ["Data Protection"],
+            "strengthening_areas": ["Legal Tech"],
+        },
+    )
+    monkeypatch.setattr(engine, "relation_exists", lambda name, db_name=None: True)
+    monkeypatch.setattr(
+        engine,
+        "fetch_all",
+        lambda sql, params=(), db_name=None: [
+            {
+                "specialization": "Especialización en Derecho Digital",
+                "missing_skill": "Data Protection",
+                "market_demand_score": 80.0,
+                "curriculum_coverage_score": 0.4,
+                "urgency_score": 70.0,
+                "emergence_score": 20.0,
+                "recommendation": "Actualizar Data Protection",
+                "evidence": {"source_tables": ["curriculum_gap_observatory"]},
+                "generated_at": "2026-05-01T00:00:00Z",
+            }
+        ]
+        if "curriculum_gap_observatory" in str(sql)
+        else []
+    )
+
+    items = engine.build_program_intelligence()
+
+    assert items[0].supporting_evidence["domain_taxonomy"]["domain_label"] == "Law"
+    assert items[0].supporting_evidence["domain_benchmark"]["reference_program"]

@@ -152,7 +152,7 @@ function buildFallbackProgramIntelligence(program: Program): ProgramIntelligence
   };
 }
 
-function withTimeout<T>(promise: Promise<T>, timeoutMs = 3500): Promise<T | undefined> {
+function withTimeout<T>(promise: Promise<T>, timeoutMs = 8000): Promise<T | undefined> {
   return new Promise((resolve) => {
     const timer = setTimeout(() => resolve(undefined), timeoutMs);
     promise

@@ -10,6 +10,7 @@ import {
   ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
+  getProgramDomainContext,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
@@ -31,11 +32,12 @@ export function ProgramForecastPage() {
   const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
   const { programs: programCatalog } = useProgramCatalog();
-  const { program, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
+  const { program, programIntelligence, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
   const { executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 6);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
   const resolvedProgram = program ?? programCatalog.find((item) => item.especializacion_id === programId);
+  const domainContext = getProgramDomainContext(programIntelligence);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -68,6 +70,9 @@ export function ProgramForecastPage() {
         programs={programCatalog}
         selectedProgramId={programId}
         onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/forecast`)}
+        domainLabel={domainContext.domainLabel}
+        subdomainLabel={domainContext.subdomainLabel}
+        benchmarkLabel={domainContext.benchmarkLabel}
         helper="Selecciona un programa para comparar horizontes 6/12/24 meses. El análisis de microcurrículo real sigue concentrado en Visual Analytics and Big Data."
       />
 

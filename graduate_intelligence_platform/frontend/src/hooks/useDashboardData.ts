@@ -137,7 +137,10 @@ export function useDashboardData() {
         setError(null);
       } catch (cause) {
         if (!cancelled) {
-          setError(cause instanceof Error ? cause.message : 'No fue posible cargar el programa seleccionado.');
+          setState((current) => ({
+            ...current,
+            selectedProgram: current.programs.find((program) => program.especializacion_id === programId),
+          }));
         }
       } finally {
         if (!cancelled) setIsProgramLoading(false);
