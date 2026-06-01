@@ -8,6 +8,11 @@ import { LoadingState } from '../components/LoadingState';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useDashboardData } from '../hooks/useDashboardData';
 import type { Program } from '../types/api';
+import { ObservatoryHeader } from '../components/programs-observatory/ObservatoryHeader';
+import { ProgramSelectorPanel } from '../components/programs-observatory/ProgramSelectorPanel';
+import { ProgramDetailPanel } from '../components/programs-observatory/ProgramDetailPanel';
+import { UniversityBenchmarkPanel } from '../components/programs-observatory/UniversityBenchmarkPanel';
+import { MarketIntelligencePanel } from '../components/programs-observatory/MarketIntelligencePanel';
 
 // Import new observatory components
 import { ActiveProgramPanel } from '../components/programs-observatory/ActiveProgramPanel';
