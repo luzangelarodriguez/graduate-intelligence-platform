@@ -130,3 +130,40 @@ def test_curriculum_simulator_uses_gap_skills_when_proposals_missing(monkeypatch
 
     assert result.proposed_skills == ["Databricks"]
     assert result.normalized_skills[0]["canonical_skill"] == "Databricks"
+
+
+def test_curriculum_simulator_returns_empty_state_without_curricular_evidence(monkeypatch) -> None:
+    monkeypatch.setattr(cis, "_load_program_base", lambda program_id, db_name=None: {"id": program_id, "nombre_especializacion": "Program without evidence", "rol": "General"})
+    monkeypatch.setattr(
+        cis,
+        "_load_program_intelligence",
+        lambda program_id, db_name=None: {
+            "program_id": program_id,
+            "program_name": "Program without evidence",
+            "program_role": "General",
+            "alignment_score": 0.0,
+            "risk_score": 0.0,
+            "top_gaps": [],
+            "top_recommendations": [],
+            "forecast_signals": [],
+            "role_signals": [],
+            "emerging_technologies": [],
+            "recommended_actions": [],
+            "confidence": 0.0,
+            "supporting_evidence": {"program_skills": []},
+            "source_tables": ["program_intelligence"],
+        },
+    )
+    monkeypatch.setattr(cis, "_load_program_context", lambda program_id, program_name, db_name=None: {})
+    monkeypatch.setattr(cis, "persist_curriculum_simulation", lambda result, db_name=None: 1)
+
+    result = cis.build_curriculum_impact_simulation(99, proposed_skills=["AWS"], persist=False)
+
+    assert result.current_alignment_score == 0.0
+    assert result.current_risk_score == 0.0
+    assert result.projected_alignment_score == 0.0
+    assert result.projected_risk_score == 0.0
+    assert result.projected_employability_gain == 0.0
+    assert result.projected_gap_reduction == 0.0
+    assert result.proposed_skills == []
+    assert result.supporting_evidence["reason"] == "no_curricular_evidence"
