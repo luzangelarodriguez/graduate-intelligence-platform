@@ -32,7 +32,7 @@
     },
     "forecast": {
       "title": "Lectura ejecutiva del forecast",
-      "bodyLength": 4795
+      "bodyLength": 5050
     },
     "simulation_interaction": {
       "selectedSkillsText": "SKILLS SELECCIONADAS",
