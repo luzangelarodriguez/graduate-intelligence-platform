@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { ArrowUpRight, BarChart3, BriefcaseBusiness, GraduationCap, Layers3, ShieldAlert, Sparkles, Target, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { EmptyState } from '../components/EmptyState';
+import { ProgramSelectorStrip } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { LoadingState } from '../components/LoadingState';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
@@ -33,14 +34,14 @@ function buildRankedPrograms(programs: Program[]): RankedProgram[] {
     const risk = Math.max(0, 100 - alignment);
     const employability = Math.max(0, 100 - risk);
     const gapCount = Math.max(1, Math.round((100 - alignment) / 20));
-    const topGap = alignment >= 70 ? 'Brecha contenida con evidencia de monitoreo' : 'Cobertura curricular con presión de actualización';
-    const topRecommendation = alignment >= 70 ? 'Mantener vigilancia y actualizar con señales emergentes.' : 'Priorizar actualización curricular y trazabilidad con mercado.';
-    const forecastSignal = program.total_empleos_relacionados > 0 ? `${program.total_empleos_relacionados} señales laborales relacionadas` : 'Sin señal laboral consolidada';
+    const topGap = alignment >= 70 ? 'Brecha contenida con evidencia de monitoreo' : 'Cobertura curricular con presiÃ³n de actualizaciÃ³n';
+    const topRecommendation = alignment >= 70 ? 'Mantener vigilancia y actualizar con seÃ±ales emergentes.' : 'Priorizar actualizaciÃ³n curricular y trazabilidad con mercado.';
+    const forecastSignal = program.total_empleos_relacionados > 0 ? `${program.total_empleos_relacionados} seÃ±ales laborales relacionadas` : 'Sin seÃ±al laboral consolidada';
 
     return {
       id: program.especializacion_id,
       name: program.nombre_especializacion,
-      area: program.rol || 'Área académica no disponible en la fuente actual',
+      area: program.rol || 'Ãrea acadÃ©mica no disponible en la fuente actual',
       alignment,
       risk,
       employability,
@@ -80,7 +81,7 @@ function RankingCard({ program, tone }: { program: RankedProgram; tone: 'critica
 
       <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
         <div className="rounded-xl border border-line bg-white px-3 py-2">
-          <span className="block text-xs uppercase tracking-[0.12em] text-muted">Alineación</span>
+          <span className="block text-xs uppercase tracking-[0.12em] text-muted">AlineaciÃ³n</span>
           <strong className="mt-1 block text-ink">{program.alignment.toFixed(1)}%</strong>
         </div>
         <div className="rounded-xl border border-line bg-white px-3 py-2">
@@ -103,10 +104,10 @@ function RankingCard({ program, tone }: { program: RankedProgram; tone: 'critica
           <strong className="font-semibold">Brecha principal:</strong> {program.topGap}
         </p>
         <p className="text-sm leading-6 text-ink">
-          <strong className="font-semibold">Acción prioritaria:</strong> {program.topRecommendation}
+          <strong className="font-semibold">AcciÃ³n prioritaria:</strong> {program.topRecommendation}
         </p>
         <p className="text-sm leading-6 text-muted">
-          <strong className="font-semibold text-ink">Señal de forecast:</strong> {program.forecastSignal}
+          <strong className="font-semibold text-ink">SeÃ±al de forecast:</strong> {program.forecastSignal}
         </p>
       </div>
     </Link>
@@ -153,7 +154,7 @@ export function ProgramsPage() {
   const selectedProgramAlignment = Number(programDashboard?.kpis?.alignment_score ?? selectedProgram?.promedio_match_mercado ?? 0);
   const selectedProgramRisk = Math.max(0, 100 - selectedProgramAlignment);
   const selectedProgramEmployability = Math.max(0, 100 - selectedProgramRisk);
-  const selectedProgramName = selectedProgram?.nombre_especializacion ?? 'Programa en análisis';
+  const selectedProgramName = selectedProgram?.nombre_especializacion ?? 'Programa en anÃ¡lisis';
   const selectedProgramSkills = selectedProgram?.skills ?? [];
   const hasDetailedMicrocurriculum =
     Boolean(selectedProgram?.microcurriculum_context) || /visual analytics.*big data/i.test(selectedProgramName);
@@ -164,11 +165,11 @@ export function ProgramsPage() {
     : 0;
   const executiveNarrative =
     rankedPrograms.length > 0
-      ? `La institución analiza ${analyzedPrograms} programas con una alineación promedio de ${averageAlignment.toFixed(1)}% y un riesgo promedio de ${averageRisk.toFixed(1)}%. La lectura ejecutiva prioriza intervención en los programas con mayor presión de actualización y oportunidad en los mejor alineados.`
+      ? `La instituciÃ³n analiza ${analyzedPrograms} programas con una alineaciÃ³n promedio de ${averageAlignment.toFixed(1)}% y un riesgo promedio de ${averageRisk.toFixed(1)}%. La lectura ejecutiva prioriza intervenciÃ³n en los programas con mayor presiÃ³n de actualizaciÃ³n y oportunidad en los mejor alineados.`
       : 'No se encontraron programas suficientes para construir la lectura ejecutiva.';
 
   if (isLoading) return <LoadingState label="Cargando inteligencia de programas..." />;
-  if (!rankedPrograms.length) return <EmptyState title="Sin programas analizados" body={error || 'No se encontró información suficiente para construir el ranking ejecutivo.'} />;
+  if (!rankedPrograms.length) return <EmptyState title="Sin programas analizados" body={error || 'No se encontrÃ³ informaciÃ³n suficiente para construir el ranking ejecutivo.'} />;
 
   return (
     <section className="space-y-6">
@@ -177,12 +178,12 @@ export function ProgramsPage() {
           <div className="space-y-3">
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
               <GraduationCap size={14} strokeWidth={2} />
-              Observatorio de pertinencia académica
+              Observatorio de pertinencia acadÃ©mica
             </span>
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold text-ink">Ranking ejecutivo de programas</h2>
               <p className="max-w-3xl text-sm leading-6 text-muted">
-                Vista institucional para rectoría, vicerrectoría y comités académicos. El orden prioriza riesgo, alineación, empleabilidad y oportunidad de intervención con evidencia real.
+                Vista institucional para rectorÃ­a, vicerrectorÃ­a y comitÃ©s acadÃ©micos. El orden prioriza riesgo, alineaciÃ³n, empleabilidad y oportunidad de intervenciÃ³n con evidencia real.
               </p>
             </div>
           </div>
@@ -206,31 +207,17 @@ export function ProgramsPage() {
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Programa analizado</span>
                 <h3 className="text-2xl font-semibold text-ink">{selectedProgramName}</h3>
                 <p className="max-w-3xl text-sm leading-6 text-muted">
-                  Selecciona un programa para ver su lectura ejecutiva, trazabilidad SNIES y el match de skills frente al currículo analizado.
+                  Selecciona un programa para ver su lectura ejecutiva, trazabilidad SNIES y el match de skills frente al currÃ­culo analizado.
                 </p>
               </div>
-              <label className="flex min-w-[260px] flex-col gap-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Selector de programa</span>
-                <select
-                  className="rounded-xl border border-line bg-white px-4 py-3 text-sm font-medium text-ink outline-none transition focus:border-brand"
-                  value={selectedProgramId ?? ''}
-                  onChange={(event) => setSelectedProgramId(Number(event.target.value))}
-                >
-                  {programs.map((program) => (
-                    <option key={program.especializacion_id} value={program.especializacion_id}>
-                      {program.nombre_especializacion}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs leading-5 text-muted">
-                  Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data.
-                </p>
-              </label>
+              <p className="max-w-[280px] text-xs leading-5 text-muted">
+                El selector detallado se muestra en el panel derecho. El microcurrÃ­culo real solo estÃ¡ cargado para Visual Analytics and Big Data.
+              </p>
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <div className="rounded-xl border border-line bg-slate-50 px-4 py-3">
-                <span className="block text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-muted">Alineación</span>
+                <span className="block text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-muted">AlineaciÃ³n</span>
                 <strong className="mt-1 block text-lg text-ink">{selectedProgramAlignment.toFixed(1)}%</strong>
               </div>
               <div className="rounded-xl border border-line bg-slate-50 px-4 py-3">
@@ -248,7 +235,7 @@ export function ProgramsPage() {
                 {selectedProgram?.rol || 'Rol no disponible'}
               </span>
               <span className="rounded-full border border-line bg-white px-2.5 py-1">
-                {selectedProgram?.total_empleos_relacionados ?? 0} señales laborales
+                {selectedProgram?.total_empleos_relacionados ?? 0} seÃ±ales laborales
               </span>
               <span className="rounded-full border border-line bg-white px-2.5 py-1">
                 {selectedProgramSkills.length} skills visibles
@@ -256,16 +243,28 @@ export function ProgramsPage() {
             </div>
           </article>
 
-          <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+          <article className="space-y-4 rounded-2xl border border-line bg-white p-4 shadow-sm">
+            <ProgramSelectorStrip
+              programs={programs}
+              selectedProgramId={selectedProgramId ?? programs[0]?.especializacion_id ?? null}
+              onChange={setSelectedProgramId}
+              label="Especialización seleccionada"
+              helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data."
+              note="Los demás programas se analizan con competencias, skills del programa y señales de mercado."
+              primaryActionLabel="Analizar especialización"
+              primaryActionHref={selectedProgramId ? `/programs/${selectedProgramId}` : undefined}
+              secondaryActionLabel="Generar microcurrículo actualizado"
+              secondaryActionHref={selectedProgramId ? `/programs/${selectedProgramId}/microcurriculum` : undefined}
+            />
             <div className="flex items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Análisis SNIES</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">AnÃ¡lisis SNIES</span>
                 <h3 className="mt-1 text-lg font-semibold text-ink">Universidades y programas comparables</h3>
               </div>
               <strong className="text-lg text-brand">{universityAverage.toFixed(1)}%</strong>
             </div>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Comparativo virtual con oferta académica y equivalencias cercanas observadas en el SNIES.
+              Comparativo virtual con oferta acadÃ©mica y equivalencias cercanas observadas en el SNIES.
             </p>
             <div className="mt-4 space-y-3">
               {relatedUniversityPrograms.length ? (
@@ -276,13 +275,13 @@ export function ProgramsPage() {
                       <span className="text-sm font-semibold text-brand">{Math.round(Number(item.similitud || 0) * 100)}%</span>
                     </div>
                     <p className="mt-1 text-xs uppercase tracking-[0.12em] text-muted">{item.programa}</p>
-                    <p className="mt-1 text-sm text-muted">{item.ciudad || 'Cobertura nacional'} · {item.modalidad || 'Modalidad no indicada'}</p>
+                    <p className="mt-1 text-sm text-muted">{item.ciudad || 'Cobertura nacional'} Â· {item.modalidad || 'Modalidad no indicada'}</p>
                   </div>
                 ))
               ) : (
                 <EmptyState
-                  title="Sin comparación SNIES suficiente"
-                  body="No se encontraron equivalencias académicas cercanas para este programa con el umbral actual."
+                  title="Sin comparaciÃ³n SNIES suficiente"
+                  body="No se encontraron equivalencias acadÃ©micas cercanas para este programa con el umbral actual."
                 />
               )}
             </div>
@@ -294,15 +293,15 @@ export function ProgramsPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Skill match</span>
-                <h3 className="mt-1 text-lg font-semibold text-ink">Skills frente al currículo analizado</h3>
+                <h3 className="mt-1 text-lg font-semibold text-ink">Skills frente al currÃ­culo analizado</h3>
               </div>
               <span className="rounded-full border border-line bg-slate-50 px-3 py-1 text-xs font-semibold text-muted">
-                {selectedProgramSkills.length} cubiertas · {missingSkills.length} faltantes
+                {selectedProgramSkills.length} cubiertas Â· {missingSkills.length} faltantes
               </span>
             </div>
             {!hasDetailedMicrocurriculum ? (
               <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-                El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data. En este programa, el match se apoya en competencias y skills visibles del programa, no en una malla microcurricular completa.
+                El microcurrÃ­culo detallado real solo estÃ¡ cargado para Visual Analytics and Big Data. En este programa, el match se apoya en competencias y skills visibles del programa, no en una malla microcurricular completa.
               </div>
             ) : null}
             <div className="mt-4 space-y-3">
@@ -320,7 +319,7 @@ export function ProgramsPage() {
               ) : (
                 <EmptyState
                   title="Sin skills cubiertas visibles"
-                  body="El programa seleccionado todavía no expone un listado normalizado suficiente para este nivel de análisis."
+                  body="El programa seleccionado todavÃ­a no expone un listado normalizado suficiente para este nivel de anÃ¡lisis."
                 />
               )}
               {missingSkills.length > 0 && (
@@ -345,7 +344,7 @@ export function ProgramsPage() {
                 <h3 className="mt-1 text-lg font-semibold text-ink">Vacantes y correspondencia de skills</h3>
               </div>
               <span className="rounded-full border border-line bg-slate-50 px-3 py-1 text-xs font-semibold text-muted">
-                {topMatches.length} señales
+                {topMatches.length} seÃ±ales
               </span>
             </div>
             <div className="mt-4 space-y-3">
@@ -356,7 +355,7 @@ export function ProgramsPage() {
                       <div className="min-w-0">
                         <strong className="block truncate text-sm text-ink">{match.titulo_empleo}</strong>
                         <p className="mt-1 text-xs text-muted">
-                          {match.skills_en_comun} skills compartidas · {match.total_skills_empleo} requeridas
+                          {match.skills_en_comun} skills compartidas Â· {match.total_skills_empleo} requeridas
                         </p>
                       </div>
                       <strong className="shrink-0 text-sm text-brand">{Number(match.porcentaje_match || 0).toFixed(1)}%</strong>
@@ -372,7 +371,7 @@ export function ProgramsPage() {
               ) : (
                 <EmptyState
                   title="Sin match visible"
-                  body="No se encontraron vacantes priorizadas para comparar el currículo seleccionado en esta ejecución."
+                  body="No se encontraron vacantes priorizadas para comparar el currÃ­culo seleccionado en esta ejecuciÃ³n."
                 />
               )}
             </div>
@@ -380,20 +379,20 @@ export function ProgramsPage() {
         </div>
 
         <ExecutiveAiSection
-          title="Análisis ejecutivo con IA"
-          subtitle="La capa de IA resume el programa seleccionado con evidencia curricular, señales laborales y lectura ejecutiva."
+          title="AnÃ¡lisis ejecutivo con IA"
+          subtitle="La capa de IA resume el programa seleccionado con evidencia curricular, seÃ±ales laborales y lectura ejecutiva."
           body={
             programExecutiveNarrative?.narrative ||
             programExecutiveNarrative?.why_at_risk ||
-            'Análisis ejecutivo pendiente de datos suficientes. Selecciona un programa para obtener una explicación contextual.'
+            'AnÃ¡lisis ejecutivo pendiente de datos suficientes. Selecciona un programa para obtener una explicaciÃ³n contextual.'
           }
           evidenceSources={programExecutiveNarrative?.evidence_sources}
           confidence={programExecutiveNarrative?.confidence}
           model={programExecutiveNarrative?.model}
           loading={executiveAiLoading}
           error={executiveAiError}
-          emptyTitle="No fue posible cargar el análisis ejecutivo"
-          emptyBody="La explicación del programa todavía no está disponible, pero el ranking sigue operativo."
+          emptyTitle="No fue posible cargar el anÃ¡lisis ejecutivo"
+          emptyBody="La explicaciÃ³n del programa todavÃ­a no estÃ¡ disponible, pero el ranking sigue operativo."
           badgeLabel="Program AI"
         />
 
@@ -409,7 +408,7 @@ export function ProgramsPage() {
           <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               <ShieldAlert size={14} strokeWidth={2} />
-              Programas críticos
+              Programas crÃ­ticos
             </div>
             <strong className="mt-3 block text-2xl font-semibold text-ink">{criticalPrograms.length}</strong>
             <p className="mt-2 text-sm text-muted">Programas con mayor riesgo curricular observado.</p>
@@ -420,12 +419,12 @@ export function ProgramsPage() {
               Programas con oportunidad
             </div>
             <strong className="mt-3 block text-2xl font-semibold text-ink">{opportunityPrograms.length}</strong>
-            <p className="mt-2 text-sm text-muted">Programas con alineación alta y ventana clara de mejora.</p>
+            <p className="mt-2 text-sm text-muted">Programas con alineaciÃ³n alta y ventana clara de mejora.</p>
           </article>
           <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               <BarChart3 size={14} strokeWidth={2} />
-              Alineación promedio
+              AlineaciÃ³n promedio
             </div>
             <strong className="mt-3 block text-2xl font-semibold text-ink">{averageAlignment.toFixed(1)}%</strong>
             <p className="mt-2 text-sm text-muted">Promedio institucional calculado desde inteligencia curricular real.</p>
@@ -436,22 +435,22 @@ export function ProgramsPage() {
       <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <article className="panel space-y-4">
           <SectionTitle
-            title="Top programas críticos"
-            subtitle="Programas priorizados por riesgo curricular, brechas y presión del mercado. Cada tarjeta abre el detalle institucional del programa."
+            title="Top programas crÃ­ticos"
+            subtitle="Programas priorizados por riesgo curricular, brechas y presiÃ³n del mercado. Cada tarjeta abre el detalle institucional del programa."
           />
           <div className="space-y-3">
             {criticalPrograms.length ? (
               criticalPrograms.map((program) => <RankingCard key={program.id} program={program} tone="critical" />)
             ) : (
-              <EmptyState title="Sin programas críticos" body="No se detectaron programas por encima del umbral crítico en esta ejecución." />
+              <EmptyState title="Sin programas crÃ­ticos" body="No se detectaron programas por encima del umbral crÃ­tico en esta ejecuciÃ³n." />
             )}
           </div>
         </article>
 
         <article className="panel space-y-4">
           <SectionTitle
-            title="Comparación ejecutiva"
-            subtitle="Lectura sintética para dirección académica con la ordenación del portafolio por alineación, riesgo y empleabilidad estimada."
+            title="ComparaciÃ³n ejecutiva"
+            subtitle="Lectura sintÃ©tica para direcciÃ³n acadÃ©mica con la ordenaciÃ³n del portafolio por alineaciÃ³n, riesgo y empleabilidad estimada."
           />
           <div className="space-y-3">
             {alignedPrograms.slice(0, 8).map((program, index) => (
@@ -485,30 +484,30 @@ export function ProgramsPage() {
         <article className="panel space-y-4">
           <SectionTitle
             title="Top programas con oportunidad"
-            subtitle="Programas con mejor posición relativa para recibir mejoras curriculares con impacto rápido en pertinencia y empleabilidad."
+            subtitle="Programas con mejor posiciÃ³n relativa para recibir mejoras curriculares con impacto rÃ¡pido en pertinencia y empleabilidad."
           />
           <div className="space-y-3">
             {opportunityPrograms.length ? (
               opportunityPrograms.map((program) => <RankingCard key={program.id} program={program} tone="opportunity" />)
             ) : (
-              <EmptyState title="Sin programas de oportunidad" body="No se identificaron programas con oportunidad alta en esta ejecución." />
+              <EmptyState title="Sin programas de oportunidad" body="No se identificaron programas con oportunidad alta en esta ejecuciÃ³n." />
             )}
           </div>
         </article>
 
         <article className="panel space-y-4">
           <SectionTitle
-            title="Señales ejecutivas"
-            subtitle="Lo que el comité académico necesita ver para decidir con rapidez sobre el portafolio."
+            title="SeÃ±ales ejecutivas"
+            subtitle="Lo que el comitÃ© acadÃ©mico necesita ver para decidir con rapidez sobre el portafolio."
           />
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-line bg-white p-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
                 <BriefcaseBusiness size={14} strokeWidth={2} />
-                Programas con señal laboral
+                Programas con seÃ±al laboral
               </div>
               <strong className="mt-3 block text-2xl font-semibold text-ink">{programsWithSignal}</strong>
-              <p className="mt-2 text-sm text-muted">Programas con brechas, riesgo o señales laborales activas.</p>
+              <p className="mt-2 text-sm text-muted">Programas con brechas, riesgo o seÃ±ales laborales activas.</p>
             </div>
             <div className="rounded-2xl border border-line bg-white p-4">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
@@ -524,7 +523,7 @@ export function ProgramsPage() {
                 Lectura de portafolio
               </div>
               <p className="mt-3 text-sm leading-7 text-ink">
-                La institución ya tiene una base real de inteligencia por programa; esta vista la reorganiza para priorizar intervención, mostrar oportunidad y facilitar discusión ejecutiva sin depender de una grilla genérica.
+                La instituciÃ³n ya tiene una base real de inteligencia por programa; esta vista la reorganiza para priorizar intervenciÃ³n, mostrar oportunidad y facilitar discusiÃ³n ejecutiva sin depender de una grilla genÃ©rica.
               </p>
             </div>
           </div>
@@ -533,3 +532,4 @@ export function ProgramsPage() {
     </section>
   );
 }
+

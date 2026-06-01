@@ -56,6 +56,10 @@ interface ProgramSelectorStripProps {
   note?: string;
   helper?: string;
   label?: string;
+  primaryActionLabel?: string;
+  primaryActionHref?: string;
+  secondaryActionLabel?: string;
+  secondaryActionHref?: string;
 }
 
 const toneClass: Record<NonNullable<MetricCardProps['tone']>, string> = {
@@ -152,6 +156,10 @@ export function ProgramSelectorStrip({
   note,
   helper = 'Selecciona un programa para revisar su evidencia, brechas y análisis uno a uno.',
   label = 'Selector de programas',
+  primaryActionLabel = 'Analizar especialización',
+  primaryActionHref,
+  secondaryActionLabel = 'Generar microcurrículo actualizado',
+  secondaryActionHref,
 }: ProgramSelectorStripProps) {
   const selectedProgram = programs.find((program) => program.especializacion_id === selectedProgramId) || programs[0] || null;
   const detailedMicrocurriculum = Boolean(
@@ -159,17 +167,18 @@ export function ProgramSelectorStrip({
   );
 
   return (
-    <article className="panel space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{label}</span>
-          <h3 className="text-lg font-semibold text-ink">{selectedProgram?.nombre_especializacion || 'Programa en análisis'}</h3>
-          <p className="max-w-3xl text-sm leading-6 text-muted">{helper}</p>
-        </div>
-        <label className="flex min-w-[280px] flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Programa activo</span>
+    <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+      <div className="space-y-2">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{label}</span>
+        <h3 className="text-lg font-semibold text-ink">{selectedProgram?.nombre_especializacion || 'Programa en análisis'}</h3>
+        <p className="max-w-3xl text-sm leading-6 text-muted">{helper}</p>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-brand/10 bg-slate-50 p-3">
+        <label className="flex flex-col gap-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Especialización seleccionada</span>
           <select
-            className="rounded-xl border border-line bg-white px-4 py-3 text-sm font-medium text-ink outline-none transition focus:border-brand"
+            className="h-14 rounded-none border border-brand/40 bg-white px-4 text-base font-medium text-ink outline-none transition focus:border-brand"
             value={selectedProgramId ?? ''}
             onChange={(event) => onChange(Number(event.target.value))}
           >
@@ -182,7 +191,26 @@ export function ProgramSelectorStrip({
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted">
+      <div className="mt-4 grid gap-3">
+        {primaryActionHref ? (
+          <Link
+            to={primaryActionHref}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-900"
+          >
+            {primaryActionLabel}
+          </Link>
+        ) : null}
+        {secondaryActionHref ? (
+          <Link
+            to={secondaryActionHref}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-4 py-4 text-sm font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
+          >
+            {secondaryActionLabel}
+          </Link>
+        ) : null}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-medium text-muted">
         <span className="rounded-full border border-line bg-slate-50 px-2.5 py-1">
           {selectedProgram?.rol || 'Rol académico no disponible'}
         </span>
@@ -194,14 +222,14 @@ export function ProgramSelectorStrip({
         </span>
       </div>
 
-      <div className="rounded-xl border border-line bg-slate-50 px-4 py-3 text-sm leading-6 text-muted">
+      <div className="mt-4 rounded-xl border border-line bg-slate-50 px-4 py-3 text-sm leading-6 text-muted">
         {detailedMicrocurriculum
           ? 'Este programa cuenta con microcurrículo real y puede compararse contra skills de mercado, vacantes y brechas.'
           : 'El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data. Los demás programas se analizan con competencias, skills del programa y señales de mercado.'}
       </div>
 
       {note ? (
-        <div className="rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm leading-6 text-brand">
+        <div className="mt-3 rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm leading-6 text-brand">
           {note}
         </div>
       ) : null}
