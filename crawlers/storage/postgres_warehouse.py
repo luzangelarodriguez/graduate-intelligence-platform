@@ -210,17 +210,46 @@ def _upsert_lookup(cur: Any, table: str, key_column: str, value: str, extra: dic
     return int(cur.fetchone()["id"])
 
 
-def _valid_job(result: AgentExtractionResult) -> bool:
+def _processing_stage(silver: Any) -> str:
+    curation_level = str(getattr(silver, "curation_level", "") or silver.contextual.get("curation_level") or "candidate_job")
+    if curation_level in {"gold_job", "curated_job", "probable_job"}:
+        return curation_level
+    return "candidate_job"
+
+
+def _persistable_job(result: AgentExtractionResult) -> bool:
     silver = result.silver
-    probability = float(getattr(silver, "job_probability_score", 0.0) or silver.contextual.get("job_probability_score") or 0.0)
-    hard_blocked = silver.document_type in {"portal_taxonomy", "filter_page", "category_page"} or silver.source_url.startswith("javascript:")
-    return (
-        not hard_blocked
-        and probability >= 0.30
-        and bool(silver.normalized_title)
-        and bool(silver.normalized_description)
-        and silver.source_url.startswith(("http://", "https://"))
-    )
+    source_url = str(silver.source_url or result.bronze.source_url or "")
+    hard_blocked = silver.document_type in {"portal_taxonomy", "filter_page", "category_page"} or source_url.startswith("javascript:")
+    return not hard_blocked and source_url.startswith(("http://", "https://"))
+
+
+def _persisted_title(result: AgentExtractionResult) -> str:
+    silver = result.silver
+    title = _plain(silver.normalized_title)
+    if title:
+        return title
+    fallback = _plain(getattr(result.bronze, "page_title", ""))
+    if fallback:
+        return fallback[:180]
+    fallback = _plain(getattr(result.bronze, "raw_text", ""))
+    if fallback:
+        return fallback[:180]
+    return "Sin titulo"
+
+
+def _persisted_description(result: AgentExtractionResult) -> str:
+    silver = result.silver
+    description = _plain(silver.normalized_description)
+    if description:
+        return description
+    fallback = _plain(getattr(result.bronze, "raw_text", ""))
+    if fallback:
+        return fallback[:4000]
+    fallback = _plain(getattr(result.bronze, "page_title", ""))
+    if fallback:
+        return fallback[:4000]
+    return "Sin descripcion"
 
 
 def _job_skills(result: AgentExtractionResult) -> list[tuple[CanonicalSkill, float, str]]:
@@ -242,6 +271,11 @@ def _job_skills(result: AgentExtractionResult) -> list[tuple[CanonicalSkill, flo
         current = skills.get(canonical.name)
         if current is None or 0.7 > current[1]:
             skills[canonical.name] = (canonical, 0.7, "description")
+    for raw in result.silver.portal_taxonomy_skills or contextual.get("portal_taxonomy_skills") or []:
+        canonical = canonicalize_skill(str(raw))
+        current = skills.get(canonical.name)
+        if current is None or 0.55 > current[1]:
+            skills[canonical.name] = (canonical, 0.55, "taxonomy")
     return sorted(skills.values(), key=lambda item: item[1], reverse=True)
 
 
@@ -455,7 +489,7 @@ def persist_warehouse(
     load_environment()
     source_metrics = source_metrics or {}
     errors = errors or []
-    valid_results = [result for result in results if _valid_job(result)]
+    persistable_results = [result for result in results if _persistable_job(result)]
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(MIGRATION.read_text(encoding="utf-8"))
@@ -521,12 +555,15 @@ def persist_warehouse(
             jobs_upserted = 0
             skills_upserted = 0
             persisted_job_ids: list[int] = []
-            for result in valid_results:
+            for result in persistable_results:
                 silver = result.silver
-                text = " ".join([silver.normalized_title, silver.normalized_description, json.dumps(silver.contextual, ensure_ascii=False)])
+                persist_title = _persisted_title(result)
+                persist_description = _persisted_description(result)
+                text = " ".join([persist_title, persist_description, json.dumps(silver.contextual, ensure_ascii=False)])
                 source_name = silver.source_name or result.bronze.source_name
                 job_probability = float(getattr(silver, "job_probability_score", 0.0) or silver.contextual.get("job_probability_score") or 0.0)
                 curation_level = str(getattr(silver, "curation_level", "") or silver.contextual.get("curation_level") or "probable_job")
+                processing_stage = _processing_stage(silver)
                 top_reasons = list(getattr(silver, "top_acceptance_reasons", None) or silver.contextual.get("top_acceptance_reasons") or [])
                 unknown_candidates = list(getattr(silver, "unknown_skill_candidates", None) or [])
                 rejection_reasons = [item for item in str(silver.invalid_job_reason or silver.rejection_reason or "").split(";") if item]
@@ -568,13 +605,13 @@ def persist_warehouse(
                 quality = build_quality_envelope(result)
                 skill_payload = _job_skills(result)
                 skill_names = [item[0].name for item in skill_payload]
-                title_family, role_inference, role_similarity = semantic_title_family(silver.normalized_title, skill_names)
-                duplicate_group = duplicate_group_key(title=silver.normalized_title, company=company_name, location=location, skills=skill_names)
+                title_family, role_inference, role_similarity = semantic_title_family(persist_title, skill_names)
+                duplicate_group = duplicate_group_key(title=persist_title, company=company_name, location=location, skills=skill_names)
                 fingerprint = job_fingerprint(
-                    title=silver.normalized_title,
-                        company=company_name,
+                    title=persist_title,
+                    company=company_name,
                     location=location,
-                    description=silver.normalized_description,
+                    description=persist_description,
                 )
                 cur.execute(
                     """
@@ -586,12 +623,12 @@ def persist_warehouse(
                          responsibilities, requirements, source_url, application_url, fingerprint, content_hash,
                          duplicate_group_id, duplicate_confidence, semantic_title_family, role_similarity, occupational_role_inference,
                          completeness_score, extraction_confidence, source_confidence, job_probability_score,
-                         curation_level, rejection_reasons, semantic_evidence_count, semantic_evidence,
+                         curation_level, processing_stage, rejection_reasons, semantic_evidence_count, semantic_evidence,
                          top_acceptance_reasons, unknown_skill_candidates, document_type, is_real_job_posting, raw_context)
                     VALUES
                         (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (content_hash) DO UPDATE SET
                         fingerprint = EXCLUDED.fingerprint,
                         company_id = EXCLUDED.company_id,
@@ -615,6 +652,7 @@ def persist_warehouse(
                         source_confidence = EXCLUDED.source_confidence,
                         job_probability_score = EXCLUDED.job_probability_score,
                         curation_level = EXCLUDED.curation_level,
+                        processing_stage = EXCLUDED.processing_stage,
                         rejection_reasons = EXCLUDED.rejection_reasons,
                         semantic_evidence_count = EXCLUDED.semantic_evidence_count,
                         semantic_evidence = EXCLUDED.semantic_evidence,
@@ -638,7 +676,7 @@ def persist_warehouse(
                         industry_id,
                         correlation_id,
                         source_name,
-                        silver.normalized_title,
+                        persist_title,
                         company_name,
                         location,
                         modality,
@@ -650,7 +688,7 @@ def persist_warehouse(
                         salary.get("period") or salary.get("salary_period"),
                         str(silver.contextual.get("contract_type") or ""),
                         str(silver.contextual.get("experience_level") or ""),
-                        silver.normalized_description,
+                        persist_description,
                         original_company,
                         company_name,
                         company_confidence,
@@ -670,6 +708,7 @@ def persist_warehouse(
                         _source_confidence(source_name),
                         job_probability,
                         curation_level,
+                        processing_stage,
                         Json(rejection_reasons),
                         int(getattr(silver, "semantic_evidence_count", 0) or len(silver.job_evidence_skills or [])),
                         Json(
@@ -741,7 +780,7 @@ def persist_warehouse(
                 (json.dumps({"jobs_upserted": jobs_upserted, "job_skills_upserted": skills_upserted}), correlation_id),
             )
         conn.commit()
-    return {"warehouse_enabled": True, "jobs": jobs_upserted, "job_skills": skills_upserted, "valid_results": len(valid_results)}
+        return {"warehouse_enabled": True, "jobs": jobs_upserted, "job_skills": skills_upserted, "valid_results": len(persistable_results)}
 
 
 def verify_warehouse_counts() -> dict[str, Any]:

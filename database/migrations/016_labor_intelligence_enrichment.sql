@@ -13,6 +13,19 @@ ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS canonical_job_id BIGINT;
 ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS semantic_title_family TEXT;
 ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS role_similarity NUMERIC(6,4) NOT NULL DEFAULT 0;
 ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS occupational_role_inference TEXT;
+ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS processing_stage TEXT;
+
+UPDATE public.jobs
+SET processing_stage = CASE
+    WHEN curation_level = 'gold_job' THEN 'gold_job'
+    WHEN curation_level = 'curated_job' THEN 'curated_job'
+    WHEN curation_level = 'probable_job' THEN 'probable_job'
+    ELSE 'candidate_job'
+END
+WHERE processing_stage IS NULL OR processing_stage = '';
+
+ALTER TABLE public.jobs ALTER COLUMN processing_stage SET DEFAULT 'candidate_job';
+ALTER TABLE public.jobs ALTER COLUMN processing_stage SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS public.job_embeddings (
     id BIGSERIAL PRIMARY KEY,
@@ -103,6 +116,7 @@ CREATE TABLE IF NOT EXISTS public.ml_prediction_explanations (
 );
 
 CREATE INDEX IF NOT EXISTS idx_job_embeddings_job ON public.job_embeddings(job_id);
+CREATE INDEX IF NOT EXISTS idx_jobs_processing_stage ON public.jobs(processing_stage, job_probability_score DESC);
 CREATE INDEX IF NOT EXISTS idx_company_skill_profiles_skill ON public.company_skill_profiles(canonical_skill, job_count DESC);
 CREATE INDEX IF NOT EXISTS idx_company_cluster_profiles_cluster ON public.company_cluster_profiles(dominant_cluster, job_count DESC);
 CREATE INDEX IF NOT EXISTS idx_emerging_skill_score ON public.emerging_skill_candidates(emergence_score DESC);
