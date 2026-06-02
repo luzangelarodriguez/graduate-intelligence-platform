@@ -1,233 +1,112 @@
 {
   "baseUrl": "http://127.0.0.1:4173",
-  "programId": 99,
+  "programId": 108,
   "pages": {
     "executive_summary": {
-      "title": "Universidad Internacional de La Rioja - Colombia",
-      "bodyLength": 4254
+      "title": "Especialización en Visual Analytics y Big Data",
+      "bodyLength": 3687
     },
     "programs": {
-      "firstProgramHref": "/programs/99",
-      "firstProgramName": "Especialización en Derechos Humanos",
-      "bodyLength": 10203
+      "firstProgramHref": "/programs/94",
+      "firstProgramName": "Especializaci?n en Criminolog?a",
+      "bodyLength": 11064
     },
     "program_detail": {
       "title": "Lectura institucional",
-      "bodyLength": 3129
+      "bodyLength": 9810
+    },
+    "copilot": {
+      "heading": "Especializaci?n en Criminolog?a",
+      "matchedSignals": [
+        "Programas prioritarios",
+        "Acciones recomendadas",
+        "Impacto esperado",
+        "Evidencia utilizada",
+        "Preguntar al observatorio"
+      ],
+      "bodyLength": 9810
     },
     "microcurriculum": {
       "title": "Skills cubiertas",
-      "bodyLength": 1956
+      "bodyLength": 4787
     },
     "forecast": {
       "title": "Lectura ejecutiva del forecast",
-      "bodyLength": 2062
+      "bodyLength": 5050
     },
     "simulation_interaction": {
       "selectedSkillsText": "SKILLS SELECCIONADAS",
-      "bodyHasAzure": true
+      "bodyHasAzure": false
     },
     "simulation": {
       "title": "Skills recomendadas para simular",
-      "bodyLength": 1193
+      "bodyLength": 3277
     }
   },
   "console_errors": [
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     },
     {
       "type": "error",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     },
     {
       "type": "error",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     },
     {
       "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      "text": "Warning: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.%s compliance \n    at div\n    at article\n    at NarrativePanel (http://127.0.0.1:4173/src/components/program-intelligence/ProgramIntelligenceBlocks.tsx?t=1780345712801:465:3)\n    at div\n    at ProgramIntelligenceDetailPage (http://127.0.0.1:4173/src/pages/ProgramIntelligenceDetailPage.tsx?t=1780347501176:100:41)\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Outlet (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4537:26)\n    at main\n    at div\n    at AppLayout\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Outlet (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4537:26)\n    at ProtectedRoute (http://127.0.0.1:4173/src/components/ProtectedRoute.tsx:23:44)\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Routes (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4601:5)\n    at AuthProvider (http://127.0.0.1:4173/src/context/AuthContext.tsx:30:32)\n    at div\n    at AppProvider (http://127.0.0.1:4173/src/context/AppContext.tsx:20:31)\n    at App\n    at Router (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4544:15)\n    at BrowserRouter (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:5290:5)"
     },
     {
       "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      "text": "Warning: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.%s compliance \n    at div\n    at article\n    at NarrativePanel (http://127.0.0.1:4173/src/components/program-intelligence/ProgramIntelligenceBlocks.tsx?t=1780345712801:465:3)\n    at div\n    at ProgramIntelligenceDetailPage (http://127.0.0.1:4173/src/pages/ProgramIntelligenceDetailPage.tsx?t=1780347501176:100:41)\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Outlet (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4537:26)\n    at main\n    at div\n    at AppLayout\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Outlet (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4537:26)\n    at ProtectedRoute (http://127.0.0.1:4173/src/components/ProtectedRoute.tsx:23:44)\n    at RenderedRoute (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4131:5)\n    at Routes (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4601:5)\n    at AuthProvider (http://127.0.0.1:4173/src/context/AuthContext.tsx:30:32)\n    at div\n    at AppProvider (http://127.0.0.1:4173/src/context/AppContext.tsx:20:31)\n    at App\n    at Router (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:4544:15)\n    at BrowserRouter (http://127.0.0.1:4173/node_modules/.vite/deps/react-router-dom.js?v=8bb02955:5290:5)"
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition."
     },
     {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
-    },
-    {
-      "type": "error",
-      "text": "Failed to load resource: the server responded with a status of 504 (Gateway Timeout)"
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath."
     }
   ],
   "page_errors": []

@@ -1,0 +1,58 @@
+{
+  "correlation_id": "lap-1d8d02b2e1614fe8",
+  "sources": [
+    "interpol",
+    "europol",
+    "un_careers"
+  ],
+  "execute_network": true,
+  "max_jobs": 5,
+  "max_pages": 1,
+  "persist": false,
+  "quality_review": false,
+  "started_at": 1780356179.8219886,
+  "checkpoints": {
+    "source:interpol": {
+      "results": 2,
+      "errors": 0,
+      "circuit": {
+        "source_name": "interpol",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:europol": {
+      "results": 2,
+      "errors": 0,
+      "circuit": {
+        "source_name": "europol",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:un_careers": {
+      "results": 2,
+      "errors": 0,
+      "circuit": {
+        "source_name": "un_careers",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 50,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 50,
+      "warehouse_verification": {},
+      "analytics_reports": {}
+    }
+  },
+  "finished_at": 1780356207.1848822,
+  "cancelled": false
+}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { BarChart3, Building2, CalendarClock, CircleAlert, GraduationCap, Layers3, LineChart, Sparkles, Target, TrendingUp } from 'lucide-react';
 
 import { EmptyState } from '../components/EmptyState';
@@ -67,8 +67,8 @@ function uniqueStrings(values: Array<string | undefined | null>) {
 
 function riskLabel(alignment: number) {
   if (alignment >= 70) return 'Alineado';
-  if (alignment >= 50) return 'Observación';
-  return 'Crítico';
+  if (alignment >= 50) return 'ObservaciÃ³n';
+  return 'CrÃ­tico';
 }
 
 function riskTone(alignment: number) {
@@ -78,13 +78,13 @@ function riskTone(alignment: number) {
 }
 
 function interpretAlignment(alignment: number) {
-  if (alignment >= 70) return 'Portafolio con alineación sólida';
-  if (alignment >= 50) return 'Portafolio con presión selectiva de actualización';
-  return 'Portafolio con brechas críticas';
+  if (alignment >= 70) return 'Portafolio con alineaciÃ³n sÃ³lida';
+  if (alignment >= 50) return 'Portafolio con presiÃ³n selectiva de actualizaciÃ³n';
+  return 'Portafolio con brechas crÃ­ticas';
 }
 
 function interpretRisk(risk: number) {
-  if (risk >= 70) return 'Requiere intervención prioritaria';
+  if (risk >= 70) return 'Requiere intervenciÃ³n prioritaria';
   if (risk >= 50) return 'Requiere monitoreo ejecutivo';
   return 'Riesgo contenido';
 }
@@ -120,10 +120,10 @@ function buildNarrative({
   const emergingSummary = emergingNames.length ? emergingNames.slice(0, 3).join(', ') : 'competencias emergentes';
 
   if (highRisk > 0) {
-    return `La institución presenta una alineación curricular moderada con el mercado laboral. Se identifican ${highRisk} programas que requieren atención y ${criticalGaps.length || 0} brechas prioritarias. Las mayores oportunidades de mejora se concentran en ${emergingSummary} y en ${gapSummary}.`;
+    return `La instituciÃ³n presenta una alineaciÃ³n curricular moderada con el mercado laboral. Se identifican ${highRisk} programas que requieren atenciÃ³n y ${criticalGaps.length || 0} brechas prioritarias. Las mayores oportunidades de mejora se concentran en ${emergingSummary} y en ${gapSummary}.`;
   }
 
-  return `La institución presenta una alineación curricular favorable con el mercado laboral. El portafolio analizado mantiene control sobre sus riesgos principales, aunque siguen siendo relevantes ${gapSummary} y ${emergingSummary}.`;
+  return `La instituciÃ³n presenta una alineaciÃ³n curricular favorable con el mercado laboral. El portafolio analizado mantiene control sobre sus riesgos principales, aunque siguen siendo relevantes ${gapSummary} y ${emergingSummary}.`;
 }
 
 function buildTopPrograms(programs: ProgramIntelligenceItem[]) {
@@ -191,7 +191,7 @@ function buildMarketSignals(
     return {
       label: skillName || 'Skill emergente',
       value: `${formatNumber(growthRate <= 1 ? growthRate * 100 : growthRate)}%`,
-      detail: String(item.reason || 'Señal emergente desde datos de mercado.'),
+      detail: String(item.reason || 'SeÃ±al emergente desde datos de mercado.'),
       progress: Math.max(4, Math.min(100, growthRate <= 1 ? growthRate * 100 : growthRate)),
       tone: growthRate >= 0.7 ? 'green' : growthRate >= 0.4 ? 'amber' : 'blue',
     };
@@ -203,7 +203,7 @@ function buildMarketSignals(
     .map((item) => ({
       label: item.entity_name,
       value: `${formatNumber(item.growth_velocity <= 1 ? item.growth_velocity * 100 : item.growth_velocity)}%`,
-      detail: `${item.market_phase || 'Señal de forecast'} · confianza ${formatNumber(item.forecast_confidence <= 1 ? item.forecast_confidence * 100 : item.forecast_confidence)}%`,
+      detail: `${item.market_phase || 'SeÃ±al de forecast'} Â· confianza ${formatNumber(item.forecast_confidence <= 1 ? item.forecast_confidence * 100 : item.forecast_confidence)}%`,
       progress: Math.max(4, Math.min(100, item.growth_velocity <= 1 ? item.growth_velocity * 100 : item.growth_velocity)),
       tone: item.market_phase === 'emerging' ? 'amber' : 'blue',
     }));
@@ -211,7 +211,7 @@ function buildMarketSignals(
   const companyItems: SignalItem[] = companies.slice(0, 5).map((item) => ({
     label: item.company,
     value: `${formatNumber(((item.hiring_velocity ?? 0) <= 1 ? (item.hiring_velocity ?? 0) * 100 : (item.hiring_velocity ?? 0)))}%`,
-    detail: [item.dominant_cluster, item.dominant_stack].filter(Boolean).join(' · ') || 'Observatorio de empresa',
+    detail: [item.dominant_cluster, item.dominant_stack].filter(Boolean).join(' Â· ') || 'Observatorio de empresa',
     progress: Math.max(4, Math.min(100, Number(item.hiring_velocity ?? 0) <= 1 ? Number(item.hiring_velocity ?? 0) * 100 : Number(item.hiring_velocity ?? 0))),
     tone: Number(item.ai_adoption_score || 0) >= 0.7 ? 'green' : 'blue',
   }));
@@ -219,7 +219,7 @@ function buildMarketSignals(
   const forecastItems: SignalItem[] = forecasts.slice(0, 5).map((item) => ({
     label: item.entity_name,
     value: `${item.horizon_months}m`,
-    detail: `${item.entity_type} · fase ${item.market_phase || 'n/d'}`,
+    detail: `${item.entity_type} Â· fase ${item.market_phase || 'n/d'}`,
     progress: Math.max(4, Math.min(100, item.growth_velocity <= 1 ? item.growth_velocity * 100 : item.growth_velocity)),
     tone: item.market_phase === 'emerging' ? 'amber' : 'slate',
   }));
@@ -258,7 +258,7 @@ function buildComparisonRows(
         ? `${(growth * 100).toFixed(1)}%`
         : `${growth.toFixed(1)}`
       : appearsAsEmerging
-        ? 'Señal emergente'
+        ? 'SeÃ±al emergente'
         : appearsInProgramGap
           ? 'Demanda visible'
           : 'Demanda en monitoreo';
@@ -320,13 +320,13 @@ function buildRecommendationCards(
       priority: String(item.priority || (item.recommendation_score >= 0.8 ? 'Alta' : 'Media')),
       affectedProgram: String(item.target_entity || item.target_company || 'Programa institucional'),
       title:
-        String(item.recommendation_reasoning || item.business_justification || item.recommendation_type || 'Actualización prioritaria').trim() ||
-        'Actualización prioritaria',
+        String(item.recommendation_reasoning || item.business_justification || item.recommendation_type || 'ActualizaciÃ³n prioritaria').trim() ||
+        'ActualizaciÃ³n prioritaria',
       academicRationale: String(item.business_justification || item.recommendation_reasoning || 'La evidencia del mercado respalda este ajuste curricular.'),
       marketEvidence:
         String((item.recommendation_evidence as Record<string, unknown>)?.market_signal || (item.recommendation_evidence as Record<string, unknown>)?.target_company || item.target_company || 'Evidencia del observatorio de mercado'),
       expectedImpact:
-        String(item.expected_impact || `Aumento esperado de ${formatNumber(item.estimated_alignment_increase)} puntos en alineación.`),
+        String(item.expected_impact || `Aumento esperado de ${formatNumber(item.estimated_alignment_increase)} puntos en alineaciÃ³n.`),
       confidence: Number(item.confidence || item.recommendation_score || 0),
     }))
     .sort((a, b) => b.confidence - a.confidence)
@@ -355,19 +355,19 @@ export function ExecutiveSummaryPage() {
 
     return [
       {
-        label: 'Oferta académica analizada',
+        label: 'Oferta acadÃ©mica analizada',
         value: formatNumber(metrics.programsAnalyzed),
-        detail: 'Programas con señales de pertinencia revisados en la última corrida.',
-        interpretation: `${metrics.alignedPrograms} alineados · ${metrics.observationPrograms} en observación · ${metrics.criticalPrograms} críticos`,
+        detail: 'Programas con seÃ±ales de pertinencia revisados en la Ãºltima corrida.',
+        interpretation: `${metrics.alignedPrograms} alineados Â· ${metrics.observationPrograms} en observaciÃ³n Â· ${metrics.criticalPrograms} crÃ­ticos`,
         badge: metrics.programsAnalyzed ? 'Activo' : 'Sin datos',
         tone: metrics.programsAnalyzed ? ('blue' as const) : ('slate' as const),
       },
       {
-        label: 'Nivel de alineación curricular',
+        label: 'Nivel de alineaciÃ³n curricular',
         value: `${metrics.averageAlignment.toFixed(1)}%`,
         detail: 'Promedio institucional observado sobre el portafolio evaluado.',
         interpretation: interpretAlignment(metrics.averageAlignment),
-        badge: metrics.averageAlignment >= 70 ? 'Sólida' : metrics.averageAlignment >= 50 ? 'Moderada' : 'Baja',
+        badge: metrics.averageAlignment >= 70 ? 'SÃ³lida' : metrics.averageAlignment >= 50 ? 'Moderada' : 'Baja',
         tone: riskTone(metrics.averageAlignment),
       },
       {
@@ -375,22 +375,22 @@ export function ExecutiveSummaryPage() {
         value: `${metrics.averageRisk.toFixed(1)}%`,
         detail: 'Promedio de riesgo sobre los programas analizados.',
         interpretation: interpretRisk(metrics.averageRisk),
-        badge: metrics.averageRisk >= 70 ? 'Crítico' : metrics.averageRisk >= 50 ? 'Observación' : 'Contenible',
+        badge: metrics.averageRisk >= 70 ? 'CrÃ­tico' : metrics.averageRisk >= 50 ? 'ObservaciÃ³n' : 'Contenible',
         tone: riskTone(100 - metrics.averageRisk),
       },
       {
-        label: 'Última actualización',
+        label: 'Ãšltima actualizaciÃ³n',
         value: formatDate(programIntelligence[0]?.generated_at || forecasts[0]?.last_seen_at || executiveObservatory?.metrics?.[0]?.metric_period || null),
-        detail: 'Momento del último cálculo institucional disponible en producción.',
-        interpretation: 'Actualización ejecutiva',
+        detail: 'Momento del Ãºltimo cÃ¡lculo institucional disponible en producciÃ³n.',
+        interpretation: 'ActualizaciÃ³n ejecutiva',
         badge: 'Tiempo real',
         tone: 'slate' as const,
       },
       {
         label: 'Jobs procesados',
         value: jobsProcessed === null ? 'N/D' : formatNumber(jobsProcessed),
-        detail: 'Señales laborales agregadas en la capa de observabilidad.',
-        interpretation: jobsProcessed === null ? 'Métrica no emitida en esta corrida' : 'Procesamiento validado',
+        detail: 'SeÃ±ales laborales agregadas en la capa de observabilidad.',
+        interpretation: jobsProcessed === null ? 'MÃ©trica no emitida en esta corrida' : 'Procesamiento validado',
         badge: jobsProcessed === null ? 'Pendiente' : 'Disponible',
         tone: jobsProcessed === null ? ('slate' as const) : ('green' as const),
       },
@@ -405,8 +405,8 @@ export function ExecutiveSummaryPage() {
       {
         label: 'Skills analizadas',
         value: formatNumber(skillsAnalyzed),
-        detail: 'Skills, tecnologías y brechas observadas desde fuentes vivas.',
-        interpretation: skillsAnalyzed ? 'Cobertura semántica' : 'Sin señales suficientes',
+        detail: 'Skills, tecnologÃ­as y brechas observadas desde fuentes vivas.',
+        interpretation: skillsAnalyzed ? 'Cobertura semÃ¡ntica' : 'Sin seÃ±ales suficientes',
         badge: skillsAnalyzed ? 'Disponible' : 'Sin datos',
         tone: skillsAnalyzed ? ('blue' as const) : ('slate' as const),
       },
@@ -472,16 +472,16 @@ export function ExecutiveSummaryPage() {
     );
 
     return [
-      `${criticalPrograms} programas requieren intervención o seguimiento ejecutivo.`,
+      `${criticalPrograms} programas requieren intervenciÃ³n o seguimiento ejecutivo.`,
       topGapNames.length
-        ? `Las brechas más fuertes se concentran en ${topGapNames.join(', ')}.`
+        ? `Las brechas mÃ¡s fuertes se concentran en ${topGapNames.join(', ')}.`
         : 'Las brechas curriculares se mantienen visibles en el portafolio analizado.',
       emergingList.length
-        ? `El mercado muestra mayor tracción en ${emergingList.join(', ')}.`
-        : 'El mercado mantiene señales emergentes que deben seguirse en la siguiente corrida.',
+        ? `El mercado muestra mayor tracciÃ³n en ${emergingList.join(', ')}.`
+        : 'El mercado mantiene seÃ±ales emergentes que deben seguirse en la siguiente corrida.',
       scenario
-        ? `Las actualizaciones curriculares priorizadas podrían elevar la alineación institucional desde ${scenario.currentAlignment.toFixed(1)}% hasta ${scenario.projectedAlignment.toFixed(1)}%.`
-        : 'Las simulaciones predictivas todavía no entregan una proyección consolidada.',
+        ? `Las actualizaciones curriculares priorizadas podrÃ­an elevar la alineaciÃ³n institucional desde ${scenario.currentAlignment.toFixed(1)}% hasta ${scenario.projectedAlignment.toFixed(1)}%.`
+        : 'Las simulaciones predictivas todavÃ­a no entregan una proyecciÃ³n consolidada.',
     ];
   }, [emergingSkills, executiveObservatory?.critical_gaps, executiveObservatory?.high_risk_programs, forecasts, metrics.criticalPrograms, scenario]);
 
@@ -489,13 +489,13 @@ export function ExecutiveSummaryPage() {
     const priorityPrograms = [
       ...attentionPrograms.slice(0, 5).map(
         (program) =>
-          `${program.programName} — alineación ${program.alignment.toFixed(1)}% · riesgo ${program.riskLevel} · ${program.mainGapDriver}`,
+          `${program.programName} â€” alineaciÃ³n ${program.alignment.toFixed(1)}% Â· riesgo ${program.riskLevel} Â· ${program.mainGapDriver}`,
       ),
       ...((executiveObservatory?.high_risk_programs || []) as Array<Record<string, unknown>>).slice(0, 3).map((item) => {
         const name = String(item.program_name || item.program || item.nombre_especializacion || 'Programa prioritario');
         const alignment = Number(item.alignment_score ?? item.alignment ?? 0);
         const risk = String(item.risk_level || item.risk || 'N/D');
-        return `${name} — alineación ${alignment.toFixed(1)}% · riesgo ${risk}`;
+        return `${name} â€” alineaciÃ³n ${alignment.toFixed(1)}% Â· riesgo ${risk}`;
       }),
     ];
 
@@ -503,11 +503,11 @@ export function ExecutiveSummaryPage() {
       ...((executiveObservatory?.critical_gaps || []) as Array<Record<string, unknown>>).slice(0, 6).map((item) =>
         String(item.missing_skill || item.skill || item.canonical_skill || item.gap || ''),
       ),
-      ...comparisonRows.slice(0, 4).map((row) => `${row.label} · ${row.marketDemand}`),
+      ...comparisonRows.slice(0, 4).map((row) => `${row.label} Â· ${row.marketDemand}`),
     ]);
 
     const recommendedActions = uniqueStrings([
-      ...recommendationCards.slice(0, 5).map((item) => `${item.title} — ${item.academicRationale}`),
+      ...recommendationCards.slice(0, 5).map((item) => `${item.title} â€” ${item.academicRationale}`),
       ...(executiveObservatory?.top_recommendations || []).slice(0, 3).map((item) =>
         String((item as Record<string, unknown>).recommendation_reasoning || (item as Record<string, unknown>).recommendation || ''),
       ),
@@ -515,9 +515,9 @@ export function ExecutiveSummaryPage() {
 
     const expectedImpact = uniqueStrings([
       scenario
-        ? `Si se aplican las recomendaciones, la alineación podría pasar de ${scenario.currentAlignment.toFixed(1)}% a ${scenario.projectedAlignment.toFixed(1)}%.`
-        : 'La simulación todavía no consolida una proyección completa por horizonte.',
-      scenario ? `La mejora esperada equivale a +${scenario.expectedImprovement.toFixed(1)} puntos de alineación.` : 'El impacto curricular se calculará cuando la simulación tenga suficiente evidencia.',
+        ? `Si se aplican las recomendaciones, la alineaciÃ³n podrÃ­a pasar de ${scenario.currentAlignment.toFixed(1)}% a ${scenario.projectedAlignment.toFixed(1)}%.`
+        : 'La simulaciÃ³n todavÃ­a no consolida una proyecciÃ³n completa por horizonte.',
+      scenario ? `La mejora esperada equivale a +${scenario.expectedImprovement.toFixed(1)} puntos de alineaciÃ³n.` : 'El impacto curricular se calcularÃ¡ cuando la simulaciÃ³n tenga suficiente evidencia.',
       ...findings.slice(0, 2),
     ]);
 
@@ -531,7 +531,7 @@ export function ExecutiveSummaryPage() {
       ...marketSignals.emergingSkillItems.slice(0, 2).map((item) => item.label),
       ...marketSignals.technologyItems.slice(0, 2).map((item) => item.label),
       ...marketSignals.companyItems.slice(0, 2).map((item) => item.label),
-      ...marketSignals.forecastItems.slice(0, 2).map((item) => `${item.label} · ${item.value}`),
+      ...marketSignals.forecastItems.slice(0, 2).map((item) => `${item.label} Â· ${item.value}`),
     ]);
 
     return {
@@ -544,7 +544,7 @@ export function ExecutiveSummaryPage() {
       model: executiveNarrative?.model || (executiveObservatory?.executive_narrative ? 'deterministic-fallback' : undefined),
       fallbackNote:
         executiveNarrative?.model === 'deterministic-fallback'
-          ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+          ? 'Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.'
           : undefined,
     };
   }, [
@@ -578,7 +578,7 @@ export function ExecutiveSummaryPage() {
     return (
       <TopLevelEmptyState
         title="No fue posible construir el Resumen Ejecutivo"
-        body="Las fuentes vivas no devolvieron datos suficientes para componer la lectura institucional. Intenta recargar la página o verifica la conexión con la API."
+        body="Las fuentes vivas no devolvieron datos suficientes para componer la lectura institucional. Intenta recargar la pÃ¡gina o verifica la conexiÃ³n con la API."
       />
     );
   }
@@ -591,12 +591,12 @@ export function ExecutiveSummaryPage() {
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full bg-[#EAF2FB] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[#003B71]">
                 <GraduationCap size={16} />
-                Observatorio de Pertinencia Académica
+                Observatorio de Pertinencia AcadÃ©mica
               </div>
               <div className="space-y-2">
                 <h1 className="text-3xl font-semibold tracking-tight text-[#1E293B] md:text-4xl">Universidad Internacional de La Rioja - Colombia</h1>
                 <p className="max-w-4xl text-sm leading-7 text-[#64748B]">
-                  Actualizado con información del mercado laboral, competencias emergentes y análisis curricular.
+                  Actualizado con informaciÃ³n del mercado laboral, competencias emergentes y anÃ¡lisis curricular.
                 </p>
               </div>
             </div>
@@ -641,12 +641,12 @@ export function ExecutiveSummaryPage() {
         {error ? <InlineAlert message={error} /> : null}
 
         <SectionPanel title="Estado Institucional" subtitle="Lectura ejecutiva construida exclusivamente a partir de datos vivos del observatorio y del mercado laboral.">
-          <NarrativeCard title="Narrativa ejecutiva" narrative={aiNarrative} caption="La síntesis se recalcula con la última información disponible en producción y puede incluir explicación generada por IA." />
+          <NarrativeCard title="Narrativa ejecutiva" narrative={aiNarrative} caption="La sÃ­ntesis se recalcula con la Ãºltima informaciÃ³n disponible en producciÃ³n y puede incluir explicaciÃ³n generada por IA." />
         </SectionPanel>
 
         <AcademicCopilotPanel
-          title="Análisis ejecutivo generado por IA"
-          subtitle="Síntesis automática sobre pertinencia académica, brechas curriculares y señales de mercado."
+          title="AnÃ¡lisis ejecutivo generado por IA"
+          subtitle="SÃ­ntesis automÃ¡tica sobre pertinencia acadÃ©mica, brechas curriculares y seÃ±ales de mercado."
           briefing={copilotBriefing}
           briefingLoading={executiveAiLoading}
           loading={executiveAiLoading}
@@ -654,15 +654,15 @@ export function ExecutiveSummaryPage() {
           answer={observatoryAnswer}
           onAsk={runQuery}
           suggestedQuestions={[
-            '¿Qué programas requieren actualización inmediata?',
-            '¿Qué competencias faltan en Visual Analytics?',
-            '¿Qué habilidades están creciendo más rápido?',
-            '¿Qué empresas demandan estas capacidades?',
-            '¿Qué pasa si agregamos Azure y Databricks?',
+            'Â¿QuÃ© programas requieren actualizaciÃ³n inmediata?',
+            'Â¿QuÃ© competencias faltan en Visual Analytics?',
+            'Â¿QuÃ© habilidades estÃ¡n creciendo mÃ¡s rÃ¡pido?',
+            'Â¿QuÃ© empresas demandan estas capacidades?',
+            'Â¿QuÃ© pasa si agregamos Azure y Databricks?',
           ]}
         />
 
-        <SectionPanel title="Estado institucional resumido" subtitle="Tres indicadores para dirección académica y comité ejecutivo.">
+        <SectionPanel title="Estado institucional resumido" subtitle="Tres indicadores para direcciÃ³n acadÃ©mica y comitÃ© ejecutivo.">
           <div className="grid gap-4 lg:grid-cols-3">
             {executiveMetrics.slice(0, 3).map((metric) => (
               <HeaderMetricCard key={metric.label} {...metric} />
@@ -670,32 +670,32 @@ export function ExecutiveSummaryPage() {
           </div>
         </SectionPanel>
 
-        <SectionPanel title="Segmentación del riesgo académico" subtitle="Lectura horizontal del portafolio académico según alineación detectada.">
+        <SectionPanel title="SegmentaciÃ³n del riesgo acadÃ©mico" subtitle="Lectura horizontal del portafolio acadÃ©mico segÃºn alineaciÃ³n detectada.">
           <RiskSegmentBar aligned={metrics.alignedPrograms} observation={metrics.observationPrograms} critical={metrics.criticalPrograms} total={metrics.programsAnalyzed} />
         </SectionPanel>
 
-        <SectionPanel title="Programas que requieren atención" subtitle="Ranking ejecutivo de programas priorizados por riesgo y brecha principal.">
+        <SectionPanel title="Programas que requieren atenciÃ³n" subtitle="Ranking ejecutivo de programas priorizados por riesgo y brecha principal.">
           <AttentionProgramList items={attentionPrograms} />
         </SectionPanel>
 
-        <SectionPanel title="¿Qué está pidiendo el mercado?" subtitle="Señales vivas del mercado laboral, empresas observadas y tecnologías en aceleración.">
+        <SectionPanel title="Â¿QuÃ© estÃ¡ pidiendo el mercado?" subtitle="SeÃ±ales vivas del mercado laboral, empresas observadas y tecnologÃ­as en aceleraciÃ³n.">
           <div className="grid gap-4 xl:grid-cols-4">
             <SignalColumn title="Top emerging skills" icon={Sparkles} items={topEmergingSkillRows} emptyMessage="No se registraron skills emergentes con suficiente evidencia." />
-            <SignalColumn title="Top technologies" icon={Layers3} items={topTechnologiesRows} emptyMessage="No se consolidaron tecnologías emergentes suficientes en la corrida." />
-            <SignalColumn title="Top companies" icon={Building2} items={topCompaniesRows} emptyMessage="No se consolidaron empresas con observatorio activo en esta ejecución." />
-            <SignalColumn title="Labor forecast signals" icon={TrendingUp} items={forecastRows} emptyMessage="No hubo señales de forecast suficientes para construir la curva laboral." />
+            <SignalColumn title="Top technologies" icon={Layers3} items={topTechnologiesRows} emptyMessage="No se consolidaron tecnologÃ­as emergentes suficientes en la corrida." />
+            <SignalColumn title="Top companies" icon={Building2} items={topCompaniesRows} emptyMessage="No se consolidaron empresas con observatorio activo en esta ejecuciÃ³n." />
+            <SignalColumn title="Labor forecast signals" icon={TrendingUp} items={forecastRows} emptyMessage="No hubo seÃ±ales de forecast suficientes para construir la curva laboral." />
           </div>
         </SectionPanel>
 
-        <SectionPanel title="University vs Market" subtitle="Comparativo de demanda de mercado y cobertura curricular sobre skills o tecnologías priorizadas.">
+        <SectionPanel title="University vs Market" subtitle="Comparativo de demanda de mercado y cobertura curricular sobre skills o tecnologÃ­as priorizadas.">
           <MarketComparisonMatrix rows={comparisonRows} />
         </SectionPanel>
 
-        <SectionPanel title="¿Qué ocurriría si actualizamos el currículo?" subtitle="Escenario de impacto basado únicamente en cálculos predictivos del observatorio.">
+        <SectionPanel title="Â¿QuÃ© ocurrirÃ­a si actualizamos el currÃ­culo?" subtitle="Escenario de impacto basado Ãºnicamente en cÃ¡lculos predictivos del observatorio.">
           <ScenarioPanel scenario={scenario} />
         </SectionPanel>
 
-        <SectionPanel title="Prioritized Recommendations" subtitle="Máximo tres recomendaciones principales, expresadas en lenguaje académico e institucional.">
+        <SectionPanel title="Prioritized Recommendations" subtitle="MÃ¡ximo tres recomendaciones principales, expresadas en lenguaje acadÃ©mico e institucional.">
           <RecommendationStack items={recommendationCards} />
         </SectionPanel>
 
@@ -704,3 +704,7 @@ export function ExecutiveSummaryPage() {
     </main>
   );
 }
+
+
+
+

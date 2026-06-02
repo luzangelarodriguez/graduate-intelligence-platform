@@ -1,4 +1,4 @@
-import { EmptyState } from '../EmptyState';
+﻿import { EmptyState } from '../EmptyState';
 import { LoadingState } from '../LoadingState';
 import { SectionTitle } from '../program-intelligence/ProgramIntelligenceBlocks';
 
@@ -39,7 +39,7 @@ export function ExecutiveAiSection({
   if (loading) {
     return (
       <section className="panel space-y-4">
-        <LoadingState label="Generando explicación ejecutiva..." />
+        <LoadingState label="Generando explicaciÃ³n ejecutiva..." />
       </section>
     );
   }
@@ -59,12 +59,12 @@ export function ExecutiveAiSection({
         </span>
         {model === 'deterministic-fallback' ? (
           <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
-            Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.
+            Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.
           </span>
         ) : null}
         {error ? (
           <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
-            Respuesta explicada con datos disponibles mientras se recupera OpenAI.
+            Respuesta explicada con datos disponibles mientras se recupera la capa de explicación avanzada.
           </span>
         ) : null}
       </div>
@@ -75,7 +75,7 @@ export function ExecutiveAiSection({
           title={emptyTitle}
           body={
             fallbackMode
-              ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+              ? 'Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.'
               : emptyBody
           }
         />
@@ -88,9 +88,13 @@ export function ExecutiveAiSection({
             </span>
           ))
         ) : (
-          <span className="text-xs text-muted">Sin fuentes explícitas.</span>
+          <span className="text-xs text-muted">Sin fuentes explÃ­citas.</span>
         )}
       </div>
     </section>
   );
 }
+
+
+
+

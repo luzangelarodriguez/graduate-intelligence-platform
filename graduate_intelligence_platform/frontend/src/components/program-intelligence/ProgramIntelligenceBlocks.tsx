@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { ArrowRight, BarChart3, BookOpen, FlaskConical, LineChart, Target } from 'lucide-react';
 import type { ReactNode } from 'react';
-import type { Program } from '../../types/api';
+import type { Program, ProgramIntelligenceItem } from '../../types/api';
 
 interface ProgramHeaderProps {
   programId: number;
@@ -53,6 +53,9 @@ interface ProgramSelectorStripProps {
   programs: Program[];
   selectedProgramId: number | null;
   onChange: (programId: number) => void;
+  domainLabel?: string;
+  subdomainLabel?: string;
+  benchmarkLabel?: string;
   note?: string;
   helper?: string;
   label?: string;
@@ -69,6 +72,35 @@ const toneClass: Record<NonNullable<MetricCardProps['tone']>, string> = {
   rose: 'border-rose/20 bg-rose/5 text-rose',
   slate: 'border-line bg-slate-50 text-ink',
 };
+
+function humanizeLabel(value: string) {
+  const cleaned = value.replace(/[_-]+/g, ' ').trim();
+  if (!cleaned) return '';
+  return cleaned
+    .split(/\s+/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
+export function getProgramDomainContext(programIntelligence?: ProgramIntelligenceItem | null) {
+  const evidence = (programIntelligence?.supporting_evidence || {}) as Record<string, unknown>;
+  const taxonomy = (evidence.domain_taxonomy || {}) as Record<string, unknown>;
+  const benchmark = (evidence.domain_benchmark || {}) as Record<string, unknown>;
+  const benchmarkInstitutions = Array.isArray(benchmark.benchmark_institutions) ? benchmark.benchmark_institutions : [];
+  const domainKey = typeof taxonomy.domain_key === 'string' ? taxonomy.domain_key : '';
+  const subdomainKey = typeof taxonomy.subdomain === 'string' ? taxonomy.subdomain : '';
+  const confidence = typeof taxonomy.confidence === 'number' ? taxonomy.confidence : null;
+
+  return {
+    domainLabel: domainKey ? humanizeLabel(domainKey) : 'Dominio no disponible',
+    subdomainLabel: subdomainKey ? humanizeLabel(subdomainKey) : 'Subdominio no disponible',
+    benchmarkLabel:
+      benchmarkInstitutions.length > 0
+        ? `${benchmarkInstitutions.length} instituciones comparables`
+        : 'Benchmark institucional',
+    confidence,
+  };
+}
 
 export function ProgramPageHeader({ programId, title, subtitle, updatedAt, meta = [] }: ProgramHeaderProps) {
   return (
@@ -153,6 +185,9 @@ export function ProgramSelectorStrip({
   programs,
   selectedProgramId,
   onChange,
+  domainLabel,
+  subdomainLabel,
+  benchmarkLabel,
   note,
   helper = 'Selecciona un programa para revisar su evidencia, brechas y análisis uno a uno.',
   label = 'Selector de programas',
@@ -167,18 +202,20 @@ export function ProgramSelectorStrip({
   );
 
   return (
-    <article className="rounded-2xl border border-line bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-sm">
       <div className="space-y-2">
         <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{label}</span>
-        <h3 className="text-lg font-semibold text-ink">{selectedProgram?.nombre_especializacion || 'Programa en análisis'}</h3>
+        <h3 className="text-xl font-semibold leading-tight text-ink">
+          {selectedProgram?.nombre_especializacion || 'Programa en análisis'}
+        </h3>
         <p className="max-w-3xl text-sm leading-6 text-muted">{helper}</p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-brand/10 bg-slate-50 p-3">
+      <div className="mt-5 rounded-2xl border border-brand/10 bg-slate-50 p-3.5">
         <label className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Especialización seleccionada</span>
           <select
-            className="h-14 rounded-none border border-brand/40 bg-white px-4 text-base font-medium text-ink outline-none transition focus:border-brand"
+            className="h-16 rounded-none border border-brand/40 bg-white px-4 text-[1.05rem] font-medium text-ink outline-none transition focus:border-brand"
             value={selectedProgramId ?? ''}
             onChange={(event) => onChange(Number(event.target.value))}
           >
@@ -191,11 +228,26 @@ export function ProgramSelectorStrip({
         </label>
       </div>
 
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <div className="rounded-xl border border-line bg-slate-50 px-3 py-2">
+          <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted">Dominio detectado</span>
+          <strong className="mt-1 block text-sm text-ink">{domainLabel || 'Dominio no disponible'}</strong>
+        </div>
+        <div className="rounded-xl border border-line bg-slate-50 px-3 py-2">
+          <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted">Subdominio</span>
+          <strong className="mt-1 block text-sm text-ink">{subdomainLabel || 'Subdominio no disponible'}</strong>
+        </div>
+        <div className="rounded-xl border border-line bg-slate-50 px-3 py-2">
+          <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted">Benchmark</span>
+          <strong className="mt-1 block text-sm text-ink">{benchmarkLabel || 'Benchmark institucional'}</strong>
+        </div>
+      </div>
+
       <div className="mt-4 grid gap-3">
         {primaryActionHref ? (
           <Link
             to={primaryActionHref}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-900"
           >
             {primaryActionLabel}
           </Link>

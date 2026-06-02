@@ -1,51 +1,207 @@
 {
-  "correlation_id": "lap-a02e9897c87949e3",
+  "correlation_id": "lap-f5cceaa8f3754261",
   "source_metrics": {
-    "linkedin": {
-      "source_name": "linkedin",
-      "started_at": 1779999872.0474033,
-      "finished_at": 1780005926.8882284,
+    "interpol": {
+      "source_name": "interpol",
+      "started_at": 1780358099.9586115,
+      "finished_at": 1780358171.4843245,
+      "requests": 1,
+      "successes": 1,
+      "failures": 1,
+      "blocked": 0,
+      "latency_ms": [
+        71525.676
+      ],
+      "duration_seconds": 71.5257,
+      "avg_latency_ms": 71525.676,
+      "health_score": 0.45
+    },
+    "europol": {
+      "source_name": "europol",
+      "started_at": 1780358171.5132263,
+      "finished_at": 1780358220.2233202,
       "requests": 1,
       "successes": 1,
       "failures": 0,
       "blocked": 0,
       "latency_ms": [
-        6054840.312
+        48710.047
       ],
-      "duration_seconds": 6054.8408,
-      "avg_latency_ms": 6054840.312,
+      "duration_seconds": 48.7101,
+      "avg_latency_ms": 48710.047,
       "health_score": 0.9
     },
-    "elempleo": {
-      "source_name": "elempleo",
-      "started_at": 1780005926.9009883,
-      "finished_at": 1780005952.1134517,
+    "un_careers": {
+      "source_name": "un_careers",
+      "started_at": 1780358220.2474782,
+      "finished_at": 1780358226.1270833,
       "requests": 1,
       "successes": 1,
       "failures": 0,
       "blocked": 0,
       "latency_ms": [
-        25212.072
+        5879.579
       ],
-      "duration_seconds": 25.2125,
-      "avg_latency_ms": 25212.072,
-      "health_score": 0.9
+      "duration_seconds": 5.8796,
+      "avg_latency_ms": 5879.579,
+      "health_score": 1.0
     },
-    "ticjob": {
-      "source_name": "ticjob",
-      "started_at": 1780005952.140434,
-      "finished_at": 1780006196.8222334,
+    "unodc": {
+      "source_name": "unodc",
+      "started_at": 1780358226.1590986,
+      "finished_at": 1780358232.3447487,
       "requests": 1,
       "successes": 1,
       "failures": 0,
       "blocked": 0,
       "latency_ms": [
-        244681.776
+        6185.621
       ],
-      "duration_seconds": 244.6818,
-      "avg_latency_ms": 244681.776,
-      "health_score": 0.9
+      "duration_seconds": 6.1857,
+      "avg_latency_ms": 6185.621,
+      "health_score": 1.0
+    },
+    "securitas": {
+      "source_name": "securitas",
+      "started_at": 1780358232.3728924,
+      "finished_at": 1780358239.6147275,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        7241.789
+      ],
+      "duration_seconds": 7.2418,
+      "avg_latency_ms": 7241.789,
+      "health_score": 1.0
+    },
+    "g4s": {
+      "source_name": "g4s",
+      "started_at": 1780358239.643775,
+      "finished_at": 1780358241.4592848,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        1815.481
+      ],
+      "duration_seconds": 1.8155,
+      "avg_latency_ms": 1815.481,
+      "health_score": 1.0
+    },
+    "prosegur": {
+      "source_name": "prosegur",
+      "started_at": 1780358241.4914112,
+      "finished_at": 1780358244.5070083,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        3015.572
+      ],
+      "duration_seconds": 3.0156,
+      "avg_latency_ms": 3015.572,
+      "health_score": 1.0
+    },
+    "fiscalia_colombia": {
+      "source_name": "fiscalia_colombia",
+      "started_at": 1780358244.5435393,
+      "finished_at": 1780358248.3523345,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        3808.765
+      ],
+      "duration_seconds": 3.8088,
+      "avg_latency_ms": 3808.765,
+      "health_score": 1.0
+    },
+    "policia_colombia": {
+      "source_name": "policia_colombia",
+      "started_at": 1780358248.377288,
+      "finished_at": 1780358250.1928706,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        1815.516
+      ],
+      "duration_seconds": 1.8156,
+      "avg_latency_ms": 1815.516,
+      "health_score": 1.0
+    },
+    "inpec": {
+      "source_name": "inpec",
+      "started_at": 1780358250.2253826,
+      "finished_at": 1780358251.6989326,
+      "requests": 1,
+      "successes": 0,
+      "failures": 1,
+      "blocked": 0,
+      "latency_ms": [
+        1473.518
+      ],
+      "duration_seconds": 1.4736,
+      "avg_latency_ms": 1473.518,
+      "health_score": 0.55
+    },
+    "procuraduria": {
+      "source_name": "procuraduria",
+      "started_at": 1780358251.7271214,
+      "finished_at": 1780358253.9390495,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        2211.897
+      ],
+      "duration_seconds": 2.2119,
+      "avg_latency_ms": 2211.897,
+      "health_score": 1.0
+    },
+    "defensoria": {
+      "source_name": "defensoria",
+      "started_at": 1780358253.9706087,
+      "finished_at": 1780358255.4179177,
+      "requests": 1,
+      "successes": 1,
+      "failures": 0,
+      "blocked": 0,
+      "latency_ms": [
+        1447.282
+      ],
+      "duration_seconds": 1.4473,
+      "avg_latency_ms": 1447.282,
+      "health_score": 1.0
     }
   },
-  "errors": []
+  "errors": [
+    {
+      "source": "Interpol Careers",
+      "error_type": "ReadTimeout",
+      "error_message": "HTTPSConnectionPool(host='209400.jobs2web.com', port=443): Read timed out. (read timeout=30)"
+    },
+    {
+      "source": "Interpol Careers",
+      "error_type": "ReadTimeout",
+      "error_message": "HTTPSConnectionPool(host='209400.jobs2web.com', port=443): Read timed out. (read timeout=30)"
+    },
+    {
+      "source": "INPEC Convocatorias",
+      "error_type": "SSLError",
+      "error_message": "HTTPSConnectionPool(host='www.inpec.gov.co', port=443): Max retries exceeded with url: /web/guest/convocatorias (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+    },
+    {
+      "source": "INPEC Convocatorias",
+      "error_type": "SSLError",
+      "error_message": "HTTPSConnectionPool(host='epn.inpec.gov.co', port=443): Max retries exceeded with url: /convocatorias-de-empleo (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+    }
+  ]
 }

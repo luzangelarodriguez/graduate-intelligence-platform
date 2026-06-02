@@ -8,7 +8,7 @@ from typing import Any
 
 from psycopg2.extras import Json, execute_values
 
-from backend.repositories import programas_repository
+from backend.repositories import microcurriculum_context_repository, programas_repository
 from backend.repositories.base import cursor, fetch_all, fetch_one, relation_exists
 from intelligence.domain_benchmark_layer import build_domain_benchmark
 from intelligence.domain_taxonomy_layer import build_domain_taxonomy_from_program
@@ -100,6 +100,110 @@ def _load_program_base(program_id: int, *, db_name: str | None = None) -> dict[s
         if row:
             return dict(row)
     return None
+
+
+def _load_program_context(program_id: int, program_name: str, *, db_name: str | None = None) -> dict[str, Any]:
+    try:
+        context = microcurriculum_context_repository.fetch_program_context(
+            program_id,
+            specialization_name=program_name,
+            db_name=db_name,
+        )
+    except Exception:
+        return {}
+    return dict(context) if context else {}
+
+
+def _has_curricular_evidence(context: dict[str, Any]) -> bool:
+    evidence_fields = (
+        "technical_skills",
+        "transversal_skills",
+        "methodologies",
+        "tools",
+        "platforms",
+        "technologies",
+        "keywords",
+        "labor_roles",
+        "occupational_profiles",
+        "strengthening_areas",
+        "real_market_gaps",
+        "subjects",
+    )
+    for field in evidence_fields:
+        value = context.get(field)
+        if isinstance(value, (list, tuple, set)) and any(str(item).strip() for item in value):
+            return True
+        if isinstance(value, dict) and value:
+            return True
+    return False
+
+
+def _has_program_intelligence_evidence(intelligence: dict[str, Any], base_evidence: dict[str, Any]) -> bool:
+    evidence_fields = (
+        "top_gaps",
+        "top_recommendations",
+        "forecast_signals",
+        "role_signals",
+        "emerging_technologies",
+        "recommended_actions",
+    )
+    for field in evidence_fields:
+        value = intelligence.get(field)
+        if isinstance(value, (list, tuple, set)) and any(str(item).strip() for item in value):
+            return True
+        if isinstance(value, dict) and value:
+            return True
+    program_skills = base_evidence.get("program_skills")
+    if isinstance(program_skills, (list, tuple, set)) and any(str(item).strip() for item in program_skills):
+        return True
+    return False
+
+
+def _empty_simulation(program: dict[str, Any], horizon_months: int, *, reason: str) -> CurriculumImpactSimulation:
+    program_id = int(program.get("especializacion_id") or program.get("id") or 0)
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    program_role = str(program.get("rol") or "").strip()
+    return CurriculumImpactSimulation(
+        program_id=program_id,
+        program_name=program_name,
+        program_role=program_role,
+        horizon_months=horizon_months,
+        current_alignment_score=0.0,
+        current_risk_score=0.0,
+        projected_alignment_score=0.0,
+        projected_risk_score=0.0,
+        projected_employability_gain=0.0,
+        projected_gap_reduction=0.0,
+        confidence_score=0.0,
+        proposed_skills=[],
+        normalized_skills=[],
+        risk_drivers=[],
+        supporting_evidence={
+            "reason": reason,
+            "current_alignment_score": 0.0,
+            "current_risk_score": 0.0,
+            "gap_count": 0,
+            "matched_gap_count": 0,
+            "matched_forecast_count": 0,
+            "recommendation_count": 0,
+            "normalized_skills": [],
+            "gap_samples": [],
+            "forecast_samples": [],
+            "horizon_months": horizon_months,
+            "horizon_weight": 0.0,
+            "horizon_momentum": 0.0,
+            "projected_alignment_delta": 0.0,
+            "projected_risk_delta": 0.0,
+            "projected_employability_delta": 0.0,
+            "domain_taxonomy": {},
+            "domain_benchmark": {},
+            "source_tables": ["especializaciones"],
+        },
+        source_tables=["especializaciones"],
+        explanation="No curricular evidence available. Upload or process a microcurriculum to generate academic intelligence.",
+        simulation_key=normalize_key(f"program:{program_id}:horizon:{horizon_months}:empty"),
+        generated_at=datetime.now(UTC).isoformat(),
+    )
 
 
 def _load_program_intelligence(program_id: int, *, db_name: str | None = None) -> dict[str, Any] | None:
@@ -486,10 +590,17 @@ def build_curriculum_impact_simulation(
     program = _load_program_base(program_id, db_name=db_name)
     if not program:
         raise KeyError(f"programa {program_id} not found")
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    program_role = str(program.get("rol") or "").strip()
     intelligence = _load_program_intelligence(program_id, db_name=db_name) or build_program_intelligence_for_program(program_id, db_name=db_name).to_dict()
-    program_name = str(intelligence.get("program_name") or program.get("nombre_especializacion") or program.get("nombre") or "").strip()
-    program_role = str(intelligence.get("program_role") or program.get("rol") or "").strip()
+    program_name = str(intelligence.get("program_name") or program_name).strip()
+    program_role = str(intelligence.get("program_role") or program_role).strip()
     base_evidence = intelligence.get("supporting_evidence") or {}
+    program_context = _load_program_context(program_id, program_name, db_name=db_name)
+    has_context_evidence = _has_curricular_evidence(program_context)
+    has_intelligence_evidence = _has_program_intelligence_evidence(intelligence, base_evidence)
+    if not has_context_evidence and not has_intelligence_evidence:
+        return _empty_simulation(program, horizon_months, reason="no_curricular_evidence")
     domain_taxonomy = build_domain_taxonomy_from_program(
         program_name=program_name,
         program_role=program_role,

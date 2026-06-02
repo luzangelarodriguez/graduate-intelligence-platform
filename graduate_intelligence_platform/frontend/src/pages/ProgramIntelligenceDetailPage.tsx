@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight, BarChart3 } from 'lucide-react';
 
@@ -13,6 +13,7 @@ import {
   ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
+  getProgramDomainContext,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
 import { useProgramCatalog } from '../hooks/useProgramCatalog';
@@ -24,7 +25,7 @@ function toNumber(value: unknown, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function getText(value: unknown, fallback = 'Sin información suficiente') {
+function getText(value: unknown, fallback = 'Sin informaciÃ³n suficiente') {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
@@ -52,7 +53,7 @@ function toTextList(value: unknown): string[] {
   return candidates.flatMap((candidate) => toTextList(candidate));
 }
 
-function firstText(value: unknown, fallback = 'Sin información suficiente') {
+function firstText(value: unknown, fallback = 'Sin informaciÃ³n suficiente') {
   const items = toTextList(value);
   return items[0] ?? fallback;
 }
@@ -93,6 +94,7 @@ export function ProgramIntelligenceDetailPage() {
   const { programs: programCatalog } = useProgramCatalog();
   const { program, programIntelligence, curriculumRisk, alignment, forecastSummary, executiveObservatory, isLoading, error, suggestedSkills } =
     useProgramIntelligenceData(programId);
+  const domainContext = getProgramDomainContext(programIntelligence);
   const {
     programSummary,
     executiveNarrative,
@@ -110,37 +112,39 @@ export function ProgramIntelligenceDetailPage() {
   const employabilityIndex = Math.max(0, 100 - riskScore);
   const topGaps = (programIntelligence?.top_gaps ?? []).slice(0, 5);
   const topRecommendations = (programIntelligence?.top_recommendations ?? []).slice(0, 5);
+  const programSkillSignals = (programIntelligence?.forecast_signals ?? []).filter((item) => (item as Record<string, unknown>).entity_type === 'skill').slice(0, 4);
+  const programRoleSignals = (programIntelligence?.role_signals ?? []).slice(0, 4);
   const narrative =
     alignment?.explanation ||
     programIntelligence?.business_justification ||
     executiveObservatory?.executive_narrative ||
-    'La inteligencia del programa se genera con señales reales de mercado, brechas curriculares y evidencia de observatorio.';
+    'La inteligencia del programa se genera con seÃ±ales reales de mercado, brechas curriculares y evidencia de observatorio.';
   const updatedAt = programIntelligence?.generated_at || executiveObservatory?.metrics?.[0]?.metric_period || 'Datos vivos';
   const copilotBriefing = useMemo<AcademicCopilotBriefing>(() => {
-    const programName = program?.nombre_especializacion || programIntelligence?.program_name || 'Programa en análisis';
+    const programName = program?.nombre_especializacion || programIntelligence?.program_name || 'Programa en anÃ¡lisis';
     const programAlignment = `${currentAlignment.toFixed(1)}%`;
     const programRisk = `${riskScore.toFixed(1)}%`;
     const gaps = topGaps.map((gap, index) => {
       const record = gap as Record<string, unknown>;
       const skill = firstText(record.skill ?? record.missing_skill ?? record.canonical_skill ?? record.name, `Brecha ${index + 1}`);
       const cluster = firstText(record.cluster_name ?? record.occupational_cluster ?? record.cluster, 'Cluster no definido');
-      return `${skill} — ${cluster}`;
+      return `${skill} â€” ${cluster}`;
     });
     const recommendations = topRecommendations.map((recommendation, index) => {
       const record = recommendation as Record<string, unknown>;
-      const title = firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, `Recomendación ${index + 1}`);
-      const reasoning = getText(record.recommendation_reasoning ?? record.business_justification, 'Recomendación basada en señales reales del mercado.');
-      return `${title} — ${reasoning}`;
+      const title = firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, `RecomendaciÃ³n ${index + 1}`);
+      const reasoning = getText(record.recommendation_reasoning ?? record.business_justification, 'RecomendaciÃ³n basada en seÃ±ales reales del mercado.');
+      return `${title} â€” ${reasoning}`;
     });
     const forecast = [6, 12, 24]
       .map((horizon) => simulations[horizon])
       .filter(Boolean)
       .map((simulation) =>
-        `${simulation?.horizon_months ?? 0} meses: alineación ${simulation?.projected_alignment_score.toFixed(1)}%, riesgo ${simulation?.projected_risk_score.toFixed(1)}%, empleabilidad +${simulation?.projected_employability_gain.toFixed(1)}%`,
+        `${simulation?.horizon_months ?? 0} meses: alineaciÃ³n ${simulation?.projected_alignment_score.toFixed(1)}%, riesgo ${simulation?.projected_risk_score.toFixed(1)}%, empleabilidad +${simulation?.projected_employability_gain.toFixed(1)}%`,
       );
     const simulationImpact = forecast.length
       ? forecast
-      : ['Simulación pendiente de datos suficientes.'];
+      : ['SimulaciÃ³n pendiente de datos suficientes.'];
     const evidence = uniqueStrings([
       ...(executiveNarrative?.evidence_sources || []),
       ...(programSummary?.evidence_sources || []),
@@ -157,12 +161,12 @@ export function ProgramIntelligenceDetailPage() {
         executiveNarrative?.narrative?.trim() ||
         narrative,
       priorityPrograms: [
-        `${programName} — alineación ${programAlignment} · riesgo ${programRisk}`,
+        `${programName} â€” alineaciÃ³n ${programAlignment} Â· riesgo ${programRisk}`,
         ...(executiveObservatory?.high_risk_programs || [])
           .slice(0, 3)
-          .map((item) => `${String((item as Record<string, unknown>).program_name || (item as Record<string, unknown>).program || programName)} — ${String((item as Record<string, unknown>).risk_level || 'riesgo observado')}`),
+          .map((item) => `${String((item as Record<string, unknown>).program_name || (item as Record<string, unknown>).program || programName)} â€” ${String((item as Record<string, unknown>).risk_level || 'riesgo observado')}`),
       ],
-      criticalGaps: gaps.length ? gaps : ['No hay microcurrículo detallado cargado para este programa. El análisis se basa en competencias y skills del programa.'],
+      criticalGaps: gaps.length ? gaps : ['No hay microcurrÃ­culo detallado cargado para este programa. El anÃ¡lisis se basa en competencias y skills del programa.'],
       recommendedActions: recommendations.length ? recommendations : ['No hay recomendaciones priorizadas con evidencia suficiente.'],
       expectedImpact: simulationImpact,
       evidence,
@@ -176,18 +180,18 @@ export function ProgramIntelligenceDetailPage() {
         }),
         recommendations: topRecommendations.map((recommendation) => {
           const record = recommendation as Record<string, unknown>;
-          return firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, 'Recomendación priorizada');
+          return firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, 'RecomendaciÃ³n priorizada');
         }),
         forecast,
         simulation: simulationImpact,
         note: programSummary?.microcurriculum_traceability
-          ? 'El análisis conserva trazabilidad hacia microcurrículo, competencia y evidencia laboral.'
-          : 'No hay un microcurrículo específico cargado. El análisis se basa en competencias y skills del programa.',
+          ? 'El anÃ¡lisis conserva trazabilidad hacia microcurrÃ­culo, competencia y evidencia laboral.'
+          : 'No hay un microcurrÃ­culo especÃ­fico cargado. El anÃ¡lisis se basa en competencias y skills del programa.',
       },
       model: executiveNarrative?.model || programSummary?.model || undefined,
       fallbackNote:
         executiveNarrative?.model === 'deterministic-fallback' || programSummary?.model === 'deterministic-fallback'
-          ? 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.'
+          ? 'Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.'
           : undefined,
     };
   }, [
@@ -215,7 +219,7 @@ export function ProgramIntelligenceDetailPage() {
   ]);
 
   if (!programId) {
-    return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
+    return <EmptyState title="Programa no vÃ¡lido" body="La ruta no contiene un identificador de programa vÃ¡lido." />;
   }
 
   if (isLoading) {
@@ -230,11 +234,11 @@ export function ProgramIntelligenceDetailPage() {
     <div className="space-y-5">
       <ProgramPageHeader
         programId={programId}
-        title={program?.nombre_especializacion || programIntelligence?.program_name || 'Programa en análisis'}
-        subtitle={`Lectura ejecutiva del programa ${program?.rol || programIntelligence?.program_role || 'académico'} con riesgo, alineación, forecast y simulación de impacto.`}
+        title={program?.nombre_especializacion || programIntelligence?.program_name || 'Programa en anÃ¡lisis'}
+        subtitle={`Lectura ejecutiva del programa ${program?.rol || programIntelligence?.program_role || 'acadÃ©mico'} con riesgo, alineaciÃ³n, forecast y simulaciÃ³n de impacto.`}
         updatedAt={updatedAt}
         meta={[
-          { label: 'Alineación actual', value: `${currentAlignment.toFixed(1)}%` },
+          { label: 'AlineaciÃ³n actual', value: `${currentAlignment.toFixed(1)}%` },
           { label: 'Riesgo curricular', value: `${riskScore.toFixed(1)}%` },
           { label: 'Empleabilidad derivada', value: `${employabilityIndex.toFixed(1)}%` },
           { label: 'Brechas activas', value: `${programIntelligence?.gap_count ?? topGaps.length}` },
@@ -245,6 +249,9 @@ export function ProgramIntelligenceDetailPage() {
         programs={programCatalog}
         selectedProgramId={programId}
         onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}`)}
+        domainLabel={domainContext.domainLabel}
+        subdomainLabel={domainContext.subdomainLabel}
+        benchmarkLabel={domainContext.benchmarkLabel}
         helper="Selecciona un programa para analizarlo uno a uno. El microcurrículo detallado real solo está cargado para Visual Analytics and Big Data; los demás programas se leen por competencias y skills del programa."
       />
 
@@ -256,15 +263,16 @@ export function ProgramIntelligenceDetailPage() {
         evidence={[
           ...(curriculumRisk?.risk_drivers?.map((driver) => `${driver.driver}: ${driver.value.toFixed(2)}`) ?? []),
           ...(alignment?.missing_skills ?? []).slice(0, 3),
-          ...(forecastSummary?.top_skills ?? []).slice(0, 2).map((item) => item.entity_name),
+          ...programSkillSignals.slice(0, 2).map((item) => String((item as Record<string, unknown>).entity_name || (item as Record<string, unknown>).name || 'Señal de mercado').trim()),
+          ...programRoleSignals.slice(0, 2).map((item) => String((item as Record<string, unknown>).source_role || (item as Record<string, unknown>).target_role || (item as Record<string, unknown>).role || 'Rol de mercado').trim()),
         ].filter(Boolean)}
       />
 
       <section className="grid gap-4 xl:grid-cols-3">
         <MetricCard
-          label="Alineación curricular"
+          label="AlineaciÃ³n curricular"
           value={`${currentAlignment.toFixed(1)}%`}
-          detail={alignment?.explanation || 'Alineación calculada desde señales curriculares y laborales reales.'}
+          detail={alignment?.explanation || 'AlineaciÃ³n calculada desde seÃ±ales curriculares y laborales reales.'}
           tone="blue"
         />
         <MetricCard
@@ -274,9 +282,9 @@ export function ProgramIntelligenceDetailPage() {
           tone={riskScore >= 75 ? 'rose' : riskScore >= 50 ? 'amber' : 'green'}
         />
         <MetricCard
-          label="Índice de empleabilidad"
+          label="Ãndice de empleabilidad"
           value={`${employabilityIndex.toFixed(1)}%`}
-          detail="Índice derivado de la señal de riesgo para soportar decisiones académicas."
+          detail="Ãndice derivado de la seÃ±al de riesgo para soportar decisiones acadÃ©micas."
           tone="green"
         />
       </section>
@@ -294,7 +302,7 @@ export function ProgramIntelligenceDetailPage() {
                 const skill = firstText(record.skill ?? record.missing_skill ?? record.canonical_skill ?? record.name, 'Brecha no tipificada');
                 const cluster = firstText(record.cluster_name ?? record.occupational_cluster ?? record.cluster, 'Cluster no definido');
                 const status = getText(record.coverage_status, 'gap');
-                const recommendation = getText(record.recommendation || record.recommendation_reasoning, 'Sin recomendación explícita.');
+                const recommendation = getText(record.recommendation || record.recommendation_reasoning, 'Sin recomendaciÃ³n explÃ­cita.');
                 const demand = toNumber(record.evidence_weight ?? record.market_demand_score ?? record.market_weight);
                 const urgency = toNumber(record.urgency_score ?? record.confidence_score);
 
@@ -328,15 +336,15 @@ export function ProgramIntelligenceDetailPage() {
         <article className="panel space-y-4">
           <SectionTitle
             title="Top recomendaciones"
-            subtitle="Acciones académicas priorizadas con trazabilidad hacia el mercado y el observatorio."
+            subtitle="Acciones acadÃ©micas priorizadas con trazabilidad hacia el mercado y el observatorio."
           />
           <div className="space-y-3">
             {topRecommendations.length ? (
               topRecommendations.map((recommendation, index) => {
                 const record = recommendation as Record<string, unknown>;
-                const title = firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, `Recomendación ${index + 1}`);
+                const title = firstText(record.target_role ?? record.target_entity ?? record.recommendation_type, `RecomendaciÃ³n ${index + 1}`);
                 const skills = recommendationSkills(record).slice(0, 3);
-                const reasoning = getText(record.recommendation_reasoning ?? record.business_justification, 'Recomendación basada en señales reales del mercado.');
+                const reasoning = getText(record.recommendation_reasoning ?? record.business_justification, 'RecomendaciÃ³n basada en seÃ±ales reales del mercado.');
                 const confidence = toNumber(record.recommendation_confidence ?? record.confidence);
                 const impact = toNumber(record.estimated_alignment_increase ?? record.recommendation_score ?? record.market_alignment_score);
 
@@ -377,7 +385,7 @@ export function ProgramIntelligenceDetailPage() {
       <section className="panel space-y-5">
         <SectionTitle
           title="Forecast 6/12/24 meses"
-          subtitle="Proyección por horizonte con el mismo programa y el conjunto de skills priorizadas derivadas del observatorio."
+          subtitle="ProyecciÃ³n por horizonte con el mismo programa y el conjunto de skills priorizadas derivadas del observatorio."
         />
         {simulationsError && <EmptyState title="No se pudo calcular el forecast" body={simulationsError} />}
         {simulationsLoading && <LoadingState label="Calculando proyecciones del programa..." />}
@@ -398,7 +406,7 @@ export function ProgramIntelligenceDetailPage() {
                 />
               ) : (
                 <div key={horizon} className="panel">
-                  <p className="text-sm text-muted">Sin simulación disponible para {horizon} meses.</p>
+                  <p className="text-sm text-muted">Sin simulaciÃ³n disponible para {horizon} meses.</p>
                 </div>
               );
             })}
@@ -409,30 +417,49 @@ export function ProgramIntelligenceDetailPage() {
       <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <article className="panel space-y-4">
           <SectionTitle
-            title="Señales de mercado"
+            title="SeÃ±ales de mercado"
             subtitle="Contexto adicional desde el forecast summary para explicar el programa sin salir de datos productivos."
           />
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-line bg-slate-50 p-4">
-              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Skills top</span>
+              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Skills de mercado</span>
               <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_skills ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
+                {programSkillSignals.length ? (
+                  programSkillSignals.map((item, index) => {
+                    const record = item as Record<string, unknown>;
+                    const name = String(record.entity_name || record.name || 'Skill').trim();
+                    const horizon = Number(record.horizon_months || 0);
+                    const growth = Number(record.growth_velocity || 0);
+                    return (
+                      <li key={`${name}-${horizon}-${index}`} className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-ink">{name}</span>
+                        <span className="text-muted">{(growth * 100).toFixed(1)}%</span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-sm text-muted">No hay señales de mercado específicas suficientes para este programa.</li>
+                )}
               </ul>
             </div>
             <div className="rounded-lg border border-line bg-slate-50 p-4">
-              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Tecnologías</span>
+              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Roles de mercado</span>
               <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_technologies ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
+                {programRoleSignals.length ? (
+                  programRoleSignals.map((item, index) => {
+                    const record = item as Record<string, unknown>;
+                    const sourceRole = String(record.source_role || record.target_role || record.role || 'Role').trim();
+                    const probability = Number(record.transition_probability || record.similarity_score || 0);
+                    return (
+                      <li key={`${sourceRole}-${probability}-${index}`} className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-ink">{sourceRole}</span>
+                        <span className="text-muted">{(probability * 100).toFixed(1)}%</span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-sm text-muted">No hay roles de mercado específicos suficientes para este programa.</li>
+                )}
               </ul>
             </div>
           </div>
@@ -440,27 +467,27 @@ export function ProgramIntelligenceDetailPage() {
 
         <article className="panel space-y-4">
           <SectionTitle
-            title="Navegación ejecutiva"
-            subtitle="Accesos rápidos a las demás capas del programa."
+            title="NavegaciÃ³n ejecutiva"
+            subtitle="Accesos rÃ¡pidos a las demÃ¡s capas del programa."
           />
           <div className="grid gap-3">
             <Link className="flex items-center justify-between rounded-lg border border-line bg-slate-50 px-4 py-3 transition hover:border-brand/40 hover:bg-brand/5" to={`/programs/${programId}/microcurriculum`}>
               <div>
                 <strong className="block text-sm font900 text-ink">Microcurriculum</strong>
-                <span className="block text-sm text-muted">Cobertura, demanda y brechas por microcurrículo.</span>
+                <span className="block text-sm text-muted">Cobertura, demanda y brechas por microcurrÃ­culo.</span>
               </div>
               <ArrowRight size={16} strokeWidth={1.9} className="text-brand" />
             </Link>
             <Link className="flex items-center justify-between rounded-lg border border-line bg-slate-50 px-4 py-3 transition hover:border-brand/40 hover:bg-brand/5" to={`/programs/${programId}/forecast`}>
               <div>
                 <strong className="block text-sm font900 text-ink">Forecast</strong>
-                <span className="block text-sm text-muted">Proyección 6/12/24 meses y señales del mercado.</span>
+                <span className="block text-sm text-muted">ProyecciÃ³n 6/12/24 meses y seÃ±ales del mercado.</span>
               </div>
               <ArrowRight size={16} strokeWidth={1.9} className="text-brand" />
             </Link>
             <Link className="flex items-center justify-between rounded-lg border border-line bg-slate-50 px-4 py-3 transition hover:border-brand/40 hover:bg-brand/5" to={`/programs/${programId}/simulation`}>
               <div>
-                <strong className="block text-sm font900 text-ink">Simulación</strong>
+                <strong className="block text-sm font900 text-ink">SimulaciÃ³n</strong>
                 <span className="block text-sm text-muted">Prueba el impacto de skills recomendadas.</span>
               </div>
               <ArrowRight size={16} strokeWidth={1.9} className="text-brand" />
@@ -494,14 +521,14 @@ export function ProgramIntelligenceDetailPage() {
         model={executiveNarrative?.model || programSummary?.model}
         loading={executiveAiLoading}
         error={executiveAiError}
-        emptyTitle="No fue posible cargar la explicación ejecutiva"
-        emptyBody="La narrativa ejecutiva todavía no está disponible, pero el análisis del programa sigue operativo."
+        emptyTitle="No fue posible cargar la explicaciÃ³n ejecutiva"
+        emptyBody="La narrativa ejecutiva todavÃ­a no estÃ¡ disponible, pero el anÃ¡lisis del programa sigue operativo."
         badgeLabel="Narrativa AI"
       />
 
       <AcademicCopilotPanel
-        title="Análisis ejecutivo generado por IA"
-        subtitle="Síntesis automática sobre pertinencia académica, brechas curriculares y señales de mercado."
+        title="AnÃ¡lisis ejecutivo generado por IA"
+        subtitle="SÃ­ntesis automÃ¡tica sobre pertinencia acadÃ©mica, brechas curriculares y seÃ±ales de mercado."
         briefing={copilotBriefing}
         briefingLoading={executiveAiLoading}
         answer={observatoryAnswer || null}
@@ -509,12 +536,17 @@ export function ProgramIntelligenceDetailPage() {
         error={executiveAiError}
         onAsk={async (question) => runQuery(question)}
         suggestedQuestions={[
-          '¿Qué competencias faltan en este programa?',
-          '¿Qué empresas demandan estas capacidades?',
-          '¿Qué pasaría si agregamos Azure y Databricks?',
-          '¿Qué recomendación es prioritaria para este programa?',
+          'Â¿QuÃ© competencias faltan en este programa?',
+          'Â¿QuÃ© empresas demandan estas capacidades?',
+          'Â¿QuÃ© pasarÃ­a si agregamos Azure y Databricks?',
+          'Â¿QuÃ© recomendaciÃ³n es prioritaria para este programa?',
         ]}
       />
     </div>
   );
 }
+
+
+
+
+

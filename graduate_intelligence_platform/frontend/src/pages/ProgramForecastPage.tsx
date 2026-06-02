@@ -10,6 +10,7 @@ import {
   ProgramSelectorStrip,
   ProgramTabs,
   SectionTitle,
+  getProgramDomainContext,
 } from '../components/program-intelligence/ProgramIntelligenceBlocks';
 import { ExecutiveAiSection } from '../components/executive-ai/ExecutiveAiSection';
 import { useExecutiveAi } from '../hooks/useExecutiveAi';
@@ -31,11 +32,12 @@ export function ProgramForecastPage() {
   const navigate = useNavigate();
   const programId = programIdFromParam(programIdParam);
   const { programs: programCatalog } = useProgramCatalog();
-  const { program, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
+  const { program, programIntelligence, alignment, forecastSummary, criticalPrograms, isLoading, error, suggestedSkills } = useProgramIntelligenceData(programId);
   const { executiveNarrative, isLoading: executiveAiLoading, error: executiveAiError } = useExecutiveAi(programId);
   const selectedSkills = suggestedSkills.slice(0, 6);
   const { simulations, isLoading: simulationsLoading, error: simulationsError } = useProgramSimulations(programId, selectedSkills, [6, 12, 24]);
   const resolvedProgram = program ?? programCatalog.find((item) => item.especializacion_id === programId);
+  const domainContext = getProgramDomainContext(programIntelligence);
 
   if (!programId) {
     return <EmptyState title="Programa no válido" body="La ruta no contiene un identificador de programa válido." />;
@@ -48,6 +50,17 @@ export function ProgramForecastPage() {
   const currentAlignment = alignment?.current_alignment ?? alignment?.alignment_score ?? program?.promedio_match_mercado ?? 0;
   const currentRisk = simulations[12]?.current_risk_score ?? Math.max(0, 100 - currentAlignment);
   const currentEmployability = Math.max(0, 100 - currentRisk);
+  const forecastSignals = (programIntelligence?.forecast_signals ?? []).filter((signal) => {
+    const record = signal as Record<string, unknown>;
+    return String(record.entity_type || '').toLowerCase() === 'skill';
+  });
+  const roleSignals = programIntelligence?.role_signals ?? [];
+  const benchmarkEvidence = (programIntelligence?.supporting_evidence as Record<string, unknown> | undefined)?.domain_benchmark as
+    | Record<string, unknown>
+    | undefined;
+  const benchmarkInstitutions = Array.isArray(benchmarkEvidence?.benchmark_institutions)
+    ? benchmarkEvidence?.benchmark_institutions.slice(0, 4)
+    : [];
 
   return (
     <div className="space-y-5">
@@ -68,6 +81,9 @@ export function ProgramForecastPage() {
         programs={programCatalog}
         selectedProgramId={programId}
         onChange={(nextProgramId) => navigate(`/programs/${nextProgramId}/forecast`)}
+        domainLabel={domainContext.domainLabel}
+        subdomainLabel={domainContext.subdomainLabel}
+        benchmarkLabel={domainContext.benchmarkLabel}
         helper="Selecciona un programa para comparar horizontes 6/12/24 meses. El análisis de microcurrículo real sigue concentrado en Visual Analytics and Big Data."
       />
 
@@ -149,53 +165,76 @@ export function ProgramForecastPage() {
 
         <article className="panel space-y-4">
           <SectionTitle
-            title="Señales del mercado"
-            subtitle="Top signals del forecast summary para explicar la tendencia del programa."
+            title="Se?ales del mercado"
+            subtitle="Se?ales del programa y del benchmark disciplinar. No se mezclan se?ales gen?ricas de otras ?reas."
           />
           <div className="space-y-3">
             <div className="rounded-lg border border-line bg-slate-50 p-4">
               <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Skills emergentes</span>
               <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_skills ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
+                {forecastSignals.length ? (
+                  forecastSignals.slice(0, 4).map((item, index) => {
+                    const record = item as Record<string, unknown>;
+                    const name = String(record.entity_name || 'Skill').trim();
+                    const growth = Number(record.growth_velocity || 0);
+                    const horizon = Number(record.horizon_months || 0);
+                    return (
+                      <li key={`${name}-${horizon}-${index}`} className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-ink">{name}</span>
+                        <span className="text-muted">{(growth * 100).toFixed(1)}%</span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-sm text-muted">No hay skills emergentes espec?ficas para este programa.</li>
+                )}
               </ul>
             </div>
             <div className="rounded-lg border border-line bg-slate-50 p-4">
-              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Tecnologías</span>
+              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Roles de mercado</span>
               <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_technologies ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
+                {roleSignals.length ? (
+                  roleSignals.slice(0, 4).map((item, index) => {
+                    const record = item as Record<string, unknown>;
+                    const sourceRole = String(record.source_role || record.target_role || record.role || 'Role').trim();
+                    const probability = Number(record.transition_probability || record.similarity_score || 0);
+                    return (
+                      <li key={`${sourceRole}-${probability}-${index}`} className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-ink">{sourceRole}</span>
+                        <span className="text-muted">{(probability * 100).toFixed(1)}%</span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-sm text-muted">No hay roles de mercado espec?ficos suficientes para este programa.</li>
+                )}
               </ul>
             </div>
             <div className="rounded-lg border border-line bg-slate-50 p-4">
-              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Empresas</span>
+              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Benchmarks institucionales</span>
               <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_companies ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
+                {benchmarkInstitutions.length ? (
+                  benchmarkInstitutions.map((item, index) => {
+                    const record = item as Record<string, unknown>;
+                    const institution = String(record.institution || record.program || 'Instituci?n').trim();
+                    const programName = String(record.program || '').trim();
+                    return (
+                      <li key={`${institution}-${index}`} className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-ink">{institution}</span>
+                        <span className="text-muted">{programName || 'Benchmark'}</span>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li className="text-sm text-muted">No hay benchmark institucional adicional para este programa.</li>
+                )}
               </ul>
             </div>
             <div className="rounded-lg border border-line bg-slate-50 p-4">
-              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Roles</span>
-              <ul className="mt-3 space-y-2">
-                {(forecastSummary?.top_roles ?? []).slice(0, 4).map((item) => (
-                  <li key={`${item.entity_name}-${item.horizon_months}`} className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{item.entity_name}</span>
-                    <span className="text-muted">{(item.growth_velocity * 100).toFixed(1)}%</span>
-                  </li>
-                ))}
-              </ul>
+              <span className="block text-[0.72rem] font900 uppercase tracking-[0.12em] text-muted">Empresas observadas</span>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Para Criminolog?a la se?al laboral se concentra en roles y competencias. No se mezclan aqu? stacks globales de analytics.
+              </p>
             </div>
           </div>
         </article>

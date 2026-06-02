@@ -290,6 +290,57 @@ def _program_microcurriculum_context(program: dict[str, Any], db_name: str | Non
     return dict(context) if context else {}
 
 
+def _has_curricular_evidence(program_context: dict[str, Any]) -> bool:
+    evidence_fields = (
+        "technical_skills",
+        "transversal_skills",
+        "methodologies",
+        "tools",
+        "platforms",
+        "technologies",
+        "keywords",
+        "labor_roles",
+        "occupational_profiles",
+        "strengthening_areas",
+        "real_market_gaps",
+        "subjects",
+    )
+    return any(_as_list(program_context.get(field)) for field in evidence_fields)
+
+
+def _empty_program_intelligence_item(program: dict[str, Any]) -> ProgramIntelligenceItem:
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    program_role = str(program.get("rol") or "").strip()
+    return ProgramIntelligenceItem(
+        program_id=int(program.get("especializacion_id") or program.get("id") or 0),
+        program_name=program_name,
+        program_role=program_role,
+        alignment_score=0.0,
+        risk_score=0.0,
+        risk_level="low",
+        gap_count=0,
+        top_gaps=[],
+        top_recommendations=[],
+        forecast_signals=[],
+        role_signals=[],
+        emerging_technologies=[],
+        recommended_actions=[],
+        business_justification="No curricular evidence available. Upload or process a microcurriculum to generate academic intelligence.",
+        supporting_evidence={
+            "microcurriculum_context": {},
+            "domain_taxonomy": {},
+            "domain_benchmark": {},
+            "domain_confidence": 0.0,
+            "domain_evidence": [],
+            "benchmark_used": {},
+            "program_skills": [],
+        },
+        source_tables=["especializaciones"],
+        confidence=0.0,
+        generated_at=datetime.now(UTC).isoformat(),
+    )
+
+
 def _context_terms(program_context: dict[str, Any]) -> list[str]:
     terms: list[str] = []
     terms.extend(_as_list(program_context.get("technical_skills")))
@@ -470,6 +521,8 @@ def _match_rows_for_program(
 
 def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, Any]]]) -> ProgramIntelligenceItem:
     program_context = _program_microcurriculum_context(program)
+    if not _has_curricular_evidence(program_context):
+        return _empty_program_intelligence_item(program)
     program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
     program_role = str(program.get("rol") or "").strip()
     domain_taxonomy = build_domain_taxonomy_from_program(

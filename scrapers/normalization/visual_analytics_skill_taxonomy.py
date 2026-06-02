@@ -88,6 +88,33 @@ SKILL_DEFINITIONS: dict[str, dict[str, object]] = {
     "Google Cloud Analytics": {"type": "cloud", "aliases": ("google cloud analytics", "bigquery", "looker", "gcp analytics")},
     "KPIs": {"type": "foundational_skill", "aliases": ("kpi", "kpis", "indicadores", "indicadores clave")},
     "estadistica": {"type": "foundational_skill", "aliases": ("estadistica", "statistics", "analisis estadistico")},
+    # Criminology labor intelligence
+    "criminal investigation": {
+        "type": "technical_skill",
+        "aliases": ("criminal investigation", "investigacion criminal", "investigacion judicial", "investigacion criminalistica"),
+    },
+    "victimology": {"type": "technical_skill", "aliases": ("victimology", "victimologia", "victim assistance", "atencion a victimas")},
+    "forensic analysis": {
+        "type": "technical_skill",
+        "aliases": ("forensic analysis", "analisis forense", "criminalistica", "criminalistics", "forensics", "forensic science"),
+    },
+    "cybercrime": {"type": "technical_skill", "aliases": ("cybercrime", "ciberdelito", "delito informatico", "computer crime")},
+    "criminal intelligence": {
+        "type": "technical_skill",
+        "aliases": ("criminal intelligence", "inteligencia criminal", "analisis de inteligencia criminal"),
+    },
+    "compliance": {"type": "methodology", "aliases": ("compliance", "cumplimiento", "cumplimiento normativo")},
+    "risk analysis": {"type": "technical_skill", "aliases": ("risk analysis", "analisis de riesgo", "risk assessment", "risk management")},
+    "chain of custody": {"type": "methodology", "aliases": ("chain of custody", "cadena de custodia", "custodia de evidencia")},
+    "organized crime": {"type": "technical_skill", "aliases": ("organized crime", "crimen organizado", "delincuencia organizada")},
+    "financial crime": {
+        "type": "technical_skill",
+        "aliases": ("financial crime", "delito financiero", "fraude financiero", "money laundering", "lavado de activos"),
+    },
+    "public safety": {"type": "technical_skill", "aliases": ("public safety", "public security", "seguridad publica", "seguridad ciudadana")},
+    "criminal analysis": {"type": "technical_skill", "aliases": ("criminal analysis", "analisis criminal", "analisis criminologico")},
+    "crime prevention": {"type": "technical_skill", "aliases": ("crime prevention", "prevencion del delito", "prevencion criminal")},
+    "penitentiary systems": {"type": "technical_skill", "aliases": ("penitentiary systems", "sistemas penitenciarios", "sistema penitenciario")},
 }
 
 ALIAS_TO_CANONICAL: dict[str, str] = {

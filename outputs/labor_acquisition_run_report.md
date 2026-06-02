@@ -1,26 +1,31 @@
 # Labor Acquisition Run Report
 
-- Correlation ID: lap-a02e9897c87949e3
-- Resultados inspeccionados: 175
-- Vacantes reales detectadas: 166
-- Probable jobs: 168
-- Curated jobs: 132
-- Gold jobs: 85
-- Documentos descartados/bloqueados: 9
-- Errores: 0
-- Completeness promedio: 0.8524
-- Persistencia: {"enabled": true, "bronze": 175, "silver": 175, "gold": 0, "warehouse_enabled": true, "jobs": 162, "job_skills": 1519, "valid_results": 162}
+- Correlation ID: lap-f5cceaa8f3754261
+- Resultados inspeccionados: 98
+- Vacantes reales detectadas: 97
+- Probable jobs: 98
+- Curated jobs: 97
+- Gold jobs: 96
+- Documentos descartados/bloqueados: 1
+- Errores: 4
+- Completeness promedio: 1.0
+- Persistencia: {"enabled": true, "bronze": 98, "silver": 98, "gold": 0, "warehouse_enabled": true, "jobs": 97, "job_skills": 494, "valid_results": 97}
 
 ## Skills extraidas
-- Python: 56
-- BI: 48
-- KPIs: 38
-- dashboarding: 31
-- data governance: 30
-- SQL: 30
-- AI: 25
-- machine learning: 21
-- Power BI: 19
-- ETL: 13
+- compliance: 97
+- risk analysis: 97
+- forensic analysis: 20
+- criminal intelligence: 15
+- criminal investigation: 15
+- public safety: 15
+- cybercrime: 8
+- financial crime: 7
+- organized crime: 4
+- crime prevention: 4
+- chain of custody: 2
 
 ## Errores por portal
+- Interpol Careers: ReadTimeout - HTTPSConnectionPool(host='209400.jobs2web.com', port=443): Read timed out. (read timeout=30)
+- Interpol Careers: ReadTimeout - HTTPSConnectionPool(host='209400.jobs2web.com', port=443): Read timed out. (read timeout=30)
+- INPEC Convocatorias: SSLError - HTTPSConnectionPool(host='www.inpec.gov.co', port=443): Max retries exceeded with url: /web/guest/convocatorias (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))
+- INPEC Convocatorias: SSLError - HTTPSConnectionPool(host='epn.inpec.gov.co', port=443): Max retries exceeded with url: /convocatorias-de-empleo (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))

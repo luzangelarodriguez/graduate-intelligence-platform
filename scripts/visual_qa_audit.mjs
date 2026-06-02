@@ -143,7 +143,7 @@ async function main() {
     const mappedPath = mapApiPath(requestUrl.pathname);
     const targetUrl = `http://127.0.0.1:8010${mappedPath}${requestUrl.search}`;
     try {
-      const response = await route.fetch({ url: targetUrl, timeout: 8000 });
+      const response = await route.fetch({ url: targetUrl, timeout: 20000 });
       await route.fulfill({ response });
     } catch (error) {
       await route.fulfill({

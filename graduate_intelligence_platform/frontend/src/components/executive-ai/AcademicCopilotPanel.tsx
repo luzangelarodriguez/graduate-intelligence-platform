@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import {
   ArrowRight,
   Bot,
@@ -87,17 +87,17 @@ function SectionList({
 function formatFallbackNotice(model?: string, error?: string | null, fallbackNote?: string) {
   if (fallbackNote?.trim()) return fallbackNote.trim();
   if (model === 'deterministic-fallback') {
-    return 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.';
+    return 'Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.';
   }
   if (error) {
-    return 'Análisis generado con narrativa determinística. Configure OpenAI para explicación avanzada.';
+    return 'Análisis generado con narrativa determinística. La explicación avanzada se activará cuando el servicio esté disponible.';
   }
   return null;
 }
 
 export function AcademicCopilotPanel({
-  title = 'Análisis ejecutivo generado por IA',
-  subtitle = 'Síntesis automática sobre pertinencia académica, brechas curriculares y señales de mercado.',
+  title = 'AnÃ¡lisis ejecutivo generado por IA',
+  subtitle = 'SÃ­ntesis automÃ¡tica sobre pertinencia acadÃ©mica, brechas curriculares y seÃ±ales de mercado.',
   briefing = null,
   briefingLoading = false,
   loading = false,
@@ -129,16 +129,16 @@ export function AcademicCopilotPanel({
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
             <Bot size={14} strokeWidth={2} />
-            Copiloto académico
+            Copiloto acadÃ©mico
           </div>
           <h3 className="mt-2 text-lg font-semibold text-ink">{title}</h3>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">{subtitle}</p>
           <p className="mt-2 max-w-4xl rounded-lg border border-brand/15 bg-brand/5 px-3 py-2 text-xs leading-6 text-brand">
-            Diagnóstico institucional · Programas prioritarios · Brechas críticas · Acciones recomendadas · Impacto esperado · Evidencia utilizada · Preguntar al observatorio
+            DiagnÃ³stico institucional Â· Programas prioritarios Â· Brechas crÃ­ticas Â· Acciones recomendadas Â· Impacto esperado Â· Evidencia utilizada Â· Preguntar al observatorio
           </p>
         </div>
         <span className="rounded-full border border-brand/15 bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
-          Briefing automático
+          Briefing automÃ¡tico
         </span>
       </div>
 
@@ -150,7 +150,7 @@ export function AcademicCopilotPanel({
 
       {briefingLoading ? (
         <div className="rounded-xl border border-line bg-slate-50 p-4 text-sm text-muted">
-          Generando análisis ejecutivo con datos del observatorio...
+          Generando anÃ¡lisis ejecutivo con datos del observatorio...
         </div>
       ) : (
         <>
@@ -158,10 +158,10 @@ export function AcademicCopilotPanel({
             <article className="rounded-xl border border-line bg-slate-50 p-5 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
                 <Building2 size={14} strokeWidth={2} />
-                Diagnóstico institucional
+                DiagnÃ³stico institucional
               </div>
               <p className="mt-3 text-sm leading-7 text-ink">
-                {briefing?.diagnosis?.trim() || 'No hay un briefing consolidado aún. La plataforma sigue mostrando las señales reales del observatorio y puede profundizarse con una consulta guiada.'}
+                {briefing?.diagnosis?.trim() || 'No hay un briefing consolidado aÃºn. La plataforma sigue mostrando las seÃ±ales reales del observatorio y puede profundizarse con una consulta guiada.'}
               </p>
               {briefing?.programContext?.name ? (
                 <div className="mt-4 rounded-xl border border-line bg-white p-4">
@@ -169,7 +169,7 @@ export function AcademicCopilotPanel({
                     <strong className="text-sm text-ink">{briefing.programContext.name}</strong>
                     {briefing.programContext.alignment ? (
                       <span className="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand">
-                        Alineación {briefing.programContext.alignment}
+                        AlineaciÃ³n {briefing.programContext.alignment}
                       </span>
                     ) : null}
                     {briefing.programContext.risk ? (
@@ -205,7 +205,7 @@ export function AcademicCopilotPanel({
                       </div>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-3">
-                      <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">Forecast / simulación</div>
+                      <div className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">Forecast / simulaciÃ³n</div>
                       <div className="mt-2 space-y-1 text-sm text-ink">
                     {(briefing.programContext.forecast || []).slice(0, 2).map((item, index) => (
                       <div key={`${item}-${index}`} className="rounded-md bg-white px-2 py-1">
@@ -218,7 +218,7 @@ export function AcademicCopilotPanel({
                           </div>
                         ))}
                         {!((briefing.programContext.forecast || []).length || (briefing.programContext.simulation || []).length) ? (
-                          <div className="text-muted">Simulación pendiente de datos suficientes.</div>
+                          <div className="text-muted">SimulaciÃ³n pendiente de datos suficientes.</div>
                         ) : null}
                       </div>
                     </div>
@@ -250,9 +250,9 @@ export function AcademicCopilotPanel({
 
           <div className="grid gap-4 lg:grid-cols-2">
             <SectionList
-              title="Brechas críticas"
+              title="Brechas crÃ­ticas"
               items={briefing?.criticalGaps || []}
-              emptyText="No hay brechas críticas tipificadas con la evidencia actual."
+              emptyText="No hay brechas crÃ­ticas tipificadas con la evidencia actual."
             />
             <SectionList
               title="Acciones recomendadas"
@@ -265,12 +265,12 @@ export function AcademicCopilotPanel({
             <SectionList
               title="Impacto esperado"
               items={briefing?.expectedImpact || []}
-              emptyText="Simulación pendiente de cálculo predictivo."
+              emptyText="SimulaciÃ³n pendiente de cÃ¡lculo predictivo."
             />
             <SectionList
               title="Evidencia utilizada"
               items={briefing?.evidence || []}
-              emptyText="Sin evidencia consolidada disponible todavía."
+              emptyText="Sin evidencia consolidada disponible todavÃ­a."
             />
           </div>
         </>
@@ -282,7 +282,7 @@ export function AcademicCopilotPanel({
           Preguntar al observatorio
         </div>
         <p className="mt-2 text-sm leading-6 text-muted">
-          El briefing ejecutivo ya está visible. Usa estas preguntas para profundizar en un hallazgo o solicitar una explicación adicional.
+          El briefing ejecutivo ya estÃ¡ visible. Usa estas preguntas para profundizar en un hallazgo o solicitar una explicaciÃ³n adicional.
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -340,7 +340,7 @@ export function AcademicCopilotPanel({
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border border-line bg-white px-3 py-1">
                 <TriangleAlert size={12} strokeWidth={2} />
-                {answer.model === 'deterministic-fallback' ? 'Narrativa determinística' : 'OpenAI explicativo'}
+                {answer.model === 'deterministic-fallback' ? 'Narrativa determinÃ­stica' : 'OpenAI explicativo'}
               </span>
             </div>
           </div>
@@ -353,3 +353,7 @@ export function AcademicCopilotPanel({
     </section>
   );
 }
+
+
+
+
