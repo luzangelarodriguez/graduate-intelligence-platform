@@ -24,9 +24,9 @@ export function CurriculumVsMarketMatch({
     );
   }
 
-  // Extract data from insights or use empty fallback
-  const academicSkills = programDashboard?.insights?.detected ? 1 : 0;
-  const laborSkills = programDashboard?.insights?.ai_recommends?.length ?? 0;
+  // Extract data from dashboard or use fallback
+  const academicSkills = programDashboard?.insights?.ai_recommends?.length ?? 0;
+  const laborSkills = program?.total_empleos_relacionados ?? 0;
   const gaps = programDashboard?.missing_skills?.length ?? 0;
 
   return (
