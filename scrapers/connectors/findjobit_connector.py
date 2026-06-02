@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from urllib.parse import quote_plus
+
 from bs4 import BeautifulSoup
 
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import source_plan_for
 from scrapers.connectors.base import BaseJobConnector, absolute_url, build_job, compact_text, parse_json_ld_jobs
 
 
@@ -10,8 +13,22 @@ class FindJobITConnector(BaseJobConnector):
     base_url = "https://findjobit.com/jobs/country/colombia"
     priority = "media"
 
+    def __init__(self, *, source_plan: dict | None = None, max_jobs: int = 20, max_pages: int = 2) -> None:
+        super().__init__(max_pages=max_pages, max_jobs=max_jobs)
+        self.source_plan = source_plan_for(source_plan, 'findjobit') if source_plan is not None else {"keywords": [], "roles": [], "families": [], "query": ""}
+
+    def search_items(self) -> list[tuple[str, dict[str, object]]]:
+        keywords = [str(item).strip() for item in (self.source_plan.get('keywords') or []) if str(item).strip()]
+        if not keywords:
+            keywords = ["data", "power bi", "analytics", "engineering"]
+        items: list[tuple[str, dict[str, object]]] = []
+        for keyword in keywords[: self.config.max_pages]:
+            url = absolute_url(self.base_url, f"?q={quote_plus(keyword)}")
+            items.append((url, {"source": "findjobit", "search_keyword": keyword, "search_keyword_source": "academic_plan", "search_plan": self.source_plan}))
+        return items
+
     def search_urls(self) -> list[str]:
-        return [self.base_url, absolute_url(self.base_url, "?q=data"), absolute_url(self.base_url, "?q=power%20bi")][: self.config.max_pages]
+        return [url for url, _ in self.search_items()]
 
     def extract_from_html(self, html: str, url: str):
         jobs = [
@@ -46,7 +63,7 @@ class FindJobITConnector(BaseJobConnector):
                     description=text,
                     tags=[node.get_text(" ", strip=True) for node in card.select("[class*='tag'],[class*='skill'],[class*='badge']")],
                     source_url=link.get("href") if link else url,
-                    raw={"selector_source": "findjobit_cards"},
+                    raw={"selector_source": "findjobit_cards", "search_plan": self.source_plan},
                 )
             )
         return jobs

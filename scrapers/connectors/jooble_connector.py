@@ -18,6 +18,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from agents.visual_analytics_labor_agent import AgentExtractionResult, BronzeEvidence, SilverEvidence, detect_language  # noqa: E402
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import source_plan_for  # noqa: E402
 from ml.labor.semantic_job_skill_extractor import extract_semantic_job_skills, semantic_skills_to_dict  # noqa: E402
 from ml.relevance.contextual_job_relevance_engine import result_to_dict, score_contextual_relevance  # noqa: E402
 from scrapers.connectors.base import compact_text  # noqa: E402
@@ -27,7 +28,6 @@ REPORT_PATH = ROOT_DIR / "outputs" / "jooble_extraction_report.md"
 SKILL_REPORT_PATH = ROOT_DIR / "outputs" / "jooble_skill_report.md"
 
 DEFAULT_JOOBLE_API_URL = "https://jooble.org/api"
-DEFAULT_JOOBLE_KEYWORDS = "Data Analyst OR Business Intelligence OR Power BI OR SQL OR Analytics"
 DEFAULT_JOOBLE_LOCATION = "Colombia"
 
 
@@ -116,7 +116,7 @@ def normalize_jooble_job(payload: dict[str, Any]) -> JoobleNormalizedJob:
     )
 
 
-def jooble_job_to_agent_result(job: JoobleNormalizedJob) -> AgentExtractionResult:
+def jooble_job_to_agent_result(job: JoobleNormalizedJob, search_context: dict[str, Any] | None = None) -> AgentExtractionResult:
     raw_text = compact_text(f"{job.title} {job.company} {job.location} {job.description}")
     semantic_items = extract_semantic_job_skills(title=job.title, description=job.description, evidence_source_type="job_evidence")
     job_skills = [item.skill for item in semantic_items] if job.is_real_job_posting else []
@@ -150,6 +150,7 @@ def jooble_job_to_agent_result(job: JoobleNormalizedJob) -> AgentExtractionResul
         **result_to_dict(contextual),
         "semantic_skill_evidence": semantic_skills_to_dict(semantic_items),
         "source_job_id": job.source_job_id,
+        "search_context": search_context or {},
         "salary": job.salary,
         "job_type": job.job_type,
         "date_updated": job.date_updated,
@@ -186,11 +187,12 @@ def jooble_job_to_agent_result(job: JoobleNormalizedJob) -> AgentExtractionResul
 class JoobleConnector:
     source_name = "jooble"
 
-    def __init__(self, *, api_key: str | None = None, api_url: str | None = None) -> None:
+    def __init__(self, *, api_key: str | None = None, api_url: str | None = None, source_plan: dict | None = None) -> None:
         _load_environment()
         self.api_key = api_key or os.getenv("JOOBLE_API_KEY", "")
         self.api_url = (api_url or os.getenv("JOOBLE_API_URL", DEFAULT_JOOBLE_API_URL)).rstrip("/")
         self.session = requests.Session()
+        self.source_plan = source_plan_for(source_plan, "jooble") if source_plan is not None else {"keywords": [], "roles": [], "families": [], "query": ""}
 
     def credentials_available(self) -> bool:
         return bool(self.api_key)
@@ -218,7 +220,7 @@ class JoobleConnector:
                 "jobs": [],
                 "errors": [],
                 "api_url_configured": bool(self.api_url),
-                "keywords": keywords or os.getenv("JOOBLE_KEYWORDS", DEFAULT_JOOBLE_KEYWORDS),
+                "keywords": keywords or os.getenv("JOOBLE_KEYWORDS") or query or plugin_search_query(),
                 "location": location or os.getenv("JOOBLE_LOCATION", DEFAULT_JOOBLE_LOCATION),
             }
             write_jooble_reports(result)
@@ -228,7 +230,11 @@ class JoobleConnector:
         errors: list[dict[str, Any]] = []
         page = 1
         per_page = max(1, min(result_on_page, 50))
-        keywords = keywords or os.getenv("JOOBLE_KEYWORDS", DEFAULT_JOOBLE_KEYWORDS)
+        plan_keywords = [str(item).strip() for item in (self.source_plan.get("keywords") or []) if str(item).strip()]
+        plan_roles = [str(item).strip() for item in (self.source_plan.get("roles") or []) if str(item).strip()]
+        if query is None:
+            query = self.source_plan.get("query") or " OR ".join([*plan_keywords, *plan_roles]) or plugin_search_query()
+        keywords = keywords or query or os.getenv("JOOBLE_KEYWORDS") or plugin_search_query()
         location = location or os.getenv("JOOBLE_LOCATION", DEFAULT_JOOBLE_LOCATION)
         while len(jobs) < max_jobs:
             payload = {
@@ -247,7 +253,7 @@ class JoobleConnector:
                 response.raise_for_status()
                 data = response.json()
                 page_jobs = data.get("jobs") or []
-                jobs.extend(normalize_jooble_job(item) for item in page_jobs if isinstance(item, dict))
+                jobs.extend(normalize_jooble_job({**item, "search_context": {"query": query, "search_plan": self.source_plan}}) for item in page_jobs if isinstance(item, dict))
                 if not page_jobs or len(jobs) >= int(data.get("totalCount") or 0):
                     break
                 page += 1
@@ -261,7 +267,7 @@ class JoobleConnector:
     def fetch_agent_results(self, **kwargs: Any) -> tuple[list[AgentExtractionResult], dict[str, Any]]:
         result = self.fetch_jobs(**kwargs)
         jobs = result.get("jobs", [])
-        agent_results = [jooble_job_to_agent_result(job) for job in jobs if isinstance(job, JoobleNormalizedJob)]
+        agent_results = [jooble_job_to_agent_result(job, job.raw_json.get("search_context") if isinstance(job.raw_json, dict) else None) for job in jobs if isinstance(job, JoobleNormalizedJob)]
         return agent_results, {key: value for key, value in result.items() if key != "jobs"} | {"jobs": len(agent_results)}
 
 

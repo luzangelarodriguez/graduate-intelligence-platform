@@ -15,6 +15,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import get_academic_search_intelligence, source_plan_for  # noqa: E402
 from agents.agentic_job_extractor import EnterpriseAgenticJobExtractor  # noqa: E402
 from agents.visual_analytics_labor_agent import AgentExtractionResult  # noqa: E402
 from backend.queries import fetch_program_skills, fetch_specialization_options  # noqa: E402
@@ -29,15 +30,6 @@ from ml.labor.market_skill_intelligence_engine import build_market_skill_intelli
 
 SESSION_STATE_PATH = ROOT_DIR / ".local_sessions" / "linkedin_storage_state.json"
 LINKEDIN_OUTPUT_REPORT = ROOT_DIR / "outputs" / "linkedin_jobs_crawler_report.md"
-DEFAULT_KEYWORDS = [
-    "data analyst",
-    "business intelligence",
-    "power bi",
-    "analytics engineer",
-    "data visualization",
-    "big data",
-    "data engineer",
-]
 DEFAULT_LOCATION = "Colombia"
 DEFAULT_MAX_JOBS = 100
 DEFAULT_MAX_PAGES = 10
@@ -441,22 +433,27 @@ def _dedupe_sort_candidates(candidates: Iterable[KeywordCandidate], *, limit: in
     return ordered[:limit]
 
 
-def _build_keyword_plan(config: LinkedInCrawlerConfig) -> list[KeywordCandidate]:
+def _build_keyword_plan(config: LinkedInCrawlerConfig, search_intelligence: dict[str, Any] | None = None) -> list[KeywordCandidate]:
+    intelligence = search_intelligence or get_academic_search_intelligence(mode=config.crawl_mode, manual_keywords=config.keywords, keyword_limit=config.keyword_limit, role_limit=max(12, config.keyword_limit // 2))
+    source_plan = source_plan_for(intelligence.get("crawler_plans"), "linkedin")
     manual = [item.strip() for item in (config.keywords or []) if item and item.strip()]
-    focused = [KeywordCandidate(keyword=item, source="manual", weight=100.0) for item in (manual or DEFAULT_KEYWORDS)]
     if config.crawl_mode == "focused":
-        return _dedupe_sort_candidates(focused, limit=config.keyword_limit)
+        base_terms = manual or source_plan.get("keywords") or ["data analyst", "business intelligence", "power bi", "analytics engineer", "data visualization", "big data", "data engineer"]
+        return _dedupe_sort_candidates([KeywordCandidate(keyword=item, source="manual" if manual else "academic_plan", weight=100.0) for item in base_terms], limit=config.keyword_limit)
 
-    academic = _academic_candidates(max(10, config.keyword_limit // 2))
-    market = _market_skill_candidates(max(10, config.keyword_limit // 2))
-    gap = _gap_candidates(max(10, config.keyword_limit // 3))
-    exploratory = _exploratory_candidates()
-    sector = _sector_discovery_candidates()
-
+    candidates: list[KeywordCandidate] = []
+    for keyword in source_plan.get("keywords", []):
+        candidates.append(KeywordCandidate(keyword=str(keyword), source="academic_program", weight=100.0))
+    for role in source_plan.get("roles", []):
+        candidates.append(KeywordCandidate(keyword=str(role), source="career_path", weight=95.0))
+    for family in source_plan.get("families", []):
+        candidates.append(KeywordCandidate(keyword=str(family), source="sector_discovery", weight=90.0))
+    for skill in intelligence.get("keywords_generated", [])[: config.keyword_limit]:
+        candidates.append(KeywordCandidate(keyword=str(skill), source="market_skill", weight=88.0))
+    if manual:
+        candidates = [*([KeywordCandidate(keyword=item, source="manual", weight=100.0) for item in manual]), *candidates]
     if config.crawl_mode == "market_discovery":
-        candidates = [*focused, *market, *gap, *sector, *exploratory, *academic]
-    else:
-        candidates = [*focused, *academic, *market, *gap, *sector, *exploratory]
+        candidates.extend([KeywordCandidate(keyword=str(item), source="exploratory", weight=80.0) for item in intelligence.get("keywords_generated", []) if str(item)])
     return _dedupe_sort_candidates(candidates, limit=config.keyword_limit)
 
 
@@ -496,7 +493,9 @@ class LinkedInJobsCrawler:
     def __init__(self, config: LinkedInCrawlerConfig | None = None) -> None:
         self.config = config or LinkedInCrawlerConfig()
         self.extractor = EnterpriseAgenticJobExtractor()
-        self.keyword_plan = _build_keyword_plan(self.config)
+        self.search_intelligence = get_academic_search_intelligence(mode=self.config.crawl_mode, manual_keywords=self.config.keywords, keyword_limit=self.config.keyword_limit, role_limit=max(12, self.config.keyword_limit // 2))
+        self.source_plan = source_plan_for(self.search_intelligence.get("crawler_plans"), "linkedin")
+        self.keyword_plan = _build_keyword_plan(self.config, self.search_intelligence)
         self.keywords = [item.keyword for item in self.keyword_plan]
 
     def ensure_storage_state(self) -> tuple[bool, str]:
@@ -586,6 +585,7 @@ class LinkedInJobsCrawler:
                                         "curated_job": curation_level in {"curated_job", "gold_job"},
                                         "gold_job": bool(getattr(result, "gold", None)),
                                         "curation_level": curation_level,
+                                        "search_plan": self.source_plan,
                                     }
                                 )
                                 result.silver.contextual.update(contextual)
@@ -642,6 +642,7 @@ def write_linkedin_report(
                 f"  - URL: {result.silver.source_url}",
                 f"  - Curation: {getattr(result.silver, 'curation_level', 'unknown')}",
                 f"  - Search keyword: {contextual.get('search_keyword', 'N/A')} ({contextual.get('search_keyword_source', 'N/A')})",
+                f"  - Source plan: {contextual.get('search_plan', {}).get('mode', crawl_mode)}",
                 f"  - Skills: {', '.join(result.silver.job_evidence_skills or []) or 'N/A'}",
             ]
         )

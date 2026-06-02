@@ -509,3 +509,34 @@ def build_academic_job_acquisition_intelligence(
             "market_discovery": "adds market and cluster expansion for new occupations, tools, and skills.",
         },
     }
+
+
+def get_academic_search_intelligence(
+    *,
+    mode: str = "academic_alignment",
+    manual_keywords: Sequence[str] | None = None,
+    keyword_limit: int = 24,
+    role_limit: int = 12,
+) -> dict[str, Any]:
+    from .engine import build_programs
+
+    return build_academic_job_acquisition_intelligence(
+        build_programs(),
+        mode=mode,
+        manual_keywords=manual_keywords,
+        keyword_limit=keyword_limit,
+        role_limit=role_limit,
+    )
+
+
+def source_plan_for(source_plans: dict[str, Any] | None, source: str) -> dict[str, Any]:
+    payload = dict((source_plans or {}).get(source, {}) or {})
+    payload.setdefault("source", source)
+    payload.setdefault("keywords", [])
+    payload.setdefault("roles", [])
+    payload.setdefault("families", [])
+    payload.setdefault("query", "")
+    payload.setdefault("mode", "academic_alignment")
+    payload.setdefault("max_jobs", 100)
+    payload.setdefault("max_pages", 10)
+    return payload

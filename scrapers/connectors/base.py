@@ -124,6 +124,9 @@ class BaseJobConnector:
     def search_urls(self) -> list[str]:
         return [self.base_url]
 
+    def search_items(self) -> list[tuple[str, dict[str, Any]]]:
+        return [(url, {}) for url in self.search_urls()]
+
     def fetch_html(self, url: str) -> str:
         response = self.session.get(url, timeout=25)
         response.raise_for_status()
@@ -137,10 +140,16 @@ class BaseJobConnector:
             return [], [{"source": self.source_name, "error_type": "dry_run", "error_message": "network_not_executed"}]
         jobs: list[ConnectorJob] = []
         errors: list[dict[str, str]] = []
-        for url in self.search_urls()[: self.config.max_pages]:
+        for url, search_context in self.search_items()[: self.config.max_pages]:
             try:
                 html = self.fetch_html(url)
-                jobs.extend(self.extract_from_html(html, url))
+                page_jobs = self.extract_from_html(html, url)
+                for job in page_jobs:
+                    if search_context:
+                        raw = dict(job.raw or {})
+                        raw.setdefault("search_context", search_context)
+                        job.raw = raw
+                jobs.extend(page_jobs)
             except Exception as exc:  # pragma: no cover - network behavior changes by source
                 errors.append({"source": self.source_name, "error_type": type(exc).__name__, "error_message": str(exc)[:500]})
             if len(jobs) >= self.config.max_jobs:

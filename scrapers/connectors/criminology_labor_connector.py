@@ -7,6 +7,7 @@ from typing import Iterable
 
 from bs4 import BeautifulSoup
 
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import source_plan_for
 from scrapers.connectors.base import BaseJobConnector, build_job, compact_text, deduplicate_jobs, parse_json_ld_jobs
 
 
@@ -223,11 +224,13 @@ class CriminologyLaborConnector(BaseJobConnector):
         max_pages: int = 2,
         max_jobs: int = 50,
         rate_limit_seconds: int = 4,
+        source_plan: dict | None = None,
     ) -> None:
         self.profile = profile
         self.source_name = profile.source_name
         self.base_url = profile.base_url
         self.priority = profile.priority
+        self.source_plan = source_plan_for(source_plan, profile.key) if source_plan is not None else {"keywords": [], "roles": [], "families": [], "query": ""}
         super().__init__(max_pages=max_pages, max_jobs=max_jobs, rate_limit_seconds=rate_limit_seconds)
 
     def search_urls(self) -> list[str]:
@@ -238,6 +241,20 @@ class CriminologyLaborConnector(BaseJobConnector):
             else:
                 urls.append(f"{self.base_url.rstrip('/')}/{path.lstrip('/')}" if path else self.base_url)
         return list(dict.fromkeys(urls))
+
+    def search_items(self) -> list[tuple[str, dict[str, object]]]:
+        urls = self.search_urls()
+        keywords = [str(item).strip() for item in (self.source_plan.get("keywords") or []) if str(item).strip()]
+        roles = [str(item).strip() for item in (self.source_plan.get("roles") or []) if str(item).strip()]
+        families = [str(item).strip() for item in (self.source_plan.get("families") or []) if str(item).strip()]
+        terms = list(dict.fromkeys([*keywords, *roles, *families]))
+        if not terms:
+            terms = [self.profile.key.replace("_", " ")]
+        contexts: list[tuple[str, dict[str, object]]] = []
+        for index, url in enumerate(urls):
+            term = terms[index % len(terms)]
+            contexts.append((url, {"source_profile": self.profile.key, "search_keyword": term, "search_keyword_source": "academic_plan", "search_plan": self.source_plan}))
+        return contexts
 
     def fetch_jobs(self, *, execute_network: bool = False) -> tuple[list[object], list[dict[str, str]]]:
         if not execute_network:
@@ -272,7 +289,7 @@ class CriminologyLaborConnector(BaseJobConnector):
                 description=item.get("description", ""),
                 source_url=item.get("source_url", url),
                 tags=self._source_tags(),
-                raw={**item, "source_profile": self.profile.key},
+                raw={**item, "source_profile": self.profile.key, "search_plan": self.source_plan},
             )
             for item in parse_json_ld_jobs(html, self.source_name, url)
         ]
@@ -377,6 +394,7 @@ class CriminologyLaborConnector(BaseJobConnector):
                         source_url=url,
                         raw={
                             "source_profile": self.profile.key,
+                            "search_plan": self.source_plan,
                             "record_type": "archived_vacancy",
                             "row": line,
                             "status": status,
@@ -438,7 +456,7 @@ class CriminologyLaborConnector(BaseJobConnector):
         )
 
 
-def make_criminology_connector(source: str, *, max_jobs: int = 20, max_pages: int = 2) -> CriminologyLaborConnector:
+def make_criminology_connector(source: str, *, max_jobs: int = 20, max_pages: int = 2, source_plan: dict | None = None) -> CriminologyLaborConnector:
     key = source.casefold().replace("-", "_")
     aliases = {
         "un": "un_careers",
@@ -449,7 +467,7 @@ def make_criminology_connector(source: str, *, max_jobs: int = 20, max_pages: in
         "policia_nacional_colombia": "policia_colombia",
     }
     key = aliases.get(key, key)
-    return CriminologyLaborConnector(SOURCE_PROFILES[key], max_jobs=max_jobs, max_pages=max_pages)
+    return CriminologyLaborConnector(SOURCE_PROFILES[key], max_jobs=max_jobs, max_pages=max_pages, source_plan=source_plan)
 
 
 def criminology_source_keys() -> list[str]:
