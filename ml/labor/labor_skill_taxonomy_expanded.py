@@ -127,6 +127,77 @@ EXPANDED_SKILLS: dict[str, dict[str, object]] = {
     "trabajo en equipo": {"category": "Soft Skills", "entity_type": "soft_skill", "aliases": ("trabajo en equipo", "teamwork")},
     "gestion de stakeholders": {"category": "Soft Skills", "entity_type": "soft_skill", "aliases": ("stakeholders", "gestion de stakeholders", "partes interesadas")},
     "ingles": {"category": "Soft Skills", "entity_type": "soft_skill", "aliases": ("ingles", "english", "b2", "c1")},
+    # Criminology and public safety
+    "criminal investigation": {
+        "category": "Criminology",
+        "entity_type": "technical_skill",
+        "aliases": ("criminal investigation", "investigacion criminal", "investigacion judicial", "investigacion criminalistica"),
+    },
+    "victimology": {
+        "category": "Criminology",
+        "entity_type": "technical_skill",
+        "aliases": ("victimology", "victimologia", "victim assistance", "atencion a victimas"),
+    },
+    "forensic analysis": {
+        "category": "Forensics",
+        "entity_type": "technical_skill",
+        "aliases": ("forensic analysis", "analisis forense", "criminalistica", "criminalistics", "forensics", "forensic science"),
+    },
+    "cybercrime": {
+        "category": "Cybercrime",
+        "entity_type": "technical_skill",
+        "aliases": ("cybercrime", "ciberdelito", "delito informatico", "computer crime"),
+    },
+    "criminal intelligence": {
+        "category": "Criminal Intelligence",
+        "entity_type": "technical_skill",
+        "aliases": ("criminal intelligence", "inteligencia criminal", "analisis de inteligencia criminal"),
+    },
+    "compliance": {
+        "category": "Governance",
+        "entity_type": "methodology",
+        "aliases": ("compliance", "cumplimiento", "cumplimiento normativo"),
+    },
+    "risk analysis": {
+        "category": "Risk & Security",
+        "entity_type": "technical_skill",
+        "aliases": ("risk analysis", "analisis de riesgo", "risk assessment", "risk management"),
+    },
+    "chain of custody": {
+        "category": "Forensics",
+        "entity_type": "methodology",
+        "aliases": ("chain of custody", "cadena de custodia", "custodia de evidencia"),
+    },
+    "organized crime": {
+        "category": "Criminology",
+        "entity_type": "technical_skill",
+        "aliases": ("organized crime", "crimen organizado", "delincuencia organizada"),
+    },
+    "financial crime": {
+        "category": "Financial Crime",
+        "entity_type": "technical_skill",
+        "aliases": ("financial crime", "delito financiero", "fraude financiero", "money laundering", "lavado de activos"),
+    },
+    "public safety": {
+        "category": "Public Safety",
+        "entity_type": "technical_skill",
+        "aliases": ("public safety", "public security", "seguridad publica", "seguridad ciudadana"),
+    },
+    "criminal analysis": {
+        "category": "Criminal Intelligence",
+        "entity_type": "technical_skill",
+        "aliases": ("criminal analysis", "analisis criminal", "analisis criminologico"),
+    },
+    "crime prevention": {
+        "category": "Public Safety",
+        "entity_type": "technical_skill",
+        "aliases": ("crime prevention", "prevencion del delito", "prevencion criminal"),
+    },
+    "penitentiary systems": {
+        "category": "Public Safety",
+        "entity_type": "technical_skill",
+        "aliases": ("penitentiary systems", "sistemas penitenciarios", "sistema penitenciario"),
+    },
 }
 
 ALIAS_TO_SKILL = {

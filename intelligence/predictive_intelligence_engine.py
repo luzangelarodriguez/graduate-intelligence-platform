@@ -7,7 +7,7 @@ from decimal import Decimal
 from statistics import mean
 from typing import Any, Iterable
 
-from backend.repositories import matches_repository, programas_repository, skills_repository
+from backend.repositories import matches_repository, microcurriculum_context_repository, programas_repository, skills_repository
 from backend.services import dashboard_service
 from backend.repositories.base import cursor, fetch_all, fetch_one, pick_relation, relation_exists
 from intelligence.common import clamp, normalize_key
@@ -235,6 +235,97 @@ class UniversityMarketAlignment:
         return asdict(self)
 
 
+def _load_program_context(program_id: int, *, db_name: str | None = None) -> dict[str, Any]:
+    program = _fetch_program_row(program_id, db_name=db_name)
+    if not program:
+        return {}
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
+    try:
+        context = microcurriculum_context_repository.fetch_program_context(
+            program_id,
+            specialization_name=program_name,
+            db_name=db_name,
+        )
+    except Exception:
+        return {}
+    return dict(context) if context else {}
+
+
+def _has_curricular_evidence(program_context: dict[str, Any]) -> bool:
+    evidence_fields = (
+        "technical_skills",
+        "transversal_skills",
+        "methodologies",
+        "tools",
+        "platforms",
+        "technologies",
+        "keywords",
+        "labor_roles",
+        "occupational_profiles",
+        "strengthening_areas",
+        "real_market_gaps",
+        "subjects",
+    )
+    return any(bool(_as_text_list(program_context.get(field))) for field in evidence_fields)
+
+
+def _empty_curriculum_risk_index(program: dict[str, Any], *, program_id: int) -> CurriculumRiskIndex:
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or f"Programa {program_id}").strip()
+    return CurriculumRiskIndex(
+        program_id=program_id,
+        program_name=program_name,
+        risk_score=0.0,
+        risk_level="low",
+        risk_drivers=[],
+        recommended_actions=[],
+        supporting_evidence={
+            "reason": "no_curricular_evidence",
+            "program_skills": [],
+            "skills": [],
+            "covered_skills": [],
+            "partial_skills": [],
+            "missing_skills": [],
+            "forecast_rows": [],
+            "source_tables": ["especializaciones"],
+            "microcurriculum_context": {},
+        },
+        source_tables=["especializaciones"],
+        confidence=0.0,
+    )
+
+
+def _empty_university_market_alignment(program: dict[str, Any], *, program_id: int) -> UniversityMarketAlignment:
+    program_name = str(program.get("nombre_especializacion") or program.get("nombre") or f"Programa {program_id}").strip()
+    return UniversityMarketAlignment(
+        program_id=program_id,
+        program_name=program_name,
+        alignment_score=0.0,
+        alignment_level="low",
+        current_alignment=0.0,
+        projected_alignment_if_added=0.0,
+        missing_skills=[],
+        emerging_skills=[],
+        company_demand_score=0.0,
+        labor_demand_score=0.0,
+        forecasted_demand_score=0.0,
+        emerging_technology_score=0.0,
+        explanation="No curricular evidence available. Upload or process a microcurriculum to generate academic intelligence.",
+        supporting_evidence={
+            "reason": "no_curricular_evidence",
+            "program_skills": [],
+            "skills": [],
+            "covered_skills": [],
+            "partial_skills": [],
+            "missing_skills": [],
+            "forecast_rows": [],
+            "source_tables": ["especializaciones"],
+            "microcurriculum_context": {},
+        },
+        source_tables=["especializaciones"],
+        confidence=0.0,
+    )
+
+
 @dataclass(frozen=True)
 class MarketForecastRecord:
     entity_type: str
@@ -426,6 +517,9 @@ def _persistent_metric(metric_name: str, metric_category: str, metric_value: flo
 
 def build_curriculum_risk_index(program_id: int, *, db_name: str | None = None, persist: bool = False) -> CurriculumRiskIndex:
     program = _fetch_program_row(program_id, db_name=db_name)
+    program_context = _load_program_context(program_id, db_name=db_name)
+    if not program or not _has_curricular_evidence(program_context):
+        return _empty_curriculum_risk_index(program or {"nombre_especializacion": f"Programa {program_id}"}, program_id=program_id)
     program_skills = _fetch_program_skills(program_id, db_name=db_name)
     program_skill_names = _skill_names(program_skills)
     market_map = _fetch_market_skill_map()
@@ -598,6 +692,9 @@ def build_curriculum_risk_index(program_id: int, *, db_name: str | None = None, 
 
 def build_university_market_alignment(program_id: int, *, db_name: str | None = None, persist: bool = False) -> UniversityMarketAlignment:
     program = _fetch_program_row(program_id, db_name=db_name)
+    program_context = _load_program_context(program_id, db_name=db_name)
+    if not program or not _has_curricular_evidence(program_context):
+        return _empty_university_market_alignment(program or {"nombre_especializacion": f"Programa {program_id}"}, program_id=program_id)
     program_skills = _fetch_program_skills(program_id, db_name=db_name)
     skill_names = _skill_names(program_skills)
     market_map = _fetch_market_skill_map()
