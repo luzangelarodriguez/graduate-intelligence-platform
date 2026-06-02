@@ -32,11 +32,21 @@ RESULTS_JSON = OUTPUT_DIR / "labor_acquisition_results.json"
 HEALTH_REPORT = OUTPUT_DIR / "labor_acquisition_health_report.json"
 
 
-def _run_source(source: str, *, execute_network: bool, max_jobs: int, max_pages: int) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
+def _run_source(
+    source: str,
+    *,
+    execute_network: bool,
+    max_jobs: int,
+    max_pages: int,
+    search_intelligence: dict[str, Any] | None = None,
+) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
     if source == "linkedin":
-        crawler = LinkedInJobsCrawler(LinkedInCrawlerConfig(max_jobs=max_jobs, max_pages=max_pages, headless=True))
+        crawler = LinkedInJobsCrawler(
+            LinkedInCrawlerConfig(max_jobs=max_jobs, max_pages=max_pages, headless=True),
+            search_intelligence=search_intelligence,
+        )
         return crawler.run(execute_network=execute_network)
-    connector = make_connector(source, max_jobs=max_jobs, max_pages=max_pages)
+    connector = make_connector(source, max_jobs=max_jobs, max_pages=max_pages, search_intelligence=search_intelligence)
     if hasattr(connector, "fetch_agent_results"):
         results, meta = connector.fetch_agent_results(execute_network=execute_network, max_jobs=max_jobs)
         errors = [
@@ -149,6 +159,7 @@ def run_labor_acquisition(
     correlation_id: str | None = None,
     workers: int = 1,
     resume_from: str = "",
+    search_intelligence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     correlation_id = correlation_id or new_correlation_id()
     logger = JsonLogger(correlation_id)
@@ -178,7 +189,13 @@ def run_labor_acquisition(
         started = time.perf_counter()
         try:
             logger.log("source_started", source=source)
-            source_results, source_errors = _run_source(source, execute_network=execute_network, max_jobs=max_jobs, max_pages=max_pages)
+            source_results, source_errors = _run_source(
+                source,
+                execute_network=execute_network,
+                max_jobs=max_jobs,
+                max_pages=max_pages,
+                search_intelligence=search_intelligence,
+            )
             results.extend(source_results)
             errors.extend(source_errors)
             metrics[source].requests += 1

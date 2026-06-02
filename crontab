@@ -6,6 +6,4 @@ DB_NAME=unir_db
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_PORT=5433
-SCRAPER_TENANT=all
-
-0 2 * * * root cd /app && /usr/local/bin/python /app/scraper.py --tenant $SCRAPER_TENANT >> /var/log/logs.log 2>&1
+0 2 * * * root cd /app && /usr/local/bin/python /app/scripts/run_daily_labor_acquisition.py >> /var/log/daily_labor_acquisition.log 2>&1

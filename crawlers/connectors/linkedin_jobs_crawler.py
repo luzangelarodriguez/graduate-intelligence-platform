@@ -490,10 +490,20 @@ def _collect_job_links(page: Any, *, min_rounds: int = 3, max_rounds: int = 6) -
 
 
 class LinkedInJobsCrawler:
-    def __init__(self, config: LinkedInCrawlerConfig | None = None) -> None:
+    def __init__(
+        self,
+        config: LinkedInCrawlerConfig | None = None,
+        *,
+        search_intelligence: dict[str, Any] | None = None,
+    ) -> None:
         self.config = config or LinkedInCrawlerConfig()
         self.extractor = EnterpriseAgenticJobExtractor()
-        self.search_intelligence = get_academic_search_intelligence(mode=self.config.crawl_mode, manual_keywords=self.config.keywords, keyword_limit=self.config.keyword_limit, role_limit=max(12, self.config.keyword_limit // 2))
+        self.search_intelligence = search_intelligence or get_academic_search_intelligence(
+            mode=self.config.crawl_mode,
+            manual_keywords=self.config.keywords,
+            keyword_limit=self.config.keyword_limit,
+            role_limit=max(12, self.config.keyword_limit // 2),
+        )
         self.source_plan = source_plan_for(self.search_intelligence.get("crawler_plans"), "linkedin")
         self.keyword_plan = _build_keyword_plan(self.config, self.search_intelligence)
         self.keywords = [item.keyword for item in self.keyword_plan]
