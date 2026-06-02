@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: '0.0.0.0',
+      allowedHosts: ['sb-7m8p2twulher.vercel.run', 'localhost', '127.0.0.1'],
       proxy: {
       '/api': {
         target: apiTarget,
