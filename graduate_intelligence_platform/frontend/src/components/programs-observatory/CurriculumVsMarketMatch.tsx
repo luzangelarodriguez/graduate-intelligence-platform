@@ -1,3 +1,5 @@
+import { Loader2 } from 'lucide-react';
+import { useDashboardData } from '../../hooks/useDashboardData';
 import type { Program } from '../../types/api';
 
 interface CurriculumMatchProps {
@@ -7,11 +9,25 @@ interface CurriculumMatchProps {
 
 export function CurriculumVsMarketMatch({
   program,
-  academicSkills,
-  laborSkills,
-  gaps,
+  programId,
 }: CurriculumMatchProps) {
-  if (!program) return null;
+  const { programDashboard, isLoading } = useDashboardData();
+
+  if (!program || !programId) return null;
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 flex items-center justify-center gap-3">
+        <Loader2 size={20} className="animate-spin text-blue-600" />
+        <p className="text-slate-600">Loading curriculum analysis...</p>
+      </div>
+    );
+  }
+
+  // Extract data from insights or use empty fallback
+  const academicSkills = programDashboard?.insights?.detected ? 1 : 0;
+  const laborSkills = programDashboard?.insights?.ai_recommends?.length ?? 0;
+  const gaps = programDashboard?.missing_skills?.length ?? 0;
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">

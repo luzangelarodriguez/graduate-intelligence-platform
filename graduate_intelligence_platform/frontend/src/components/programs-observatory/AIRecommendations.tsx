@@ -1,28 +1,35 @@
-interface Recommendation {
-  finding: string;
-  evidence: string;
-  impact: string;
-  priority: 'high' | 'medium' | 'low';
-}
+import { Loader2 } from 'lucide-react';
+import { useDashboardData } from '../../hooks/useDashboardData';
+import type { RecommendationProgram } from '../../types/api';
 
 interface AIRecommendationsProps {
   programId: number | null;
 }
 
-export function AIRecommendations({ recommendations, loading = false }: AIRecommendationsProps) {
-  if (loading) {
+export function AIRecommendations({ programId }: AIRecommendationsProps) {
+  const { programDashboard, isLoading } = useDashboardData();
+
+  if (!programId) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
+        <p className="text-slate-600">Select a program to view recommendations</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-900 mb-6">AI Recommendations</h3>
         <div className="text-center py-8">
-          <div className="inline-block animate-spin">
-            <div className="w-6 h-6 border-3 border-slate-200 border-t-slate-900 rounded-full" />
-          </div>
+          <Loader2 size={24} className="animate-spin text-blue-600 mx-auto" />
           <p className="text-sm text-slate-600 mt-3">Analyzing program recommendations...</p>
         </div>
       </div>
     );
   }
+
+  const recommendations = programDashboard?.recommendations ?? [];
 
   if (!recommendations.length) {
     return (
@@ -37,7 +44,9 @@ export function AIRecommendations({ recommendations, loading = false }: AIRecomm
       <h3 className="text-lg font-semibold text-slate-900 mb-6">AI Recommendations</h3>
 
       <div className="space-y-4">
-        {recommendations.slice(0, 6).map((rec, idx) => {
+        {recommendations.slice(0, 6).map((rec: RecommendationProgram, idx: number) => {
+          // Use default priority medium since field doesn't exist
+          const priority = 'medium' as const;
           const priorityColors = {
             high: 'border-red-200 bg-red-50',
             medium: 'border-amber-200 bg-amber-50',
@@ -50,22 +59,22 @@ export function AIRecommendations({ recommendations, loading = false }: AIRecomm
           };
 
           return (
-            <div key={idx} className={`rounded-lg border p-4 ${priorityColors[rec.priority]}`}>
+            <div key={idx} className={`rounded-lg border p-4 ${priorityColors[priority]}`}>
               <div className="flex items-start justify-between mb-3">
-                <h4 className="font-semibold text-slate-900 flex-1">{rec.finding}</h4>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded whitespace-nowrap ml-2 ${priorityBadgeColors[rec.priority]}`}>
-                  {rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}
+                <h4 className="font-semibold text-slate-900 flex-1">{rec.nombre || 'N/D'}</h4>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded whitespace-nowrap ml-2 ${priorityBadgeColors[priority]}`}>
+                  {priority.charAt(0).toUpperCase() + priority.slice(1)}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-600 mb-1">Evidence</p>
-                  <p className="text-slate-700">{rec.evidence}</p>
+                  <p className="text-xs uppercase font-semibold text-slate-600 mb-1">Match Score</p>
+                  <p className="text-slate-700">{Number((rec.match ?? 0) * 100).toFixed(0)}%</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-600 mb-1">Impact</p>
-                  <p className="text-slate-700">{rec.impact}</p>
+                  <p className="text-xs uppercase font-semibold text-slate-600 mb-1">Reason</p>
+                  <p className="text-slate-700">{rec.reason || 'N/D'}</p>
                 </div>
               </div>
             </div>

@@ -1,11 +1,32 @@
+import { Loader2 } from 'lucide-react';
+import { useDashboardData } from '../../hooks/useDashboardData';
 import type { Match } from '../../types/api';
 
 interface RelatedJobsPanelProps {
   programId: number | null;
 }
 
-export function RelatedJobsPanel({ matches }: RelatedJobsPanelProps) {
-  if (!matches.length) {
+export function RelatedJobsPanel({ programId }: RelatedJobsPanelProps) {
+  const { matches, isLoading } = useDashboardData();
+
+  if (!programId) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
+        <p className="text-slate-600">Select a program to view related jobs</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 flex items-center justify-center gap-3">
+        <Loader2 size={20} className="animate-spin text-blue-600" />
+        <p className="text-slate-600">Loading job market data...</p>
+      </div>
+    );
+  }
+
+  if (!matches || matches.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm text-center">
         <p className="text-slate-600">No related jobs found in labor market signal</p>
@@ -27,15 +48,15 @@ export function RelatedJobsPanel({ matches }: RelatedJobsPanelProps) {
           </tr>
         </thead>
         <tbody>
-          {matches.slice(0, 10).map((match, idx) => {
+          {matches.slice(0, 10).map((match: Match, idx: number) => {
             const matchPercent = Number(match.porcentaje_match || 0);
             return (
               <tr key={`${match.empleo_id}-${idx}`} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="py-3 px-3 text-slate-900 font-medium">{match.titulo_empleo}</td>
+                <td className="py-3 px-3 text-slate-900 font-medium">{match.titulo_empleo || 'N/D'}</td>
                 <td className="py-3 px-3 text-slate-600">Employer</td>
                 <td className="py-3 px-3 text-center text-slate-600">
                   <span className="text-xs bg-slate-100 px-2 py-1 rounded">
-                    {match.skills_en_comun} / {match.total_skills_empleo}
+                    {match.skills_en_comun ?? 0} / {match.total_skills_empleo ?? 0}
                   </span>
                 </td>
                 <td className="py-3 px-3 text-center">

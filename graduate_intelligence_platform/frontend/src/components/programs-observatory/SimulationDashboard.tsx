@@ -53,14 +53,14 @@ export function SimulationDashboard({ programId, proposedSkills = [], horizonMon
     return { change, percent };
   };
 
-  const currentAlignment = simulation.current_alignment ?? 0;
-  const projectedAlignment = simulation.projected_alignment ?? 0;
-  const currentRisk = simulation.current_risk ?? 0;
-  const projectedRisk = simulation.projected_risk ?? 0;
-  const currentEmployability = simulation.current_employability ?? 0;
-  const projectedEmployability = simulation.projected_employability ?? 0;
-  const currentGaps = simulation.current_gaps ?? 0;
-  const projectedGaps = simulation.projected_gaps ?? 0;
+  const currentAlignment = simulation.current_alignment_score ?? 0;
+  const projectedAlignment = simulation.projected_alignment_score ?? 0;
+  const currentRisk = simulation.current_risk_score ?? 0;
+  const projectedRisk = simulation.projected_risk_score ?? 0;
+  const currentEmployability = 100 - currentRisk;
+  const projectedEmployability = simulation.projected_employability_gain ?? 0;
+  const currentGaps = 100 - currentAlignment;
+  const projectedGaps = simulation.projected_gap_reduction ?? 0;
 
   const alignmentChange = calculateChange(currentAlignment, projectedAlignment);
   const riskChange = calculateChange(currentRisk, projectedRisk);

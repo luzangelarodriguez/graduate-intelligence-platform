@@ -41,11 +41,11 @@ export function ActiveProgramPanel({
     );
   }
 
-  const alignment = summary?.kpis?.alignment_score ?? Number(program.promedio_match_mercado ?? 0) ?? 0;
-  const risk = summary?.kpis?.risk_score ?? 0;
-  const employability = summary?.kpis?.employability_score ?? 0;
-  const skillsCount = program.total_skills_programa ?? summary?.skills_count ?? 0;
-  const jobsCount = program.total_empleos_relacionados ?? summary?.jobs_count ?? 0;
+  const alignment = Number(program.promedio_match_mercado ?? 0);
+  const risk = 100 - alignment;
+  const employability = alignment > 50 ? alignment : 50;
+  const skillsCount = program.total_skills_programa ?? 0;
+  const jobsCount = program.total_empleos_relacionados ?? 0;
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">

@@ -1,11 +1,41 @@
+import { Loader2 } from 'lucide-react';
+import { useUniversityBenchmarks } from '../../hooks/useUniversityBenchmarks';
 import type { RelatedUniversityProgram } from '../../types/api';
 
 interface UniversityBenchmarksProps {
   programId: number | null;
 }
 
-export function UniversityBenchmarks({ programs }: UniversityBenchmarksProps) {
-  if (!programs.length) {
+export function UniversityBenchmarks({ programId }: UniversityBenchmarksProps) {
+  const { programs, isLoading, error } = useUniversityBenchmarks(programId, 10);
+
+  if (!programId) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
+        <p className="text-slate-600">Select a program to view benchmarks</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-6 flex items-center justify-center gap-3">
+        <Loader2 size={20} className="animate-spin text-blue-600" />
+        <p className="text-slate-600">Loading university benchmarks...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <p className="text-red-900 font-semibold">Error loading benchmarks</p>
+        <p className="text-sm text-red-700 mt-2">{error.message}</p>
+      </div>
+    );
+  }
+
+  if (!programs || programs.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm text-center">
         <p className="text-slate-600">No comparable programs found in SNIES database</p>
@@ -28,12 +58,12 @@ export function UniversityBenchmarks({ programs }: UniversityBenchmarksProps) {
           </tr>
         </thead>
         <tbody>
-          {programs.slice(0, 8).map((prog, idx) => {
-            const similarity = Math.round(Number(prog.similitud || 0) * 100);
+          {programs.slice(0, 8).map((prog: RelatedUniversityProgram, idx: number) => {
+            const similarity = prog.similitud ? Math.round(Number(prog.similitud) * 100) : 0;
             return (
               <tr key={`${prog.universidad}-${prog.programa}-${idx}`} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="py-3 px-3 text-slate-900 font-medium">{prog.universidad}</td>
-                <td className="py-3 px-3 text-slate-700">{prog.programa}</td>
+                <td className="py-3 px-3 text-slate-900 font-medium">{prog.universidad || 'N/D'}</td>
+                <td className="py-3 px-3 text-slate-700">{prog.programa || 'N/D'}</td>
                 <td className="py-3 px-3 text-slate-600">{prog.ciudad || 'Nacional'} · {prog.modalidad || 'Virtual'}</td>
                 <td className="py-3 px-3 text-slate-600">{prog.competidor || 'Comparable offer'}</td>
                 <td className="py-3 px-3 text-center">
