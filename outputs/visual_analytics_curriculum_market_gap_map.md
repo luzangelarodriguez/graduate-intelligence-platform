@@ -3,9 +3,9 @@
 - Especializacion: Especialización en Visual Analytics y Big Data
 - Covered: 14
 - Partial: 22
-- Missing: 0
-- Emerging: 0
-- Irrelevant: 13
+- Missing: 1
+- Emerging: 3
+- Irrelevant: 21
 
 ## Skills laborales detectadas
 
@@ -333,8 +333,48 @@
 - Relacion con perfil/grafo: Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo.
 - Recomendacion: Profundizar ELT mediante actividades aplicadas vinculadas a Enterprise Analytics.
 
+### reporting
+- Cluster ocupacional: Reporting & KPI
+- Cobertura curricular: missing
+- Peso de evidencia: 6.5
+- Fuente de evidencia: {"bronze_job_posting": 15, "portal_taxonomy": 5}
+- Cargos asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Relacion con perfil/grafo: Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa.
+- Recomendacion: Incorporar evidencia curricular de reporting si se confirma demanda laboral recurrente.
+
+### compliance
+- Cluster ocupacional: AI Analytics
+- Cobertura curricular: emerging
+- Peso de evidencia: 107.6
+- Fuente de evidencia: {"bronze_job_posting": 97, "portal_taxonomy": 2, "silver_job_posting": 98}
+- Cargos asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Relacion con perfil/grafo: Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa.
+- Recomendacion: Evaluar incorporacion gradual de compliance como competencia emergente del cluster AI Analytics.
+
+### financial crime
+- Cluster ocupacional: AI Analytics
+- Cobertura curricular: emerging
+- Peso de evidencia: 9.9
+- Fuente de evidencia: {"bronze_job_posting": 9, "silver_job_posting": 9}
+- Cargos asociados: Border management, Corruption, Our work, SECONDMENT Criminal Intelligence Officer - Crimes Against Children, Skip to main content
+- Relacion con perfil/grafo: Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa.
+- Recomendacion: Evaluar incorporacion gradual de financial crime como competencia emergente del cluster AI Analytics.
+
+### chain of custody
+- Cluster ocupacional: AI Analytics
+- Cobertura curricular: emerging
+- Peso de evidencia: 2.2
+- Fuente de evidencia: {"bronze_job_posting": 2, "silver_job_posting": 2}
+- Cargos asociados: Entidad, Manuales del Consejo Nacional de Policía Judicial (CNPJ)
+- Relacion con perfil/grafo: Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa.
+- Recomendacion: Evaluar incorporacion gradual de chain of custody como competencia emergente del cluster AI Analytics.
+
 ## Recomendaciones curriculares
 
+- Evaluar incorporacion gradual de compliance como competencia emergente del cluster AI Analytics. (skill: compliance, cluster: AI Analytics)
+- Evaluar incorporacion gradual de financial crime como competencia emergente del cluster AI Analytics. (skill: financial crime, cluster: AI Analytics)
+- Evaluar incorporacion gradual de chain of custody como competencia emergente del cluster AI Analytics. (skill: chain of custody, cluster: AI Analytics)
+- Incorporar evidencia curricular de reporting si se confirma demanda laboral recurrente. (skill: reporting, cluster: Reporting & KPI)
 - Profundizar comunicacion mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: comunicacion, cluster: Enterprise Analytics)
 - Profundizar trabajo en equipo mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: trabajo en equipo, cluster: Enterprise Analytics)
 - Profundizar APIs mediante actividades aplicadas vinculadas a Software/Data Platform. (skill: APIs, cluster: Software/Data Platform)
@@ -346,7 +386,3 @@
 - Profundizar PostgreSQL mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: PostgreSQL, cluster: Enterprise Analytics)
 - Profundizar PL/SQL mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: PL/SQL, cluster: Enterprise Analytics)
 - Profundizar NoSQL mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: NoSQL, cluster: Enterprise Analytics)
-- Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: MySQL, cluster: Enterprise Analytics)
-- Profundizar scikit-learn mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: scikit-learn, cluster: Enterprise Analytics)
-- Profundizar pandas mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: pandas, cluster: Enterprise Analytics)
-- Profundizar gestion de stakeholders mediante actividades aplicadas vinculadas a Enterprise Analytics. (skill: gestion de stakeholders, cluster: Enterprise Analytics)

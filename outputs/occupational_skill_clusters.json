@@ -2,6 +2,16 @@
   {
     "cluster_name": "Enterprise Analytics",
     "skills": [
+      "risk analysis",
+      "pensamiento analitico",
+      "security",
+      "forensic analysis",
+      "public safety",
+      "criminal investigation",
+      "criminal intelligence",
+      "cybercrime",
+      "organized crime",
+      "crime prevention",
       "Python",
       "SQL",
       "comunicacion",
@@ -9,7 +19,6 @@
       "resolucion de problemas",
       "Oracle",
       "Agile",
-      "pensamiento analitico",
       "liderazgo",
       "ingles",
       "Redis",
@@ -31,29 +40,88 @@
       "Kafka",
       "ELT"
     ],
-    "total_weight": 5.9,
-    "evidence_count": 59,
+    "total_weight": 286.8,
+    "evidence_count": 633,
     "dominant_sources": {
-      "portal_taxonomy": 59
+      "bronze_job_posting": 377,
+      "portal_taxonomy": 72,
+      "silver_job_posting": 184
     },
-    "representative_roles": [],
+    "representative_roles": [
+      "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+      "AGENTE DE CONTROL",
+      "Border management",
+      "Corruption",
+      "Crime prevention and criminal justice",
+      "Entidad",
+      "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+      "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+      "Europol Vacancies Status (27/05/2025) 1/3",
+      "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+      "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+      "Organized crime"
+    ],
+    "is_strong_market_signal": true
+  },
+  {
+    "cluster_name": "AI Analytics",
+    "skills": [
+      "compliance",
+      "financial crime",
+      "chain of custody",
+      "machine learning",
+      "AI"
+    ],
+    "total_weight": 120.1,
+    "evidence_count": 223,
+    "dominant_sources": {
+      "bronze_job_posting": 108,
+      "portal_taxonomy": 6,
+      "silver_job_posting": 109
+    },
+    "representative_roles": [
+      "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+      "AGENTE DE CONTROL",
+      "Border management",
+      "Corruption",
+      "Crime prevention and criminal justice",
+      "Entidad",
+      "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+      "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+      "Europol Vacancies Status (27/05/2025) 1/3",
+      "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+      "Our work",
+      "SECONDMENT Criminal Intelligence Officer - Crimes Against Children"
+    ],
     "is_strong_market_signal": true
   },
   {
     "cluster_name": "Reporting & KPI",
     "skills": [
-      "KPIs",
       "reporting",
+      "KPIs",
       "BI",
       "executive reporting",
       "Copilot BI"
     ],
-    "total_weight": 1.8,
-    "evidence_count": 18,
+    "total_weight": 7.9,
+    "evidence_count": 34,
     "dominant_sources": {
-      "portal_taxonomy": 18
+      "bronze_job_posting": 15,
+      "portal_taxonomy": 19
     },
-    "representative_roles": [],
+    "representative_roles": [
+      "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+      "AGENTE DE CONTROL",
+      "Border management",
+      "Corruption",
+      "Crime prevention and criminal justice",
+      "Entidad",
+      "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+      "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+      "Organized crime",
+      "Our work"
+    ],
     "is_strong_market_signal": true
   },
   {
@@ -111,20 +179,6 @@
     "evidence_count": 5,
     "dominant_sources": {
       "portal_taxonomy": 5
-    },
-    "representative_roles": [],
-    "is_strong_market_signal": false
-  },
-  {
-    "cluster_name": "AI Analytics",
-    "skills": [
-      "machine learning",
-      "AI"
-    ],
-    "total_weight": 0.4,
-    "evidence_count": 4,
-    "dominant_sources": {
-      "portal_taxonomy": 4
     },
     "representative_roles": [],
     "is_strong_market_signal": false

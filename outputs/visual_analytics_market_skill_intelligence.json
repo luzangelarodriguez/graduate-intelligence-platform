@@ -3,6 +3,614 @@
   "specialization_name": "Especialización en Visual Analytics y Big Data",
   "market_skills": [
     {
+      "skill": "compliance",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 127.1,
+      "evidence_count": 197,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 98
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "risk analysis",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 126.4,
+      "evidence_count": 197,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3,
+        "silver_job_posting": 97
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "pensamiento analitico",
+      "skill_type": "soft_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 48.8,
+      "evidence_count": 100,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://www.elempleo.com/co/ofertas-empleo/",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "security",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 48.1,
+      "evidence_count": 97,
+      "evidence_sources": {
+        "bronze_job_posting": 96,
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "forensic analysis",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 32.7,
+      "evidence_count": 52,
+      "evidence_sources": {
+        "bronze_job_posting": 25,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 25
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "public safety",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal investigation",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal intelligence",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "financial crime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 11.7,
+      "evidence_count": 18,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist - EFECC Operations (Corruption), Financial Crime Team",
+        "Specialist - EFECC Operations (Cryptocurrency), Financial Crime Team"
+      ],
+      "companies": [
+        "Europol",
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/index.html"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "cybercrime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 11.7,
+      "evidence_count": 18,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "BI",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist – Cybercrime Strategy & Development, Policy &",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "Europol",
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "reporting",
+      "skill_type": "explicit_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 8.0,
+      "evidence_count": 20,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 5
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "organized crime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 5.2,
+      "evidence_count": 8,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "crime prevention",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 5.2,
+      "evidence_count": 8,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Python",
+      "roles": [
+        "Crime prevention and criminal justice",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/justice-and-prison-reform/crime-prevention-and-criminal-justice.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "chain of custody",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 2.6,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "bronze_job_posting": 2,
+        "silver_job_posting": 2
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion"
+      ],
+      "source_urls": [
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
       "skill": "Python",
       "skill_type": "technology",
       "occupational_cluster": "Enterprise Analytics",
@@ -235,30 +843,6 @@
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
       "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "reporting",
-      "skill_type": "explicit_skill",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "partial",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -547,28 +1131,6 @@
       ],
       "recommendation": "Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.",
       "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
-    },
-    {
-      "skill": "pensamiento analitico",
-      "skill_type": "soft_skill",
-      "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "irrelevant",
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
     },
     {
       "skill": "Redis",
@@ -1390,6 +1952,53 @@
   ],
   "partial_skills": [
     {
+      "skill": "reporting",
+      "skill_type": "explicit_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 8.0,
+      "evidence_count": 20,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 5
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
       "skill": "comunicacion",
       "skill_type": "soft_skill",
       "occupational_cluster": "Enterprise Analytics",
@@ -1460,30 +2069,6 @@
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
       "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "reporting",
-      "skill_type": "explicit_skill",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "partial",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -2068,27 +2653,567 @@
       "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     }
   ],
-  "missing_skills": [],
+  "missing_skills": [
+    {
+      "skill": "compliance",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 127.1,
+      "evidence_count": 197,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 98
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "financial crime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 11.7,
+      "evidence_count": 18,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist - EFECC Operations (Corruption), Financial Crime Team",
+        "Specialist - EFECC Operations (Cryptocurrency), Financial Crime Team"
+      ],
+      "companies": [
+        "Europol",
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/index.html"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "chain of custody",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 2.6,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "bronze_job_posting": 2,
+        "silver_job_posting": 2
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion"
+      ],
+      "source_urls": [
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    }
+  ],
   "emerging_skills": [],
   "irrelevant_skills": [
+    {
+      "skill": "risk analysis",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 126.4,
+      "evidence_count": 197,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3,
+        "silver_job_posting": 97
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
     {
       "skill": "pensamiento analitico",
       "skill_type": "soft_skill",
       "occupational_cluster": "Enterprise Analytics",
-      "market_weight": 0.2,
-      "evidence_count": 2,
+      "market_weight": 48.8,
+      "evidence_count": 100,
       "evidence_sources": {
-        "portal_taxonomy": 2
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3
       },
       "market_signal_confidence": "weak",
       "coverage_status": "irrelevant",
       "affinity_score": 0.08,
       "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "companies": [],
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
       "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
         "https://ticjob.co/es/search",
-        "https://www.elempleo.com/co/ofertas-empleo/"
+        "https://www.elempleo.com/co/ofertas-empleo/",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "security",
+      "skill_type": "methodology",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 48.1,
+      "evidence_count": 97,
+      "evidence_sources": {
+        "bronze_job_posting": 96,
+        "portal_taxonomy": 1
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "forensic analysis",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 32.7,
+      "evidence_count": 52,
+      "evidence_sources": {
+        "bronze_job_posting": 25,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 25
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "public safety",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal investigation",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal intelligence",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 19.7,
+      "evidence_count": 32,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "cybercrime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 11.7,
+      "evidence_count": 18,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "BI",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist – Cybercrime Strategy & Development, Policy &",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "Europol",
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "organized crime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 5.2,
+      "evidence_count": 8,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
+      ],
+      "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "crime prevention",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "Enterprise Analytics",
+      "market_weight": 5.2,
+      "evidence_count": 8,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "irrelevant",
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Python",
+      "roles": [
+        "Crime prevention and criminal justice",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "companies": [
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://www.unodc.org/unodc/en/commissions/index.html",
+        "https://www.unodc.org/unodc/en/index.html",
+        "https://www.unodc.org/unodc/en/justice-and-prison-reform/crime-prevention-and-criminal-justice.html",
+        "https://www.unodc.org/unodc/en/organized-crime/toc.html"
       ],
       "recommendation": "No priorizar curricularmente por baja afinidad o evidencia debil.",
       "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
@@ -2163,6 +3288,16 @@
     {
       "cluster_name": "Enterprise Analytics",
       "skills": [
+        "risk analysis",
+        "pensamiento analitico",
+        "security",
+        "forensic analysis",
+        "public safety",
+        "criminal investigation",
+        "criminal intelligence",
+        "cybercrime",
+        "organized crime",
+        "crime prevention",
         "Python",
         "SQL",
         "comunicacion",
@@ -2170,7 +3305,6 @@
         "resolucion de problemas",
         "Oracle",
         "Agile",
-        "pensamiento analitico",
         "liderazgo",
         "ingles",
         "Redis",
@@ -2192,29 +3326,88 @@
         "Kafka",
         "ELT"
       ],
-      "total_weight": 5.9,
-      "evidence_count": 59,
+      "total_weight": 286.8,
+      "evidence_count": 633,
       "dominant_sources": {
-        "portal_taxonomy": 59
+        "bronze_job_posting": 377,
+        "portal_taxonomy": 72,
+        "silver_job_posting": 184
       },
-      "representative_roles": [],
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime"
+      ],
+      "is_strong_market_signal": true
+    },
+    {
+      "cluster_name": "AI Analytics",
+      "skills": [
+        "compliance",
+        "financial crime",
+        "chain of custody",
+        "machine learning",
+        "AI"
+      ],
+      "total_weight": 120.1,
+      "evidence_count": 223,
+      "dominant_sources": {
+        "bronze_job_posting": 108,
+        "portal_taxonomy": 6,
+        "silver_job_posting": 109
+      },
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children"
+      ],
       "is_strong_market_signal": true
     },
     {
       "cluster_name": "Reporting & KPI",
       "skills": [
-        "KPIs",
         "reporting",
+        "KPIs",
         "BI",
         "executive reporting",
         "Copilot BI"
       ],
-      "total_weight": 1.8,
-      "evidence_count": 18,
+      "total_weight": 7.9,
+      "evidence_count": 34,
       "dominant_sources": {
-        "portal_taxonomy": 18
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 19
       },
-      "representative_roles": [],
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
       "is_strong_market_signal": true
     },
     {
@@ -2277,20 +3470,6 @@
       "is_strong_market_signal": false
     },
     {
-      "cluster_name": "AI Analytics",
-      "skills": [
-        "machine learning",
-        "AI"
-      ],
-      "total_weight": 0.4,
-      "evidence_count": 4,
-      "dominant_sources": {
-        "portal_taxonomy": 4
-      },
-      "representative_roles": [],
-      "is_strong_market_signal": false
-    },
-    {
       "cluster_name": "Software/Data Platform",
       "skills": [
         "APIs"
@@ -2319,6 +3498,169 @@
     }
   ],
   "curriculum_gaps": [
+    {
+      "skill": "compliance",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 127.1,
+      "evidence_count": 197,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 98
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Europol",
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250109.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250527.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus_20241113.pdf",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "financial crime",
+      "skill_type": "technical_skill",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 11.7,
+      "evidence_count": 18,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist - EFECC Operations (Corruption), Financial Crime Team",
+        "Specialist - EFECC Operations (Cryptocurrency), Financial Crime Team"
+      ],
+      "companies": [
+        "Europol",
+        "INTERPOL",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://www.europol.europa.eu/cms/sites/default/files/documents/VacanciesStatus20250704.pdf",
+        "https://www.interpol.int/en/Crimes/Corruption",
+        "https://www.interpol.int/en/How-we-work/Border-management",
+        "https://www.unodc.org/unodc/en/index.html"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "chain of custody",
+      "skill_type": "methodology",
+      "occupational_cluster": "AI Analytics",
+      "market_weight": 2.6,
+      "evidence_count": 4,
+      "evidence_sources": {
+        "bronze_job_posting": 2,
+        "silver_job_posting": 2
+      },
+      "market_signal_confidence": "high",
+      "coverage_status": "missing",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion"
+      ],
+      "source_urls": [
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/quienes-somos/"
+      ],
+      "recommendation": "Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "reporting",
+      "skill_type": "explicit_skill",
+      "occupational_cluster": "Reporting & KPI",
+      "market_weight": 8.0,
+      "evidence_count": 20,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 5
+      },
+      "market_signal_confidence": "weak",
+      "coverage_status": "partial",
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "companies": [
+        "Fiscalia General de la Nacion",
+        "INTERPOL",
+        "Securitas",
+        "UNODC"
+      ],
+      "source_urls": [
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/",
+        "https://209400.jobs2web.com/job/San-Salvador-SECONDMENT-Criminal-Intelligence-Officer-Crimes-Against-Children/1314510200/#content",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/antioquia/medellin/medellin-i/aviacion/agente-de-control/1576",
+        "https://jobs.securitas.es/ssia/jobs/details/colombia/atlantico/barranquilla/barranquilla-iv/agente-de-control/1923",
+        "https://jobs.securitas.es/ssia/pais/colombia/3",
+        "https://ticjob.co/es/search",
+        "https://ticjob.co/es/search/job/administrador-linux/8664",
+        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
+        "https://www.elempleo.com/co/ofertas-empleo/",
+        "https://www.fiscalia.gov.co/colombia/la-entidad/ofertas-de-empleo/concurso-area-de-policia-judicial/"
+      ],
+      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
     {
       "skill": "comunicacion",
       "skill_type": "soft_skill",
@@ -2390,30 +3732,6 @@
         "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022"
       ],
       "recommendation": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "reporting",
-      "skill_type": "explicit_skill",
-      "occupational_cluster": "Reporting & KPI",
-      "market_weight": 0.4,
-      "evidence_count": 4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "market_signal_confidence": "weak",
-      "coverage_status": "partial",
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "companies": [],
-      "source_urls": [
-        "https://ticjob.co/es/search",
-        "https://ticjob.co/es/search/job/administrador-linux/8664",
-        "https://ticjob.co/es/search/job/administrador-servidores-aplicaciones/8022",
-        "https://www.elempleo.com/co/ofertas-empleo/"
-      ],
-      "recommendation": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
     },
     {
@@ -3000,6 +4318,63 @@
   ],
   "recommended_updates": [
     {
+      "skill": "compliance",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "market_signal_confidence": "high",
+      "market_weight": 127.1,
+      "action": "Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice"
+      ]
+    },
+    {
+      "skill": "financial crime",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "market_signal_confidence": "high",
+      "market_weight": 11.7,
+      "action": "Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content"
+      ]
+    },
+    {
+      "skill": "chain of custody",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "market_signal_confidence": "high",
+      "market_weight": 2.6,
+      "action": "Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.",
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ]
+    },
+    {
+      "skill": "reporting",
+      "cluster_name": "Reporting & KPI",
+      "priority": "media",
+      "market_signal_confidence": "weak",
+      "market_weight": 8.0,
+      "action": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice"
+      ]
+    },
+    {
       "skill": "comunicacion",
       "cluster_name": "Enterprise Analytics",
       "priority": "media",
@@ -3024,15 +4399,6 @@
       "market_signal_confidence": "weak",
       "market_weight": 0.4,
       "action": "Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.",
-      "roles": []
-    },
-    {
-      "skill": "reporting",
-      "cluster_name": "Reporting & KPI",
-      "priority": "media",
-      "market_signal_confidence": "weak",
-      "market_weight": 0.4,
-      "action": "Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
       "roles": []
     },
     {
@@ -3150,33 +4516,6 @@
       "market_signal_confidence": "weak",
       "market_weight": 0.1,
       "action": "Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.",
-      "roles": []
-    },
-    {
-      "skill": "GCP",
-      "cluster_name": "Cloud Analytics",
-      "priority": "media",
-      "market_signal_confidence": "weak",
-      "market_weight": 0.1,
-      "action": "Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.",
-      "roles": []
-    },
-    {
-      "skill": "executive reporting",
-      "cluster_name": "Reporting & KPI",
-      "priority": "media",
-      "market_signal_confidence": "weak",
-      "market_weight": 0.1,
-      "action": "Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.",
-      "roles": []
-    },
-    {
-      "skill": "Qlik",
-      "cluster_name": "BI & Visualization",
-      "priority": "media",
-      "market_signal_confidence": "weak",
-      "market_weight": 0.1,
-      "action": "Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.",
       "roles": []
     }
   ]
