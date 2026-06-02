@@ -1,7 +1,7 @@
 # Labor Market Skill After Acquisition
 
-- Skill universe: 68
+- Skill universe: 61
 - Occupational clusters: 9
-- Covered skills: 16
-- Missing skills: 8
-- Emerging skills: 10
+- Covered skills: 14
+- Missing skills: 1
+- Emerging skills: 3

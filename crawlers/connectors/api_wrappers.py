@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from agents.agentic_job_extractor import EnterpriseAgenticJobExtractor  # noqa: E402
 from agents.visual_analytics_labor_agent import AgentExtractionResult  # noqa: E402
+from scrapers.connectors.criminology_labor_connector import criminology_source_keys, make_criminology_connector  # noqa: E402
 from scrapers.connectors.elempleo_connector import ElempleoConnector  # noqa: E402
 from scrapers.connectors.findjobit_connector import FindJobITConnector  # noqa: E402
 from scrapers.connectors.hireline_connector import HirelineConnector  # noqa: E402
@@ -61,4 +62,6 @@ def make_connector(source: str, *, max_jobs: int = 20, max_pages: int = 2):
         return StructuredConnectorCrawler(HirelineConnector(max_jobs=max_jobs, max_pages=max_pages), "hireline")
     if source == "findjobit":
         return StructuredConnectorCrawler(FindJobITConnector(max_jobs=max_jobs, max_pages=max_pages), "findjobit")
+    if source in criminology_source_keys() or source in {"un", "uncareers", "fiscalia", "policia", "policia_nacional_colombia"}:
+        return StructuredConnectorCrawler(make_criminology_connector(source, max_jobs=max_jobs, max_pages=max_pages), source)
     raise KeyError(source)

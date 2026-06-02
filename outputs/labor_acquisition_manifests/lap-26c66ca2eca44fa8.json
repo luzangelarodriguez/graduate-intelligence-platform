@@ -1,0 +1,58 @@
+{
+  "correlation_id": "lap-26c66ca2eca44fa8",
+  "sources": [
+    "prosegur",
+    "fiscalia_colombia",
+    "policia_colombia"
+  ],
+  "execute_network": true,
+  "max_jobs": 5,
+  "max_pages": 1,
+  "persist": false,
+  "quality_review": false,
+  "started_at": 1780356202.413978,
+  "checkpoints": {
+    "source:prosegur": {
+      "results": 0,
+      "errors": 0,
+      "circuit": {
+        "source_name": "prosegur",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:fiscalia_colombia": {
+      "results": 2,
+      "errors": 0,
+      "circuit": {
+        "source_name": "fiscalia_colombia",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:policia_colombia": {
+      "results": 2,
+      "errors": 0,
+      "circuit": {
+        "source_name": "policia_colombia",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 50,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 50,
+      "warehouse_verification": {},
+      "analytics_reports": {}
+    }
+  },
+  "finished_at": 1780356236.2783864,
+  "cancelled": false
+}

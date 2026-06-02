@@ -509,9 +509,356 @@
       "reason": "Skill transversal o de soporte necesaria para el desempeño profesional y la trazabilidad curricular, aunque no aparezca como competencia nuclear del grafo."
     }
   ],
-  "missing_skills": [],
-  "emerging_skills": [],
+  "missing_skills": [
+    {
+      "skill": "reporting",
+      "cluster_name": "Reporting & KPI",
+      "coverage_status": "missing",
+      "evidence_weight": 6.5,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 5
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "big data processing",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "recommendation": "Incorporar evidencia curricular de reporting si se confirma demanda laboral recurrente.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    }
+  ],
+  "emerging_skills": [
+    {
+      "skill": "compliance",
+      "cluster_name": "AI Analytics",
+      "coverage_status": "emerging",
+      "evidence_weight": 107.6,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 98
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "recommendation": "Evaluar incorporacion gradual de compliance como competencia emergente del cluster AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "financial crime",
+      "cluster_name": "AI Analytics",
+      "coverage_status": "emerging",
+      "evidence_weight": 9.9,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist - EFECC Operations (Corruption), Financial Crime Team",
+        "Specialist - EFECC Operations (Cryptocurrency), Financial Crime Team"
+      ],
+      "recommendation": "Evaluar incorporacion gradual de financial crime como competencia emergente del cluster AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    },
+    {
+      "skill": "chain of custody",
+      "cluster_name": "AI Analytics",
+      "coverage_status": "emerging",
+      "evidence_weight": 2.2,
+      "evidence_sources": {
+        "bronze_job_posting": 2,
+        "silver_job_posting": 2
+      },
+      "affinity_score": 0.48,
+      "matched_curriculum_skill": "machine learning",
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "recommendation": "Evaluar incorporacion gradual de chain of custody como competencia emergente del cluster AI Analytics.",
+      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
+    }
+  ],
   "irrelevant_skills": [
+    {
+      "skill": "risk analysis",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 107.0,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3,
+        "silver_job_posting": 97
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "pensamiento analitico",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 39.1,
+      "evidence_sources": {
+        "bronze_job_posting": 97,
+        "portal_taxonomy": 3
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "security",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 38.5,
+      "evidence_sources": {
+        "bronze_job_posting": 96,
+        "portal_taxonomy": 1
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "forensic analysis",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 27.7,
+      "evidence_sources": {
+        "bronze_job_posting": 25,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 25
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "public safety",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 16.7,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal investigation",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 16.7,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "criminal intelligence",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 16.7,
+      "evidence_sources": {
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 2,
+        "silver_job_posting": 15
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "visualizacion analitica",
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "cybercrime",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 9.9,
+      "evidence_sources": {
+        "bronze_job_posting": 9,
+        "silver_job_posting": 9
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "BI",
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content",
+        "Specialist – Cybercrime Strategy & Development, Policy &",
+        "Treaties and intergovernmental bodies"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "organized crime",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 4.4,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "estadistica",
+      "roles": [
+        "Corruption",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
+    {
+      "skill": "crime prevention",
+      "cluster_name": "Enterprise Analytics",
+      "coverage_status": "irrelevant",
+      "evidence_weight": 4.4,
+      "evidence_sources": {
+        "bronze_job_posting": 4,
+        "silver_job_posting": 4
+      },
+      "affinity_score": 0.08,
+      "matched_curriculum_skill": "Python",
+      "roles": [
+        "Crime prevention and criminal justice",
+        "Organized crime",
+        "Our work",
+        "Treaties and intergovernmental bodies"
+      ],
+      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
+      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
+    },
     {
       "skill": "Azure",
       "cluster_name": "Cloud Analytics",
@@ -539,34 +886,6 @@
       "roles": [],
       "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
       "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "reporting",
-      "cluster_name": "Reporting & KPI",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.4,
-      "evidence_sources": {
-        "portal_taxonomy": 4
-      },
-      "affinity_score": 0.48,
-      "matched_curriculum_skill": "big data processing",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill laboral relevante para el ecosistema de Visual Analytics y Big Data, pero sin cobertura curricular directa."
-    },
-    {
-      "skill": "pensamiento analitico",
-      "cluster_name": "Enterprise Analytics",
-      "coverage_status": "irrelevant",
-      "evidence_weight": 0.2,
-      "evidence_sources": {
-        "portal_taxonomy": 2
-      },
-      "affinity_score": 0.08,
-      "matched_curriculum_skill": "estadistica",
-      "roles": [],
-      "recommendation": "Excluir de recomendaciones curriculares por baja afinidad con la especializacion.",
-      "reason": "Skill con baja relacion semantica frente al grafo curricular de la especializacion."
     },
     {
       "skill": "Redis",
@@ -699,6 +1018,16 @@
     {
       "cluster_name": "Enterprise Analytics",
       "skills": [
+        "risk analysis",
+        "pensamiento analitico",
+        "security",
+        "forensic analysis",
+        "public safety",
+        "criminal investigation",
+        "criminal intelligence",
+        "cybercrime",
+        "organized crime",
+        "crime prevention",
         "Python",
         "SQL",
         "comunicacion",
@@ -706,7 +1035,6 @@
         "resolucion de problemas",
         "Oracle",
         "Agile",
-        "pensamiento analitico",
         "liderazgo",
         "ingles",
         "Redis",
@@ -728,29 +1056,88 @@
         "Kafka",
         "ELT"
       ],
-      "total_weight": 5.9,
-      "evidence_count": 59,
+      "total_weight": 286.8,
+      "evidence_count": 633,
       "dominant_sources": {
-        "portal_taxonomy": 59
+        "bronze_job_posting": 377,
+        "portal_taxonomy": 72,
+        "silver_job_posting": 184
       },
-      "representative_roles": [],
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime"
+      ],
+      "is_strong_market_signal": true
+    },
+    {
+      "cluster_name": "AI Analytics",
+      "skills": [
+        "compliance",
+        "financial crime",
+        "chain of custody",
+        "machine learning",
+        "AI"
+      ],
+      "total_weight": 120.1,
+      "evidence_count": 223,
+      "dominant_sources": {
+        "bronze_job_posting": 108,
+        "portal_taxonomy": 6,
+        "silver_job_posting": 109
+      },
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Europol Vacancies Status (04/07/2025) 1/3 Seconded National Expert, Analysis Project (AP) Terminal, EC3",
+        "Europol Vacancies Status (04/07/2025) 2/3 Specialist - Core International Crimes, Team Operations C, Counter",
+        "Europol Vacancies Status (27/05/2025) 1/3",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children"
+      ],
       "is_strong_market_signal": true
     },
     {
       "cluster_name": "Reporting & KPI",
       "skills": [
-        "KPIs",
         "reporting",
+        "KPIs",
         "BI",
         "executive reporting",
         "Copilot BI"
       ],
-      "total_weight": 1.8,
-      "evidence_count": 18,
+      "total_weight": 7.9,
+      "evidence_count": 34,
       "dominant_sources": {
-        "portal_taxonomy": 18
+        "bronze_job_posting": 15,
+        "portal_taxonomy": 19
       },
-      "representative_roles": [],
+      "representative_roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice",
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)",
+        "OPERADOR DE SEGURIDAD RIONEGRO-. Objetivo del cargo: Garantizar un servicio de vigilancia",
+        "Organized crime",
+        "Our work"
+      ],
       "is_strong_market_signal": true
     },
     {
@@ -813,20 +1200,6 @@
       "is_strong_market_signal": false
     },
     {
-      "cluster_name": "AI Analytics",
-      "skills": [
-        "machine learning",
-        "AI"
-      ],
-      "total_weight": 0.4,
-      "evidence_count": 4,
-      "dominant_sources": {
-        "portal_taxonomy": 4
-      },
-      "representative_roles": [],
-      "is_strong_market_signal": false
-    },
-    {
       "cluster_name": "Software/Data Platform",
       "skills": [
         "APIs"
@@ -855,6 +1228,59 @@
     }
   ],
   "recommended_curriculum_updates": [
+    {
+      "skill": "compliance",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "action": "Evaluar incorporacion gradual de compliance como competencia emergente del cluster AI Analytics.",
+      "evidence_weight": 107.6,
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice"
+      ]
+    },
+    {
+      "skill": "financial crime",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "action": "Evaluar incorporacion gradual de financial crime como competencia emergente del cluster AI Analytics.",
+      "evidence_weight": 9.9,
+      "roles": [
+        "Border management",
+        "Corruption",
+        "Our work",
+        "SECONDMENT Criminal Intelligence Officer - Crimes Against Children",
+        "Skip to main content"
+      ]
+    },
+    {
+      "skill": "chain of custody",
+      "cluster_name": "AI Analytics",
+      "priority": "alta",
+      "action": "Evaluar incorporacion gradual de chain of custody como competencia emergente del cluster AI Analytics.",
+      "evidence_weight": 2.2,
+      "roles": [
+        "Entidad",
+        "Manuales del Consejo Nacional de Policía Judicial (CNPJ)"
+      ]
+    },
+    {
+      "skill": "reporting",
+      "cluster_name": "Reporting & KPI",
+      "priority": "media",
+      "action": "Incorporar evidencia curricular de reporting si se confirma demanda laboral recurrente.",
+      "evidence_weight": 6.5,
+      "roles": [
+        "14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri",
+        "AGENTE DE CONTROL",
+        "Border management",
+        "Corruption",
+        "Crime prevention and criminal justice"
+      ]
+    },
     {
       "skill": "comunicacion",
       "cluster_name": "Enterprise Analytics",
@@ -940,38 +1366,6 @@
       "cluster_name": "Enterprise Analytics",
       "priority": "media",
       "action": "Profundizar NoSQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
-      "evidence_weight": 0.1,
-      "roles": []
-    },
-    {
-      "skill": "MySQL",
-      "cluster_name": "Enterprise Analytics",
-      "priority": "media",
-      "action": "Profundizar MySQL mediante actividades aplicadas vinculadas a Enterprise Analytics.",
-      "evidence_weight": 0.1,
-      "roles": []
-    },
-    {
-      "skill": "scikit-learn",
-      "cluster_name": "Enterprise Analytics",
-      "priority": "media",
-      "action": "Profundizar scikit-learn mediante actividades aplicadas vinculadas a Enterprise Analytics.",
-      "evidence_weight": 0.1,
-      "roles": []
-    },
-    {
-      "skill": "pandas",
-      "cluster_name": "Enterprise Analytics",
-      "priority": "media",
-      "action": "Profundizar pandas mediante actividades aplicadas vinculadas a Enterprise Analytics.",
-      "evidence_weight": 0.1,
-      "roles": []
-    },
-    {
-      "skill": "gestion de stakeholders",
-      "cluster_name": "Enterprise Analytics",
-      "priority": "media",
-      "action": "Profundizar gestion de stakeholders mediante actividades aplicadas vinculadas a Enterprise Analytics.",
       "evidence_weight": 0.1,
       "roles": []
     }

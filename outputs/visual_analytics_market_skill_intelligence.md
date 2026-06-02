@@ -1,14 +1,154 @@
 # Visual Analytics Market Skill Intelligence
 
 - Especializacion: Especialización en Visual Analytics y Big Data
-- Skills mercado: 49
+- Skills mercado: 61
 - Covered: 14
 - Partial: 31
-- Missing: 0
+- Missing: 3
 - Emerging: 0
-- Irrelevant: 4
+- Irrelevant: 13
 
 ## Top market skills
+
+### compliance
+- Cluster: AI Analytics
+- Market weight: 127.1
+- Market signal confidence: high
+- Coverage curricular: missing
+- Evidence sources: {"bronze_job_posting": 97, "portal_taxonomy": 2, "silver_job_posting": 98}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.48
+- Recomendacion: Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.
+
+### risk analysis
+- Cluster: Enterprise Analytics
+- Market weight: 126.4
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 97, "portal_taxonomy": 3, "silver_job_posting": 97}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### pensamiento analitico
+- Cluster: Enterprise Analytics
+- Market weight: 48.8
+- Market signal confidence: weak
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 97, "portal_taxonomy": 3}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### security
+- Cluster: Enterprise Analytics
+- Market weight: 48.1
+- Market signal confidence: weak
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 96, "portal_taxonomy": 1}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### forensic analysis
+- Cluster: Enterprise Analytics
+- Market weight: 32.7
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 25, "portal_taxonomy": 2, "silver_job_posting": 25}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### public safety
+- Cluster: Enterprise Analytics
+- Market weight: 19.7
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 15, "portal_taxonomy": 2, "silver_job_posting": 15}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### criminal investigation
+- Cluster: Enterprise Analytics
+- Market weight: 19.7
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 15, "portal_taxonomy": 2, "silver_job_posting": 15}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### criminal intelligence
+- Cluster: Enterprise Analytics
+- Market weight: 19.7
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 15, "portal_taxonomy": 2, "silver_job_posting": 15}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### financial crime
+- Cluster: AI Analytics
+- Market weight: 11.7
+- Market signal confidence: high
+- Coverage curricular: missing
+- Evidence sources: {"bronze_job_posting": 9, "silver_job_posting": 9}
+- Roles asociados: Border management, Corruption, Our work, SECONDMENT Criminal Intelligence Officer - Crimes Against Children, Skip to main content
+- Afinidad: 0.48
+- Recomendacion: Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.
+
+### cybercrime
+- Cluster: Enterprise Analytics
+- Market weight: 11.7
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 9, "silver_job_posting": 9}
+- Roles asociados: Border management, Corruption, Organized crime, Our work, SECONDMENT Criminal Intelligence Officer - Crimes Against Children
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### reporting
+- Cluster: Reporting & KPI
+- Market weight: 8.0
+- Market signal confidence: weak
+- Coverage curricular: partial
+- Evidence sources: {"bronze_job_posting": 15, "portal_taxonomy": 5}
+- Roles asociados: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
+- Afinidad: 0.48
+- Recomendacion: Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
+
+### organized crime
+- Cluster: Enterprise Analytics
+- Market weight: 5.2
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 4, "silver_job_posting": 4}
+- Roles asociados: Corruption, Organized crime, Our work, Treaties and intergovernmental bodies
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### crime prevention
+- Cluster: Enterprise Analytics
+- Market weight: 5.2
+- Market signal confidence: high
+- Coverage curricular: irrelevant
+- Evidence sources: {"bronze_job_posting": 4, "silver_job_posting": 4}
+- Roles asociados: Crime prevention and criminal justice, Organized crime, Our work, Treaties and intergovernmental bodies
+- Afinidad: 0.08
+- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
+
+### chain of custody
+- Cluster: AI Analytics
+- Market weight: 2.6
+- Market signal confidence: high
+- Coverage curricular: missing
+- Evidence sources: {"bronze_job_posting": 2, "silver_job_posting": 2}
+- Roles asociados: Entidad, Manuales del Consejo Nacional de Policía Judicial (CNPJ)
+- Afinidad: 0.48
+- Recomendacion: Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.
 
 ### Python
 - Cluster: Enterprise Analytics
@@ -110,16 +250,6 @@
 - Afinidad: 0.55
 - Recomendacion: Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.
 
-### reporting
-- Cluster: Reporting & KPI
-- Market weight: 0.4
-- Market signal confidence: weak
-- Coverage curricular: partial
-- Evidence sources: {"portal_taxonomy": 4}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.48
-- Recomendacion: Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
-
 ### trabajo en equipo
 - Cluster: Enterprise Analytics
 - Market weight: 0.4
@@ -180,139 +310,11 @@
 - Afinidad: 0.82
 - Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
 
-### Tableau
-- Cluster: BI & Visualization
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.82
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### Spark
-- Cluster: Data Engineering
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.82
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### Hadoop
-- Cluster: Data Engineering
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.82
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### AI
-- Cluster: AI Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.82
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### liderazgo
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: partial
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.35
-- Recomendacion: Profundizar liderazgo como capacidad aplicada dentro del cluster Enterprise Analytics.
-
-### ingles
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: partial
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.35
-- Recomendacion: Profundizar ingles como capacidad aplicada dentro del cluster Enterprise Analytics.
-
-### PostgreSQL
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: partial
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.35
-- Recomendacion: Profundizar PostgreSQL como capacidad aplicada dentro del cluster Enterprise Analytics.
-
-### pensamiento analitico
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
-### Redis
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
-### ITIL
-- Cluster: Enterprise Analytics
-- Market weight: 0.2
-- Market signal confidence: weak
-- Coverage curricular: irrelevant
-- Evidence sources: {"portal_taxonomy": 2}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.08
-- Recomendacion: No priorizar curricularmente por baja afinidad o evidencia debil.
-
-### visualizacion analitica
-- Cluster: BI & Visualization
-- Market weight: 0.1
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 1}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.845
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### estadistica
-- Cluster: Enterprise Analytics
-- Market weight: 0.1
-- Market signal confidence: weak
-- Coverage curricular: covered
-- Evidence sources: {"portal_taxonomy": 1}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.82
-- Recomendacion: Mantener cobertura curricular y fortalecer evidencia evaluable si el mercado confirma frecuencia alta.
-
-### PL/SQL
-- Cluster: Enterprise Analytics
-- Market weight: 0.1
-- Market signal confidence: weak
-- Coverage curricular: partial
-- Evidence sources: {"portal_taxonomy": 1}
-- Roles asociados: sin cargo asociado
-- Afinidad: 0.81
-- Recomendacion: Profundizar PL/SQL como capacidad aplicada dentro del cluster Enterprise Analytics.
-
 ## Missing skills
 
-- Sin missing skills con señal media/alta.
+- compliance (AI Analytics, weight=127.1)
+- financial crime (AI Analytics, weight=11.7)
+- chain of custody (AI Analytics, weight=2.6)
 
 ## Emerging skills
 
@@ -320,10 +322,13 @@
 
 ## Recommended updates
 
+- Evaluar incorporacion curricular de compliance por demanda laboral no cubierta en AI Analytics.
+- Evaluar incorporacion curricular de financial crime por demanda laboral no cubierta en AI Analytics.
+- Evaluar incorporacion curricular de chain of custody por demanda laboral no cubierta en AI Analytics.
+- Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
 - Profundizar comunicacion como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar Azure como capacidad aplicada dentro del cluster Cloud Analytics.
 - Profundizar AWS como capacidad aplicada dentro del cluster Cloud Analytics.
-- Profundizar reporting como capacidad aplicada dentro del cluster Reporting & KPI.
 - Profundizar trabajo en equipo como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar APIs como capacidad aplicada dentro del cluster Software/Data Platform.
 - Profundizar resolucion de problemas como capacidad aplicada dentro del cluster Enterprise Analytics.
@@ -337,6 +342,3 @@
 - Profundizar MySQL como capacidad aplicada dentro del cluster Enterprise Analytics.
 - Profundizar RAG como capacidad aplicada dentro del cluster GenAI Analytics.
 - Profundizar LLM como capacidad aplicada dentro del cluster GenAI Analytics.
-- Profundizar GCP como capacidad aplicada dentro del cluster Cloud Analytics.
-- Profundizar executive reporting como capacidad aplicada dentro del cluster Reporting & KPI.
-- Profundizar Qlik como capacidad aplicada dentro del cluster BI & Visualization.

@@ -1,0 +1,490 @@
+{
+  "correlation_id": "lap-f5cceaa8f3754261",
+  "sources": [
+    "interpol",
+    "europol",
+    "un_careers",
+    "unodc",
+    "securitas",
+    "g4s",
+    "prosegur",
+    "fiscalia_colombia",
+    "policia_colombia",
+    "inpec",
+    "procuraduria",
+    "defensoria"
+  ],
+  "execute_network": true,
+  "max_jobs": 200,
+  "max_pages": 20,
+  "persist": true,
+  "quality_review": false,
+  "started_at": 1780358099.925366,
+  "checkpoints": {
+    "source:interpol": {
+      "results": 4,
+      "errors": 2,
+      "circuit": {
+        "source_name": "interpol",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:europol": {
+      "results": 157,
+      "errors": 2,
+      "circuit": {
+        "source_name": "europol",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:un_careers": {
+      "results": 157,
+      "errors": 2,
+      "circuit": {
+        "source_name": "un_careers",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:unodc": {
+      "results": 161,
+      "errors": 2,
+      "circuit": {
+        "source_name": "unodc",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:securitas": {
+      "results": 167,
+      "errors": 2,
+      "circuit": {
+        "source_name": "securitas",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:g4s": {
+      "results": 167,
+      "errors": 2,
+      "circuit": {
+        "source_name": "g4s",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:prosegur": {
+      "results": 167,
+      "errors": 2,
+      "circuit": {
+        "source_name": "prosegur",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:fiscalia_colombia": {
+      "results": 169,
+      "errors": 2,
+      "circuit": {
+        "source_name": "fiscalia_colombia",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:policia_colombia": {
+      "results": 169,
+      "errors": 2,
+      "circuit": {
+        "source_name": "policia_colombia",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:inpec": {
+      "results": 169,
+      "errors": 4,
+      "circuit": {
+        "source_name": "inpec",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:procuraduria": {
+      "results": 169,
+      "errors": 4,
+      "circuit": {
+        "source_name": "procuraduria",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:defensoria": {
+      "results": 169,
+      "errors": 4,
+      "circuit": {
+        "source_name": "defensoria",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 61,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 1,
+      "emerging_skills": 3,
+      "market_skills": 61,
+      "warehouse_verification": {
+        "jobs_count": 423,
+        "jobs_by_source": [
+          {
+            "source": "Ticjob",
+            "count": 244
+          },
+          {
+            "source": "Europol Careers",
+            "count": 164
+          },
+          {
+            "source": "Securitas Colombia Careers",
+            "count": 5
+          },
+          {
+            "source": "Interpol Careers",
+            "count": 4
+          },
+          {
+            "source": "UNODC Careers",
+            "count": 4
+          },
+          {
+            "source": "Fiscalia Colombia Convocatorias",
+            "count": 2
+          }
+        ],
+        "top_skills": [
+          {
+            "canonical_skill": "security",
+            "count": 266
+          },
+          {
+            "canonical_skill": "compliance",
+            "count": 227
+          },
+          {
+            "canonical_skill": "comunicacion",
+            "count": 169
+          },
+          {
+            "canonical_skill": "AWS",
+            "count": 153
+          },
+          {
+            "canonical_skill": "Azure",
+            "count": 151
+          },
+          {
+            "canonical_skill": "reporting",
+            "count": 124
+          },
+          {
+            "canonical_skill": "APIs",
+            "count": 117
+          },
+          {
+            "canonical_skill": "Oracle",
+            "count": 113
+          },
+          {
+            "canonical_skill": "pensamiento analitico",
+            "count": 109
+          },
+          {
+            "canonical_skill": "Python",
+            "count": 108
+          },
+          {
+            "canonical_skill": "trabajo en equipo",
+            "count": 107
+          },
+          {
+            "canonical_skill": "risk analysis",
+            "count": 97
+          },
+          {
+            "canonical_skill": "liderazgo",
+            "count": 96
+          },
+          {
+            "canonical_skill": "Agile",
+            "count": 88
+          },
+          {
+            "canonical_skill": "BI",
+            "count": 86
+          },
+          {
+            "canonical_skill": "resolucion de problemas",
+            "count": 83
+          },
+          {
+            "canonical_skill": "gestion de stakeholders",
+            "count": 81
+          },
+          {
+            "canonical_skill": "pipelines",
+            "count": 68
+          },
+          {
+            "canonical_skill": "KPIs",
+            "count": 67
+          },
+          {
+            "canonical_skill": "privacy",
+            "count": 64
+          },
+          {
+            "canonical_skill": "dashboarding",
+            "count": 63
+          },
+          {
+            "canonical_skill": "GCP",
+            "count": 63
+          },
+          {
+            "canonical_skill": "SQL",
+            "count": 61
+          },
+          {
+            "canonical_skill": "ITIL",
+            "count": 60
+          },
+          {
+            "canonical_skill": "data governance",
+            "count": 57
+          },
+          {
+            "canonical_skill": "AI",
+            "count": 46
+          },
+          {
+            "canonical_skill": "Scrum",
+            "count": 42
+          },
+          {
+            "canonical_skill": "MongoDB",
+            "count": 41
+          },
+          {
+            "canonical_skill": "ELT",
+            "count": 39
+          },
+          {
+            "canonical_skill": "Kanban",
+            "count": 39
+          },
+          {
+            "canonical_skill": "machine learning",
+            "count": 39
+          },
+          {
+            "canonical_skill": "MLflow",
+            "count": 39
+          },
+          {
+            "canonical_skill": "pandas",
+            "count": 39
+          },
+          {
+            "canonical_skill": "scikit-learn",
+            "count": 39
+          },
+          {
+            "canonical_skill": "Power BI",
+            "count": 30
+          },
+          {
+            "canonical_skill": "ingles",
+            "count": 29
+          },
+          {
+            "canonical_skill": "PostgreSQL",
+            "count": 27
+          },
+          {
+            "canonical_skill": "Redis",
+            "count": 27
+          },
+          {
+            "canonical_skill": "ETL",
+            "count": 25
+          },
+          {
+            "canonical_skill": "forensic analysis",
+            "count": 25
+          },
+          {
+            "canonical_skill": "SQL Server",
+            "count": 25
+          },
+          {
+            "canonical_skill": "SSIS",
+            "count": 25
+          },
+          {
+            "canonical_skill": "executive reporting",
+            "count": 16
+          },
+          {
+            "canonical_skill": "criminal intelligence",
+            "count": 15
+          },
+          {
+            "canonical_skill": "criminal investigation",
+            "count": 15
+          },
+          {
+            "canonical_skill": "public safety",
+            "count": 15
+          },
+          {
+            "canonical_skill": "Copilot BI",
+            "count": 11
+          },
+          {
+            "canonical_skill": "LLM",
+            "count": 11
+          },
+          {
+            "canonical_skill": "RAG",
+            "count": 11
+          },
+          {
+            "canonical_skill": "cybercrime",
+            "count": 9
+          }
+        ],
+        "jobs_by_seniority": [
+          {
+            "seniority": "No especificado",
+            "count": 209
+          },
+          {
+            "seniority": "Senior",
+            "count": 202
+          },
+          {
+            "seniority": "Semi Senior",
+            "count": 12
+          }
+        ],
+        "jobs_by_modality": [
+          {
+            "modality": "Hibrido",
+            "count": 282
+          },
+          {
+            "modality": "Remoto",
+            "count": 141
+          }
+        ],
+        "recent_companies": [
+          {
+            "company": "Europol",
+            "count": 164
+          },
+          {
+            "company": "UNODC",
+            "count": 4
+          },
+          {
+            "company": "Securitas",
+            "count": 5
+          },
+          {
+            "company": "INTERPOL",
+            "count": 4
+          },
+          {
+            "company": "Fiscalia General de la Nacion",
+            "count": 2
+          },
+          {
+            "company": "TICXAR",
+            "count": 6
+          },
+          {
+            "company": "TALENTO SOLIDO",
+            "count": 5
+          },
+          {
+            "company": "CS3",
+            "count": 6
+          },
+          {
+            "company": "SETI",
+            "count": 34
+          },
+          {
+            "company": "No especificada",
+            "count": 172
+          },
+          {
+            "company": "Confidencial2",
+            "count": 1
+          },
+          {
+            "company": "Venta Equipos",
+            "count": 9
+          },
+          {
+            "company": "Soluciones en Bases de Datos",
+            "count": 1
+          },
+          {
+            "company": "Indra",
+            "count": 6
+          },
+          {
+            "company": "GINKO FINANCIAL SOLUTIONS",
+            "count": 4
+          }
+        ],
+        "duplicate_groups": 310,
+        "job_embeddings": 358,
+        "skill_embeddings": 55,
+        "company_embeddings": 52,
+        "company_profiles": 303,
+        "emerging_candidates": 1
+      },
+      "analytics_reports": {
+        "top_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\top_skills.md",
+        "source_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\source_distribution.md",
+        "salary_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\salary_distribution.md",
+        "emerging_skills.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skills.md",
+        "company_skill_distribution.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\company_skill_distribution.md",
+        "duplicate_detection_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\duplicate_detection_report.md",
+        "emerging_skill_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\emerging_skill_report.md",
+        "semantic_role_clusters.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\semantic_role_clusters.md",
+        "labor_market_maturity_report.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_maturity_report.md",
+        "labor_market_summary.md": "C:\\Users\\SoporteTI\\Desktop\\SOFTWARE\\outputs\\analytics\\labor_market_summary.md"
+      }
+    }
+  },
+  "finished_at": 1780358843.3982995,
+  "cancelled": false
+}

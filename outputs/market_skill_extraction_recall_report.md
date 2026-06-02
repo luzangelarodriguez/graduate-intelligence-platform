@@ -1,9 +1,9 @@
 # Market Skill Extraction Recall Report
 
-- Skills antes: 14
-- Skills despues: 49
-- Nuevas skills detectadas: 35
-- Referencia anterior: extractor base Visual Analytics (14 skills presentes en la taxonomia base).
+- Skills antes: 25
+- Skills despues: 61
+- Nuevas skills detectadas: 36
+- Referencia anterior: extractor base Visual Analytics (25 skills presentes en la taxonomia base).
 
 ## Nuevas skills detectadas
 
@@ -219,17 +219,17 @@
 
 ### pensamiento analitico
 - Cluster: Enterprise Analytics
-- Fuente: {"portal_taxonomy": 2}
+- Fuente: {"bronze_job_posting": 97, "portal_taxonomy": 3}
 - Confidence: weak
 - Clasificacion curricular: irrelevant
-- Roles: sin cargo asociado
+- Roles: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
 
 ### reporting
 - Cluster: Reporting & KPI
-- Fuente: {"portal_taxonomy": 4}
+- Fuente: {"bronze_job_posting": 15, "portal_taxonomy": 5}
 - Confidence: weak
 - Clasificacion curricular: partial
-- Roles: sin cargo asociado
+- Roles: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
 
 ### resolucion de problemas
 - Cluster: Enterprise Analytics
@@ -244,6 +244,13 @@
 - Confidence: weak
 - Clasificacion curricular: partial
 - Roles: sin cargo asociado
+
+### security
+- Cluster: Enterprise Analytics
+- Fuente: {"bronze_job_posting": 96, "portal_taxonomy": 1}
+- Confidence: weak
+- Clasificacion curricular: irrelevant
+- Roles: 14147-AGENTE DE CONTROL-BARRANQUILLA: Objetivo del cargo: Garantizar el cumplimiento estri, AGENTE DE CONTROL, Border management, Corruption, Crime prevention and criminal justice
 
 ### trabajo en equipo
 - Cluster: Enterprise Analytics

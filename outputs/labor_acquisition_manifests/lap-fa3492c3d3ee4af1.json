@@ -1,0 +1,58 @@
+{
+  "correlation_id": "lap-fa3492c3d3ee4af1",
+  "sources": [
+    "unodc",
+    "securitas",
+    "g4s"
+  ],
+  "execute_network": true,
+  "max_jobs": 5,
+  "max_pages": 1,
+  "persist": false,
+  "quality_review": false,
+  "started_at": 1780356201.887803,
+  "checkpoints": {
+    "source:unodc": {
+      "results": 3,
+      "errors": 0,
+      "circuit": {
+        "source_name": "unodc",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:securitas": {
+      "results": 3,
+      "errors": 0,
+      "circuit": {
+        "source_name": "securitas",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:g4s": {
+      "results": 3,
+      "errors": 0,
+      "circuit": {
+        "source_name": "g4s",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 50,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 50,
+      "warehouse_verification": {},
+      "analytics_reports": {}
+    }
+  },
+  "finished_at": 1780356235.981146,
+  "cancelled": false
+}

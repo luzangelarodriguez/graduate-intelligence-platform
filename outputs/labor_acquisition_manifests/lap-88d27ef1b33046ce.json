@@ -1,0 +1,58 @@
+{
+  "correlation_id": "lap-88d27ef1b33046ce",
+  "sources": [
+    "inpec",
+    "procuraduria",
+    "defensoria"
+  ],
+  "execute_network": true,
+  "max_jobs": 5,
+  "max_pages": 1,
+  "persist": false,
+  "quality_review": false,
+  "started_at": 1780356202.167189,
+  "checkpoints": {
+    "source:inpec": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "inpec",
+        "state": "closed",
+        "failure_count": 1,
+        "opened": false
+      }
+    },
+    "source:procuraduria": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "procuraduria",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "source:defensoria": {
+      "results": 0,
+      "errors": 1,
+      "circuit": {
+        "source_name": "defensoria",
+        "state": "closed",
+        "failure_count": 0,
+        "opened": false
+      }
+    },
+    "market": {
+      "skill_universe": 50,
+      "occupational_clusters": 9,
+      "covered_skills": 14,
+      "missing_skills": 0,
+      "emerging_skills": 0,
+      "market_skills": 50,
+      "warehouse_verification": {},
+      "analytics_reports": {}
+    }
+  },
+  "finished_at": 1780356228.8354921,
+  "cancelled": false
+}
