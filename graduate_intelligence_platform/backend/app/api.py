@@ -15,6 +15,7 @@ from backend.repositories import empleos_repository, matches_repository, microcu
 from backend.repositories.base import fetch_all, fetch_one
 from backend.services import alumni_service, dashboard_service, recommendation_service
 from backend.services.normalization_service import basic_text_key, normalize_program_row
+from .academic_job_acquisition import build_academic_job_acquisition_intelligence
 from ml.inference.domain_classifier import input_hash, predict_domain, prediction_to_dict
 from ml.clustering.labor_cluster_engine import build_labor_occupational_clusters, cluster_to_dict
 from ml.curriculum.curriculum_market_gap_engine import build_curriculum_market_gap_map, gap_map_to_dict
@@ -843,6 +844,69 @@ def get_labor_cluster(cluster_id: int, _current_user=Depends(require_current_use
         if int(cluster.get("id") or 0) == cluster_id:
             return jsonable_encoder(cluster)
     raise not_found("labor_cluster", cluster_id)
+
+
+@router.get("/api/labor/search-intelligence")
+def labor_search_intelligence(
+    mode: str = Query("academic_alignment"),
+    market_discovery_mode: bool = Query(False),
+    keyword_limit: int = Query(24, ge=1, le=80),
+    role_limit: int = Query(12, ge=1, le=40),
+    _current_user=Depends(require_current_user),
+) -> dict[str, Any]:
+    base_programs = programs()
+    enriched_programs: list[dict[str, Any]] = []
+    for program in base_programs:
+        resolved_id = int(program.get("especializacion_id") or program.get("id") or 0)
+        enriched = program_by_id(resolved_id) if resolved_id else None
+        if enriched:
+            enriched_programs.append(enriched)
+        else:
+            enriched_programs.append(program)
+
+    selected_mode = "market_discovery" if market_discovery_mode else mode
+    market_intelligence = {}
+    curriculum_gap_map = {}
+    occupational_clusters = []
+    try:
+        market_intelligence = market_skill_intelligence_to_dict(
+            build_market_skill_intelligence_map(include_database=True, write_output=False)
+        )
+    except Exception:
+        market_intelligence = {}
+    try:
+        curriculum_gap_map = gap_map_to_dict(build_curriculum_market_gap_map(write_output=False))
+    except Exception:
+        curriculum_gap_map = {}
+    try:
+        occupational_clusters = [cluster_to_dict(cluster) for cluster in build_labor_occupational_clusters(write_outputs=False)]
+    except Exception:
+        occupational_clusters = []
+
+    intelligence = build_academic_job_acquisition_intelligence(
+        enriched_programs,
+        mode=selected_mode,
+        market_skill_intelligence={
+            "market_skills": market_intelligence.get("market_skills") or market_intelligence.get("top_skills") or [],
+            "emerging_skills": market_intelligence.get("emerging_skills") or [],
+            "missing_market_skills": curriculum_gap_map.get("missing_market_skills") or curriculum_gap_map.get("missing_skills") or [],
+            "strengthening_areas": curriculum_gap_map.get("strengthening_areas") or [],
+            "clusters": occupational_clusters,
+        },
+        curriculum_gap_map=curriculum_gap_map,
+        occupational_clusters=occupational_clusters,
+        keyword_limit=keyword_limit,
+        role_limit=role_limit,
+    )
+    intelligence["market_discovery_mode"] = market_discovery_mode
+    intelligence["source_context"] = {
+        "programs_loaded": len(base_programs),
+        "programs_enriched": len(enriched_programs),
+        "market_intelligence_available": bool(market_intelligence),
+        "curriculum_gap_map_available": bool(curriculum_gap_map),
+        "occupational_clusters_available": bool(occupational_clusters),
+    }
+    return jsonable_encoder(intelligence)
 
 
 @router.get("/api/programas/{program_id}/occupational-affinity")
