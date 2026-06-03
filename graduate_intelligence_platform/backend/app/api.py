@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from backend.repositories import empleos_repository, matches_repository, microcurriculum_context_repository, programas_repository, skills_repository
 from backend.repositories.base import fetch_all, fetch_one
 from backend.services import alumni_service, dashboard_service, recommendation_service
+from backend.services.program_market_matching_service import build_program_market_alignment_report
 from backend.services.normalization_service import basic_text_key, normalize_program_row
 from .academic_job_acquisition import build_academic_job_acquisition_intelligence
 from ml.inference.domain_classifier import input_hash, predict_domain, prediction_to_dict
@@ -1246,8 +1247,67 @@ def dashboard_programa(program_id: int, _current_user=Depends(require_current_us
                 "critical_signal": "Microcurrículo real indexado",
             }
         )
+    try:
+        alignment_report = build_program_market_alignment_report(program_id=resolved_id, write_output=False)
+        if alignment_report.get("programs"):
+            alignment = alignment_report["programs"][0]
+            payload["market_alignment"] = alignment
+            payload["program_market_alignment"] = {
+                "program_id": alignment.get("program_id"),
+                "program_name": alignment.get("program_name"),
+                "market_alignment_score": alignment.get("market_alignment_score"),
+                "coverage_score": alignment.get("coverage_score"),
+                "gap_score": alignment.get("gap_score"),
+                "matched_jobs": alignment.get("matched_jobs"),
+                "missing_skills": alignment.get("missing_skills"),
+                "nearest_jobs": alignment.get("nearest_jobs"),
+                "nearest_programs": alignment.get("nearest_programs"),
+            }
+    except Exception:
+        pass
     payload["source"] = relation or "empleo_skills"
     return jsonable_encoder(payload)
+
+
+@router.get("/api/programas/{program_id}/market-alignment")
+def program_market_alignment(program_id: int, _current_user=Depends(require_current_user)) -> dict[str, Any]:
+    report = build_program_market_alignment_report(program_id=program_id, write_output=False)
+    if not report.get("programs"):
+        raise not_found("programa", program_id)
+    return jsonable_encoder(report["programs"][0])
+
+
+@router.get("/api/programas/{program_id}/skill-gaps")
+def program_skill_gaps(program_id: int, _current_user=Depends(require_current_user)) -> dict[str, Any]:
+    report = build_program_market_alignment_report(program_id=program_id, write_output=False)
+    if not report.get("programs"):
+        raise not_found("programa", program_id)
+    item = report["programs"][0]
+    return jsonable_encoder(
+        {
+            "program_id": item["program_id"],
+            "program_name": item["program_name"],
+            "missing_skills": item["missing_skills"],
+            "taught_not_demanded": item["taught_not_demanded"],
+        }
+    )
+
+
+@router.get("/api/programas/{program_id}/recommended-jobs")
+def program_recommended_jobs(program_id: int, _current_user=Depends(require_current_user)) -> dict[str, Any]:
+    report = build_program_market_alignment_report(program_id=program_id, write_output=False)
+    if not report.get("programs"):
+        raise not_found("programa", program_id)
+    item = report["programs"][0]
+    return jsonable_encoder(
+        {
+            "program_id": item["program_id"],
+            "program_name": item["program_name"],
+            "recommended_jobs": item["recommended_jobs"],
+            "nearest_jobs": item["nearest_jobs"],
+            "nearest_programs": item["nearest_programs"],
+        }
+    )
 
 
 @router.get("/api/ml/domain-classification")

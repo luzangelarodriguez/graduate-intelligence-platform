@@ -32,6 +32,7 @@ from .api import router
 from .auth import ensure_auth_schema, router as auth_router
 from .middleware import InMemoryRateLimitMiddleware, SecurityHeadersMiddleware
 from .settings import settings
+from backend.queries import ensure_program_market_matching_objects
 
 if settings.sentry_dsn:
     try:
@@ -84,6 +85,7 @@ app.include_router(auth_router)
 @app.on_event("startup")
 def startup() -> None:
     ensure_auth_schema()
+    ensure_program_market_matching_objects()
 
 
 if __name__ == "__main__":

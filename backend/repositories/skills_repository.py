@@ -64,11 +64,10 @@ def fetch_missing_market_skill_rows_for_program(
     return fetch_all(
         f"""
         WITH program_skills AS (
-            SELECT DISTINCT lower(s.nombre) AS nombre_key
-            FROM especializacion_skills es
-            INNER JOIN skills s
-                ON s.id = es.skill_id
-            WHERE es.especializacion_id = %s
+            SELECT DISTINCT
+                lower(COALESCE(skill_key, '')) AS nombre_key
+            FROM vw_programa_skills
+            WHERE especializacion_id = %s
         ),
         market_skills AS (
             SELECT
