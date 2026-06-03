@@ -417,7 +417,7 @@ def _pair_scores(
     cosine = (common_count / math.sqrt(left_count * right_count)) if left_count and right_count else 0.0
     match_score = (jaccard + cosine) / 2.0
     domain_factor = _domain_similarity(left_domain, right_domain)
-    adjusted_match = match_score * domain_factor
+    adjusted_match = (match_score * 100.0 * 0.50) + (coverage * 100.0 * 0.30) + (domain_factor * 20.0)
     return {
         "matched_skills": common_count,
         "coverage_score": round(coverage * 100, 2),
@@ -426,7 +426,7 @@ def _pair_scores(
         "cosine_score": round(cosine * 100, 2),
         "match_score": round(match_score * 100, 2),
         "domain_factor": round(domain_factor, 4),
-        "adjusted_match_score": round(adjusted_match * 100, 2),
+        "adjusted_match_score": round(adjusted_match, 2),
     }
 
 
@@ -505,7 +505,7 @@ def _knn_neighbors(
                     "adjusted_match_score": scores["adjusted_match_score"],
                 }
             )
-        filtered_items = [item for item in items if float(item["domain_factor"]) >= 0.7]
+        filtered_items = [item for item in items if float(item["domain_factor"]) >= 0.5]
         neighbors[source_index] = sorted(filtered_items, key=lambda item: (item["similarity_score"], item["coverage_score"], item["adjusted_match_score"]), reverse=True)
     return neighbors
 
@@ -522,9 +522,13 @@ def _program_market_rows(
             left_domain=program.domain_label,
             right_domain=job.domain_label,
         )
-        if scores["matched_skills"] <= 0:
+        if float(scores["domain_factor"]) == 0.1 and scores["matched_skills"] < 3:
             continue
-        if program.domain_key != job.domain_key and float(scores["domain_factor"]) < 0.7:
+        if float(scores["domain_factor"]) == 1.0 and scores["matched_skills"] >= 1:
+            pass
+        elif float(scores["domain_factor"]) >= 0.5 and scores["matched_skills"] >= 2:
+            pass
+        else:
             continue
         common_keys = sorted(set(program.skill_keys) & set(job.skill_keys))
         rows.append(
