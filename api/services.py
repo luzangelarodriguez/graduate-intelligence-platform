@@ -239,6 +239,43 @@ def _safe_program_name(program_id: int, *, db_name: str | None = None) -> str:
     return str(row.get("nombre_especializacion") or row.get("nombre") or f"Programa {program_id}")
 
 
+def _program_has_curricular_evidence(program_id: int, *, db_name: str | None = None) -> bool:
+    program = _safe_program_base_row(program_id, db_name=db_name)
+    if not program:
+        return False
+    try:
+        context = microcurriculum_context_repository.fetch_program_context(
+            program_id,
+            specialization_name=str(program.get("nombre_especializacion") or program.get("nombre") or "").strip(),
+            db_name=db_name,
+        )
+    except Exception:
+        return False
+    if not context:
+        return False
+    evidence_fields = (
+        "technical_skills",
+        "transversal_skills",
+        "methodologies",
+        "tools",
+        "platforms",
+        "technologies",
+        "keywords",
+        "labor_roles",
+        "occupational_profiles",
+        "strengthening_areas",
+        "real_market_gaps",
+        "subjects",
+    )
+    for field in evidence_fields:
+        value = context.get(field)
+        if isinstance(value, (list, tuple, set)) and any(str(item).strip() for item in value):
+            return True
+        if isinstance(value, dict) and value:
+            return True
+    return False
+
+
 def _fallback_skill_list(raw_skills: list[Any] | None = None) -> list[dict[str, Any]]:
     skills = []
     for index, item in enumerate(raw_skills or []):
@@ -1021,6 +1058,19 @@ def list_emerging_skills(*, limit: int = DEFAULT_LIMIT, offset: int = 0) -> dict
 
 
 def get_curriculum_risk_index(program_id: int) -> dict[str, Any]:
+    if not _program_has_curricular_evidence(program_id):
+        program_name = _safe_program_name(program_id)
+        return {
+            "program_id": program_id,
+            "program_name": program_name,
+            "risk_score": 0.0,
+            "risk_level": "low",
+            "risk_drivers": [],
+            "recommended_actions": [],
+            "supporting_evidence": {"reason": "no_curricular_evidence", "program_intelligence": {}},
+            "source_tables": ["especializaciones"],
+            "confidence": 0.0,
+        }
     try:
         return build_curriculum_risk_index(program_id, persist=False).to_dict()
     except Exception as exc:
@@ -1029,6 +1079,25 @@ def get_curriculum_risk_index(program_id: int) -> dict[str, Any]:
 
 
 def get_university_market_alignment(program_id: int) -> dict[str, Any]:
+    if not _program_has_curricular_evidence(program_id):
+        program_name = _safe_program_name(program_id)
+        return {
+            "program_id": program_id,
+            "program_name": program_name,
+            "alignment_score": 0.0,
+            "alignment_level": "low",
+            "current_alignment": 0.0,
+            "projected_alignment_if_added": 0.0,
+            "missing_skills": [],
+            "emerging_skills": [],
+            "company_demand_score": 0.0,
+            "labor_demand_score": 0.0,
+            "forecasted_demand_score": 0.0,
+            "emerging_technology_score": 0.0,
+            "supporting_evidence": {"reason": "no_curricular_evidence", "program_intelligence": {}},
+            "source_tables": ["especializaciones"],
+            "confidence": 0.0,
+        }
     try:
         return build_university_market_alignment(program_id, persist=False).to_dict()
     except Exception as exc:
@@ -1112,6 +1181,29 @@ def get_curriculum_simulator(program_id: int, proposed_skills: str | None = None
     skills: list[str] = []
     if proposed_skills:
         skills = [part.strip() for part in proposed_skills.split(",") if part.strip()]
+    if not _program_has_curricular_evidence(program_id):
+        program_name = _safe_program_name(program_id)
+        return {
+            "program_id": program_id,
+            "program_name": program_name,
+            "program_role": "",
+            "horizon_months": horizon_months,
+            "current_alignment_score": 0.0,
+            "current_risk_score": 0.0,
+            "projected_alignment_score": 0.0,
+            "projected_risk_score": 0.0,
+            "projected_employability_gain": 0.0,
+            "projected_gap_reduction": 0.0,
+            "confidence_score": 0.0,
+            "proposed_skills": [],
+            "normalized_skills": [],
+            "risk_drivers": [],
+            "supporting_evidence": {"reason": "no_curricular_evidence", "program_intelligence": {}},
+            "source_tables": ["especializaciones"],
+            "explanation": "No curricular evidence available. Upload or process a microcurriculum to generate academic intelligence.",
+            "simulation_key": f"fallback-{program_id}-{horizon_months}",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
     try:
         requested_signature = _normalize_skill_list(skills)
         if relation_exists("curriculum_simulations") and relation_has_rows("curriculum_simulations"):
@@ -1241,6 +1333,33 @@ def get_executive_narrative(program_id: int | None = None) -> dict[str, Any]:
 
 
 def get_program_summary(program_id: int) -> dict[str, Any]:
+    if not _program_has_curricular_evidence(program_id):
+        program_name = _safe_program_name(program_id)
+        return {
+            "program_id": program_id,
+            "program_name": program_name,
+            "summary": "No curricular evidence available. Upload or process a microcurriculum to generate academic intelligence.",
+            "why_at_risk": "No curricular evidence available.",
+            "microcurriculum_traceability": {
+                "microcurriculum_name": program_name,
+                "covered_skills": [],
+                "transversal_skills": [],
+                "missing_skills": [],
+                "strengthening_areas": [],
+                "coverage": {},
+                "labor_roles": [],
+            },
+            "evidence_sources": ["especializaciones"],
+            "source_tables": ["especializaciones"],
+            "supporting_evidence": {
+                "program": {"especializacion_id": program_id, "nombre_especializacion": program_name},
+                "risk": {"risk_score": 0.0, "risk_level": "low", "risk_drivers": [], "recommended_actions": []},
+                "alignment": {"alignment_score": 0.0, "alignment_level": "low", "current_alignment": 0.0, "missing_skills": []},
+            },
+            "confidence": 0.0,
+            "model": "deterministic-fallback",
+            "generated_at": datetime.now(UTC).isoformat(),
+        }
     try:
         return build_executive_program_summary(program_id)
     except Exception as exc:

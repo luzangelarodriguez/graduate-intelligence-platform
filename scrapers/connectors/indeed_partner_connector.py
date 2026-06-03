@@ -24,6 +24,7 @@ from agents.visual_analytics_labor_agent import (  # noqa: E402
     content_hash,
     detect_language,
 )
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import source_plan_for  # noqa: E402
 from ml.labor.semantic_job_skill_extractor import extract_semantic_job_skills, semantic_skills_to_dict  # noqa: E402
 from ml.relevance.contextual_job_relevance_engine import result_to_dict, score_contextual_relevance  # noqa: E402
 from scrapers.connectors.base import compact_text  # noqa: E402
@@ -32,8 +33,6 @@ from scrapers.normalization.visual_analytics_skill_taxonomy import normalize_tex
 
 REPORT_PATH = ROOT_DIR / "outputs" / "indeed_partner_extraction_report.md"
 SKILL_REPORT_PATH = ROOT_DIR / "outputs" / "indeed_partner_skill_report.md"
-
-DEFAULT_QUERY = "Data Analyst OR Business Intelligence OR Power BI OR SQL OR Analytics"
 GRAPHQL_QUERY = """
 query FindEmployerJobsPartner($input: FindEmployerJobsPartnerInput!) {
   findEmployerJobsPartner(input: $input) {
@@ -176,7 +175,7 @@ def validate_indeed_job(job: dict[str, Any]) -> tuple[str, bool, str]:
     return "job_posting", True, ""
 
 
-def normalize_indeed_node(node: dict[str, Any]) -> IndeedNormalizedJob:
+def normalize_indeed_node(node: dict[str, Any], search_context: dict[str, Any] | None = None) -> IndeedNormalizedJob:
     job_data = node.get("jobData") or node.get("job_data") or node
     salary = job_data.get("salary") or {}
     location_data = job_data.get("jobLocation") or job_data.get("job_location") or {}
@@ -191,7 +190,7 @@ def normalize_indeed_node(node: dict[str, Any]) -> IndeedNormalizedJob:
     country = compact_text(location_data.get("countryCode"))
     full_address = compact_text(location_data.get("fullAddress") or metadata.get("rawInputLocation"))
     location = full_address or ", ".join([item for item in (city, country) if item])
-    raw = {"id": node.get("id"), "jobData": job_data, "managementUrls": node.get("managementUrls") or {}}
+    raw = {"id": node.get("id"), "jobData": job_data, "managementUrls": node.get("managementUrls") or {}, "search_context": search_context or {}}
     hsh = _stable_hash("indeed_partner", source_job_id, title, company, description, external_url, indeed_view_url)
     validation_payload = {
         "title": title,
@@ -226,7 +225,7 @@ def normalize_indeed_node(node: dict[str, Any]) -> IndeedNormalizedJob:
     )
 
 
-def indeed_job_to_agent_result(job: IndeedNormalizedJob) -> AgentExtractionResult:
+def indeed_job_to_agent_result(job: IndeedNormalizedJob, search_context: dict[str, Any] | None = None) -> AgentExtractionResult:
     source_url = job.external_url or job.indeed_view_url
     raw_text = compact_text(f"{job.title} {job.company} {job.location} {job.description}")
     semantic_items = extract_semantic_job_skills(title=job.title, description=job.description, evidence_source_type="job_evidence")
@@ -261,6 +260,7 @@ def indeed_job_to_agent_result(job: IndeedNormalizedJob) -> AgentExtractionResul
         **result_to_dict(contextual),
         "semantic_skill_evidence": semantic_skills_to_dict(semantic_items),
         "source_job_id": job.source_job_id,
+        "search_context": search_context or {},
         "salary": {
             "min": job.salary_min,
             "max": job.salary_max,
@@ -301,12 +301,13 @@ def indeed_job_to_agent_result(job: IndeedNormalizedJob) -> AgentExtractionResul
 class IndeedPartnerConnector:
     source_name = "indeed_partner"
 
-    def __init__(self, *, api_url: str | None = None, access_token: str | None = None, source_id: str | None = None) -> None:
+    def __init__(self, *, api_url: str | None = None, access_token: str | None = None, source_id: str | None = None, source_plan: dict | None = None) -> None:
         _load_environment()
         self.api_url = api_url or os.getenv("INDEED_API_URL", "")
         self.access_token = access_token or os.getenv("INDEED_ACCESS_TOKEN", "")
         self.source_id = source_id or os.getenv("INDEED_SOURCE_ID", "")
         self.session = requests.Session()
+        self.source_plan = source_plan_for(source_plan, "indeed_partner") if source_plan is not None else {"keywords": [], "roles": [], "families": [], "query": ""}
 
     def credentials_available(self) -> bool:
         return bool(self.api_url and self.access_token)
@@ -331,7 +332,7 @@ class IndeedPartnerConnector:
         *,
         execute_network: bool = False,
         max_jobs: int = 100,
-        query: str = DEFAULT_QUERY,
+        query: str | None = None,
         page_size: int = 25,
     ) -> dict[str, Any]:
         if not self.credentials_available():
@@ -359,8 +360,11 @@ class IndeedPartnerConnector:
         errors: list[dict[str, Any]] = []
         after: str | None = None
         has_next = True
-        if query == DEFAULT_QUERY:
-            query = plugin_search_query()
+        plan_query = self.source_plan.get("query") or ""
+        plan_keywords = [str(item).strip() for item in (self.source_plan.get("keywords") or []) if str(item).strip()]
+        plan_roles = [str(item).strip() for item in (self.source_plan.get("roles") or []) if str(item).strip()]
+        if query is None:
+            query = plan_query or " OR ".join([*plan_keywords, *plan_roles]) or plugin_search_query()
         while has_next and len(jobs) < max_jobs:
             variables = self._variables(first=min(page_size, max_jobs - len(jobs)), after=after, query=query)
             try:
@@ -378,7 +382,7 @@ class IndeedPartnerConnector:
                 if payload.get("errors"):
                     errors.append({"error_type": "graphql_errors", "message": str(payload.get("errors"))[:500]})
                 nodes, page_info = _extract_nodes(payload)
-                jobs.extend(normalize_indeed_node(node) for node in nodes)
+                jobs.extend(normalize_indeed_node(node, {"query": query, "search_plan": self.source_plan}) for node in nodes)
                 has_next = bool(page_info.get("hasNextPage")) and bool(page_info.get("endCursor"))
                 after = page_info.get("endCursor")
                 if not nodes:
@@ -393,7 +397,7 @@ class IndeedPartnerConnector:
     def fetch_agent_results(self, **kwargs: Any) -> tuple[list[AgentExtractionResult], dict[str, Any]]:
         result = self.fetch_jobs(**kwargs)
         jobs = result.get("jobs", [])
-        agent_results = [indeed_job_to_agent_result(job) for job in jobs if isinstance(job, IndeedNormalizedJob)]
+        agent_results = [indeed_job_to_agent_result(job, job.raw_json.get("search_context") if isinstance(job.raw_json, dict) else None) for job in jobs if isinstance(job, IndeedNormalizedJob)]
         return agent_results, {key: value for key, value in result.items() if key != "jobs"} | {"jobs": len(agent_results)}
 
 

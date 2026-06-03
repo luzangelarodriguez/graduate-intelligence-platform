@@ -20,9 +20,12 @@ def sentence_transformers_available() -> bool:
 def load_sentence_transformer(model_name: str = DEFAULT_EMBEDDING_MODEL):
     if not sentence_transformers_available():
         return None
-    from sentence_transformers import SentenceTransformer
+    try:
+        from sentence_transformers import SentenceTransformer
 
-    return SentenceTransformer(model_name)
+        return SentenceTransformer(model_name)
+    except Exception:
+        return None
 
 
 def encode_texts(texts: Iterable[str], *, model_name: str = DEFAULT_EMBEDDING_MODEL) -> list[list[float]]:

@@ -521,8 +521,6 @@ def _match_rows_for_program(
 
 def _build_item(program: dict[str, Any], observatory: dict[str, list[dict[str, Any]]]) -> ProgramIntelligenceItem:
     program_context = _program_microcurriculum_context(program)
-    if not _has_curricular_evidence(program_context):
-        return _empty_program_intelligence_item(program)
     program_name = str(program.get("nombre_especializacion") or program.get("nombre") or "").strip()
     program_role = str(program.get("rol") or "").strip()
     domain_taxonomy = build_domain_taxonomy_from_program(

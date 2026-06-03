@@ -251,6 +251,22 @@ def _load_program_context(program_id: int, *, db_name: str | None = None) -> dic
     return dict(context) if context else {}
 
 
+def _as_text_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        value = value.strip()
+        return [value] if value else []
+    if isinstance(value, (list, tuple, set)):
+        items: list[str] = []
+        for item in value:
+            text = str(item).strip()
+            if text:
+                items.append(text)
+        return items
+    return [str(value).strip()] if str(value).strip() else []
+
+
 def _has_curricular_evidence(program_context: dict[str, Any]) -> bool:
     evidence_fields = (
         "technical_skills",
@@ -517,9 +533,9 @@ def _persistent_metric(metric_name: str, metric_category: str, metric_value: flo
 
 def build_curriculum_risk_index(program_id: int, *, db_name: str | None = None, persist: bool = False) -> CurriculumRiskIndex:
     program = _fetch_program_row(program_id, db_name=db_name)
-    program_context = _load_program_context(program_id, db_name=db_name)
-    if not program or not _has_curricular_evidence(program_context):
+    if not program:
         return _empty_curriculum_risk_index(program or {"nombre_especializacion": f"Programa {program_id}"}, program_id=program_id)
+    program_context = _load_program_context(program_id, db_name=db_name)
     program_skills = _fetch_program_skills(program_id, db_name=db_name)
     program_skill_names = _skill_names(program_skills)
     market_map = _fetch_market_skill_map()
@@ -692,9 +708,9 @@ def build_curriculum_risk_index(program_id: int, *, db_name: str | None = None, 
 
 def build_university_market_alignment(program_id: int, *, db_name: str | None = None, persist: bool = False) -> UniversityMarketAlignment:
     program = _fetch_program_row(program_id, db_name=db_name)
-    program_context = _load_program_context(program_id, db_name=db_name)
-    if not program or not _has_curricular_evidence(program_context):
+    if not program:
         return _empty_university_market_alignment(program or {"nombre_especializacion": f"Programa {program_id}"}, program_id=program_id)
+    program_context = _load_program_context(program_id, db_name=db_name)
     program_skills = _fetch_program_skills(program_id, db_name=db_name)
     skill_names = _skill_names(program_skills)
     market_map = _fetch_market_skill_map()

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
-from scrapers.connectors.base import BaseJobConnector, absolute_url, build_job, compact_text, parse_json_ld_jobs
+from graduate_intelligence_platform.backend.app.academic_job_acquisition import source_plan_for
 from ml.relevance.contextual_job_relevance_engine import score_contextual_relevance
+from scrapers.connectors.base import BaseJobConnector, absolute_url, build_job, compact_text, parse_json_ld_jobs
 
 
-COMPANY_SUFFIX_RE = re.compile(r"\b(s\.?a\.?s\.?|ltda\.?|inc\.?|corp\.?|solutions|consulting|technology|technologies)\b", re.IGNORECASE)
+COMPANY_SUFFIX_RE = re.compile(r"(s\.?a\.?s\.?|ltda\.?|inc\.?|corp\.?|solutions|consulting|technology|technologies)", re.IGNORECASE)
 
 
 def _card_container(node: Tag) -> Tag:
@@ -32,9 +34,9 @@ def _looks_like_company(value: str) -> bool:
     value = compact_text(value or "")
     if not value or len(value) > 90 or len(value.split()) > 8:
         return False
-    if re.search(r"\b(rol|requisitos|responsabilidades|condiciones laborales|salario|modalidad|experiencia|vacante)\b", value, re.IGNORECASE):
+    if re.search(r"(rol|requisitos|responsabilidades|condiciones laborales|salario|modalidad|experiencia|vacante)", value, re.IGNORECASE):
         return False
-    return bool(COMPANY_SUFFIX_RE.search(value)) or bool(re.search(r"\b(colombia|latam|group|empresa)\b", value, re.IGNORECASE))
+    return bool(COMPANY_SUFFIX_RE.search(value)) or bool(re.search(r"(colombia|latam|group|empresa)", value, re.IGNORECASE))
 
 
 class TicjobConnector(BaseJobConnector):
@@ -42,15 +44,23 @@ class TicjobConnector(BaseJobConnector):
     base_url = "https://ticjob.co/"
     priority = "alta"
 
+    def __init__(self, *, source_plan: dict | None = None, max_jobs: int = 20, max_pages: int = 2) -> None:
+        super().__init__(max_pages=max_pages, max_jobs=max_jobs)
+        self.source_plan = source_plan_for(source_plan, 'ticjob') if source_plan is not None else {"keywords": [], "roles": [], "families": [], "query": ""}
+
+    def search_items(self) -> list[tuple[str, dict[str, object]]]:
+        keywords = [str(item).strip() for item in (self.source_plan.get('keywords') or []) if str(item).strip()]
+        if not keywords:
+            keywords = ["data analyst", "business intelligence", "power bi", "data engineer"]
+        items: list[tuple[str, dict[str, object]]] = []
+        for keyword in keywords[: self.config.max_pages]:
+            query = quote_plus(keyword)
+            url = absolute_url(self.base_url, f"/es/search?q={query}")
+            items.append((url, {"source": "ticjob", "search_keyword": keyword, "search_keyword_source": "academic_plan", "search_plan": self.source_plan}))
+        return items
+
     def search_urls(self) -> list[str]:
-        urls = [
-            absolute_url(self.base_url, "/es/search"),
-            absolute_url(self.base_url, "/es/it-job-openings"),
-            absolute_url(self.base_url, "/it-job-openings/data-analyst"),
-            absolute_url(self.base_url, "/es/it-job-openings/data-analyst-bogota"),
-            absolute_url(self.base_url, "/es/it-job-openings/data-analyst-ms-power-bi-bogota"),
-        ]
-        return urls[: self.config.max_pages]
+        return [url for url, _ in self.search_items()]
 
     def fetch_detail_text(self, url: str) -> tuple[str, dict[str, str]]:
         try:
@@ -151,7 +161,7 @@ class TicjobConnector(BaseJobConnector):
                 description=text,
                 tags=[node.get_text(" ", strip=True) for node in tag_nodes],
                 source_url=detail_url,
-                raw={"selector_source": "ticjob_cards", "phase": "list"},
+                raw={"selector_source": "ticjob_cards", "phase": "list", "search_plan": self.source_plan},
             )
             preview_score = score_contextual_relevance(
                 title=preview_job.title,
@@ -182,6 +192,7 @@ class TicjobConnector(BaseJobConnector):
                         "list_text": text,
                         "detail_fetched": bool(detail_text),
                         "contextual_preview": preview_score.__dict__,
+                        "search_plan": self.source_plan,
                     },
                 )
             )
