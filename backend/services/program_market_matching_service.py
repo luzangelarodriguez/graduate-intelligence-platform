@@ -16,6 +16,7 @@ from backend.repositories.microcurriculum_context_repository import fetch_progra
 from backend.services.dashboard_service import list_programs_base
 from backend.services.normalization_service import basic_text_key
 from graduate_intelligence_platform.backend.app.engine import build_programs
+from intelligence.domain_taxonomy_layer import build_domain_taxonomy_from_program
 from ml.curriculum.curriculum_market_gap_engine import build_curriculum_market_gap_map
 from ml.labor.market_skill_intelligence_engine import build_market_skill_intelligence_map
 
@@ -29,6 +30,10 @@ class SkillProfile:
     program_name: str
     program_level: str
     faculty: str
+    domain_key: str
+    domain_label: str
+    domain_subdomain: str
+    domain_confidence: float
     skills: list[str]
     skill_keys: list[str]
     labels_by_key: dict[str, str]
@@ -44,6 +49,10 @@ class JobProfile:
     source: str
     job_url: str
     posted_at: str
+    domain_key: str
+    domain_label: str
+    domain_subdomain: str
+    domain_confidence: float
     skills: list[str]
     skill_keys: list[str]
     labels_by_key: dict[str, str]
@@ -139,6 +148,41 @@ def _job_skill_rows(db_name: str | None = None) -> list[dict[str, Any]]:
     )
 
 
+def _infer_program_domain(
+    *,
+    program_name: str,
+    program_role: str,
+    faculty: str,
+    context: dict[str, Any] | None,
+    skills: list[str],
+) -> tuple[str, str, str, float]:
+    taxonomy = build_domain_taxonomy_from_program(
+        program_name=program_name,
+        program_role=program_role,
+        faculty=faculty,
+        microcurriculum_context=context or {},
+        skills=skills,
+    )
+    return taxonomy.domain_key, taxonomy.domain_label, taxonomy.subdomain, taxonomy.confidence
+
+
+def _infer_job_domain(*, job_title: str, skills: list[str]) -> tuple[str, str, str, float]:
+    taxonomy = build_domain_taxonomy_from_program(
+        program_name=job_title,
+        program_role=job_title,
+        microcurriculum_context={
+            "technical_skills": skills,
+            "transversal_skills": [],
+            "tools": skills,
+            "technologies": skills,
+            "keywords": skills,
+            "labor_roles": [job_title],
+        },
+        skills=skills,
+    )
+    return taxonomy.domain_key, taxonomy.domain_label, taxonomy.subdomain, taxonomy.confidence
+
+
 def _collect_program_profiles(db_name: str | None = None) -> list[SkillProfile]:
     base_rows = _program_base_rows(db_name=db_name)
     rows_by_program: dict[int, list[dict[str, Any]]] = defaultdict(list)
@@ -186,12 +230,23 @@ def _collect_program_profiles(db_name: str | None = None) -> list[SkillProfile]:
             source_breakdown["program_role"] += 1
 
         ordered, labels_by_key = _unique_terms(labels)
+        domain_key, domain_label, domain_subdomain, domain_confidence = _infer_program_domain(
+            program_name=str(program.get("nombre_especializacion") or ""),
+            program_role=str(program.get("rol") or ""),
+            faculty=str(program.get("facultad") or ""),
+            context=context if isinstance(context, dict) else {},
+            skills=ordered,
+        )
         profiles.append(
             SkillProfile(
                 program_id=program_id,
                 program_name=str(program.get("nombre_especializacion") or ""),
                 program_level=str(program.get("nivel") or "Especialización"),
                 faculty=str(program.get("facultad") or ""),
+                domain_key=domain_key,
+                domain_label=domain_label,
+                domain_subdomain=domain_subdomain,
+                domain_confidence=domain_confidence,
                 skills=ordered,
                 skill_keys=[_normalize_key(item) for item in ordered if _normalize_key(item)],
                 labels_by_key=labels_by_key,
@@ -215,6 +270,10 @@ def _collect_job_profiles(db_name: str | None = None) -> list[JobProfile]:
             if value:
                 labels.append(value)
         ordered, labels_by_key = _unique_terms(labels)
+        domain_key, domain_label, domain_subdomain, domain_confidence = _infer_job_domain(
+            job_title=str(first.get("job_title") or ""),
+            skills=ordered,
+        )
         profiles.append(
             JobProfile(
                 job_id=job_id,
@@ -224,6 +283,10 @@ def _collect_job_profiles(db_name: str | None = None) -> list[JobProfile]:
                 source=str(first.get("source") or ""),
                 job_url=str(first.get("job_url") or ""),
                 posted_at=str(first.get("posted_at") or ""),
+                domain_key=domain_key,
+                domain_label=domain_label,
+                domain_subdomain=domain_subdomain,
+                domain_confidence=domain_confidence,
                 skills=ordered,
                 skill_keys=[_normalize_key(item) for item in ordered if _normalize_key(item)],
                 labels_by_key=labels_by_key,
@@ -252,6 +315,10 @@ def _collect_job_profiles(db_name: str | None = None) -> list[JobProfile]:
             job_id = str(row.get("job_id") or "")
             if job_id in skills_job_ids:
                 continue
+            domain_key, domain_label, domain_subdomain, domain_confidence = _infer_job_domain(
+                job_title=str(row.get("job_title") or ""),
+                skills=[],
+            )
             profiles.append(
                 JobProfile(
                     job_id=job_id,
@@ -261,6 +328,10 @@ def _collect_job_profiles(db_name: str | None = None) -> list[JobProfile]:
                     source=str(row.get("source") or ""),
                     job_url=str(row.get("job_url") or ""),
                     posted_at=str(row.get("posted_at") or ""),
+                    domain_key=domain_key,
+                    domain_label=domain_label,
+                    domain_subdomain=domain_subdomain,
+                    domain_confidence=domain_confidence,
                     skills=[],
                     skill_keys=[],
                     labels_by_key={},
@@ -270,7 +341,69 @@ def _collect_job_profiles(db_name: str | None = None) -> list[JobProfile]:
     return sorted(profiles, key=lambda item: item.job_id)
 
 
-def _pair_scores(left_keys: Sequence[str], right_keys: Sequence[str]) -> dict[str, float | int]:
+def _domain_similarity(left_domain: str, right_domain: str) -> float:
+    left = _normalize_key(left_domain)
+    right = _normalize_key(right_domain)
+    if not left or not right:
+        return 0.1
+    if left == right:
+        return 1.0
+    related_pairs = {
+        frozenset({"data analytics", "artificial intelligence"}),
+        frozenset({"data analytics", "cybersecurity"}),
+        frozenset({"data analytics", "finance accounting"}),
+        frozenset({"data analytics", "project management"}),
+        frozenset({"data analytics", "business management"}),
+        frozenset({"data analytics", "marketing commercial"}),
+        frozenset({"data analytics", "logistics operations"}),
+        frozenset({"data analytics", "legal compliance"}),
+        frozenset({"data analytics", "education"}),
+        frozenset({"data analytics", "health"}),
+        frozenset({"data analytics", "criminology security"}),
+        frozenset({"artificial intelligence", "cybersecurity"}),
+        frozenset({"artificial intelligence", "project management"}),
+        frozenset({"artificial intelligence", "business management"}),
+        frozenset({"artificial intelligence", "education"}),
+        frozenset({"artificial intelligence", "health"}),
+        frozenset({"artificial intelligence", "criminology security"}),
+        frozenset({"cybersecurity", "criminology security"}),
+        frozenset({"cybersecurity", "legal compliance"}),
+        frozenset({"cybersecurity", "finance accounting"}),
+        frozenset({"cybersecurity", "business management"}),
+        frozenset({"cybersecurity", "project management"}),
+        frozenset({"criminology security", "legal compliance"}),
+        frozenset({"criminology security", "finance accounting"}),
+        frozenset({"criminology security", "health"}),
+        frozenset({"criminology security", "project management"}),
+        frozenset({"finance accounting", "project management"}),
+        frozenset({"finance accounting", "business management"}),
+        frozenset({"finance accounting", "marketing commercial"}),
+        frozenset({"finance accounting", "legal compliance"}),
+        frozenset({"project management", "business management"}),
+        frozenset({"project management", "marketing commercial"}),
+        frozenset({"project management", "logistics operations"}),
+        frozenset({"project management", "education"}),
+        frozenset({"project management", "health"}),
+        frozenset({"project management", "legal compliance"}),
+        frozenset({"business management", "marketing commercial"}),
+        frozenset({"business management", "logistics operations"}),
+        frozenset({"business management", "legal compliance"}),
+        frozenset({"marketing commercial", "logistics operations"}),
+        frozenset({"education", "health"}),
+        frozenset({"education", "business management"}),
+        frozenset({"education", "legal compliance"}),
+        frozenset({"health", "legal compliance"}),
+    }
+    return 0.5 if frozenset({left, right}) in related_pairs else 0.1
+
+
+def _pair_scores(
+    left_keys: Sequence[str],
+    right_keys: Sequence[str],
+    *,
+    left_domain: str = "",
+    right_domain: str = "",
+) -> dict[str, float | int]:
     left = {key for key in left_keys if key}
     right = {key for key in right_keys if key}
     common = left & right
@@ -283,6 +416,8 @@ def _pair_scores(left_keys: Sequence[str], right_keys: Sequence[str]) -> dict[st
     jaccard = (common_count / union_count) if union_count else 0.0
     cosine = (common_count / math.sqrt(left_count * right_count)) if left_count and right_count else 0.0
     match_score = (jaccard + cosine) / 2.0
+    domain_factor = _domain_similarity(left_domain, right_domain)
+    adjusted_match = match_score * domain_factor
     return {
         "matched_skills": common_count,
         "coverage_score": round(coverage * 100, 2),
@@ -290,6 +425,8 @@ def _pair_scores(left_keys: Sequence[str], right_keys: Sequence[str]) -> dict[st
         "jaccard_score": round(jaccard * 100, 2),
         "cosine_score": round(cosine * 100, 2),
         "match_score": round(match_score * 100, 2),
+        "domain_factor": round(domain_factor, 4),
+        "adjusted_match_score": round(adjusted_match * 100, 2),
     }
 
 
@@ -316,37 +453,60 @@ def _knn_neighbors(
     if not source_profiles or not target_profiles:
         return neighbors
 
-    vocab = sorted({key for profile in [*source_profiles, *target_profiles] for key in getattr(profile, "skill_keys", []) if key})
-    if not vocab:
-        return neighbors
+    for source_index, source_profile in enumerate(source_profiles):
+        source_id = getattr(source_profile, "program_id", getattr(source_profile, "job_id", None))
+        same_domain_targets = [
+            (index, target)
+            for index, target in enumerate(target_profiles)
+            if getattr(target, "skill_keys", [])
+            and getattr(target, "domain_key", "") == getattr(source_profile, "domain_key", "")
+            and getattr(target, "program_id", getattr(target, "job_id", None)) != source_id
+        ]
+        candidate_targets = same_domain_targets or [
+            (index, target)
+            for index, target in enumerate(target_profiles)
+            if getattr(target, "skill_keys", [])
+            and getattr(target, "program_id", getattr(target, "job_id", None)) != source_id
+        ]
+        if not candidate_targets:
+            continue
 
-    mlb = MultiLabelBinarizer(classes=vocab)
-    source_matrix = mlb.fit_transform([profile.skill_keys for profile in source_profiles])
-    target_matrix = mlb.transform([profile.skill_keys for profile in target_profiles])
-    target_non_empty = [index for index, profile in enumerate(target_profiles) if getattr(profile, "skill_keys", [])]
-    if not target_non_empty:
-        return neighbors
+        vocab = sorted({key for _, profile in [(-1, source_profile), *candidate_targets] for key in getattr(profile, "skill_keys", []) if key})
+        if not vocab:
+            continue
 
-    model = NearestNeighbors(metric="cosine")
-    model.fit(target_matrix[target_non_empty])
-    query_k = min(max(k, 1), len(target_non_empty))
-    distances, indices = model.kneighbors(source_matrix, n_neighbors=query_k)
+        mlb = MultiLabelBinarizer(classes=vocab)
+        source_matrix = mlb.fit_transform([source_profile.skill_keys])
+        target_matrix = mlb.transform([profile.skill_keys for _, profile in candidate_targets])
 
-    for source_index, (dist_row, idx_row) in enumerate(zip(distances, indices)):
+        model = NearestNeighbors(metric="cosine")
+        model.fit(target_matrix)
+        query_k = min(max(k, 1), len(candidate_targets))
+        distances, indices = model.kneighbors(source_matrix, n_neighbors=query_k)
+
         items: list[dict[str, Any]] = []
-        for distance, target_index in zip(dist_row, idx_row):
-            real_index = target_non_empty[target_index]
-            target = target_profiles[real_index]
+        for distance, target_index in zip(distances[0], indices[0]):
+            _, target = candidate_targets[target_index]
+            scores = _pair_scores(
+                source_profile.skill_keys,
+                getattr(target, "skill_keys", []),
+                left_domain=getattr(source_profile, "domain_label", ""),
+                right_domain=getattr(target, "domain_label", ""),
+            )
             items.append(
                 {
                     "id": getattr(target, "job_id", getattr(target, "program_id", "")),
                     "title": getattr(target, "job_title", getattr(target, "program_name", "")),
-                    "similarity_score": round((1.0 - float(distance)) * 100, 2),
-                    "coverage_score": _pair_scores(getattr(source_profiles[source_index], "skill_keys", []), getattr(target, "skill_keys", []))["coverage_score"],
-                    "gap_score": _pair_scores(getattr(source_profiles[source_index], "skill_keys", []), getattr(target, "skill_keys", []))["gap_score"],
+                    "domain_label": getattr(target, "domain_label", ""),
+                    "similarity_score": round((1.0 - float(distance)) * 100 * float(scores["domain_factor"]), 2),
+                    "coverage_score": scores["coverage_score"],
+                    "gap_score": scores["gap_score"],
+                    "domain_factor": scores["domain_factor"],
+                    "adjusted_match_score": scores["adjusted_match_score"],
                 }
             )
-        neighbors[source_index] = items
+        filtered_items = [item for item in items if float(item["domain_factor"]) >= 0.7]
+        neighbors[source_index] = sorted(filtered_items, key=lambda item: (item["similarity_score"], item["coverage_score"], item["adjusted_match_score"]), reverse=True)
     return neighbors
 
 
@@ -356,8 +516,15 @@ def _program_market_rows(
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for job in jobs:
-        scores = _pair_scores(program.skill_keys, job.skill_keys)
+        scores = _pair_scores(
+            program.skill_keys,
+            job.skill_keys,
+            left_domain=program.domain_label,
+            right_domain=job.domain_label,
+        )
         if scores["matched_skills"] <= 0:
+            continue
+        if program.domain_key != job.domain_key and float(scores["domain_factor"]) < 0.7:
             continue
         common_keys = sorted(set(program.skill_keys) & set(job.skill_keys))
         rows.append(
@@ -373,6 +540,8 @@ def _program_market_rows(
                 "source": job.source,
                 "job_url": job.job_url,
                 "posted_at": job.posted_at,
+                "program_domain": program.domain_label,
+                "job_domain": job.domain_label,
                 **scores,
                 "matched_skills": [program.labels_by_key.get(key) or job.labels_by_key.get(key) or key for key in common_keys],
                 "missing_skills": [
@@ -381,7 +550,7 @@ def _program_market_rows(
                 ],
             }
         )
-    rows.sort(key=lambda item: (item["match_score"], item["coverage_score"], item["matched_skills"]), reverse=True)
+    rows.sort(key=lambda item: (item["adjusted_match_score"], item["coverage_score"], item["matched_skills"]), reverse=True)
     return rows
 
 
@@ -395,7 +564,7 @@ def _program_summary(
 ) -> dict[str, Any]:
     scored_jobs = _program_market_rows(program, jobs)
     matched_jobs = len(scored_jobs)
-    avg_match = round(sum(item["match_score"] for item in scored_jobs) / matched_jobs, 2) if matched_jobs else 0.0
+    avg_match = round(sum(item["adjusted_match_score"] for item in scored_jobs) / matched_jobs, 2) if matched_jobs else 0.0
     avg_coverage = round(sum(item["coverage_score"] for item in scored_jobs) / matched_jobs, 2) if matched_jobs else 0.0
     avg_gap = round(sum(item["gap_score"] for item in scored_jobs) / matched_jobs, 2) if matched_jobs else 100.0
     demand_counter: Counter[str] = Counter()
@@ -438,6 +607,10 @@ def _program_summary(
         "program_name": program.program_name,
         "program_level": program.program_level,
         "faculty": program.faculty,
+        "domain_key": program.domain_key,
+        "domain_label": program.domain_label,
+        "domain_subdomain": program.domain_subdomain,
+        "domain_confidence": program.domain_confidence,
         "program_skill_count": len(program.skill_keys),
         "market_alignment_score": avg_match,
         "coverage_score": avg_coverage,
@@ -472,62 +645,9 @@ def build_program_market_alignment_report(
     knn_programs: dict[int, list[dict[str, Any]]] = {}
 
     if program_model and job_model:
-        vocab = sorted({key for profile in [*program_model, *job_model] for key in profile.skill_keys})
-        mlb = MultiLabelBinarizer(classes=vocab)
-        program_matrix = mlb.fit_transform([profile.skill_keys for profile in program_model])
-        job_matrix = mlb.transform([profile.skill_keys for profile in job_model])
-
-        job_nn = NearestNeighbors(metric="cosine")
-        job_nn.fit(job_matrix)
-        k_jobs = min(max(k_values), len(job_model))
-        distances, indices = job_nn.kneighbors(program_matrix, n_neighbors=k_jobs)
-        for program_index, (dist_row, idx_row) in enumerate(zip(distances, indices)):
-            items: list[dict[str, Any]] = []
-            source_profile = program_model[program_index]
-            for distance, target_index in zip(dist_row, idx_row):
-                target_profile = job_model[target_index]
-                scores = _pair_scores(source_profile.skill_keys, target_profile.skill_keys)
-                items.append(
-                    {
-                        "job_id": target_profile.job_id,
-                        "job_title": target_profile.job_title,
-                        "company": target_profile.company,
-                        "location": target_profile.location,
-                        "source": target_profile.source,
-                        "job_url": target_profile.job_url,
-                        "similarity_score": round((1.0 - float(distance)) * 100, 2),
-                        "coverage_score": scores["coverage_score"],
-                        "gap_score": scores["gap_score"],
-                        "match_score": scores["match_score"],
-                    }
-                )
-            knn_jobs[source_profile.program_id] = items
-
-        program_nn = NearestNeighbors(metric="cosine")
-        program_nn.fit(program_matrix)
-        k_programs = min(max(k_values) + 1, len(program_model))
-        distances, indices = program_nn.kneighbors(program_matrix, n_neighbors=k_programs)
-        for program_index, (dist_row, idx_row) in enumerate(zip(distances, indices)):
-            items: list[dict[str, Any]] = []
-            source_profile = program_model[program_index]
-            for distance, target_index in zip(dist_row, idx_row):
-                if target_index == program_index:
-                    continue
-                target_profile = program_model[target_index]
-                scores = _pair_scores(source_profile.skill_keys, target_profile.skill_keys)
-                items.append(
-                    {
-                        "program_id": target_profile.program_id,
-                        "program_name": target_profile.program_name,
-                        "program_level": target_profile.program_level,
-                        "faculty": target_profile.faculty,
-                        "similarity_score": round((1.0 - float(distance)) * 100, 2),
-                        "coverage_score": scores["coverage_score"],
-                        "gap_score": scores["gap_score"],
-                        "match_score": scores["match_score"],
-                    }
-                )
-            knn_programs[source_profile.program_id] = items
+        k_limit = max(k_values) if k_values else 5
+        knn_jobs = _knn_neighbors(program_model, job_model, k=k_limit)
+        knn_programs = _knn_neighbors(program_model, program_model, k=min(k_limit + 1, max(len(program_model) - 1, 1)))
 
     program_summaries: list[dict[str, Any]] = []
     for index, program in enumerate(programs):
@@ -648,6 +768,7 @@ def write_program_market_alignment_report(report: dict[str, Any], path: Path = R
                 f"### {item['program_name']}",
                 f"- Level: {item['program_level']}",
                 f"- Faculty: {item['faculty'] or 'n/a'}",
+                f"- Domain: {item.get('domain_label') or 'n/a'} / {item.get('domain_subdomain') or 'general'}",
                 f"- Market alignment score: {item['market_alignment_score']}",
                 f"- Coverage score: {item['coverage_score']}",
                 f"- Gap score: {item['gap_score']}",
@@ -668,6 +789,7 @@ def write_program_market_alignment_report(report: dict[str, Any], path: Path = R
         lines.extend(
             [
                 f"### {item['program_name']}",
+                f"- Domain: {item.get('domain_label') or 'n/a'} / {item.get('domain_subdomain') or 'general'}",
                 f"- Market alignment score: {item['market_alignment_score']}",
                 f"- Coverage score: {item['coverage_score']}",
                 f"- Gap score: {item['gap_score']}",

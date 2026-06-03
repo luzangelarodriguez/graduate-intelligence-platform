@@ -11,6 +11,21 @@ from datetime import datetime, timedelta
 from threading import RLock
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
+from backend.services.domain_taxonomy import (
+    DOMAIN_KEYWORDS,
+    DOMAIN_LABELS,
+    classify_job_key,
+    classify_program_key,
+    classify_skill_key,
+    domain_label,
+    domain_weight,
+    infer_job_domain,
+    infer_program_domain,
+    infer_skill_domain,
+    normalize_domain_text,
+    related_domains,
+)
+
 
 def now_iso() -> str:
     return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
@@ -1062,185 +1077,14 @@ def data_quality_metrics(jobs: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-DOMAIN_SKILL_PRIORITY: Dict[str, List[str]] = {
-    "law": [
-        "Legal Analysis",
-        "Compliance",
-        "Regulatory Compliance",
-        "Corporate Governance",
-        "Corporate Law",
-        "Contract Drafting",
-        "Legal Risk",
-        "Privacy",
-        "Public Policy",
-        "Procurement",
-        "Due Diligence",
-        "Negotiation",
-        "Litigation",
-        "AML/CFT",
-        "Risk Management",
-        "Research Methods",
-        "Communication",
-    ],
-    "technology": [
-        "Python",
-        "SQL",
-        "APIs",
-        "Cloud",
-        "Git",
-        "Testing",
-        "Agile",
-        "Machine Learning",
-        "Big Data",
-        "ETL",
-        "Business Intelligence",
-        "Dashboarding",
-        "Data Modeling",
-        "Data Analysis",
-        "Cybersecurity",
-        "Privacy",
-        "Prompt Engineering",
-        "Communication",
-    ],
-    "business": [
-        "Finance",
-        "Strategy",
-        "Leadership",
-        "Project Management",
-        "Communication",
-        "CRM",
-        "Digital Marketing",
-        "Web Analytics",
-        "Reporting",
-        "KPI Design",
-        "Data Storytelling",
-        "Business Intelligence",
-        "Data Analysis",
-        "Data Modeling",
-        "Compliance",
-    ],
-    "education": [
-        "Curriculum Design",
-        "Instructional Design",
-        "LMS",
-        "Evaluation",
-        "Learning Analytics",
-        "Communication",
-        "Leadership",
-        "Research Methods",
-        "Data Storytelling",
-    ],
-    "health": [
-        "Health Management",
-        "Public Health",
-        "Occupational Health",
-        "Risk Management",
-        "Compliance",
-        "Project Management",
-        "Leadership",
-        "Evaluation",
-        "Communication",
-    ],
-}
-
-
-DOMAIN_JOB_TERMS: Dict[str, List[str]] = {
-    "law": [
-        "legal",
-        "compliance",
-        "regulatory",
-        "contract",
-        "corporate",
-        "governance",
-        "privacy",
-        "data protection",
-        "habeas data",
-        "sagrilaft",
-        "sarlaft",
-        "litigation",
-        "arbitration",
-        "lawyer",
-        "abogado",
-        "juridic",
-        "procurement",
-        "risk legal",
-        "risk regulatorio",
-        "due diligence",
-    ],
-    "technology": [
-        "software",
-        "engineer",
-        "developer",
-        "python",
-        "sql",
-        "cloud",
-        "api",
-        "data",
-        "etl",
-        "big data",
-        "analytics",
-        "cybersecurity",
-        "agile",
-    ],
-    "business": [
-        "finance",
-        "manager",
-        "marketing",
-        "sales",
-        "operations",
-        "strategy",
-        "business",
-        "reporting",
-        "kpi",
-        "crm",
-        "controller",
-    ],
-    "education": [
-        "education",
-        "curriculum",
-        "pedagogy",
-        "learning",
-        "instructional",
-        "lms",
-        "assessment",
-        "teacher",
-        "school",
-    ],
-    "health": [
-        "health",
-        "clinical",
-        "hospital",
-        "patient",
-        "safety",
-        "occupational",
-        "public health",
-        "care",
-        "service",
-    ],
-}
-
-
-DOMAIN_EXCLUSION_TERMS: Dict[str, List[str]] = {
-    "law": ["python", "sql", "cloud", "big data", "dashboard", "power bi", "data analysis", "machine learning"],
-    "technology": ["habeas data", "sagrilaft", "sarlaft", "litigation", "corporate governance"],
-    "business": ["litigation", "habeas data", "sagrilaft", "software engineer"],
-    "education": ["python", "sql", "cloud", "sagrilaft", "litigation"],
-    "health": ["python", "sql", "cloud", "litigation", "seo"],
-}
-
-
 def program_domain(program: Dict[str, Any]) -> str:
-    name = normalize_text(clean_human_text(program.get("name")))
-    faculty = normalize_text(clean_human_text(program.get("faculty")))
-    if faculty == "derecho" or "derecho" in name:
-        return "law"
-    if faculty == "ingenieria y tecnologia" or any(token in name for token in ["ingenieria", "software", "inteligencia artificial", "seguridad informatica", "visual analytics", "big data", "tecnologias de la informacion"]):
-        return "technology"
-    if faculty == "educacion" or "educacion" in name or "pedagog" in name or "licenciatura" in name:
-        return "education"
-    if faculty == "ciencias de la salud" or "salud" in name:
-        return "health"
-    return "business"
+    result = infer_program_domain(
+        program.get("name"),
+        faculty=program.get("faculty"),
+        role=program.get("rol") or program.get("role"),
+        skills=program.get("curriculum_skills") or program.get("skills") or [],
+    )
+    return result.domain
 
 
 def job_text_blob(job: Dict[str, Any]) -> str:
@@ -1259,48 +1103,38 @@ def job_text_blob(job: Dict[str, Any]) -> str:
 
 
 def domain_skill_weight(skill: str, domain: str) -> float:
-    normalized = normalize_text(skill)
-    allowed = {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY.get(domain, [])}
-    if normalized in allowed:
-        return 1.0
-    if skill_category(skill) == "soft":
-        return 0.45
-    if domain == "law" and normalized in {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY["technology"]}:
-        return 0.08
-    if domain == "technology" and normalized in {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY["law"]}:
-        return 0.08
-    if domain == "business" and normalized in {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY["law"]}:
-        return 0.15
-    if domain == "education" and normalized in {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY["technology"]}:
-        return 0.15
-    if domain == "health" and normalized in {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY["technology"]}:
-        return 0.15
-    return 0.25
+    skill_domain = infer_skill_domain(skill).domain
+    return domain_weight(skill_domain, domain)
 
 
 def job_relevance_score(program: Dict[str, Any], job: Dict[str, Any]) -> Dict[str, Any]:
     domain = program_domain(program)
-    blob = job_text_blob(job)
-    terms = DOMAIN_JOB_TERMS.get(domain, [])
-    exclusions = DOMAIN_EXCLUSION_TERMS.get(domain, [])
     extracted = extract_skills_from_text(f"{job.get('title', '')} {job.get('description', '')}")
+    job_domain = infer_job_domain(
+        job.get("title"),
+        source=job.get("source"),
+        industry=job.get("industry"),
+        description=job.get("description"),
+        responsibilities=job.get("responsibilities"),
+        requirements=job.get("requirements"),
+        skills=[skill["name"] for skill in extracted],
+    ).domain
+    blob = job_text_blob(job)
+    terms = DOMAIN_KEYWORDS.get(domain, [])
     curriculum = as_skill_names(program.get("curriculum_skills") or [])
     curriculum_keys = {normalize_text(item) for item in curriculum}
-    domain_skills = {normalize_text(item) for item in DOMAIN_SKILL_PRIORITY.get(domain, [])}
+    domain_skills = {normalize_text(item) for item in DOMAIN_KEYWORDS.get(domain, [])}
     term_hits = [term for term in terms if normalize_text(term) in blob]
-    excluded_hits = [term for term in exclusions if normalize_text(term) in blob]
-    skill_hits = [skill["name"] for skill in extracted if normalize_text(skill["name"]) in curriculum_keys or normalize_text(skill["name"]) in domain_skills]
+    excluded_hits: list[str] = []
+    skill_hits = [skill["name"] for skill in extracted if normalize_text(skill["name"]) in curriculum_keys or infer_skill_domain(skill["name"]).domain == domain]
     context_hits = [token for token in normalize_text(clean_human_text(program.get("name", ""))).split() if len(token) > 3 and token in blob]
-    industry_hits = 1 if normalize_text(job.get("industry")) in {normalize_text(domain), normalize_text(program.get("faculty"))} else 0
+    industry_hits = 1 if normalize_text(job.get("industry")) in {normalize_text(domain_label(domain)), normalize_text(program.get("faculty"))} else 0
     score = (len(term_hits) * 2.0) + (len(skill_hits) * 1.6) + (len(context_hits) * 0.8) + (industry_hits * 1.0) - (len(excluded_hits) * 1.8)
-    if any(normalize_text(item) in blob for item in DOMAIN_JOB_TERMS.get(domain, [])):
-        score += 0.5
-    if domain == "law" and any(token in blob for token in ["python", "sql", "cloud", "power bi", "dashboard", "big data", "machine learning"]):
-        score -= 1.2
-    if domain == "technology" and any(token in blob for token in ["habeas data", "sagrilaft", "sarlaft", "litigation"]):
-        score -= 1.0
+    score *= domain_weight(domain, job_domain)
     return {
         "program_domain": domain,
+        "job_domain": job_domain,
+        "domain_weight": domain_weight(domain, job_domain),
         "score": round(max(score, 0.0), 2),
         "term_hits": term_hits,
         "excluded_hits": excluded_hits,
