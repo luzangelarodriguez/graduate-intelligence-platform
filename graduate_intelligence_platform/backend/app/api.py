@@ -728,10 +728,14 @@ def program_by_id(program_id: int) -> dict[str, Any] | None:
     if not row:
         return None
     normalized = normalize_program_row(row)
+    found_in_visible_catalog = False
     for item in programs():
         if int(item.get("especializacion_id") or 0) == resolved_id:
             normalized.update(item)
+            found_in_visible_catalog = True
             break
+    if not found_in_visible_catalog:
+        return None
     normalized["skills"] = dashboard_service.normalize_skill_rows(
         programas_repository.fetch_program_skill_rows(resolved_id, db_name=DB_NAME)
     )
@@ -1102,6 +1106,8 @@ def related_universities_for_program(
     program = program_by_id(program_id)
     if not program:
         raise not_found("programa", program_id)
+    if not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=0)
     program_name = str(program.get("nombre_especializacion") or "")
     rows = programas_repository.fetch_related_virtual_programs(
         program_name,
@@ -1172,6 +1178,9 @@ def list_matches_for_program(
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     if not relation:
         return page([], limit=bounded_limit(limit), offset=offset)
+    program = program_by_id(program_id)
+    if not program or not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=offset)
     resolved_id = programas_repository.resolve_program_id(program_id, db_name=DB_NAME)
     limit = bounded_limit(limit)
     rows = matches_repository.fetch_match_rows_for_program(
@@ -1197,6 +1206,37 @@ def dashboard_programa(program_id: int, _current_user=Depends(require_current_us
     selected = program_by_id(program_id)
     if not selected:
         raise not_found("programa", program_id)
+    if not selected.get("microcurriculum_context"):
+        return {
+            "program_id": int(selected.get("especializacion_id") or program_id),
+            "program": selected,
+            "kpis": {
+                "alignment_score": 0.0,
+                "missing_critical_skills": 0,
+                "high_demand_roles": 0,
+                "employability_trend": 0.0,
+                "digital_coverage": 0.0,
+                "curricular_update_signal": "Sin evidencia",
+            },
+            "status": {
+                "curricular_status": "Sin evidencia curricular",
+                "curricular_status_detail": "No se encontró microcurrículo ni inteligencia específica del programa.",
+                "ai_signal": "No curricular evidence available.",
+                "trend_label": "Sin señal",
+            },
+            "missing_skills": [],
+            "matches": [],
+            "recommendations": [],
+            "insights": {
+                "detected": "No curricular evidence available.",
+                "ai_recommends": [
+                    "Cargar o procesar un microcurrículo para habilitar inteligencia académica específica del programa.",
+                ],
+                "emerging_gap": "Sin brechas tipificadas",
+                "critical_signal": "Sin evidencia curricular",
+            },
+            "source": "especializaciones",
+        }
 
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     resolved_id = int(selected.get("especializacion_id") or programas_repository.resolve_program_id(program_id, db_name=DB_NAME))
@@ -1597,6 +1637,8 @@ def recommendations_programs(
     selected = program_by_id(program_id)
     if not selected:
         raise not_found("programa", program_id)
+    if not selected.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=0)
     current_programs = programs()
     items = recommendation_service.recommended_program_cards(
         current_programs,
@@ -1622,6 +1664,9 @@ def recommendations_jobs(
     offset: int = Query(0, ge=0),
     _current_user=Depends(require_current_user),
 ) -> Page:
+    program = program_by_id(program_id)
+    if not program or not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=offset)
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     if not relation:
         return page([], limit=bounded_limit(limit), offset=offset)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from backend.repositories.base import cursor, fetch_all, fetch_one, pick_relation
+from backend.repositories.base import cursor, fetch_all, fetch_one, pick_relation, relation_exists
 
 
 PROGRAM_NAME_STOPWORDS = {
@@ -37,6 +37,27 @@ PROGRAM_NAME_STOPWORDS = {
 def _program_search_tokens(program_name: str) -> list[str]:
     tokens = re.findall(r"[a-záéíóúñü0-9]{4,}", program_name.lower())
     return [token for token in tokens if token not in PROGRAM_NAME_STOPWORDS][:5]
+
+
+def _program_visibility_allowed_programs_sql(*, db_name: str | None = None) -> str | None:
+    sources: list[str] = []
+    if relation_exists("public.vw_programa_skills", db_name=db_name):
+        sources.append(
+            """
+            SELECT DISTINCT especializacion_id AS program_id
+            FROM public.vw_programa_skills
+            """
+        )
+    if relation_exists("public.microcurriculum_program_contexts", db_name=db_name):
+        sources.append(
+            """
+            SELECT DISTINCT specialization_id AS program_id
+            FROM public.microcurriculum_program_contexts
+            """
+        )
+    if not sources:
+        return None
+    return "SELECT DISTINCT program_id FROM (\n" + "\nUNION\n".join(src.strip() for src in sources) + "\n) allowed_programs"
 
 
 def ensure_pg_trgm(*, db_name: str | None = None) -> bool:
@@ -84,15 +105,23 @@ def resolve_program_id(especializacion_id: int, *, db_name: str | None = None) -
 
 
 def fetch_fallback_program_rows(*, db_name: str | None = None) -> list[dict[str, Any]]:
+    allowed_programs_sql = _program_visibility_allowed_programs_sql(db_name=db_name)
+    if not allowed_programs_sql:
+        return []
     return fetch_all(
         """
+        WITH allowed_programs AS (
+            {allowed_programs_sql}
+        )
         SELECT
             id AS especializacion_id,
             nombre AS nombre_especializacion,
             COALESCE(rol, '') AS rol
         FROM especializaciones
+        INNER JOIN allowed_programs ap
+            ON ap.program_id = especializaciones.id
         ORDER BY nombre
-        """,
+        """.format(allowed_programs_sql=allowed_programs_sql),
         db_name=db_name,
     )
 
@@ -148,6 +177,10 @@ def fetch_program_rows_with_metrics(
     metrics_relation: str | None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
+    allowed_programs_sql = _program_visibility_allowed_programs_sql(db_name=db_name)
+    if not allowed_programs_sql:
+        return []
+
     if metrics_relation:
         metrics_select = """
             COALESCE(v.promedio_match_mercado, 0) AS promedio_match_mercado,
@@ -165,7 +198,10 @@ def fetch_program_rows_with_metrics(
 
     return fetch_all(
         f"""
-        WITH programa_skills AS (
+        WITH allowed_programs AS (
+            {allowed_programs_sql}
+        ),
+        programa_skills AS (
             SELECT especializacion_id, COUNT(DISTINCT skill_id)::int AS total_skills_programa
             FROM especializacion_skills
             GROUP BY especializacion_id
@@ -195,6 +231,8 @@ def fetch_program_rows_with_metrics(
             COALESCE(pbl.total_habilidades_blandas, 0) AS total_habilidades_blandas,
             {metrics_select}
         FROM especializaciones s
+        INNER JOIN allowed_programs ap
+            ON ap.program_id = s.id
         LEFT JOIN programa_skills ps ON ps.especializacion_id = s.id
         LEFT JOIN programa_herramientas ph ON ph.especializacion_id = s.id
         LEFT JOIN programa_competencias pc ON pc.especializacion_id = s.id
