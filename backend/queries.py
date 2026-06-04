@@ -378,7 +378,10 @@ classified AS (
         best_score,
         skill_text,
         skill_domains,
-        {job_domain_sql} AS domain_key
+        CASE
+            WHEN {title_domain_sql} <> 'business_management' THEN {title_domain_sql}
+            ELSE {support_domain_sql}
+        END AS domain_key
     FROM job_context
 )
 SELECT
@@ -398,7 +401,8 @@ SELECT
 FROM classified;
 '''.format(
     job_skill_domain_sql=build_sql_domain_case("concat_ws(' ', js.canonical_skill, js.skill_family, js.skill_category)"),
-    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', job_title, job_description, company, location, job_date, source, declared_program, skill_text, skill_domains)"),
+    title_domain_sql=build_sql_job_domain_case("concat_ws(' ', job_title, job_title, job_title)"),
+    support_domain_sql=build_sql_job_domain_case("concat_ws(' ', skill_text, skill_text, job_description, company, location, job_date, source, declared_program)"),
     job_domain_label_sql=_sql_domain_label_case("domain_key", JOB_DOMAIN_LABELS),
 )
 
@@ -428,7 +432,7 @@ FROM (
 ) classified;
 '''.format(
     skill_domain_sql=build_sql_domain_case("concat_ws(' ', js.canonical_skill, js.skill_family, js.skill_category)"),
-    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', j.title, j.description, j.company, COALESCE(j.location, ''), COALESCE(j.source, ''), COALESCE(j.industry, ''), COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''))"),
+    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', j.title, j.title, j.title, j.description, j.company, COALESCE(j.location, ''), COALESCE(j.source, ''), COALESCE(j.industry, ''), COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''), COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''))"),
     skill_domain_label_sql=_sql_domain_label_case("skill_domain"),
     job_domain_label_sql=_sql_domain_label_case("domain_key", JOB_DOMAIN_LABELS),
 )
