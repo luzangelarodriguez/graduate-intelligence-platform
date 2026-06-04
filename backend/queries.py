@@ -6,14 +6,200 @@ from backend.db import get_conn, get_cursor
 from backend.services.domain_taxonomy import (
     DOMAIN_LABELS,
     build_sql_domain_case,
+    build_sql_job_domain_case,
     build_sql_domain_weight_case,
+    JOB_DOMAIN_LABELS,
 )
 
 
-def _sql_domain_label_case(domain_expr: str) -> str:
-    clauses = [f"WHEN {domain_expr} = '{domain_key}' THEN '{label}'" for domain_key, label in DOMAIN_LABELS.items()]
-    default_label = DOMAIN_LABELS.get("business_management", "Business Management")
+def _sql_domain_label_case(domain_expr: str, labels: dict[str, str] | None = None) -> str:
+    label_map = labels or DOMAIN_LABELS
+    clauses = [f"WHEN {domain_expr} = '{domain_key}' THEN '{label}'" for domain_key, label in label_map.items()]
+    default_label = label_map.get("business_management", "Business Management")
     return "CASE\n" + "\n".join(clauses) + f"\nELSE '{default_label}'\nEND"
+
+
+def _sql_literal(value: str) -> str:
+    return value.replace("'", "''")
+
+
+def _program_base_sql() -> str:
+    return """
+SELECT
+    s.id AS program_id,
+    s.nombre AS program_name,
+    COALESCE(s.descripcion, '') AS program_description,
+    COALESCE(s.facultad, '') AS faculty,
+    COALESCE(s.rol, '') AS role,
+    COALESCE(s.campo_laboral, '') AS field,
+    lower(unaccent(COALESCE(s.nombre, ''))) AS normalized_program_name,
+    COALESCE(ps.total_skills_programa, 0) AS total_skills_programa,
+    COALESCE(ph.total_herramientas, 0) AS total_herramientas,
+    COALESCE(pc.total_competencias, 0) AS total_competencias,
+    COALESCE(pbl.total_habilidades_blandas, 0) AS total_habilidades_blandas,
+    CASE
+        WHEN COALESCE(s.source_url, '') <> '' OR COALESCE(s.plan_estudios, '') <> '' THEN 0
+        ELSE 1
+    END AS source_priority,
+    CASE WHEN COALESCE(s.rol, '') <> '' THEN 0 ELSE 1 END AS role_priority,
+    CASE WHEN s.nombre ~ '^[A-Z]' THEN 0 ELSE 1 END AS casing_priority
+FROM public.especializaciones s
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT skill_id)::int AS total_skills_programa
+    FROM public.especializacion_skills
+    GROUP BY especializacion_id
+) ps ON ps.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT herramienta_id)::int AS total_herramientas
+    FROM public.especializacion_herramientas
+    GROUP BY especializacion_id
+) ph ON ph.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT competencia_id)::int AS total_competencias
+    FROM public.especializacion_competencias
+    GROUP BY especializacion_id
+) pc ON pc.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT habilidad_id)::int AS total_habilidades_blandas
+    FROM public.especializacion_habilidades_blandas
+    GROUP BY especializacion_id
+) pbl ON pbl.especializacion_id = s.id
+"""
+
+
+PROGRAM_DOMAIN_MAPPING_SEED_ROWS = (
+    (108, "criminology_security", "Criminology & Security"),
+    (107, "health", "Health"),
+    (82, "business_management", "Business Management"),
+    (97, "legal_compliance", "Legal & Compliance"),
+    (100, "legal_compliance", "Legal & Compliance"),
+    (99, "legal_compliance", "Legal & Compliance"),
+    (88, "marketing_commercial", "Marketing & Commercial"),
+    (90, "project_management", "Project Management"),
+    (96, "data_analytics", "Data & Analytics"),
+    (105, "education", "Education"),
+    (102, "education", "Education"),
+    (104, "education", "Education"),
+    (84, "finance_accounting", "Finance & Accounting"),
+    (95, "logistics_operations", "Logistics & Operations"),
+    (83, "health", "Health"),
+    (86, "business_management", "Business Management"),
+    (98, "legal_compliance", "Legal & Compliance"),
+    (91, "data_analytics", "Data & Analytics"),
+    (92, "artificial_intelligence", "Artificial Intelligence"),
+    (85, "data_analytics", "Data & Analytics"),
+    (87, "marketing_commercial", "Marketing & Commercial"),
+    (101, "education", "Education"),
+    (106, "education", "Education"),
+    (89, "finance_accounting", "Finance & Accounting"),
+    (93, "cybersecurity", "Cybersecurity"),
+    (103, "education", "Education"),
+    (94, "data_analytics", "Data & Analytics"),
+)
+
+PROGRAM_DOMAIN_MAPPING_SEED_VALUES_SQL = ",\n        ".join(
+    f"({program_id}, '{_sql_literal(domain_key)}', '{_sql_literal(domain_label)}')"
+    for program_id, domain_key, domain_label in PROGRAM_DOMAIN_MAPPING_SEED_ROWS
+)
+
+
+PROGRAM_DOMAIN_MAPPING_SQL = '''
+CREATE TABLE IF NOT EXISTS public.program_domain_mapping (
+    program_id integer PRIMARY KEY,
+    program_name text NOT NULL,
+    domain_key text NOT NULL,
+    domain_label text NOT NULL,
+    is_manual boolean NOT NULL DEFAULT TRUE,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.program_domain_mapping (program_id, program_name, domain_key, domain_label, is_manual, created_at, updated_at)
+WITH canonical_programs AS (
+    SELECT *
+    FROM (
+        SELECT
+            base.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY base.normalized_program_name
+                ORDER BY
+                    base.source_priority,
+                    base.total_skills_programa DESC,
+                    base.role_priority,
+                    base.casing_priority,
+                    base.program_id DESC
+            ) AS program_rank
+        FROM ({program_base_sql}) base
+    ) ranked
+    WHERE ranked.program_rank = 1
+)
+SELECT
+    s.program_id,
+    s.program_name,
+    seed.domain_key,
+    seed.domain_label,
+    TRUE,
+    now(),
+    now()
+FROM (
+    VALUES
+        {seed_values}
+) AS seed(program_id, domain_key, domain_label)
+INNER JOIN canonical_programs s
+    ON s.program_id = seed.program_id
+ON CONFLICT (program_id) DO UPDATE SET
+    program_name = EXCLUDED.program_name,
+    domain_key = EXCLUDED.domain_key,
+    domain_label = EXCLUDED.domain_label,
+    is_manual = TRUE,
+    updated_at = now();
+'''.format(
+    seed_values=PROGRAM_DOMAIN_MAPPING_SEED_VALUES_SQL,
+    program_base_sql=_program_base_sql(),
+)
+
+
+PROGRAM_BASE_SQL = """
+SELECT
+    s.id AS program_id,
+    s.nombre AS program_name,
+    COALESCE(s.descripcion, '') AS program_description,
+    COALESCE(s.facultad, '') AS faculty,
+    COALESCE(s.rol, '') AS role,
+    COALESCE(s.campo_laboral, '') AS field,
+    lower(unaccent(COALESCE(s.nombre, ''))) AS normalized_program_name,
+    COALESCE(ps.total_skills_programa, 0) AS total_skills_programa,
+    COALESCE(ph.total_herramientas, 0) AS total_herramientas,
+    COALESCE(pc.total_competencias, 0) AS total_competencias,
+    COALESCE(pbl.total_habilidades_blandas, 0) AS total_habilidades_blandas,
+    CASE
+        WHEN COALESCE(s.source_url, '') <> '' OR COALESCE(s.plan_estudios, '') <> '' THEN 0
+        ELSE 1
+    END AS source_priority,
+    CASE WHEN COALESCE(s.rol, '') <> '' THEN 0 ELSE 1 END AS role_priority,
+    CASE WHEN s.nombre ~ '^[A-Z]' THEN 0 ELSE 1 END AS casing_priority
+FROM public.especializaciones s
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT skill_id)::int AS total_skills_programa
+    FROM public.especializacion_skills
+    GROUP BY especializacion_id
+) ps ON ps.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT herramienta_id)::int AS total_herramientas
+    FROM public.especializacion_herramientas
+    GROUP BY especializacion_id
+) ph ON ph.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT competencia_id)::int AS total_competencias
+    FROM public.especializacion_competencias
+    GROUP BY especializacion_id
+) pc ON pc.especializacion_id = s.id
+LEFT JOIN (
+    SELECT especializacion_id, COUNT(DISTINCT habilidad_id)::int AS total_habilidades_blandas
+    FROM public.especializacion_habilidades_blandas
+    GROUP BY especializacion_id
+) pbl ON pbl.especializacion_id = s.id
+"""
 
 
 SKILL_DOMAIN_TAXONOMY_SQL = '''
@@ -74,35 +260,61 @@ FROM (
 
 PROGRAM_DOMAIN_TAXONOMY_SQL = '''
 CREATE OR REPLACE VIEW public.vw_program_domain_taxonomy AS
-WITH program_context AS (
+WITH program_base AS (
+    SELECT *
+    FROM (
+        SELECT
+            base.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY base.normalized_program_name
+                ORDER BY
+                    base.source_priority,
+                    base.total_skills_programa DESC,
+                    base.role_priority,
+                    base.casing_priority,
+                    base.program_id DESC
+            ) AS program_rank
+        FROM ({program_base_sql}) base
+    ) ranked
+    WHERE ranked.program_rank = 1
+),
+program_context AS (
     SELECT
-        e.id AS program_id,
-        e.nombre AS program_name,
-        COALESCE(e.descripcion, '') AS general_text,
+        pb.program_id,
+        pb.program_name,
+        pb.faculty AS facultad,
+        pb.role AS rol,
+        pb.field AS campo_laboral,
+        COALESCE(pb.program_description, '') AS general_text,
         COALESCE(string_agg(DISTINCT ps.skill, ' ' ORDER BY ps.skill), '') AS skill_text,
         COALESCE(string_agg(DISTINCT ps.skill_domain, ' ' ORDER BY ps.skill_domain), '') AS skill_domains,
         COALESCE(string_agg(DISTINCT ps.categoria, ' ' ORDER BY ps.categoria), '') AS skill_categories
-    FROM public.especializaciones e
+    FROM program_base pb
     LEFT JOIN public.vw_programa_skills ps
-        ON ps.especializacion_id = e.id
+        ON ps.especializacion_id = pb.program_id
     GROUP BY
-        e.id,
-        e.nombre,
-        COALESCE(e.descripcion, '')
+        pb.program_id,
+        pb.program_name,
+        pb.faculty,
+        pb.role,
+        pb.field,
+        pb.program_description
 ),
 classified AS (
     SELECT
-        program_id,
-        program_name,
-        ''::text AS facultad,
-        ''::text AS rol,
-        ''::text AS campo_laboral,
-        general_text,
-        skill_text,
-        skill_domains,
-        skill_categories,
-        {program_domain_sql} AS domain_key
-    FROM program_context
+        pc.program_id,
+        pc.program_name,
+        pc.facultad,
+        pc.rol,
+        pc.campo_laboral,
+        pc.general_text,
+        pc.skill_text,
+        pc.skill_domains,
+        pc.skill_categories,
+        COALESCE(pdm.domain_key, {program_domain_sql}) AS domain_key
+    FROM program_context pc
+    LEFT JOIN public.program_domain_mapping pdm
+        ON pdm.program_id = pc.program_id
 )
 SELECT
     program_id,
@@ -118,7 +330,8 @@ SELECT
     {program_domain_label_sql} AS domain_label
 FROM classified;
 '''.format(
-    program_domain_sql=build_sql_domain_case("concat_ws(' ', program_name, general_text, skill_text, skill_domains, skill_categories)"),
+    program_base_sql=PROGRAM_BASE_SQL,
+    program_domain_sql=build_sql_domain_case("concat_ws(' ', pc.program_name, pc.general_text, pc.skill_text, pc.skill_domains, pc.skill_categories)"),
     program_domain_label_sql=_sql_domain_label_case("domain_key"),
 )
 
@@ -127,33 +340,30 @@ JOB_DOMAIN_TAXONOMY_SQL = '''
 CREATE OR REPLACE VIEW public.vw_job_domain_taxonomy AS
 WITH job_context AS (
     SELECT
-        e.id AS job_id,
-        COALESCE(e.titulo, '') AS job_title,
-        COALESCE(e.descripcion, '') AS job_description,
-        COALESCE(e.empresa, '') AS company,
-        COALESCE(e.ubicacion, e.ciudad, '') AS location,
-        COALESCE(e.fecha_publicacion::text, '') AS job_date,
-        COALESCE(e.fuente, e.portal, '') AS source,
-        COALESCE(e.dominio, e.sector, '') AS declared_program,
-        COALESCE(COALESCE(e.confidence_score, 0)::text, '') AS best_score,
-        COALESCE(string_agg(DISTINCT COALESCE(s.nombre, ''), ' ' ORDER BY COALESCE(s.nombre, '')), '') AS skill_text,
+        j.id AS job_id,
+        COALESCE(j.title, '') AS job_title,
+        COALESCE(j.description, '') AS job_description,
+        COALESCE(j.company, '') AS company,
+        COALESCE(j.location, '') AS location,
+        COALESCE(j.created_at::text, '') AS job_date,
+        COALESCE(j.source, '') AS source,
+        COALESCE(j.industry, '') AS declared_program,
+        COALESCE(COALESCE(j.job_probability_score, 0)::text, '') AS best_score,
+        COALESCE(string_agg(DISTINCT COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''), ' ' ORDER BY COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '')), '') AS skill_text,
         COALESCE(string_agg(DISTINCT {job_skill_domain_sql}, ' ' ORDER BY {job_skill_domain_sql}), '') AS skill_domains
-    FROM public.empleos e
-    LEFT JOIN public.empleo_skills es
-        ON es.empleo_id = e.id
-    LEFT JOIN public.skills s
-        ON s.id = es.skill_id
+    FROM public.jobs j
+    LEFT JOIN public.job_skills js
+        ON js.job_id = j.id
     GROUP BY
-        e.id,
-        e.titulo,
-        e.descripcion,
-        e.empresa,
-        COALESCE(e.ubicacion, e.ciudad, ''),
-        COALESCE(e.fecha_publicacion::text, ''),
-        COALESCE(e.fuente, e.portal, ''),
-        e.portal,
-        COALESCE(e.dominio, e.sector, ''),
-        e.confidence_score
+        j.id,
+        j.title,
+        j.description,
+        j.company,
+        j.location,
+        j.created_at::text,
+        j.source,
+        j.industry,
+        j.job_probability_score
 ),
 classified AS (
     SELECT
@@ -187,9 +397,9 @@ SELECT
     {job_domain_label_sql} AS domain_label
 FROM classified;
 '''.format(
-    job_skill_domain_sql=build_sql_domain_case("concat_ws(' ', s.nombre)"),
-    job_domain_sql=build_sql_domain_case("concat_ws(' ', job_title, job_description, company, location, job_date, source, declared_program, skill_text, skill_domains)"),
-    job_domain_label_sql=_sql_domain_label_case("domain_key"),
+    job_skill_domain_sql=build_sql_domain_case("concat_ws(' ', js.canonical_skill, js.skill_family, js.skill_category)"),
+    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', job_title, job_description, company, location, job_date, source, declared_program, skill_text, skill_domains)"),
+    job_domain_label_sql=_sql_domain_label_case("domain_key", JOB_DOMAIN_LABELS),
 )
 
 
@@ -206,36 +416,34 @@ SELECT
     {job_domain_label_sql} AS job_domain_label
 FROM (
     SELECT
-        ROW_NUMBER() OVER (ORDER BY es.empleo_id, es.skill_id)::bigint AS job_skill_id,
-        es.empleo_id AS job_id,
-        e.titulo AS job_title,
-        COALESCE(s.nombre, '') AS skill_name,
+        ROW_NUMBER() OVER (ORDER BY js.job_id, js.id)::bigint AS job_skill_id,
+        js.job_id AS job_id,
+        j.title AS job_title,
+        COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') AS skill_name,
         {skill_domain_sql} AS skill_domain,
         {job_domain_sql} AS domain_key
-    FROM public.empleo_skills es
-    LEFT JOIN public.empleos e
-        ON e.id = es.empleo_id
-    LEFT JOIN public.skills s
-        ON s.id = es.skill_id
+    FROM public.job_skills js
+    LEFT JOIN public.jobs j
+        ON j.id = js.job_id
 ) classified;
 '''.format(
-    skill_domain_sql=build_sql_domain_case("concat_ws(' ', s.nombre)"),
-    job_domain_sql=build_sql_domain_case("concat_ws(' ', e.titulo, e.descripcion, e.empresa, COALESCE(e.ubicacion, e.ciudad, ''), COALESCE(e.fecha_publicacion::text, ''), COALESCE(e.fuente, e.portal, ''), COALESCE(e.dominio, e.sector, ''), COALESCE(s.nombre, ''))"),
+    skill_domain_sql=build_sql_domain_case("concat_ws(' ', js.canonical_skill, js.skill_family, js.skill_category)"),
+    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', j.title, j.description, j.company, COALESCE(j.location, ''), COALESCE(j.source, ''), COALESCE(j.industry, ''), COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''))"),
     skill_domain_label_sql=_sql_domain_label_case("skill_domain"),
-    job_domain_label_sql=_sql_domain_label_case("domain_key"),
+    job_domain_label_sql=_sql_domain_label_case("domain_key", JOB_DOMAIN_LABELS),
 )
 
 
-MATCH_VIEW_SQL = '''
-CREATE OR REPLACE VIEW vw_match_empleo_especializacion AS
+MATCH_MATERIALIZED_VIEW_SQL = '''
+CREATE TABLE IF NOT EXISTS public.mv_match_empleo_especializacion AS
+SELECT *
+FROM (
 WITH empleo_skills_distinct AS (
     SELECT DISTINCT
-        es.empleo_id,
-        lower(unaccent(COALESCE(s.nombre, ''))) AS skill_key,
-        s.nombre AS skill
-    FROM empleo_skills es
-    INNER JOIN skills s
-        ON s.id = es.skill_id
+        js.job_id AS empleo_id,
+        lower(unaccent(COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''))) AS skill_key,
+        COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') AS skill
+    FROM public.job_skills js
 ),
 especializacion_skills_distinct AS (
     SELECT DISTINCT
@@ -288,30 +496,30 @@ skills_en_comun AS (
 ),
 base_matches AS (
     SELECT
-        e.id AS empleo_id,
-        e.titulo AS titulo_empleo,
+        j.id AS empleo_id,
+        j.title AS titulo_empleo,
         COALESCE(jd.job_domain, {job_domain_sql}) AS job_domain,
         COALESCE(jd.job_domain_label, '') AS job_domain_label,
-        s.id AS especializacion_id,
-        s.nombre AS nombre_especializacion,
+        s.program_id AS especializacion_id,
+        s.program_name AS nombre_especializacion,
         COALESCE(pd.program_domain, {program_domain_sql}) AS program_domain,
         COALESCE(pd.program_domain_label, '') AS program_domain_label,
         COALESCE(te.total_skills_empleo, 0) AS total_skills_empleo,
         COALESCE(ts.total_skills_especializacion, 0) AS total_skills_especializacion,
         COALESCE(sec.skills_en_comun, 0) AS skills_en_comun
-    FROM empleos e
-    CROSS JOIN especializaciones s
+    FROM public.jobs j
+    CROSS JOIN program_domains s
     LEFT JOIN total_skills_empleo te
-        ON te.empleo_id = e.id
+        ON te.empleo_id = j.id
     LEFT JOIN total_skills_especializacion ts
-        ON ts.especializacion_id = s.id
+        ON ts.especializacion_id = s.program_id
     LEFT JOIN skills_en_comun sec
-        ON sec.empleo_id = e.id
-       AND sec.especializacion_id = s.id
+        ON sec.empleo_id = j.id
+       AND sec.especializacion_id = s.program_id
     LEFT JOIN program_domains pd
-        ON pd.program_id = s.id
+        ON pd.program_id = s.program_id
     LEFT JOIN job_domains jd
-        ON jd.job_id = e.id
+        ON jd.job_id = j.id
 ),
 scored_matches AS (
     SELECT
@@ -369,28 +577,105 @@ weighted_matches AS (
     FROM scored_matches scored
 )
 SELECT
-    weighted.*,
-    ROUND(100 - weighted.coverage_score, 2) AS gap_score,
-    weighted.adjusted_match_score AS match_score,
-    weighted.adjusted_match_score AS porcentaje_match,
-    weighted.skills_en_comun AS total_skills_comunes
-FROM weighted_matches weighted;
+    weighted.empleo_id,
+    weighted.especializacion_id,
+    weighted.program_domain,
+    weighted.job_domain,
+    weighted.domain_score,
+    weighted.domain_weight,
+    weighted.jaccard_score,
+    weighted.cosine_score,
+    weighted.coverage_score,
+    weighted.total_skills_empleo,
+    weighted.total_skills_especializacion,
+    weighted.skills_en_comun,
+    weighted.passes_skill_threshold
+   FROM weighted_matches weighted
+) AS materialized_match
+WHERE FALSE;
 '''.format(
-    job_domain_sql=build_sql_domain_case("concat_ws(' ', e.titulo, e.descripcion, e.empresa, COALESCE(e.ubicacion, e.ciudad, ''), COALESCE(e.fecha_publicacion::text, ''), COALESCE(e.fuente, e.portal, ''), COALESCE(e.dominio, e.sector, ''))"),
-    program_domain_sql=build_sql_domain_case("concat_ws(' ', s.nombre, COALESCE(s.descripcion, ''))"),
+    job_domain_sql=build_sql_job_domain_case("concat_ws(' ', j.title, j.description, j.company, COALESCE(j.location, ''), COALESCE(j.source, ''), COALESCE(j.industry, ''))"),
+    program_domain_sql=build_sql_domain_case("concat_ws(' ', s.program_name)"),
     domain_weight_sql=build_sql_domain_weight_case("scored.program_domain", "scored.job_domain"),
 )
+
+MATCH_MATERIALIZED_INDEX_SQLS = (
+    'CREATE UNIQUE INDEX IF NOT EXISTS ux_mv_match_empleo_especializacion ON public.mv_match_empleo_especializacion (empleo_id, especializacion_id)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_empleo_id ON public.mv_match_empleo_especializacion (empleo_id)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_especializacion_id ON public.mv_match_empleo_especializacion (especializacion_id)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_program_domain ON public.mv_match_empleo_especializacion (program_domain)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_job_domain ON public.mv_match_empleo_especializacion (job_domain)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_domain_score ON public.mv_match_empleo_especializacion (domain_score)',
+    'CREATE INDEX IF NOT EXISTS ix_mv_match_empleo_especializacion_passes_skill_threshold ON public.mv_match_empleo_especializacion (passes_skill_threshold)',
+)
+
+MATCH_VIEW_SQL = '''
+CREATE OR REPLACE VIEW public.vw_match_empleo_especializacion AS
+SELECT
+    m.empleo_id,
+    m.especializacion_id,
+    m.program_domain,
+    COALESCE(pd.domain_label, '') AS program_domain_label,
+    m.job_domain,
+    COALESCE(jd.domain_label, '') AS job_domain_label,
+    j.title AS titulo_empleo,
+    COALESCE(pd.program_name, '') AS nombre_especializacion,
+    m.domain_score,
+    m.domain_weight,
+    ROUND((m.jaccard_score + m.cosine_score) / 2, 2) AS base_match_score,
+    ROUND((m.jaccard_score + m.cosine_score) / 2, 2) AS base_similarity_score,
+    m.coverage_score,
+    ROUND(100 - m.coverage_score, 2) AS gap_score,
+    ROUND(
+        (
+            (ROUND((m.jaccard_score + m.cosine_score) / 2, 2) * 0.50)
+            + (m.coverage_score * 0.30)
+            + (m.domain_weight * 20)
+        ),
+        2
+    ) AS match_score,
+    ROUND(
+        (
+            (ROUND((m.jaccard_score + m.cosine_score) / 2, 2) * 0.50)
+            + (m.coverage_score * 0.30)
+            + (m.domain_weight * 20)
+        ),
+        2
+    ) AS porcentaje_match,
+    m.total_skills_empleo,
+    m.total_skills_especializacion,
+    m.skills_en_comun,
+    m.skills_en_comun AS total_skills_comunes,
+    m.passes_skill_threshold,
+    m.jaccard_score,
+    m.cosine_score
+FROM public.mv_match_empleo_especializacion m
+LEFT JOIN public.jobs j
+    ON j.id = m.empleo_id
+LEFT JOIN public.vw_program_domain_taxonomy pd
+    ON pd.program_id = m.especializacion_id
+LEFT JOIN public.vw_job_domain_taxonomy jd
+    ON jd.job_id = m.empleo_id;
+'''
 
 MATCH_POSITIVE_SQL = '''
 CREATE OR REPLACE VIEW vw_match_empleo_especializacion_positivo AS
 SELECT *
-FROM vw_match_empleo_especializacion
+FROM public.vw_match_empleo_especializacion
 WHERE passes_skill_threshold = TRUE;
 '''
 
 DASHBOARD_VIEW_SQL = '''
 CREATE OR REPLACE VIEW vw_dashboard_especializacion AS
-WITH programa_skills AS (
+WITH program_domains AS (
+    SELECT
+        program_id,
+        program_name,
+        domain_key AS program_domain,
+        domain_label AS program_domain_label
+    FROM public.vw_program_domain_taxonomy
+),
+programa_skills AS (
     SELECT
         especializacion_id,
         COUNT(DISTINCT skill_id) AS total_skills_programa
@@ -428,8 +713,8 @@ match_summary AS (
     GROUP BY especializacion_id
 )
 SELECT
-    s.id AS especializacion_id,
-    s.nombre AS nombre_especializacion,
+    pd.program_id AS especializacion_id,
+    pd.program_name AS nombre_especializacion,
     COALESCE(ps.total_skills_programa, 0) AS total_skills_programa,
     COALESCE(ph.total_herramientas, 0) AS total_herramientas,
     COALESCE(pc.total_competencias, 0) AS total_competencias,
@@ -437,17 +722,17 @@ SELECT
     COALESCE(ms.promedio_match_mercado, 0) AS promedio_match_mercado,
     COALESCE(ms.max_match_mercado, 0) AS max_match_mercado,
     COALESCE(ms.total_empleos_relacionados, 0) AS total_empleos_relacionados
-FROM especializaciones s
+FROM program_domains pd
 LEFT JOIN programa_skills ps
-    ON ps.especializacion_id = s.id
+    ON ps.especializacion_id = pd.program_id
 LEFT JOIN programa_herramientas ph
-    ON ph.especializacion_id = s.id
+    ON ph.especializacion_id = pd.program_id
 LEFT JOIN programa_competencias pc
-    ON pc.especializacion_id = s.id
+    ON pc.especializacion_id = pd.program_id
 LEFT JOIN programa_habilidades_blandas pbl
-    ON pbl.especializacion_id = s.id
+    ON pbl.especializacion_id = pd.program_id
 LEFT JOIN match_summary ms
-    ON ms.especializacion_id = s.id;
+    ON ms.especializacion_id = pd.program_id;
 '''
 
 DASHBOARD_MV_SQL = '''
@@ -466,13 +751,31 @@ _PROGRAM_MARKET_OBJECTS_READY = False
 
 PROGRAMA_SKILLS_SQL = '''
 CREATE OR REPLACE VIEW public.vw_programa_skills AS
-WITH unified_rows AS (
+WITH program_base AS (
+    SELECT *
+    FROM (
+        SELECT
+            base.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY base.normalized_program_name
+                ORDER BY
+                    base.source_priority,
+                    base.total_skills_programa DESC,
+                    base.role_priority,
+                    base.casing_priority,
+                    base.program_id DESC
+            ) AS program_rank
+        FROM ({program_base_sql}) base
+    ) ranked
+    WHERE ranked.program_rank = 1
+),
+unified_rows AS (
     SELECT
-        e.id AS especializacion_id,
-        e.nombre AS especializacion,
-        {program_domain_sql} AS program_domain,
+        pb.program_id AS especializacion_id,
+        pb.program_name AS especializacion,
+        COALESCE((SELECT pdm.domain_key FROM public.program_domain_mapping pdm WHERE pdm.program_id = pb.program_id LIMIT 1), {program_domain_sql}) AS program_domain,
         ROW_NUMBER() OVER (
-            PARTITION BY e.id
+            PARTITION BY pb.program_id
             ORDER BY lower(unaccent(COALESCE(s.nombre, ''))), s.id
         ) AS skill_id,
         s.nombre AS skill,
@@ -482,18 +785,18 @@ WITH unified_rows AS (
         'especializacion_skills' AS source_table,
         {skill_domain_sql_skill} AS skill_domain,
         lower(unaccent(COALESCE(s.nombre, ''))) AS skill_key
-    FROM public.especializaciones e
+    FROM program_base pb
     INNER JOIN public.especializacion_skills es
-        ON es.especializacion_id = e.id
+        ON es.especializacion_id = pb.program_id
     INNER JOIN public.skills s
         ON s.id = es.skill_id
     UNION ALL
     SELECT
-        e.id AS especializacion_id,
-        e.nombre AS especializacion,
-        {program_domain_sql} AS program_domain,
+        pb.program_id AS especializacion_id,
+        pb.program_name AS especializacion,
+        COALESCE((SELECT pdm.domain_key FROM public.program_domain_mapping pdm WHERE pdm.program_id = pb.program_id LIMIT 1), {program_domain_sql}) AS program_domain,
         ROW_NUMBER() OVER (
-            PARTITION BY e.id
+            PARTITION BY pb.program_id
             ORDER BY lower(unaccent(COALESCE(c.nombre, ''))), c.id
         ) AS skill_id,
         c.nombre AS skill,
@@ -503,18 +806,18 @@ WITH unified_rows AS (
         'especializacion_competencias' AS source_table,
         {skill_domain_sql_competency} AS skill_domain,
         lower(unaccent(COALESCE(c.nombre, ''))) AS skill_key
-    FROM public.especializaciones e
+    FROM program_base pb
     INNER JOIN public.especializacion_competencias ec
-        ON ec.especializacion_id = e.id
+        ON ec.especializacion_id = pb.program_id
     INNER JOIN public.competencias c
         ON c.id = ec.competencia_id
     UNION ALL
     SELECT
-        e.id AS especializacion_id,
-        e.nombre AS especializacion,
-        {program_domain_sql} AS program_domain,
+        pb.program_id AS especializacion_id,
+        pb.program_name AS especializacion,
+        COALESCE((SELECT pdm.domain_key FROM public.program_domain_mapping pdm WHERE pdm.program_id = pb.program_id LIMIT 1), {program_domain_sql}) AS program_domain,
         ROW_NUMBER() OVER (
-            PARTITION BY e.id
+            PARTITION BY pb.program_id
             ORDER BY lower(unaccent(COALESCE(h.nombre, ''))), h.id
         ) AS skill_id,
         h.nombre AS skill,
@@ -524,18 +827,18 @@ WITH unified_rows AS (
         'especializacion_herramientas' AS source_table,
         {skill_domain_sql_tool} AS skill_domain,
         lower(unaccent(COALESCE(h.nombre, ''))) AS skill_key
-    FROM public.especializaciones e
+    FROM program_base pb
     INNER JOIN public.especializacion_herramientas eh
-        ON eh.especializacion_id = e.id
+        ON eh.especializacion_id = pb.program_id
     INNER JOIN public.herramientas h
         ON h.id = eh.herramienta_id
     UNION ALL
     SELECT
-        e.id AS especializacion_id,
-        e.nombre AS especializacion,
-        {program_domain_sql} AS program_domain,
+        pb.program_id AS especializacion_id,
+        pb.program_name AS especializacion,
+        COALESCE((SELECT pdm.domain_key FROM public.program_domain_mapping pdm WHERE pdm.program_id = pb.program_id LIMIT 1), {program_domain_sql}) AS program_domain,
         ROW_NUMBER() OVER (
-            PARTITION BY e.id
+            PARTITION BY pb.program_id
             ORDER BY lower(unaccent(COALESCE(hb.nombre, ''))), hb.id
         ) AS skill_id,
         hb.nombre AS skill,
@@ -545,9 +848,9 @@ WITH unified_rows AS (
         'especializacion_habilidades_blandas' AS source_table,
         {skill_domain_sql_soft} AS skill_domain,
         lower(unaccent(COALESCE(hb.nombre, ''))) AS skill_key
-    FROM public.especializaciones e
+    FROM program_base pb
     INNER JOIN public.especializacion_habilidades_blandas ehb
-        ON ehb.especializacion_id = e.id
+        ON ehb.especializacion_id = pb.program_id
     INNER JOIN public.habilidades_blandas hb
         ON hb.id = ehb.habilidad_id
 )
@@ -567,7 +870,8 @@ FROM unified_rows
 WHERE skill_key <> ''
 ORDER BY especializacion_id, skill_key, source_kind, skill_id;
 '''.format(
-    program_domain_sql=build_sql_domain_case("concat_ws(' ', e.nombre, COALESCE(e.descripcion, ''))"),
+    program_base_sql=PROGRAM_BASE_SQL,
+    program_domain_sql=build_sql_domain_case("concat_ws(' ', pb.program_name, COALESCE(pb.program_description, ''))"),
     skill_domain_sql_skill=build_sql_domain_case("concat_ws(' ', s.nombre)"),
     skill_domain_sql_competency=build_sql_domain_case("concat_ws(' ', c.nombre)"),
     skill_domain_sql_tool=build_sql_domain_case("concat_ws(' ', h.nombre, 'herramienta')"),
@@ -617,18 +921,21 @@ program_domains AS (
 market_skill_hits AS (
     SELECT
         m.especializacion_id AS program_id,
-        s.nombre AS skill,
+        COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') AS skill,
         COUNT(DISTINCT m.empleo_id)::int AS gap_frequency
     FROM public.vw_match_empleo_especializacion_positivo m
-    INNER JOIN public.empleo_skills es
-        ON es.empleo_id = m.empleo_id
-    INNER JOIN public.skills s
-        ON s.id = es.skill_id
+    INNER JOIN program_domains pd
+        ON pd.program_id = m.especializacion_id
+    INNER JOIN public.job_skills js
+        ON js.job_id = m.empleo_id
     LEFT JOIN program_skill_keys psk
         ON psk.especializacion_id = m.especializacion_id
-       AND psk.skill_key = lower(unaccent(COALESCE(s.nombre, '')))
+       AND psk.skill_key = lower(unaccent(COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '')))
     WHERE psk.skill_key IS NULL
-    GROUP BY m.especializacion_id, s.nombre
+      AND COALESCE(m.program_domain, '') <> ''
+      AND COALESCE(m.job_domain, '') <> ''
+      AND m.program_domain = m.job_domain
+    GROUP BY m.especializacion_id, COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '')
 )
 SELECT
     msh.program_id,
@@ -763,12 +1070,12 @@ shared_skills AS (
 ),
 scored_pairs AS (
     SELECT
-        p1.id AS program_id,
-        p1.nombre AS program_name,
+        p1.program_id AS program_id,
+        p1.program_name AS program_name,
         pd1.program_domain,
         pd1.program_domain_label,
-        p2.id AS peer_program_id,
-        p2.nombre AS peer_program_name,
+        p2.program_id AS peer_program_id,
+        p2.program_name AS peer_program_name,
         pd2.program_domain AS peer_program_domain,
         pd2.program_domain_label AS peer_program_domain_label,
         COALESCE(ss.shared_skills, 0) AS shared_skills,
@@ -806,20 +1113,20 @@ scored_pairs AS (
             END
         ) / 2, 2) AS base_similarity_score,
         {domain_weight_sql} AS domain_weight
-    FROM especializaciones p1
-    INNER JOIN especializaciones p2
-        ON p1.id <> p2.id
+    FROM program_domains p1
+    INNER JOIN program_domains p2
+        ON p1.program_id <> p2.program_id
     LEFT JOIN shared_skills ss
-        ON ss.program_id = p1.id
-       AND ss.peer_program_id = p2.id
+        ON ss.program_id = p1.program_id
+       AND ss.peer_program_id = p2.program_id
     LEFT JOIN program_skill_counts pc1
-        ON pc1.especializacion_id = p1.id
+        ON pc1.especializacion_id = p1.program_id
     LEFT JOIN program_skill_counts pc2
-        ON pc2.especializacion_id = p2.id
+        ON pc2.especializacion_id = p2.program_id
     LEFT JOIN program_domains pd1
-        ON pd1.program_id = p1.id
+        ON pd1.program_id = p1.program_id
     LEFT JOIN program_domains pd2
-        ON pd2.program_id = p2.id
+        ON pd2.program_id = p2.program_id
 )
 SELECT
     scored_pairs.*,
@@ -870,8 +1177,8 @@ top_missing_skills AS (
     GROUP BY g.program_id
 )
 SELECT
-    e.id AS program_id,
-    e.nombre AS program_name,
+    pd.program_id AS program_id,
+    pd.program_name AS program_name,
     COALESCE(pd.program_domain, '') AS program_domain,
     COALESCE(pd.program_domain_label, '') AS program_domain_label,
     COALESCE(ma.market_alignment_score, 0) AS market_alignment_score,
@@ -879,13 +1186,11 @@ SELECT
     COALESCE(ma.gap_score, 0) AS gap_score,
     COALESCE(ma.matched_jobs, 0) AS matched_jobs,
     COALESCE(tms.missing_skills, '[]'::jsonb) AS missing_skills
-FROM especializaciones e
-LEFT JOIN program_domains pd
-    ON pd.program_id = e.id
+FROM program_domains pd
 LEFT JOIN market_alignment ma
-    ON ma.program_id = e.id
+    ON ma.program_id = pd.program_id
 LEFT JOIN top_missing_skills tms
-    ON tms.program_id = e.id;
+    ON tms.program_id = pd.program_id;
 '''
 
 
@@ -911,6 +1216,7 @@ def ensure_program_market_matching_objects() -> None:
         return
     drop_statements: list[str] = [
         'DROP MATERIALIZED VIEW IF EXISTS public.mv_dashboard_especializacion CASCADE',
+        'DROP TABLE IF EXISTS public.mv_match_empleo_especializacion CASCADE',
         'DROP VIEW IF EXISTS public.vw_program_market_alignment CASCADE',
         'DROP VIEW IF EXISTS public.vw_program_skill_gaps CASCADE',
         'DROP VIEW IF EXISTS public.vw_program_recommended_jobs CASCADE',
@@ -925,12 +1231,14 @@ def ensure_program_market_matching_objects() -> None:
         'DROP VIEW IF EXISTS public.vw_programa_skills CASCADE',
     ]
     statements: list[str] = [
+        PROGRAM_DOMAIN_MAPPING_SQL,
         PROGRAMA_SKILLS_SQL,
         SKILL_DOMAIN_TAXONOMY_SQL,
         SKILL_ALIAS_DOMAIN_TAXONOMY_SQL,
         PROGRAM_DOMAIN_TAXONOMY_SQL,
         JOB_DOMAIN_TAXONOMY_SQL,
         JOB_SKILL_DOMAIN_TAXONOMY_SQL,
+        MATCH_MATERIALIZED_VIEW_SQL,
         MATCH_VIEW_SQL,
         MATCH_POSITIVE_SQL,
         PROGRAM_RECOMMENDED_JOBS_SQL,
@@ -1378,6 +1686,7 @@ def fetch_dashboard_analysis_terms(limit: int = 10) -> dict[str, list[dict[str, 
 
 def refresh_materialized_views() -> str:
     _ensure_dashboard_objects()
+    refresh_match_views()
     relation = _dashboard_relation()
     if relation != 'mv_dashboard_especializacion':
         return 'view-only'
@@ -1401,6 +1710,83 @@ def refresh_materialized_views() -> str:
     if last_error is not None:
         raise last_error
     return statements[-1]
+
+
+def _match_empleo_especializacion_body_sql(job_filter_sql: str = '') -> str:
+    prefix = "\nCREATE TABLE IF NOT EXISTS public.mv_match_empleo_especializacion AS\nSELECT *\nFROM (\n"
+    suffix = "\n) AS materialized_match\nWHERE FALSE;\n"
+    sql = MATCH_MATERIALIZED_VIEW_SQL
+    if not sql.startswith(prefix) or not sql.endswith(suffix):
+        raise RuntimeError('unexpected match storage SQL wrapper')
+    body = sql[len(prefix):-len(suffix)]
+    if job_filter_sql:
+        body = body.replace(
+            "FROM public.jobs j\n    CROSS JOIN program_domains s",
+            f"FROM (SELECT * FROM public.jobs {job_filter_sql}) j\n    CROSS JOIN program_domains s",
+            1,
+        )
+    return body
+
+
+def refresh_match_views() -> str:
+    ensure_program_market_matching_objects()
+    conn = get_conn()
+    try:
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            cur.execute('SELECT id FROM public.jobs ORDER BY id')
+            job_ids = [row['id'] for row in cur.fetchall()]
+            if not job_ids:
+                cur.execute('DROP TABLE IF EXISTS public.mv_match_empleo_especializacion_new CASCADE')
+                cur.execute('CREATE TABLE public.mv_match_empleo_especializacion_new (LIKE public.mv_match_empleo_especializacion INCLUDING ALL)')
+                cur.execute('DROP TABLE IF EXISTS public.mv_match_empleo_especializacion CASCADE')
+                cur.execute('ALTER TABLE public.mv_match_empleo_especializacion_new RENAME TO mv_match_empleo_especializacion')
+                cur.execute(MATCH_VIEW_SQL)
+                cur.execute(MATCH_POSITIVE_SQL)
+                for statement in (
+                    PROGRAM_RECOMMENDED_JOBS_SQL,
+                    PROGRAM_SKILL_GAPS_SQL,
+                    PROGRAM_MARKET_ALIGNMENT_SQL,
+                    PROGRAM_PROGRAM_SIMILARITY_SQL,
+                ):
+                    cur.execute(statement)
+                for statement in MATCH_MATERIALIZED_INDEX_SQLS:
+                    cur.execute(statement)
+                return 'rebuilt-empty'
+
+            temp_tables: list[str] = []
+            for job_idx, job_id in enumerate(job_ids, start=1):
+                batch_sql = _match_empleo_especializacion_body_sql('')
+                batch_sql = batch_sql.replace(
+                    'FROM public.jobs j\n    CROSS JOIN program_domains s',
+                    f"FROM (SELECT * FROM public.jobs WHERE id = '{job_id}') j\n    CROSS JOIN program_domains s",
+                    1,
+                )
+                temp_table = f'tmp_match_empleo_especializacion_{job_idx}'
+                cur.execute(f'DROP TABLE IF EXISTS {temp_table}')
+                cur.execute(f'CREATE TEMP TABLE {temp_table} AS\n{batch_sql}')
+                temp_tables.append(temp_table)
+
+            cur.execute('DROP TABLE IF EXISTS public.mv_match_empleo_especializacion_new CASCADE')
+            cur.execute(f'CREATE TABLE public.mv_match_empleo_especializacion_new (LIKE {temp_tables[0]} INCLUDING ALL)')
+            for temp_table in temp_tables:
+                cur.execute(f'INSERT INTO public.mv_match_empleo_especializacion_new SELECT * FROM {temp_table}')
+            cur.execute('DROP TABLE IF EXISTS public.mv_match_empleo_especializacion CASCADE')
+            cur.execute('ALTER TABLE public.mv_match_empleo_especializacion_new RENAME TO mv_match_empleo_especializacion')
+            cur.execute(MATCH_VIEW_SQL)
+            cur.execute(MATCH_POSITIVE_SQL)
+            for statement in (
+                PROGRAM_RECOMMENDED_JOBS_SQL,
+                PROGRAM_SKILL_GAPS_SQL,
+                PROGRAM_MARKET_ALIGNMENT_SQL,
+                PROGRAM_PROGRAM_SIMILARITY_SQL,
+            ):
+                cur.execute(statement)
+            for statement in MATCH_MATERIALIZED_INDEX_SQLS:
+                cur.execute(statement)
+            return f'rebuilt:{len(temp_tables)}'
+    finally:
+        conn.close()
 
 
 
