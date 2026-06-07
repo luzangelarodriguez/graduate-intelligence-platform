@@ -141,8 +141,9 @@ def classify_gap_status(entity: Any, detected_entities: list[Any], market_signal
 
     Detected curriculum evidence is never reported as a real market gap. If the
     same entity appears in market signals, it becomes a strengthening area.
+    When market_signals is empty the entity is treated as missing_gap so that
+    gaps coming exclusively from the KNN/matching engine are not silently lost.
     """
-
     entity_key = basic_text_key(_entity_value(entity))
     if not entity_key:
         return "not_applicable"
@@ -154,9 +155,37 @@ def classify_gap_status(entity: Any, detected_entities: list[Any], market_signal
         return "strengthening_area"
     if in_curriculum:
         return "detected"
-    if in_market:
+    if in_market or not market_keys:
         return "missing_gap"
     return "not_applicable"
+
+
+def _build_score_percent(scores: dict[str, Any]) -> dict[str, int]:
+    """Unified score_percent builder — single source of truth for all endpoints."""
+    return {
+        "pertinencia_curricular": int(round(_score_value(scores, "pertinencia_curricular") * 100)),
+        "cobertura_skills_mercado": int(round(_score_value(scores, "cobertura_skills_mercado") * 100)),
+        "modernizacion_tecnologica": int(round(_score_value(scores, "modernizacion_tecnologica") * 100)),
+        "alineacion_laboral": int(round(_score_value(scores, "alineacion_laboral") * 100)),
+        "riesgo_obsolescencia": int(round(_score_value(scores, "riesgo_obsolescencia") * 100)),
+    }
+
+
+def _pertinencia_label(score_pct: int) -> str:
+    """Semantic label for academic-market pertinence score (0-100)."""
+    if score_pct >= 80:
+        return "excelente"
+    if score_pct >= 65:
+        return "alta"
+    if score_pct >= 45:
+        return "media"
+    if score_pct >= 25:
+        return "baja"
+    return "critica"
+
+
+# Minimum score (0-100) for a program to be declared "ready for academic committee review".
+_PERTINENCIA_COMMITTEE_THRESHOLD = 65
 
 
 def _normalized_file_key(value: str) -> str:
@@ -354,14 +383,14 @@ def _consolidate_specialization_analysis(specialization: dict[str, Any], analyse
     strengthening_areas = [
         item for item in market_signals if classify_gap_status(item, detected_values, market_signals) == "strengthening_area"
     ]
-    scores = [analysis.get("score_percent") or {} for analysis in analyses]
-    avg = lambda key: int(round(sum(float(item.get(key, 0) or 0) for item in scores) / max(1, len(scores))))
+    _agg_scores = [analysis.get("score_percent") or {} for analysis in analyses]
+    _avg = lambda key: int(round(sum(float(s.get(key, 0) or 0) for s in _agg_scores) / max(1, len(_agg_scores))))
     score_percent = {
-        "pertinencia_curricular": avg("pertinencia_curricular"),
-        "cobertura_skills_mercado": avg("cobertura_skills_mercado"),
-        "modernizacion_tecnologica": avg("modernizacion_tecnologica"),
-        "alineacion_laboral": avg("alineacion_laboral"),
-        "riesgo_obsolescencia": avg("riesgo_obsolescencia"),
+        "pertinencia_curricular": _avg("pertinencia_curricular"),
+        "cobertura_skills_mercado": _avg("cobertura_skills_mercado"),
+        "modernizacion_tecnologica": _avg("modernizacion_tecnologica"),
+        "alineacion_laboral": _avg("alineacion_laboral"),
+        "riesgo_obsolescencia": _avg("riesgo_obsolescencia"),
     }
     detected_domain = "analitica" if _compact_key(specialization["nombre"]) == _compact_key(VISUAL_ANALYTICS_NAME) else (analyses[0].get("detected_domain") if analyses else "")
     detected_subdomain = "analitica/visual_analytics_big_data" if detected_domain == "analitica" else (analyses[0].get("detected_subdomain") if analyses else "")
@@ -401,10 +430,17 @@ def _consolidate_specialization_analysis(specialization: dict[str, Any], analyse
             "scores": {key: value / 100 for key, value in score_percent.items()},
             "score_percent": score_percent,
             "documents": [analysis.get("document") for analysis in analyses],
+            "pertinencia_label": _pertinencia_label(score_percent["pertinencia_curricular"]),
             "executive_summary": {
-                "headline": f"Pertinencia curricular {score_percent['pertinencia_curricular']}% para {specialization['nombre']}.",
+                "headline": f"Pertinencia curricular {score_percent['pertinencia_curricular']}% ({_pertinencia_label(score_percent['pertinencia_curricular'])}) para {specialization['nombre']}.",
                 "narrative": summary_text,
-                "decision_signal": "Listo para revision de comite academico" if score_percent["pertinencia_curricular"] >= 45 else "Requiere priorizacion curricular",
+                "decision_signal": (
+                    "Listo para revision de comite academico"
+                    if score_percent["pertinencia_curricular"] >= _PERTINENCIA_COMMITTEE_THRESHOLD
+                    else "Requiere priorizacion curricular urgente"
+                    if score_percent["pertinencia_curricular"] < 25
+                    else "Requiere actualizacion curricular"
+                ),
                 "top_actions": [item.get("accion_curricular") for item in recommendations[:3]],
             },
         }
@@ -439,19 +475,28 @@ def _executive_summary(payload: dict[str, Any]) -> dict[str, Any]:
     subdomain = payload.get("detected_subdomain") or domain
     gaps = payload.get("real_market_gaps") or payload.get("market_gaps") or []
     score = int(round(_score_value(scores, "pertinencia_curricular") * 100))
+    label = _pertinencia_label(score)
     top_actions = [
         str(item.get("accion_curricular") or _recommendation_text(item))
         for item in recommendations[:3]
         if item.get("accion_curricular") or _recommendation_text(item)
     ]
     return {
-        "headline": f"Pertinencia curricular {score}% para {subdomain}.",
+        "headline": f"Pertinencia curricular {score}% ({label}) para {subdomain}.",
+        "pertinencia_score": score,
+        "pertinencia_label": label,
         "narrative": (
             f"El documento fue clasificado en {domain} con foco {subdomain}. "
             f"Se identificaron {len(payload.get('detected_entities') or payload.get('skills') or [])} evidencias curriculares y "
             f"{len(gaps)} brechas reales de mercado priorizables para comite academico."
         ),
-        "decision_signal": "Listo para revision de comite" if score >= 45 else "Requiere priorizacion curricular",
+        "decision_signal": (
+            "Listo para revision de comite academico"
+            if score >= _PERTINENCIA_COMMITTEE_THRESHOLD
+            else "Requiere priorizacion curricular urgente"
+            if score < 25
+            else "Requiere actualizacion curricular"
+        ),
         "top_actions": top_actions,
     }
 
@@ -515,16 +560,12 @@ def _format_microcurriculum_analysis(result: dict[str, Any], *, uploaded_filenam
         "market_gaps": real_market_gaps,
         "recommendations": recommendations,
         "scores": scores,
-        "score_percent": {
-            "pertinencia_curricular": int(round(_score_value(scores, "pertinencia_curricular") * 100)),
-            "cobertura_skills_mercado": int(round(_score_value(scores, "cobertura_skills_mercado") * 100)),
-            "modernizacion_tecnologica": int(round(_score_value(scores, "modernizacion_tecnologica") * 100)),
-            "alineacion_laboral": int(round(_score_value(scores, "alineacion_laboral") * 100)),
-            "riesgo_obsolescencia": int(round(_score_value(scores, "riesgo_obsolescencia") * 100)),
-        },
+        "score_percent": _build_score_percent(scores),
         "market_comparison": market_comparison,
         "metadata": result.get("metadata") or {},
     }
+    sp = payload["score_percent"]
+    payload["pertinencia_label"] = _pertinencia_label(sp["pertinencia_curricular"])
     payload["executive_summary"] = _executive_summary(payload)
     return jsonable_encoder(payload)
 
@@ -614,14 +655,9 @@ def _demo_case_to_analysis(item: dict[str, Any], index: int) -> dict[str, Any]:
         "market_gaps": real_market_gaps,
         "recommendations": recommendations,
         "scores": scores,
-        "score_percent": {
-            "pertinencia_curricular": int(round(_score_value(scores, "pertinencia_curricular") * 100)),
-            "cobertura_skills_mercado": int(round(_score_value(scores, "cobertura_skills_mercado") * 100)),
-            "modernizacion_tecnologica": int(round(_score_value(scores, "modernizacion_tecnologica") * 100)),
-            "alineacion_laboral": int(round(_score_value(scores, "alineacion_laboral") * 100)),
-            "riesgo_obsolescencia": int(round(_score_value(scores, "riesgo_obsolescencia") * 100)),
-        },
+        "score_percent": _build_score_percent(scores),
     }
+    payload["pertinencia_label"] = _pertinencia_label(payload["score_percent"]["pertinencia_curricular"])
     payload["executive_summary"] = _executive_summary(payload)
     return jsonable_encoder(payload)
 
