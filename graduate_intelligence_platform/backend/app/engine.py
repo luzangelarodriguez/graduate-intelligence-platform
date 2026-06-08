@@ -329,24 +329,141 @@ def program_description(name: str, faculty: str) -> str:
     return f"Programa de {faculty.lower()} de la FundaciÃ³n UNIR Colombia orientado a {focus}."
 
 
+def _fetch_db_programs() -> List[Dict[str, Any]] | None:
+    """Query especializaciones + microcurriculo_skills from the configured DB.
+
+    Returns None on any error so build_programs() can fall back to PROGRAM_BLUEPRINTS.
+    Uses RAILWAY_DATABASE_URL / local DB via backend.db (same path as all other repositories).
+    """
+    try:
+        from backend.repositories.base import fetch_all  # local import to avoid circular deps at module load
+    except Exception:
+        return None
+    try:
+        rows = fetch_all(
+            """
+            SELECT
+                e.id                          AS especializacion_id,
+                e.nombre                      AS nombre_especializacion,
+                COALESCE(e.facultad, '')       AS facultad,
+                COALESCE(e.nivel, '')          AS nivel,
+                COALESCE(e.rol, '')            AS rol,
+                COALESCE(e.plan_estudios, '')  AS plan_estudios,
+                COALESCE(e.campo_laboral, '')  AS campo_laboral
+            FROM especializaciones e
+            ORDER BY e.id
+            """
+        )
+    except Exception:
+        return None
+    if not rows:
+        return None
+
+    # Fetch all microcurriculo skills in one query, keyed by programa name
+    try:
+        skill_rows = fetch_all(
+            """
+            SELECT
+                m.programa,
+                ms.skill_normalized,
+                ms.tipo_skill,
+                ms.confidence_score
+            FROM microcurriculo_skills ms
+            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+            WHERE ms.skill_normalized IS NOT NULL
+              AND ms.skill_normalized <> ''
+            ORDER BY ms.confidence_score DESC
+            """
+        )
+    except Exception:
+        skill_rows = []
+
+    # Build programa → skills index
+    from collections import defaultdict
+    micro_index: dict[str, dict[str, list[str]]] = defaultdict(lambda: {
+        "technologies": [], "technical_skills": [], "tools": [],
+        "platforms": [], "transversal_skills": [], "methodologies": [],
+    })
+    _tipo_map = {
+        "tecnologia": "technologies",
+        "skill_tecnica": "technical_skills",
+        "herramienta": "tools",
+        "plataforma": "platforms",
+        "skill_transversal": "transversal_skills",
+        "metodologia": "methodologies",
+    }
+    for sr in skill_rows:
+        prog = str(sr.get("programa") or "").strip()
+        skill = str(sr.get("skill_normalized") or "").strip()
+        tipo = str(sr.get("tipo_skill") or "").strip()
+        if not prog or not skill:
+            continue
+        bucket = _tipo_map.get(tipo, "technical_skills")
+        bucket_list = micro_index[normalize_text(prog)][bucket]
+        if skill not in bucket_list:
+            bucket_list.append(skill)
+
+    programs: List[Dict[str, Any]] = []
+    for row in rows:
+        name = str(row.get("nombre_especializacion") or "").strip()
+        faculty = str(row.get("facultad") or "").strip()
+        level = str(row.get("nivel") or "Especialización").strip()
+        prog_dict: Dict[str, Any] = {
+            "name": name,
+            "faculty": faculty,
+            "area": faculty,
+            "level": level,
+        }
+        micro_ctx = micro_index.get(normalize_text(name), {})
+        prog_dict["microcurriculum_context"] = {
+            "technologies": list(micro_ctx.get("technologies", [])),
+            "technical_skills": list(micro_ctx.get("technical_skills", [])),
+            "tools": list(micro_ctx.get("tools", [])),
+            "platforms": list(micro_ctx.get("platforms", [])),
+            "transversal_skills": list(micro_ctx.get("transversal_skills", [])),
+            "methodologies": list(micro_ctx.get("methodologies", [])),
+        }
+        prog_dict["curriculum_skills"] = program_skill_profile(name, faculty)
+        prog_dict["curriculum_topics"] = program_topic_profile(name, faculty)
+        domain_key = program_domain(prog_dict)
+        prog_dict["domain_key"] = domain_key
+        prog_dict["id"] = int(row.get("especializacion_id") or 0)
+        prog_dict["nombre"] = name
+        prog_dict["nombre_especializacion"] = name
+        programs.append(prog_dict)
+    return programs if programs else None
+
+
 def build_programs() -> List[Dict[str, Any]]:
+    db_programs = _fetch_db_programs()
+    if db_programs is not None:
+        return db_programs
+    # Fallback: static PROGRAM_BLUEPRINTS (no DB available)
     programs: List[Dict[str, Any]] = []
     for index, blueprint in enumerate(PROGRAM_BLUEPRINTS, start=1):
         level = blueprint["level"]
-        programs.append(
-            {
-                "id": index,
-                "name": blueprint["name"],
-                "faculty": blueprint["faculty"],
-                "area": blueprint["faculty"],
-                "level": level,
-                "credits": 24 if level == "EspecializaciÃ³n" else 160,
-                "delivery_mode": "Virtual",
-                "description": program_description(blueprint["name"], blueprint["faculty"]),
-                "curriculum_skills": program_skill_profile(blueprint["name"], blueprint["faculty"]),
-                "curriculum_topics": program_topic_profile(blueprint["name"], blueprint["faculty"]),
-            }
-        )
+        name = blueprint["name"]
+        faculty = blueprint["faculty"]
+        prog: Dict[str, Any] = {
+            "id": index,
+            "name": name,
+            "nombre": name,
+            "nombre_especializacion": name,
+            "faculty": faculty,
+            "area": faculty,
+            "level": level,
+            "credits": 24 if level in ("Especialización", "EspecializaciÃ³n") else 160,
+            "delivery_mode": "Virtual",
+            "description": program_description(name, faculty),
+            "curriculum_skills": program_skill_profile(name, faculty),
+            "curriculum_topics": program_topic_profile(name, faculty),
+            "microcurriculum_context": {
+                "technologies": [], "technical_skills": [], "tools": [],
+                "platforms": [], "transversal_skills": [], "methodologies": [],
+            },
+        }
+        prog["domain_key"] = program_domain(prog)
+        programs.append(prog)
     return programs
 
 
