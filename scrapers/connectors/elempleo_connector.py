@@ -48,10 +48,10 @@ class ElempleoConnector(BaseJobConnector):
         ]
         soup = BeautifulSoup(html, "html.parser")
         for card in soup.select("article, div[class*='offer'], div[class*='oferta'], div[class*='job']"):
-            title_node = card.select_one("h1,h2,h3,a[href*='oferta'],[class*='title'],[class*='cargo']")
+            title_node = card.select_one("h1,h2,h3,a[href*='detalle-oferta'],[class*='title'],[class*='cargo']")
             if not title_node:
                 continue
-            link = card.select_one("a[href]")
+            link = card.select_one("a[href*='detalle-oferta']") or card.select_one("a[href]")
             company_node = card.select_one("[class*='company'],[class*='empresa']")
             location_node = card.select_one("[class*='location'],[class*='ubicacion'],[class*='ciudad']")
             date_node = card.select_one("time,[class*='date'],[class*='fecha']")

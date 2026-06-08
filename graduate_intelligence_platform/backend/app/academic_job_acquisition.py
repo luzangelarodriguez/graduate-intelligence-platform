@@ -31,7 +31,16 @@ CRAWLER_TARGETS = (
     "hireline",
     "findjobit",
     "criminology",
+    "computrabajo",
+    "magneto",
+    "torre",
+    "spe",
 )
+
+_COLOMBIAN_PORTALS = frozenset({
+    "elempleo", "ticjob", "hireline", "findjobit", "criminology",
+    "computrabajo", "magneto", "torre", "spe",
+})
 
 ROLE_SIGNATURES: list[tuple[set[str], list[str]]] = [
     (
@@ -269,8 +278,10 @@ def _source_payload(
     }
     if source in {"linkedin", "indeed", "jooble"}:
         payload["query"] = query
-    elif source in {"elempleo", "ticjob", "hireline", "findjobit", "criminology"}:
+    elif source in _COLOMBIAN_PORTALS:
         payload["search_terms"] = keywords[:keyword_limit]
+        # Spanish-first query for Colombian portals: build from existing keywords (already in Spanish)
+        payload["query_es"] = _build_query(keywords[:8])
     return payload
 
 
