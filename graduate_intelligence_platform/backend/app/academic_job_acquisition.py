@@ -31,7 +31,60 @@ CRAWLER_TARGETS = (
     "hireline",
     "findjobit",
     "criminology",
+    "computrabajo",
+    "magneto",
+    "torre",
+    "spe",
 )
+
+_COLOMBIAN_PORTALS = frozenset({
+    "elempleo", "ticjob", "hireline", "findjobit", "criminology",
+    "computrabajo", "magneto", "torre", "spe",
+})
+
+# Términos de búsqueda en español por dominio académico para portales colombianos
+DOMAIN_SPANISH_QUERIES: dict[str, list[str]] = {
+    "technology": [
+        "analista de datos", "ingeniero de datos", "desarrollador de software",
+        "ingeniero cloud", "arquitecto de soluciones", "analista BI",
+        "data engineer", "desarrollador backend", "devops",
+    ],
+    "business": [
+        "analista de negocios", "gerente de proyectos", "analista financiero",
+        "analista comercial", "analista de procesos", "coordinador PMO",
+        "analista de operaciones", "gerente de producto",
+    ],
+    "law": [
+        "abogado cumplimiento", "analista juridico", "oficial de cumplimiento",
+        "analista de riesgo legal", "analista de contratos", "compliance officer",
+        "oficial de privacidad", "gobierno corporativo",
+    ],
+    "education": [
+        "diseñador instruccional", "coordinador academico", "analista de aprendizaje",
+        "especialista en tecnologia educativa", "gestor curricular",
+        "tutor virtual", "facilitador formacion",
+    ],
+    "health": [
+        "coordinador de salud", "gestor de calidad", "analista de riesgo clinico",
+        "coordinador seguridad del paciente", "administrador hospitalario",
+        "analista salud ocupacional",
+    ],
+    "criminology": [
+        "analista de inteligencia criminal", "investigador forense",
+        "analista seguridad ciudadana", "analista criminalistica",
+        "investigador judicial", "analista antifraude",
+    ],
+    "data_analytics": [
+        "analista de datos", "analista business intelligence", "desarrollador power bi",
+        "analista tableau", "ingeniero de datos", "analista sql",
+        "científico de datos", "analista de reportes",
+    ],
+    "artificial_intelligence": [
+        "ingeniero machine learning", "científico de datos ia",
+        "ingeniero mlops", "analista inteligencia artificial",
+        "desarrollador nlp", "ingeniero modelos ia",
+    ],
+}
 
 ROLE_SIGNATURES: list[tuple[set[str], list[str]]] = [
     (
@@ -255,6 +308,7 @@ def _source_payload(
     role_limit: int,
     max_jobs: int,
     max_pages: int,
+    domain: str = "",
 ) -> dict[str, Any]:
     query = _build_query([*keywords[:keyword_limit], *roles[:role_limit], *families])
     payload = {
@@ -269,8 +323,12 @@ def _source_payload(
     }
     if source in {"linkedin", "indeed", "jooble"}:
         payload["query"] = query
-    elif source in {"elempleo", "ticjob", "hireline", "findjobit", "criminology"}:
+    elif source in _COLOMBIAN_PORTALS:
         payload["search_terms"] = keywords[:keyword_limit]
+        # Spanish-first query: prefer domain-specific terms, fall back to program keywords
+        domain_es_terms = DOMAIN_SPANISH_QUERIES.get(domain, [])
+        es_terms = unique([*domain_es_terms[:6], *keywords[:6]])
+        payload["query_es"] = _build_query(es_terms[:8])
     return payload
 
 
@@ -400,6 +458,7 @@ def build_program_search_profile(
             role_limit=role_limit,
             max_jobs=100 if normalized_mode != "market_discovery" else 1000,
             max_pages=10 if normalized_mode != "market_discovery" else 50,
+            domain=domain,
         )
         for source in CRAWLER_TARGETS
     }

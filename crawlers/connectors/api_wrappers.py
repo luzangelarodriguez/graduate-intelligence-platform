@@ -18,6 +18,54 @@ from scrapers.connectors.hireline_connector import HirelineConnector  # noqa: E4
 from scrapers.connectors.indeed_partner_connector import IndeedPartnerConnector  # noqa: E402
 from scrapers.connectors.jooble_connector import JoobleConnector  # noqa: E402
 from scrapers.connectors.ticjob_connector import TicjobConnector  # noqa: E402
+from scrapers.sources.computrabajo_scraper import scrape_jobs as _computrabajo_scrape  # noqa: E402
+from scrapers.sources.magneto_api_scraper import scrape_jobs as _magneto_scrape  # noqa: E402
+from scrapers.sources.torre_scraper import scrape_jobs as _torre_scrape  # noqa: E402
+from scrapers.sources.spe_scraper import scrape_jobs as _spe_scrape  # noqa: E402
+
+
+class ScraperAdapterCrawler:
+    """Wraps a scrapers/sources scrape_jobs() function for use in the agent pipeline."""
+
+    def __init__(self, scrape_fn: Any, source_name: str, *, source_plan: dict[str, Any] | None = None) -> None:
+        self.scrape_fn = scrape_fn
+        self.source_name = source_name
+        self.source_plan = source_plan or {}
+        self.extractor = EnterpriseAgenticJobExtractor()
+
+    def run(self, *, execute_network: bool = False) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
+        if not execute_network:
+            return [], []
+        keywords = self.source_plan.get("keywords") or []
+        query = (
+            self.source_plan.get("query_es")
+            or self.source_plan.get("query")
+            or (" ".join(str(k) for k in keywords[:3]) if keywords else "analista datos")
+        )
+        try:
+            raw_jobs = self.scrape_fn(query) or []
+        except Exception as exc:
+            return [], [{"source": self.source_name, "error_type": "scraper_error", "error_message": str(exc)}]
+        results: list[AgentExtractionResult] = []
+        for job in raw_jobs:
+            if not isinstance(job, dict):
+                continue
+            html = (
+                "<html><body><main>"
+                f"<h1>{job.get('title', '')}</h1>"
+                f"<div class='company'>{job.get('company', '')}</div>"
+                f"<div class='location'>{job.get('location', '')}</div>"
+                f"<article class='description'>{job.get('description', '')}</article>"
+                "</main></body></html>"
+            )
+            result = self.extractor.inspect_detail_html(
+                html=html,
+                source_name=self.source_name,
+                source_url=str(job.get("url") or job.get("source_url") or ""),
+                fallback_title=str(job.get("title") or ""),
+            )
+            results.append(result)
+        return results, []
 
 
 class StructuredConnectorCrawler:
@@ -81,4 +129,12 @@ def make_connector(source: str, *, max_jobs: int = 20, max_pages: int = 2, searc
         return StructuredConnectorCrawler(FindJobITConnector(max_jobs=max_jobs, max_pages=max_pages, source_plan=plan), "findjobit", source_plan=plan)
     if source in criminology_source_keys() or source in {"un", "uncareers", "fiscalia", "policia", "policia_nacional_colombia"}:
         return StructuredConnectorCrawler(make_criminology_connector(source, max_jobs=max_jobs, max_pages=max_pages, source_plan=plan), source, source_plan=plan)
+    if source == "computrabajo":
+        return ScraperAdapterCrawler(_computrabajo_scrape, "computrabajo", source_plan=plan)
+    if source == "magneto":
+        return ScraperAdapterCrawler(_magneto_scrape, "magneto", source_plan=plan)
+    if source == "torre":
+        return ScraperAdapterCrawler(_torre_scrape, "torre", source_plan=plan)
+    if source == "spe":
+        return ScraperAdapterCrawler(_spe_scrape, "spe", source_plan=plan)
     raise KeyError(source)
