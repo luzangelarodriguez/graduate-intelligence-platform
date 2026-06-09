@@ -340,7 +340,9 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
     except Exception:
         return None
     try:
-        # id >= 80: low ids are mojibake duplicates from initial import
+        # id >= 80: low ids are mojibake duplicates from initial import.
+        # detected_domain lives in microcurriculos, not especializaciones —
+        # use DISTINCT ON to get one row per especialización.
         rows = fetch_all(
             """
             SELECT
@@ -352,6 +354,7 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
                 COALESCE(e.plan_estudios, '')  AS plan_estudios,
                 COALESCE(e.campo_laboral, '')  AS campo_laboral
             FROM especializaciones e
+            LEFT JOIN microcurriculos m ON m.specialization_id = e.id
             WHERE e.id >= 80
             ORDER BY e.id
             """
@@ -369,20 +372,23 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
         _skill_total = -1
 
     try:
-        # Use COALESCE(skill_normalized, skill_original) so rows with only
-        # skill_original still contribute; filter truly empty values.
+        # Navigate especializaciones → microcurriculos → microcurriculo_skills
+        # so the JOIN is anchored to e.id >= 80 and uses the canonical e.nombre
+        # as the program key (same as the rows query above).
         skill_rows = fetch_all(
             """
             SELECT
-                m.programa,
+                e.nombre                                        AS programa,
                 COALESCE(NULLIF(ms.skill_normalized, ''),
-                         NULLIF(ms.skill_original, ''))  AS skill_value,
+                         NULLIF(ms.skill_original,   ''))      AS skill_value,
                 ms.tipo_skill,
                 ms.confidence_score
-            FROM microcurriculo_skills ms
-            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
-            WHERE COALESCE(NULLIF(ms.skill_normalized, ''),
-                           NULLIF(ms.skill_original, '')) IS NOT NULL
+            FROM especializaciones e
+            JOIN microcurriculos m  ON m.specialization_id  = e.id
+            JOIN microcurriculo_skills ms ON ms.microcurriculo_id = m.id
+            WHERE e.id >= 80
+              AND COALESCE(NULLIF(ms.skill_normalized, ''),
+                           NULLIF(ms.skill_original,   '')) IS NOT NULL
             ORDER BY ms.confidence_score DESC
             """
         )
