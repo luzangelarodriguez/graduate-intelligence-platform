@@ -311,7 +311,7 @@ def _source_payload(
     domain: str = "",
 ) -> dict[str, Any]:
     query = _build_query([*keywords[:keyword_limit], *roles[:role_limit], *families])
-    payload = {
+    payload: dict[str, Any] = {
         "source": source,
         "mode": mode,
         "keywords": keywords[:keyword_limit],
@@ -540,6 +540,7 @@ def build_academic_job_acquisition_intelligence(
             role_limit=role_limit,
             max_jobs=100 if normalized_mode != "market_discovery" else 1000,
             max_pages=10 if normalized_mode != "market_discovery" else 50,
+            domain="",  # aggregate plan — no single domain
         )
         for source in CRAWLER_TARGETS
     }
