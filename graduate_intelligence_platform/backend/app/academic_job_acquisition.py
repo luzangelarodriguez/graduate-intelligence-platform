@@ -355,6 +355,20 @@ def build_program_search_profile(
     curriculum_skills = unique(as_skill_names(program.get("curriculum_skills") or program.get("skills") or []))
     curriculum_topics = unique([clean_human_text(item).strip() for item in _string_items(program.get("curriculum_topics")) if clean_human_text(item).strip()])
 
+    # Diagnostic: log what fields arrived from build_programs()
+    import logging as _logging
+    _diag_log = _logging.getLogger(__name__)
+    _diag_log.debug(
+        "build_program_search_profile_input",
+        extra={
+            "program_name": program_name,
+            "has_curriculum_skills": bool(curriculum_skills),
+            "curriculum_skills_count": len(curriculum_skills),
+            "has_microcurriculum_context": bool(program.get("microcurriculum_context")),
+            "program_keys": sorted(program.keys()),
+        },
+    )
+
     microcurriculum_context = program.get("microcurriculum_context") or {}
     micro_skills = _extract_terms(
         [
@@ -424,7 +438,7 @@ def build_program_search_profile(
     elif normalized_mode == "market_discovery":
         keyword_terms = unique([*seed_terms, *market_terms, *gap_terms, *cluster_terms])
     else:
-        keyword_terms = unique([*curriculum_skills, *curriculum_topics, *micro_skills, *market_terms, *gap_terms, *cluster_terms, program_name, faculty])
+        keyword_terms = unique([*micro_skills, *curriculum_skills, *curriculum_topics, *market_terms, *gap_terms, *cluster_terms, program_name, faculty])
 
     tools = _extract_tools([*curriculum_skills, *micro_tools, *market_terms, *gap_terms])
     keywords = keyword_terms[:keyword_limit]
