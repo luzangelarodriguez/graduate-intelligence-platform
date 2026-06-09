@@ -6,15 +6,22 @@ ALTER TABLE IF EXISTS empleos
     ADD COLUMN IF NOT EXISTS fuente TEXT,
     ADD COLUMN IF NOT EXISTS url TEXT;
 
-UPDATE empleos
-SET
-    ubicacion = COALESCE(NULLIF(ubicacion, ''), location),
-    fuente = COALESCE(NULLIF(fuente, ''), source),
-    url = COALESCE(NULLIF(url, ''), job_url)
-WHERE
-    (ubicacion IS NULL OR ubicacion = '')
-    OR (fuente IS NULL OR fuente = '')
-    OR (url IS NULL OR url = '');
+DO $$
+BEGIN
+    -- Back-fill from legacy English-named columns when they exist.
+    -- Wrapped in exception handler so the block is a no-op on fresh schemas.
+    UPDATE empleos
+    SET
+        ubicacion = COALESCE(NULLIF(ubicacion, ''), location),
+        fuente    = COALESCE(NULLIF(fuente,    ''), source),
+        url       = COALESCE(NULLIF(url,       ''), job_url)
+    WHERE
+        (ubicacion IS NULL OR ubicacion = '')
+        OR (fuente IS NULL OR fuente = '')
+        OR (url    IS NULL OR url    = '');
+EXCEPTION
+    WHEN undefined_column THEN NULL;
+END $$;
 
 ALTER TABLE IF EXISTS especializaciones
     ADD COLUMN IF NOT EXISTS campo_laboral TEXT,
