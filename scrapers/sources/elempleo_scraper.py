@@ -13,6 +13,9 @@ CONFIG = SourceConfig(
         "article a[href]",
     ),
     headless_override=False,
+    max_runtime_seconds=300,
+    max_detail_attempts=50,
+    max_pages=5,
 )
 
 
