@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 import re
 import time
 from dataclasses import dataclass
@@ -25,6 +26,33 @@ except ModuleNotFoundError:
 
 
 LOGGER = logging.getLogger(__name__)
+
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
+]
+
+_VIEWPORTS = [
+    {"width": 1366, "height": 768},
+    {"width": 1440, "height": 900},
+    {"width": 1920, "height": 1080},
+    {"width": 1536, "height": 864},
+]
+
+_EXTRA_HEADERS = {
+    "Accept-Language": "es-CO,es;q=0.9,en;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "DNT": "1",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+}
 
 
 @dataclass(frozen=True)
@@ -244,13 +272,21 @@ class PlaywrightJobSource:
         limit: int,
         screenshots_dir: Path,
     ) -> list[dict[str, Any]]:
+        user_agent = random.choice(_USER_AGENTS)
+        viewport = random.choice(_VIEWPORTS)
         context = await browser.new_context(
             locale="es-CO",
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-            ),
+            user_agent=user_agent,
+            viewport=viewport,
+            extra_http_headers=_EXTRA_HEADERS,
         )
+        # Mask Playwright's automation fingerprint
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3]});
+            Object.defineProperty(navigator, 'languages', {get: () => ['es-CO', 'es', 'en']});
+            window.chrome = {runtime: {}};
+        """)
         page = await context.new_page()
         page.set_default_timeout(10000)
         url = build_search_url(self.config.search_url_template, query=query, location=location)
@@ -332,7 +368,8 @@ class PlaywrightJobSource:
     async def _extract_detail(self, context: Any, url: str) -> dict[str, Any]:
         page = await context.new_page()
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=8000)
+            await page.wait_for_timeout(random.randint(300, 900))
+            await page.goto(url, wait_until="domcontentloaded", timeout=12000)
             await safe_wait_for_results(
                 page,
                 ("h1", "h2", "main", "article", *self.config.description_selectors),
