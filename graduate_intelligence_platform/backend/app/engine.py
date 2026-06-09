@@ -340,6 +340,7 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
     except Exception:
         return None
     try:
+        # id >= 80: low ids are mojibake duplicates from initial import
         rows = fetch_all(
             """
             SELECT
@@ -351,6 +352,7 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
                 COALESCE(e.plan_estudios, '')  AS plan_estudios,
                 COALESCE(e.campo_laboral, '')  AS campo_laboral
             FROM especializaciones e
+            WHERE e.id >= 80
             ORDER BY e.id
             """
         )
@@ -361,17 +363,26 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
 
     # Fetch all microcurriculo skills in one query, keyed by programa name
     try:
+        count_rows = fetch_all("SELECT COUNT(*) AS total FROM microcurriculo_skills")
+        _skill_total = int((count_rows[0].get("total") or 0) if count_rows else 0)
+    except Exception:
+        _skill_total = -1
+
+    try:
+        # Use COALESCE(skill_normalized, skill_original) so rows with only
+        # skill_original still contribute; filter truly empty values.
         skill_rows = fetch_all(
             """
             SELECT
                 m.programa,
-                ms.skill_normalized,
+                COALESCE(NULLIF(ms.skill_normalized, ''),
+                         NULLIF(ms.skill_original, ''))  AS skill_value,
                 ms.tipo_skill,
                 ms.confidence_score
             FROM microcurriculo_skills ms
             JOIN microcurriculos m ON m.id = ms.microcurriculo_id
-            WHERE ms.skill_normalized IS NOT NULL
-              AND ms.skill_normalized <> ''
+            WHERE COALESCE(NULLIF(ms.skill_normalized, ''),
+                           NULLIF(ms.skill_original, '')) IS NOT NULL
             ORDER BY ms.confidence_score DESC
             """
         )

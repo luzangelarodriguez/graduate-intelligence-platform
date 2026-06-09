@@ -51,6 +51,7 @@ def get_conn(db_name: str | None = None):
         connect_timeout=int(config["connect_timeout"]),
         application_name=str(config["application_name"]),
         cursor_factory=RealDictCursor,
+        options="-c client_encoding=UTF8",
     )
 
 
