@@ -330,8 +330,9 @@ def _domains_compatible(d1: str, d2: str) -> bool:
 # accent/case differences between DB text and the lookup list are irrelevant.
 SKILLS_LOOKUP: List[str] = [
     # --- Programming languages ---
-    "python", "sql", "r", "java", "javascript", "typescript",
+    "python", "sql", "java", "javascript", "typescript",
     "scala", "golang", "rust", "php", "ruby", "c++", "c#", "kotlin", "swift",
+    "lenguaje r", "rstudio", "r studio",  # 'r' alone causes false positives
     # --- BI / Visualisation tools ---
     "power bi", "tableau", "qlik", "qliksense", "qlixview",
     "looker", "metabase", "superset", "grafana",
@@ -423,18 +424,45 @@ SKILLS_LOOKUP: List[str] = [
     "git", "control de versiones",
 ]
 
-# Pre-normalise the lookup list once at import time.
-_SKILLS_LOOKUP_NORM: List[str] = [_normalize(s) for s in SKILLS_LOOKUP]
+# Single-character and noise tokens that must never be treated as skills.
+SKILLS_EXCLUDE: frozenset = frozenset({
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "go", "no", "de", "en", "el", "la", "un", "se",
+})
+
+# Pre-normalise the lookup list once at import time; skip excluded tokens.
+_SKILLS_LOOKUP_NORM: List[str] = [
+    n for s in SKILLS_LOOKUP
+    if (n := _normalize(s)) and n not in SKILLS_EXCLUDE and len(n) >= 2
+]
+
+# Compile per-term word-boundary patterns for short terms (≤ 4 chars) to
+# avoid "r" matching "errors", "sql" matching "psql", etc.
+_SHORT_TERMS: Dict[str, re.Pattern] = {
+    term: re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])")
+    for term in _SKILLS_LOOKUP_NORM
+    if len(term) <= 4
+}
 
 
 def extract_skills_by_lookup(text: str) -> List[str]:
     """
-    Substring lookup of SKILLS_LOOKUP terms inside normalised text.
-    More robust than regex for Spanish descriptions because it handles
-    accent stripping uniformly on both sides before comparison.
+    Lookup of SKILLS_LOOKUP terms in normalised text.
+    - Long terms (>4 chars): plain substring match (fast, low false-positive risk).
+    - Short terms (≤4 chars): word-boundary regex to avoid partial matches
+      ('sql' should not match 'psql', 'r' should not match 'errors').
     """
     n = _normalize(text)
-    return sorted({term for term in _SKILLS_LOOKUP_NORM if term in n})
+    found: set = set()
+    for term in _SKILLS_LOOKUP_NORM:
+        if term in _SHORT_TERMS:
+            if _SHORT_TERMS[term].search(n):
+                found.add(term)
+        else:
+            if term in n:
+                found.add(term)
+    return sorted(found)
 
 
 def _skills_from_text(text: str) -> List[str]:
@@ -1114,16 +1142,36 @@ def main(argv: Optional[List[str]] = None) -> None:
         for lbl, cnt in counts.items():
             f.write(f"  - `{lbl}`: {cnt}\n")
         f.write(f"\n## Top 20 matches\n")
-        f.write(f"| # | Programa | Empleo | Empresa | Score | Semántico | Pertinencia | Label |\n")
-        f.write(f"|---|---|---|---|---|---|---|---|\n")
+        f.write(f"| # | Programa | Empleo | Empresa | Score | Semántico | Pertinencia | Skills comunes | Label |\n")
+        f.write(f"|---|---|---|---|---|---|---|---|---|\n")
         for i, r in enumerate(results[:20], 1):
             f.write(
                 f"| {i} | {r.program_name[:35]} | {r.job_title[:35]} | {r.company[:20]} "
                 f"| {r.final_score:.1f} | {r.semantic_score:.1f} | {r.pertinence_score:.1f} "
+                f"| {', '.join(r.common_skills[:4]) or '—'} "
                 f"| {r.relevance_label} |\n"
             )
         if results:
             f.write(f"\n## Detalles primer match\n```\n{results[0].explanation}\n```\n")
+
+        # Show ALL low-label matches so quality can be assessed
+        low_matches = [r for r in results if r.relevance_label == "low"]
+        if low_matches:
+            f.write(f"\n## Matches de categoría 'low' ({len(low_matches)} total)\n")
+            f.write(f"| Programa | Empleo | Score | Sem | Pert | Skills comunes |\n")
+            f.write(f"|---|---|---|---|---|---|\n")
+            for r in low_matches:
+                f.write(
+                    f"| {r.program_name[:35]} | {r.job_title[:35]} "
+                    f"| {r.final_score:.1f} | {r.semantic_score:.1f} | {r.pertinence_score:.1f} "
+                    f"| {', '.join(r.common_skills[:5]) or '—'} |\n"
+                )
+            # Also log them to console
+            logger.info("=== Matches 'low' (%d) ===", len(low_matches))
+            for r in low_matches:
+                logger.info("  [low] %.1f  %-40s  ←→  %-40s  comunes=%s",
+                            r.final_score, r.program_name[:40], r.job_title[:40],
+                            r.common_skills[:3])
     logger.info("Reporte guardado en: %s", report_path)
 
 
