@@ -35,11 +35,16 @@ CRAWLER_TARGETS = (
     "magneto",
     "torre",
     "spe",
+    "getonbrd",
+    "tecnoempleo",
+    "remoterocketship",
+    "hirelatam",
 )
 
 _COLOMBIAN_PORTALS = frozenset({
     "elempleo", "ticjob", "hireline", "findjobit", "criminology",
     "computrabajo", "magneto", "torre", "spe",
+    "getonbrd", "tecnoempleo", "remoterocketship", "hirelatam",
 })
 
 # Términos de búsqueda en español por dominio académico para portales colombianos
