@@ -303,8 +303,22 @@ def _infer_domain(text: str) -> str:
     return best[0]
 
 
+# Domains that are considered compatible with each other even when not equal.
+# E.g. "datos" programs are relevant for "software" jobs and vice-versa.
+_COMPATIBLE_DOMAINS: Dict[str, set] = {
+    "datos":    {"datos", "software", "general"},
+    "software": {"software", "datos", "general"},
+    "gestion":  {"gestion", "general"},
+    "seguridad":{"seguridad", "general"},
+    "redes":    {"redes", "general"},
+    "criminologia": {"criminologia", "general"},
+    "finanzas": {"finanzas", "general"},
+    "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
+}
+
+
 def _domains_compatible(d1: str, d2: str) -> bool:
-    return d1 == "general" or d2 == "general" or d1 == d2
+    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1, "general"})
 
 
 # ---------------------------------------------------------------------------
@@ -639,6 +653,7 @@ def run_matching(
     bm25_index = _make_bm25(bm25_corpus)
 
     results: List[MatchResult] = []
+    _debug_done = False  # one-shot debug for first program-with-skills × first job
     for prog in programs:
         if prog.embedding is None:
             continue
@@ -649,7 +664,14 @@ def run_matching(
 
         for j_idx, job in enumerate(jobs):
             # --- Domain filter (OBLIGATORIO) ---
-            if domain_filter and not _domains_compatible(prog.domain, job.domain):
+            domain_ok = _domains_compatible(prog.domain, job.domain)
+            if domain_filter and not domain_ok:
+                if not _debug_done and prog.skills:
+                    logger.info(
+                        "[DEBUG-DOMAIN-BLOCK] prog='%s' domain=%s  job='%s' domain=%s  → BLOQUEADO",
+                        prog.program_name[:40], prog.domain, job.title[:40], job.domain,
+                    )
+                    _debug_done = True
                 continue
             if job.embedding is None:
                 continue
@@ -664,6 +686,19 @@ def run_matching(
             coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
                 prog.skills, job.skills
             )
+
+            # One-shot debug for first valid pair
+            if not _debug_done and prog.skills and j_idx == 0:
+                logger.info(
+                    "[DEBUG] prog='%s' domain=%s | job='%s' domain=%s",
+                    prog.program_name[:40], prog.domain, job.title[:40], job.domain,
+                )
+                logger.info("[DEBUG] prog.skills[:5] = %s", prog.skills[:5])
+                logger.info("[DEBUG] job.skills[:5]  = %s", job.skills[:5])
+                logger.info("[DEBUG] common_skills   = %s", common[:5])
+                logger.info("[DEBUG] coverage=%.1f  density=%.1f  pertinence=%.1f  sem=%.1f",
+                            coverage, density, pertinence, sem)
+                _debug_done = True
 
             # Final score
             final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
