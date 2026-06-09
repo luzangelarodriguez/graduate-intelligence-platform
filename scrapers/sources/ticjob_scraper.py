@@ -10,11 +10,8 @@ CONFIG = SourceConfig(
     base_url="https://ticjob.co",
     search_url_template="https://ticjob.co/es/search?q={query}",
     card_selectors=(
-        "a[href*='it-job-openings']",
-        "a[href*='/es/it-job-openings']",
-        "a[href*='oferta']",
-        "a[href*='empleo']",
-        "article a[href]",
+        "a[href*='/LCL/']",
+        "a[href*='ticjob.co/LCL']",
     ),
     title_selectors=(
         "h1[class*='title']",
