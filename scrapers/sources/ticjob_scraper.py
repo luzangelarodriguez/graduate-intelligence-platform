@@ -34,6 +34,7 @@ CONFIG = SourceConfig(
         "[data-testid*='location']",
     ),
     headless_override=False,
+    cookie_accept_selector="button:has-text('Aceptar y Continuar')",
     max_runtime_seconds=300,
     max_detail_attempts=50,
     max_pages=5,

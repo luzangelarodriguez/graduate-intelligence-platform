@@ -70,6 +70,7 @@ class SourceConfig:
     max_runtime_seconds: int = 75
     max_detail_attempts: int = 24
     headless_override: bool | None = None
+    cookie_accept_selector: str | None = None
 
 
 @dataclass(frozen=True)
@@ -297,6 +298,14 @@ class PlaywrightJobSource:
         detail_attempts = 0
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=15000)
+            if self.config.cookie_accept_selector:
+                try:
+                    btn = page.locator(self.config.cookie_accept_selector).first
+                    if await btn.is_visible(timeout=3000):
+                        await btn.click()
+                        await page.wait_for_timeout(1000)
+                except Exception:
+                    pass
             wait_result = await safe_wait_for_results(
                 page,
                 self.config.card_selectors,
