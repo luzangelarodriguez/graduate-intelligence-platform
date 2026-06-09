@@ -325,24 +325,69 @@ def _domains_compatible(d1: str, d2: str) -> bool:
 # Skill extraction from free text
 # ---------------------------------------------------------------------------
 
+# Broad pattern covering tools, technologies and competencies common in
+# Colombian job postings and academic microcurrículos (Spanish + English).
 _SKILL_RE = re.compile(
-    r"\b(python|r\b|sql|nosql|java(?:script)?|typescript|scala|c\+\+|c#|"
-    r"power\s*bi|tableau|qlik|looker|metabase|"
-    r"pandas|numpy|scikit[- ]learn|tensorflow|pytorch|keras|"
-    r"excel|word|powerpoint|"
-    r"spark|hadoop|airflow|kafka|dbt|"
-    r"aws|azure|gcp|docker|kubernetes|terraform|"
-    r"postgresql|mysql|mongodb|redis|elasticsearch|"
-    r"machine\s*learning|deep\s*learning|nlp|"
-    r"git|jira|confluence|scrum|agile|"
-    r"analisis\s*de\s*datos?|visualizacion|estadistica|"
-    r"gestion\s*de\s*proyectos?|liderazgo)\b",
+    r"\b("
+    # Programming languages
+    r"python|r\b|sql|nosql|java(?:script)?|typescript|scala|c\+\+|c#|golang|rust|php|ruby|"
+    # BI / Analytics tools
+    r"power\s*bi|tableau|qlik(?:sense|view)?|looker|metabase|superset|grafana|"
+    r"google\s*data\s*studio|datastudio|"
+    # Data / ML libraries
+    r"pandas|numpy|scikit[- ]learn|sklearn|tensorflow|pytorch|keras|"
+    r"hugging\s*face|transformers|xgboost|lightgbm|"
+    # Office / Productivity
+    r"excel|word|powerpoint|google\s*sheets|"
+    # Big Data / ETL
+    r"spark|hadoop|airflow|kafka|dbt|flink|hive|presto|databricks|"
+    # Cloud
+    r"aws|azure|gcp|google\s*cloud|"
+    # DevOps / Infra
+    r"docker|kubernetes|terraform|ansible|jenkins|gitlab|github|"
+    # Databases
+    r"postgresql|mysql|mariadb|mongodb|redis|elasticsearch|cassandra|bigquery|snowflake|redshift|"
+    # ML / AI concepts
+    r"machine\s*learning|aprendizaje\s*autom[aá]tico|"
+    r"deep\s*learning|redes\s*neuronales|"
+    r"nlp|procesamiento\s*de\s*lenguaje|"
+    r"inteligencia\s*artificial|"
+    r"mineria\s*de\s*datos?|miner[ií]a\s*de\s*datos?|"
+    r"computer\s*vision|vision\s*por\s*computador|"
+    # Statistics / Math
+    r"estad[ií]stica|estadisticas|r\s*studio|spss|sas\b|stata|"
+    r"regresi[oó]n|regresion|series\s*de\s*tiempo|clustering|clasificaci[oó]n|"
+    # Analytics / Data
+    r"anal[ií]sis\s*de\s*datos?|analisis\s*de\s*datos?|"
+    r"ciencia\s*de\s*datos?|data\s*science|"
+    r"ingenier[ií]a\s*de\s*datos?|data\s*engineering|"
+    r"visualizaci[oó]n|visualizacion|"
+    r"inteligencia\s*de\s*negocios|business\s*intelligence|"
+    r"dashboards?|reportes?|"
+    # Project management / Soft skills (measurable)
+    r"scrum|agile|kanban|jira|confluence|trello|"
+    r"gesti[oó]n\s*de\s*proyectos?|gestion\s*de\s*proyectos?|"
+    r"liderazgo|trabajo\s*en\s*equipo|comunicaci[oó]n|"
+    # Security
+    r"ciberseguridad|cybersecurity|siem|soc\b|pentest|"
+    # Networks
+    r"redes\s*neuronales|networking|cisco|"
+    # APIs / Architecture
+    r"api\s*rest|restful|microservicios?|microservices|arquitectura\s*de\s*datos?|"
+    r"etl|elt|data\s*warehouse|data\s*lake|lakehouse|"
+    # Git / Version control
+    r"git\b|control\s*de\s*versiones|"
+    # Soft skills / Competencies often listed in Colombian postings
+    r"pensamiento\s*anal[ií]tico|pensamiento\s*critico|"
+    r"resoluci[oó]n\s*de\s*problemas?|toma\s*de\s*decisiones?"
+    r")\b",
     re.IGNORECASE,
 )
 
 
 def _skills_from_text(text: str) -> List[str]:
-    return list({_normalize(m.group(0)) for m in _SKILL_RE.finditer(text)})
+    """Extract normalised skill tokens from free text using broad regex."""
+    return sorted({_normalize(m.group(0)) for m in _SKILL_RE.finditer(text)})
 
 
 # ---------------------------------------------------------------------------
@@ -518,10 +563,20 @@ def load_jobs(conn) -> List[JobProfile]:
         rows = cur.fetchall()
 
     profiles: List[JobProfile] = []
+    n_from_db = 0
+    n_from_text = 0
     for row in rows:
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
         text = " ".join([row["title"], row["company"], row["description"]])[:800]
-        skills = db_skills or _skills_from_text(text)
+        # Always extract from text AND merge with DB skills so jobs inserted
+        # by run_acquisition.py (which may have empty job_skills rows) still
+        # get meaningful skill coverage for pertinence scoring.
+        text_skills = _skills_from_text(text)
+        skills = sorted(set(db_skills) | set(text_skills))
+        if db_skills:
+            n_from_db += 1
+        elif text_skills:
+            n_from_text += 1
         skill_tokens = _tokenize(" ".join(skills))
         profiles.append(JobProfile(
             job_id=row["job_id"],
@@ -532,6 +587,18 @@ def load_jobs(conn) -> List[JobProfile]:
             text=text,
             skill_tokens=skill_tokens,
         ))
+
+    logger.info(
+        "load_jobs: %d empleos cargados  "
+        "(con skills en DB: %d  |  solo extracción de texto: %d  |  sin skills: %d)",
+        len(profiles), n_from_db, n_from_text,
+        len(profiles) - n_from_db - n_from_text,
+    )
+    # Debug: show first 3 jobs with their skill counts
+    for j in profiles[:3]:
+        logger.info("  empleo %-45s  skills=%d  %s",
+                    j.title[:45], len(j.skills),
+                    str(j.skills[:5]) if j.skills else "(sin skills)")
     return profiles
 
 
