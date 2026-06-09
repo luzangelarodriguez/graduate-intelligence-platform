@@ -322,72 +322,124 @@ def _domains_compatible(d1: str, d2: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Skill extraction from free text
+# Skill extraction — lookup-based (more robust than regex for Spanish text)
 # ---------------------------------------------------------------------------
 
-# Broad pattern covering tools, technologies and competencies common in
-# Colombian job postings and academic microcurrículos (Spanish + English).
-_SKILL_RE = re.compile(
-    r"\b("
-    # Programming languages
-    r"python|r\b|sql|nosql|java(?:script)?|typescript|scala|c\+\+|c#|golang|rust|php|ruby|"
-    # BI / Analytics tools
-    r"power\s*bi|tableau|qlik(?:sense|view)?|looker|metabase|superset|grafana|"
-    r"google\s*data\s*studio|datastudio|"
-    # Data / ML libraries
-    r"pandas|numpy|scikit[- ]learn|sklearn|tensorflow|pytorch|keras|"
-    r"hugging\s*face|transformers|xgboost|lightgbm|"
-    # Office / Productivity
-    r"excel|word|powerpoint|google\s*sheets|"
-    # Big Data / ETL
-    r"spark|hadoop|airflow|kafka|dbt|flink|hive|presto|databricks|"
-    # Cloud
-    r"aws|azure|gcp|google\s*cloud|"
-    # DevOps / Infra
-    r"docker|kubernetes|terraform|ansible|jenkins|gitlab|github|"
-    # Databases
-    r"postgresql|mysql|mariadb|mongodb|redis|elasticsearch|cassandra|bigquery|snowflake|redshift|"
-    # ML / AI concepts
-    r"machine\s*learning|aprendizaje\s*autom[aá]tico|"
-    r"deep\s*learning|redes\s*neuronales|"
-    r"nlp|procesamiento\s*de\s*lenguaje|"
-    r"inteligencia\s*artificial|"
-    r"mineria\s*de\s*datos?|miner[ií]a\s*de\s*datos?|"
-    r"computer\s*vision|vision\s*por\s*computador|"
-    # Statistics / Math
-    r"estad[ií]stica|estadisticas|r\s*studio|spss|sas\b|stata|"
-    r"regresi[oó]n|regresion|series\s*de\s*tiempo|clustering|clasificaci[oó]n|"
-    # Analytics / Data
-    r"anal[ií]sis\s*de\s*datos?|analisis\s*de\s*datos?|"
-    r"ciencia\s*de\s*datos?|data\s*science|"
-    r"ingenier[ií]a\s*de\s*datos?|data\s*engineering|"
-    r"visualizaci[oó]n|visualizacion|"
-    r"inteligencia\s*de\s*negocios|business\s*intelligence|"
-    r"dashboards?|reportes?|"
-    # Project management / Soft skills (measurable)
-    r"scrum|agile|kanban|jira|confluence|trello|"
-    r"gesti[oó]n\s*de\s*proyectos?|gestion\s*de\s*proyectos?|"
-    r"liderazgo|trabajo\s*en\s*equipo|comunicaci[oó]n|"
-    # Security
-    r"ciberseguridad|cybersecurity|siem|soc\b|pentest|"
-    # Networks
-    r"redes\s*neuronales|networking|cisco|"
-    # APIs / Architecture
-    r"api\s*rest|restful|microservicios?|microservices|arquitectura\s*de\s*datos?|"
-    r"etl|elt|data\s*warehouse|data\s*lake|lakehouse|"
-    # Git / Version control
-    r"git\b|control\s*de\s*versiones|"
-    # Soft skills / Competencies often listed in Colombian postings
-    r"pensamiento\s*anal[ií]tico|pensamiento\s*critico|"
-    r"resoluci[oó]n\s*de\s*problemas?|toma\s*de\s*decisiones?"
-    r")\b",
-    re.IGNORECASE,
-)
+# All terms are stored in their NORMALISED form (lowercase ASCII, no accents).
+# _normalize() is applied to both the lookup terms and the input text, so
+# accent/case differences between DB text and the lookup list are irrelevant.
+SKILLS_LOOKUP: List[str] = [
+    # --- Programming languages ---
+    "python", "sql", "r", "java", "javascript", "typescript",
+    "scala", "golang", "rust", "php", "ruby", "c++", "c#", "kotlin", "swift",
+    # --- BI / Visualisation tools ---
+    "power bi", "tableau", "qlik", "qliksense", "qlixview",
+    "looker", "metabase", "superset", "grafana",
+    "google data studio", "datastudio", "data studio",
+    # --- Data / ML libraries ---
+    "pandas", "numpy", "scikit learn", "sklearn",
+    "tensorflow", "pytorch", "keras", "hugging face",
+    "xgboost", "lightgbm", "transformers",
+    # --- Office / Productivity ---
+    "excel", "word", "powerpoint", "google sheets",
+    # --- Big Data / ETL / Orchestration ---
+    "spark", "hadoop", "airflow", "kafka", "dbt",
+    "flink", "hive", "presto", "databricks", "nifi",
+    "etl", "elt", "data pipeline",
+    # --- Cloud ---
+    "aws", "azure", "gcp", "google cloud",
+    # --- DevOps / Infra ---
+    "docker", "kubernetes", "terraform", "ansible",
+    "jenkins", "gitlab", "github", "devops", "ci cd",
+    # --- Databases ---
+    "postgresql", "mysql", "mariadb", "mongodb",
+    "redis", "elasticsearch", "cassandra",
+    "bigquery", "snowflake", "redshift", "oracle",
+    "bases de datos", "base de datos",
+    # --- Data warehouse / Lakehouse ---
+    "data warehouse", "data lake", "lakehouse", "data mart",
+    # --- ML / AI concepts ---
+    "machine learning", "aprendizaje automatico",
+    "deep learning", "redes neuronales",
+    "nlp", "procesamiento de lenguaje",
+    "inteligencia artificial",
+    "mineria de datos", "data mining",
+    "computer vision", "vision por computador",
+    "modelos predictivos", "modelo predictivo",
+    "algoritmos", "algoritmo",
+    # --- Statistics / Math ---
+    "estadistica", "estadisticas",
+    "r studio", "rstudio", "spss", "sas", "stata",
+    "regresion", "regresion lineal", "regresion logistica",
+    "series de tiempo", "clustering", "clasificacion",
+    "analisis estadistico", "inferencia estadistica",
+    "probabilidad",
+    # --- Analytics / Data Science ---
+    "analisis de datos", "analitica de datos",
+    "ciencia de datos", "data science",
+    "ingenieria de datos", "data engineering",
+    "analitica avanzada", "analitica descriptiva",
+    "analitica predictiva", "analitica prescriptiva",
+    "inteligencia de negocios", "business intelligence",
+    "visualizacion", "visualizacion de datos",
+    "dashboard", "dashboards", "reporte", "reportes",
+    "kpi", "metricas", "indicadores",
+    # --- APIs / Architecture ---
+    "api rest", "restful", "api", "microservicios",
+    "microservices", "arquitectura de datos",
+    "arquitectura de software",
+    # --- Project / Methodology ---
+    "scrum", "agile", "kanban", "jira", "confluence", "trello",
+    "gestion de proyectos", "project management",
+    "metodologias agiles",
+    # --- Security ---
+    "ciberseguridad", "cybersecurity",
+    "siem", "soc", "pentest", "seguridad informatica",
+    "forense digital", "analisis forense",
+    # --- Networks ---
+    "redes", "networking", "cisco", "telecomunicaciones",
+    # --- Soft / transferable skills (measurable) ---
+    "liderazgo", "trabajo en equipo", "comunicacion",
+    "pensamiento analitico", "pensamiento critico",
+    "resolucion de problemas", "toma de decisiones",
+    "orientacion a resultados",
+    # --- Criminology / Law / Social (for criminologia domain) ---
+    "criminologia", "criminalistica", "victimologia",
+    "investigacion criminal", "perfilacion criminal",
+    "psicologia forense", "psicologia criminal",
+    "derecho penal", "proceso penal", "sistema penal",
+    "investigacion judicial", "policia judicial",
+    "delitos informaticos", "evidencia digital",
+    "cadena de custodia",
+    # --- Finance / Accounting ---
+    "finanzas", "contabilidad", "financiero",
+    "tesoreria", "presupuesto", "auditoria", "tributario",
+    "estados financieros", "niif", "ifrs",
+    # --- Management / Strategy ---
+    "gestion", "gerencia", "administracion",
+    "estrategia", "planeacion estrategica",
+    "transformacion digital",
+    # --- Version control ---
+    "git", "control de versiones",
+]
+
+# Pre-normalise the lookup list once at import time.
+_SKILLS_LOOKUP_NORM: List[str] = [_normalize(s) for s in SKILLS_LOOKUP]
+
+
+def extract_skills_by_lookup(text: str) -> List[str]:
+    """
+    Substring lookup of SKILLS_LOOKUP terms inside normalised text.
+    More robust than regex for Spanish descriptions because it handles
+    accent stripping uniformly on both sides before comparison.
+    """
+    n = _normalize(text)
+    return sorted({term for term in _SKILLS_LOOKUP_NORM if term in n})
 
 
 def _skills_from_text(text: str) -> List[str]:
-    """Extract normalised skill tokens from free text using broad regex."""
-    return sorted({_normalize(m.group(0)) for m in _SKILL_RE.finditer(text)})
+    """Alias kept for backward compatibility — delegates to lookup."""
+    return extract_skills_by_lookup(text)
 
 
 # ---------------------------------------------------------------------------
