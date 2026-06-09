@@ -16,14 +16,23 @@ from typing import Any
 import psycopg2
 from psycopg2.extras import Json, RealDictCursor, execute_values
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env.local")
+except ImportError:
+    pass
 
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "127.0.0.1"),
-    "port": os.getenv("DB_PORT", "5433"),
-    "dbname": os.getenv("DB_NAME", "cliente_a_db"),
-    "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres"),
-}
+_RAILWAY_URL = os.getenv("RAILWAY_DATABASE_URL")
+if _RAILWAY_URL:
+    DB_CONFIG = {"dsn": _RAILWAY_URL, "sslmode": "require"}
+else:
+    DB_CONFIG = {
+        "host": os.getenv("DB_HOST", "127.0.0.1"),
+        "port": os.getenv("DB_PORT", "5433"),
+        "dbname": os.getenv("DB_NAME", "cliente_a_db"),
+        "user": os.getenv("DB_USER", "postgres"),
+        "password": os.getenv("DB_PASSWORD", "postgres"),
+    }
 
 TASK_NAME = "program_job_match"
 MATCH_METHOD = "rules_v1"
@@ -321,6 +330,8 @@ def stable_hash(payload: Any) -> str:
 
 
 def connect():
+    if "dsn" in DB_CONFIG:
+        return psycopg2.connect(DB_CONFIG["dsn"], sslmode=DB_CONFIG["sslmode"], cursor_factory=RealDictCursor)
     return psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
 
 
@@ -345,7 +356,7 @@ def create_run(cur, dataset_version: str, notes: str) -> int:
             f"program-job-match-{dataset_version}",
             TASK_NAME,
             dataset_version,
-            Json({"method": MATCH_METHOD, "model": MODEL_NAME, "db": DB_CONFIG["dbname"]}),
+            Json({"method": MATCH_METHOD, "model": MODEL_NAME, "db": DB_CONFIG.get("dbname", DB_CONFIG.get("dsn", "")[:40])}),
             notes,
         ),
     )
