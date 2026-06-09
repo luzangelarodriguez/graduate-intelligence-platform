@@ -69,6 +69,7 @@ class SourceConfig:
     max_pages: int = 3
     max_runtime_seconds: int = 75
     max_detail_attempts: int = 24
+    headless_override: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -250,8 +251,9 @@ class PlaywrightJobSource:
         screenshots_dir: str | Path = "logs/screenshots",
     ) -> list[dict[str, Any]]:
         Path(screenshots_dir).mkdir(parents=True, exist_ok=True)
+        effective_headless = self.config.headless_override if self.config.headless_override is not None else headless
         async with async_playwright() as pw:
-            browser = await pw.chromium.launch(headless=headless)
+            browser = await pw.chromium.launch(headless=effective_headless)
             try:
                 return await self._scrape_with_browser(
                     browser,

@@ -7,7 +7,12 @@ CONFIG = SourceConfig(
     portal="elempleo",
     base_url="https://www.elempleo.com",
     search_url_template="https://www.elempleo.com/co/ofertas-empleo/?trabajo={query}",
-    card_selectors=("a[href*='/co/ofertas-trabajo/']", "article a[href]"),
+    card_selectors=(
+        "a[href*='/co/ofertas-trabajo/']",
+        "a[href*='ofertas-trabajo']",
+        "article a[href]",
+    ),
+    headless_override=False,
 )
 
 
