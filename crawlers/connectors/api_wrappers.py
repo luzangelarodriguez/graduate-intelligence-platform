@@ -69,6 +69,31 @@ class ScraperAdapterCrawler:
         return results, []
 
 
+class AgentResultConnectorCrawler:
+    """Wraps connectors that expose fetch_agent_results() instead of fetch_jobs().
+
+    IndeedPartnerConnector and JoobleConnector return already-processed
+    AgentExtractionResult objects — no re-extraction needed.
+    """
+
+    def __init__(self, connector: Any, source_name: str, *, source_plan: dict[str, Any] | None = None) -> None:
+        self.connector = connector
+        self.source_name = source_name
+        self.source_plan = source_plan or {}
+
+    def run(self, *, execute_network: bool = False) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
+        results, meta = self.connector.fetch_agent_results(execute_network=execute_network)
+        errors: list[dict[str, str]] = [
+            {"source": e.get("source", self.source_name), "error_type": e.get("error_type", "error"), "error_message": e.get("error_message", "")}
+            for e in (meta.get("errors") or [])
+        ]
+        if self.source_plan:
+            for result in results:
+                result.silver.contextual.setdefault("search_context", {})
+                result.silver.contextual["search_context"].update(self.source_plan)
+        return results, errors
+
+
 class StructuredConnectorCrawler:
     def __init__(self, connector: Any, source_name: str, *, source_plan: dict[str, Any] | None = None) -> None:
         self.connector = connector
@@ -226,9 +251,9 @@ def make_connector(source: str, *, max_jobs: int = 20, max_pages: int = 2, searc
     intelligence = search_intelligence or _default_search_intelligence()
     plan = source_plan_for(intelligence.get('crawler_plans'), source)
     if source == "indeed_partner":
-        return IndeedPartnerConnector(source_plan=plan)
+        return AgentResultConnectorCrawler(IndeedPartnerConnector(source_plan=plan), "indeed_partner", source_plan=plan)
     if source == "jooble":
-        return JoobleConnector(source_plan=plan)
+        return AgentResultConnectorCrawler(JoobleConnector(source_plan=plan), "jooble", source_plan=plan)
     if source == "ticjob":
         return StructuredConnectorCrawler(TicjobConnector(max_jobs=max_jobs, max_pages=max_pages, source_plan=plan), "ticjob", source_plan=plan)
     if source == "elempleo":
