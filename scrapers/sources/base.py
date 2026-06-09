@@ -369,14 +369,15 @@ class PlaywrightJobSource:
         page = await context.new_page()
         try:
             await page.wait_for_timeout(random.randint(300, 900))
-            await page.goto(url, wait_until="domcontentloaded", timeout=12000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            await page.wait_for_timeout(random.randint(1500, 3000))
             await safe_wait_for_results(
                 page,
                 ("h1", "h2", "main", "article", *self.config.description_selectors),
                 source=self.config.portal,
                 phase="detail",
-                timeout_ms=2500,
-                retries=0,
+                timeout_ms=8000,
+                retries=1,
                 fallback_wait_ms=500,
             )
             title = await first_text(page, self.config.title_selectors)
