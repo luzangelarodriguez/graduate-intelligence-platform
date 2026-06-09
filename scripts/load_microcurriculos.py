@@ -369,13 +369,36 @@ def fetch_especializaciones(conn) -> list[dict]:
         return [{"id": r[0], "nombre": r[1]} for r in cur.fetchall()]
 
 
+# Explicit overrides: normalized program name fragment → especializacion_id
+_EXPLICIT_ESP_MAP: dict[str, int] = {
+    # Criminología / Psicología Criminal / Victimología → id=108
+    "psicologia criminal": 108,
+    "criminologia": 108,
+    "victimologia": 108,
+    "criminolog": 108,
+    "victimolog": 108,
+    # Administración de Empresas → id=82 (Alta Gerencia)
+    "administracion de empresas": 82,
+    "alta gerencia": 82,
+}
+
+
 def match_esp_id(programa: str, esps: list[dict]) -> int | None:
     prog_n = _normalize_text(programa)
+
+    # 1. Explicit map takes priority
+    for fragment, eid in _EXPLICIT_ESP_MAP.items():
+        if fragment in prog_n:
+            return eid
+
+    # 2. Fuzzy match — collect all candidates, prefer highest id
+    candidates: list[int] = []
     for e in esps:
         e_n = _normalize_text(e["nombre"])
         if e_n in prog_n or prog_n in e_n:
-            return e["id"]
-    return None
+            candidates.append(e["id"])
+
+    return max(candidates) if candidates else None
 
 
 def fetch_existing_microcurriculos(conn) -> set[str]:
