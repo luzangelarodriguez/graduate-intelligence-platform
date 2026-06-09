@@ -388,6 +388,12 @@ class MatchResult:
 # ---------------------------------------------------------------------------
 
 def load_programs(conn) -> List[ProgramProfile]:
+    # Join strategy:
+    # 1. PRIMARY:  microcurriculos.specialization_id = especializaciones.id
+    #    (set by load_microcurriculos.py via migration 009)
+    # 2. FALLBACK: microcurriculos.programa ILIKE especializaciones.nombre
+    #    (for rows where specialization_id is still NULL)
+    # Both arms are UNION-ed so no skills are lost.
     with conn.cursor() as cur:
         cur.execute("""
             SELECT
@@ -402,7 +408,14 @@ def load_programs(conn) -> List[ProgramProfile]:
                     )
                 ) FILTER (WHERE ms.id IS NOT NULL) AS micro_skills
             FROM especializaciones e
-            LEFT JOIN microcurriculos mc ON mc.specialization_id = e.id
+            LEFT JOIN microcurriculos mc ON (
+                mc.specialization_id = e.id
+                OR (
+                    mc.specialization_id IS NULL
+                    AND mc.programa IS NOT NULL
+                    AND lower(mc.programa) = lower(e.nombre)
+                )
+            )
             LEFT JOIN microcurriculo_skills ms ON ms.microcurriculo_id = mc.id
             GROUP BY e.id, e.nombre, e.campo_laboral, e.plan_estudios
         """)
@@ -427,6 +440,13 @@ def load_programs(conn) -> List[ProgramProfile]:
             text=text,
             skill_tokens=skill_tokens,
         ))
+
+    # Debug: show skill counts per program so zero-skill cases are visible
+    for p in profiles:
+        logger.info("  programa %-45s  skills=%d  %s",
+                    p.program_name[:45], len(p.skills),
+                    str(p.skills[:3]) if p.skills else "(sin skills — pertinencia=0)")
+
     return profiles
 
 
