@@ -433,6 +433,7 @@ def extract(query: str, *, pages: int, page_size: int, dry_run: bool = False) ->
             "error_count": error_count,
             "bronze_dir": str(dated_layer_path("bronze", SOURCE, run_id)),
             "silver_dir": str(dated_layer_path("silver", SOURCE, run_id)),
+            "jobs": normalized_jobs,
         }
     except Exception:
         finish_run(run_id, "failed", raw_count, len(normalized_jobs), error_count + 1)
