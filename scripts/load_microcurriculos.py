@@ -739,7 +739,6 @@ def main() -> None:
             sys.exit(0)
 
         inserted = []
-        conn.autocommit = False
         try:
             for rec in new_records:
                 esp_id = match_esp_id(rec["programa"], esps)
