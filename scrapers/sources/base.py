@@ -187,11 +187,18 @@ async def extract_card_links(page: Page, config: SourceConfig) -> list[str]:
     return list(dict.fromkeys(links))
 
 
+_NON_JOB_TITLES = frozenset({
+    "inicio", "home", "buscar empleo", "registro de vacantes",
+    "ten cuidado con el fraude", "¡ten cuidado con el fraude!",
+    "cuidado con el fraude", "aviso de seguridad",
+})
+
+
 def looks_like_non_job_page(title: str, description: str, url: str) -> bool:
     title_norm = re.sub(r"\s+", " ", title or "").strip().casefold()
     description_norm = re.sub(r"\s+", " ", description or "").strip().casefold()
     url_norm = (url or "").casefold()
-    if title_norm in {"inicio", "home", "buscar empleo", "registro de vacantes"}:
+    if title_norm in _NON_JOB_TITLES:
         return True
     nav_terms = ("transparencia", "atencion a la ciudadania", "participa", "normativa", "prensa")
     if sum(1 for term in nav_terms if term in description_norm) >= 3:
