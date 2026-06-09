@@ -438,15 +438,20 @@ def load_jobs(conn) -> List[JobProfile]:
         """)
         existing = {r["table_name"] for r in cur.fetchall()}
 
+    # empleos: skill columns are skill_normalized / skill_original (no skill_nombre)
+    # jobs:    skill column is canonical_skill in job_skills (job_id BIGINT FK)
     parts: List[str] = []
     if "empleos" in existing:
         parts.append("""
             SELECT
-                e.id::text                              AS job_id,
-                COALESCE(e.titulo, '')                  AS title,
-                COALESCE(e.empresa, '')                 AS company,
-                COALESCE(e.descripcion, '')             AS description,
-                COALESCE(es.skill_nombre, '')           AS skill_nombre
+                e.id::text                                          AS job_id,
+                COALESCE(e.titulo, '')                              AS title,
+                COALESCE(e.empresa, '')                             AS company,
+                COALESCE(e.descripcion, '')                         AS description,
+                COALESCE(
+                    NULLIF(es.skill_normalized, ''),
+                    NULLIF(es.skill_original, '')
+                )                                                   AS skill_name
             FROM empleos e
             LEFT JOIN empleo_skills es ON es.empleo_id = e.id
         """)
@@ -457,8 +462,9 @@ def load_jobs(conn) -> List[JobProfile]:
                 COALESCE(j.title, '')                   AS title,
                 COALESCE(j.company, '')                 AS company,
                 COALESCE(j.description, '')             AS description,
-                ''                                      AS skill_nombre
+                COALESCE(js.canonical_skill, '')        AS skill_name
             FROM jobs j
+            LEFT JOIN job_skills js ON js.job_id = j.id
         """)
 
     if not parts:
@@ -470,8 +476,8 @@ def load_jobs(conn) -> List[JobProfile]:
         cur.execute(f"""
             SELECT
                 job_id, title, company, description,
-                array_agg(DISTINCT skill_nombre)
-                    FILTER (WHERE skill_nombre <> '') AS db_skills
+                array_agg(DISTINCT skill_name)
+                    FILTER (WHERE skill_name IS NOT NULL AND skill_name <> '') AS db_skills
             FROM ({union_sql}) sub
             GROUP BY job_id, title, company, description
         """)
