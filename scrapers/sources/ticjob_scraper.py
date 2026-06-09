@@ -12,6 +12,7 @@ CONFIG = SourceConfig(
     card_selectors=(
         "a[href*='/LCL/']",
         "a[href*='ticjob.co/LCL']",
+        "body",
     ),
     title_selectors=(
         "h1[class*='title']",
