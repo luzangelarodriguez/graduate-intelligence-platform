@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import sys
 from pathlib import Path
 from typing import Any
@@ -100,6 +101,115 @@ class StructuredConnectorCrawler:
             result.silver.contextual.update(contextual)
             results.append(result)
         return results, [{"source": item.get("source", self.source_name), "error_type": item.get("error_type", "error"), "error_message": item.get("error_message", "")} for item in errors]
+
+
+class ScraperAdapterCrawler:
+    """Adapts a scrape_jobs(query) → list[dict] function to the crawler protocol."""
+
+    def __init__(self, scrape_fn: Any, source_name: str, *, source_plan: dict[str, Any] | None = None) -> None:
+        self.scrape_fn = scrape_fn
+        self.source_name = source_name
+        self.source_plan = source_plan or {}
+        self.extractor = EnterpriseAgenticJobExtractor()
+
+    def run(self, *, execute_network: bool = False) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
+        if not execute_network:
+            return [], []
+        # Prefer Spanish-first query for Colombian portals
+        query: str = (
+            self.source_plan.get("query_es")
+            or self.source_plan.get("query")
+            or " ".join((self.source_plan.get("keywords") or [])[:3])
+            or "analista datos"
+        )
+        try:
+            raw_jobs: list[dict[str, Any]] = self.scrape_fn(query) or []
+        except Exception as exc:
+            return [], [{"source": self.source_name, "error_type": "scraper_error", "error_message": str(exc)}]
+        results: list[AgentExtractionResult] = []
+        for job in raw_jobs:
+            title = str(job.get("title") or job.get("cargo") or "")
+            company = str(job.get("company") or job.get("empresa") or "")
+            location = str(job.get("location") or job.get("ubicacion") or "Colombia")
+            description = str(job.get("description") or job.get("descripcion") or "")
+            url = str(job.get("url") or job.get("source_url") or "")
+            html = (
+                f"<html><body><main>"
+                f"<h1>{title}</h1>"
+                f"<div class='company'>{company}</div>"
+                f"<div class='location'>{location}</div>"
+                f"<article class='description'>{description}</article>"
+                f"</main></body></html>"
+            )
+            result = self.extractor.inspect_detail_html(
+                html=html,
+                source_name=self.source_name,
+                source_url=url,
+                fallback_title=title,
+            )
+            if self.source_plan:
+                result.silver.contextual.setdefault("search_context", {})
+                result.silver.contextual["search_context"].update(self.source_plan)
+            results.append(result)
+        return results, []
+
+
+class ComputrabajoAdapterCrawler:
+    """Computrabajo-specific adapter: iterates search_terms, deduplicates by content hash."""
+
+    def __init__(self, *, source_plan: dict[str, Any] | None = None) -> None:
+        self.source_plan = source_plan or {}
+        self.extractor = EnterpriseAgenticJobExtractor()
+
+    def run(self, *, execute_network: bool = False) -> tuple[list[AgentExtractionResult], list[dict[str, str]]]:
+        if not execute_network:
+            return [], []
+        search_terms: list[str] = list(self.source_plan.get("search_terms") or [])
+        if not search_terms:
+            fallback = (
+                self.source_plan.get("query_es")
+                or self.source_plan.get("query")
+                or "analista datos"
+            )
+            search_terms = [fallback]
+        seen_hashes: set[str] = set()
+        results: list[AgentExtractionResult] = []
+        errors: list[dict[str, str]] = []
+        for term in search_terms:
+            try:
+                raw_jobs: list[dict[str, Any]] = ct_scrape(term) or []
+            except Exception as exc:
+                errors.append({"source": "computrabajo", "error_type": "scraper_error", "error_message": str(exc)})
+                continue
+            for job in raw_jobs:
+                title = str(job.get("title") or job.get("cargo") or "")
+                description = str(job.get("description") or job.get("descripcion") or "")
+                content_hash = hashlib.md5(f"{title}|{description[:120]}".encode()).hexdigest()
+                if content_hash in seen_hashes:
+                    continue
+                seen_hashes.add(content_hash)
+                company = str(job.get("company") or job.get("empresa") or "")
+                location = str(job.get("location") or job.get("ubicacion") or "Colombia")
+                url = str(job.get("url") or job.get("source_url") or "")
+                html = (
+                    f"<html><body><main>"
+                    f"<h1>{title}</h1>"
+                    f"<div class='company'>{company}</div>"
+                    f"<div class='location'>{location}</div>"
+                    f"<article class='description'>{description}</article>"
+                    f"</main></body></html>"
+                )
+                result = self.extractor.inspect_detail_html(
+                    html=html,
+                    source_name="computrabajo",
+                    source_url=url,
+                    fallback_title=title,
+                )
+                if self.source_plan:
+                    result.silver.contextual.setdefault("search_context", {})
+                    result.silver.contextual["search_context"].update(self.source_plan)
+                results.append(result)
+        return results, errors
 
 
 def _default_search_intelligence() -> dict[str, Any]:
