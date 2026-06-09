@@ -35,6 +35,7 @@ CONFIG = SourceConfig(
     ),
     headless_override=False,
     cookie_accept_selector="button:has-text('Aceptar y Continuar')",
+    reuse_page_for_details=True,
     max_runtime_seconds=300,
     max_detail_attempts=50,
     max_pages=5,

@@ -71,6 +71,7 @@ class SourceConfig:
     max_detail_attempts: int = 24
     headless_override: bool | None = None
     cookie_accept_selector: str | None = None
+    reuse_page_for_details: bool = False
 
 
 @dataclass(frozen=True)
@@ -349,7 +350,9 @@ class PlaywrightJobSource:
                         continue
                     seen_links.add(link)
                     detail_attempts += 1
-                    detail = await self._extract_detail(context, link)
+                    detail = await self._extract_detail(
+                        context, link, reuse_page=page if self.config.reuse_page_for_details else None
+                    )
                     if detail.get("titulo") or detail.get("descripcion"):
                         jobs.append(detail)
                 if (
@@ -376,8 +379,9 @@ class PlaywrightJobSource:
             await context.close()
         return jobs
 
-    async def _extract_detail(self, context: Any, url: str) -> dict[str, Any]:
-        page = await context.new_page()
+    async def _extract_detail(self, context: Any, url: str, *, reuse_page: Any = None) -> dict[str, Any]:
+        owned = reuse_page is None
+        page = reuse_page if reuse_page is not None else await context.new_page()
         try:
             await page.wait_for_timeout(random.randint(300, 900))
             await page.goto(url, wait_until="domcontentloaded", timeout=20000)
@@ -415,7 +419,8 @@ class PlaywrightJobSource:
             LOGGER.warning("source=%s source_status=degraded phase=detail url=%s error=%s", self.config.portal, url, exc)
             return {}
         finally:
-            await page.close()
+            if owned:
+                await page.close()
 
     async def _go_next(self, page: Page) -> bool:
         for selector in self.config.next_selectors:
