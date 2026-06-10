@@ -1117,6 +1117,16 @@ def related_universities_for_program(
     return page(rows, limit=bounded_limit(limit), offset=0)
 
 
+@router.get("/api/universities/{program_id}", response_model=Page)
+def universities_for_program(
+    program_id: int,
+    limit: int = Query(10, ge=1, le=MAX_LIMIT),
+    _current_user=Depends(require_current_user),
+) -> Page:
+    """Alias of /api/programs/related-universities/{program_id}."""
+    return related_universities_for_program(program_id, limit=limit, _current_user=_current_user)
+
+
 @router.get("/api/empleos", response_model=Page)
 def list_empleos(
     limit: int = Query(25, ge=1, le=MAX_LIMIT),
