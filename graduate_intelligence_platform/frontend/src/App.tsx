@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './layouts/AppLayout';
+import PertinenciaDashboard from './components/PertinenciaDashboard';
 import { AlumniOnboardingPage } from './pages/AlumniOnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/programs/:programId/forecast" element={<ProgramForecastPage />} />
               <Route path="/programs/:programId/simulation" element={<ProgramSimulationPage />} />
               <Route path="/registro" element={<AlumniOnboardingPage />} />
+              <Route path="/pertinencia" element={<PertinenciaDashboard />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
