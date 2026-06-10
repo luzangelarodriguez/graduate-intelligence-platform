@@ -538,10 +538,13 @@ def load_programs(conn) -> List[ProgramProfile]:
     with conn.cursor() as cur:
         cur.execute("""
             SELECT
-                e.id                            AS especializacion_id,
-                e.nombre                        AS program_name,
-                COALESCE(e.campo_laboral, '')   AS campo_laboral,
-                COALESCE(e.plan_estudios, '')   AS plan_estudios,
+                e.id                                AS especializacion_id,
+                e.nombre                            AS program_name,
+                COALESCE(e.descripcion, '')         AS descripcion,
+                COALESCE(e.rol, '')                 AS rol,
+                COALESCE(e.campo_laboral, '')       AS campo_laboral,
+                COALESCE(e.plan_estudios, '')       AS plan_estudios,
+                COALESCE(e.general_text, '')        AS general_text,
                 array_agg(
                     DISTINCT COALESCE(
                         NULLIF(ms.skill_normalized, ''),
@@ -558,7 +561,8 @@ def load_programs(conn) -> List[ProgramProfile]:
                 )
             )
             LEFT JOIN microcurriculo_skills ms ON ms.microcurriculo_id = mc.id
-            GROUP BY e.id, e.nombre, e.campo_laboral, e.plan_estudios
+            GROUP BY e.id, e.nombre, e.descripcion, e.rol,
+                     e.campo_laboral, e.plan_estudios, e.general_text
         """)
         rows = cur.fetchall()
 
@@ -566,12 +570,17 @@ def load_programs(conn) -> List[ProgramProfile]:
     for row in rows:
         raw_skills: List[str] = [s for s in (row["micro_skills"] or []) if s]
         skills = [_normalize(s) for s in raw_skills if _normalize(s)]
-        text = " ".join([
-            row["program_name"] or "",
-            row["campo_laboral"] or "",
-            row["plan_estudios"] or "",
+        # Rich embedding text: name + description + role + academic fields + skills
+        # Truncated to 1000 chars so the embedding model sees the most relevant content.
+        text = " ".join(filter(None, [
+            row["program_name"],
+            row["descripcion"],
+            row["rol"],
+            row["campo_laboral"],
+            row["plan_estudios"],
+            row["general_text"],
             " ".join(raw_skills),
-        ])[:800]
+        ]))[:1000]
         skill_tokens = _tokenize(" ".join(skills))
         profiles.append(ProgramProfile(
             especializacion_id=row["especializacion_id"],
@@ -649,7 +658,11 @@ def load_jobs(conn) -> List[JobProfile]:
     n_from_text = 0
     for row in rows:
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
-        text = " ".join([row["title"], row["company"], row["description"]])[:800]
+        text = " ".join(filter(None, [
+            row["title"],
+            (row["description"] or "")[:500],
+            " ".join(db_skills),
+        ]))[:800]
         # Always extract from text AND merge with DB skills so jobs inserted
         # by run_acquisition.py (which may have empty job_skills rows) still
         # get meaningful skill coverage for pertinence scoring.
