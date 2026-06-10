@@ -6,13 +6,38 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
-const LABEL_COLORS = {
+const LABEL_COLORS: Record<string, string> = {
   high: '#16a34a',
   medium: '#d97706',
   low: '#dc2626',
 };
 
-const INITIAL_DATA = {
+interface Programa {
+  id: number;
+  nombre: string;
+  matches_total: number;
+  score_promedio: number;
+  score_maximo: number;
+  labels: { high: number; medium: number; low: number };
+}
+
+interface TopMatch {
+  programa: string;
+  empleo: string;
+  empresa: string;
+  score: number;
+  label: string;
+}
+
+interface DashboardData {
+  run_id: number | null;
+  fecha: string;
+  programas: Programa[];
+  top_matches: TopMatch[];
+  totales: { matches: number; alta: number; media: number; baja: number };
+}
+
+const INITIAL_DATA: DashboardData = {
   run_id: null,
   fecha: '—',
   programas: [],
@@ -21,9 +46,9 @@ const INITIAL_DATA = {
 };
 
 export default function PertinenciaDashboard() {
-  const [data, setData] = useState(INITIAL_DATA);
+  const [data, setData] = useState<DashboardData>(INITIAL_DATA);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${API_URL}/api/dashboard/summary`)

@@ -4,7 +4,7 @@ import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './layouts/AppLayout';
-import PertinenciaDashboard from './components/PertinenciaDashboard.tsx';
+import PertinenciaDashboard from './components/PertinenciaDashboard';
 import { AlumniOnboardingPage } from './pages/AlumniOnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
