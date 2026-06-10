@@ -961,40 +961,55 @@ def persist_embeddings(
     jobs: List[JobProfile],
     conn,
 ) -> None:
-    ensure_embedding_tables(conn)
-    model = EMBED_MODEL_NAME
-    with conn.cursor() as cur:
-        for p in programs:
-            if p.embedding is None:
-                continue
-            th = hashlib.md5(p.text.encode()).hexdigest()
-            cur.execute("""
-                INSERT INTO microcurriculo_embeddings
-                    (especializacion_id, model_name, embedding, text_hash)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (especializacion_id, model_name) DO UPDATE
-                    SET embedding = EXCLUDED.embedding,
-                        text_hash = EXCLUDED.text_hash,
-                        created_at = now()
-            """, (p.especializacion_id, model,
-                  psycopg2.Binary(p.embedding.astype(np.float32).tobytes()), th))
+    """Cache embeddings to DB. Non-critical — errors are logged and swallowed."""
+    try:
+        ensure_embedding_tables(conn)
+    except Exception as exc:
+        logger.warning("persist_embeddings: no se pudo crear tablas de embeddings: %s", exc)
+        conn.rollback()
+        return
 
-        for j in jobs:
-            if j.embedding is None:
-                continue
-            th = hashlib.md5(j.text.encode()).hexdigest()
-            cur.execute("""
-                INSERT INTO job_embeddings
-                    (job_id, job_table, model_name, embedding, text_hash)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (job_id, job_table, model_name) DO UPDATE
-                    SET embedding = EXCLUDED.embedding,
-                        text_hash = EXCLUDED.text_hash,
-                        created_at = now()
-            """, (j.job_id, "jobs", model,
-                  psycopg2.Binary(j.embedding.astype(np.float32).tobytes()), th))
-    conn.commit()
-    logger.info("Embeddings persistidos: %d programas, %d empleos.", len(programs), len(jobs))
+    model = EMBED_MODEL_NAME
+    n_prog = n_job = 0
+    try:
+        with conn.cursor() as cur:
+            for p in programs:
+                if p.embedding is None:
+                    continue
+                th = hashlib.md5(p.text.encode()).hexdigest()
+                cur.execute("""
+                    INSERT INTO microcurriculo_embeddings
+                        (especializacion_id, model_name, embedding, text_hash)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (especializacion_id, model_name) DO UPDATE
+                        SET embedding = EXCLUDED.embedding,
+                            text_hash = EXCLUDED.text_hash,
+                            created_at = now()
+                """, (p.especializacion_id, model,
+                      psycopg2.Binary(p.embedding.astype(np.float32).tobytes()), th))
+                n_prog += 1
+
+            for j in jobs:
+                if j.embedding is None:
+                    continue
+                th = hashlib.md5(j.text.encode()).hexdigest()
+                cur.execute("""
+                    INSERT INTO job_embeddings
+                        (job_id, job_table, model_name, embedding, text_hash)
+                    VALUES (%s, %s, %s, %s, %s)
+                    ON CONFLICT (job_id, job_table, model_name) DO UPDATE
+                        SET embedding = EXCLUDED.embedding,
+                            text_hash = EXCLUDED.text_hash,
+                            created_at = now()
+                """, (j.job_id, "jobs", model,
+                      psycopg2.Binary(j.embedding.astype(np.float32).tobytes()), th))
+                n_job += 1
+
+        conn.commit()
+        logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
+    except Exception as exc:
+        logger.warning("persist_embeddings: error al guardar embeddings (no crítico): %s", exc)
+        conn.rollback()
 
 
 # ---------------------------------------------------------------------------
