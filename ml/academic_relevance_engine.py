@@ -923,52 +923,25 @@ def run_matching(
 
 
 # ---------------------------------------------------------------------------
-# DB schema for embedding tables
+# Persist embeddings (optional cache — uses the production table schema)
 # ---------------------------------------------------------------------------
-
-_EMBEDDING_TABLES_SQL = """
-CREATE TABLE IF NOT EXISTS microcurriculo_embeddings (
-    id                 BIGSERIAL PRIMARY KEY,
-    especializacion_id INTEGER   NOT NULL,
-    model_name         TEXT      NOT NULL DEFAULT 'all-MiniLM-L6-v2',
-    embedding          BYTEA     NOT NULL,
-    text_hash          TEXT      NOT NULL,
-    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (especializacion_id, model_name)
-);
-
-CREATE TABLE IF NOT EXISTS job_embeddings (
-    id          BIGSERIAL PRIMARY KEY,
-    job_id      TEXT      NOT NULL,
-    job_table   TEXT      NOT NULL DEFAULT 'jobs',
-    model_name  TEXT      NOT NULL DEFAULT 'all-MiniLM-L6-v2',
-    embedding   BYTEA     NOT NULL,
-    text_hash   TEXT      NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (job_id, job_table, model_name)
-);
-"""
-
-
-def ensure_embedding_tables(conn) -> None:
-    with conn.cursor() as cur:
-        cur.execute(_EMBEDDING_TABLES_SQL)
-    conn.commit()
-
 
 def persist_embeddings(
     programs: List[ProgramProfile],
     jobs: List[JobProfile],
     conn,
 ) -> None:
-    """Cache embeddings to DB. Non-critical — errors are logged and swallowed."""
-    try:
-        ensure_embedding_tables(conn)
-    except Exception as exc:
-        logger.warning("persist_embeddings: no se pudo crear tablas de embeddings: %s", exc)
-        conn.rollback()
-        return
+    """Cache embeddings to DB using the production microcurriculo_embeddings schema.
 
+    Schema (from 003_enterprise_labor_intelligence_schema.sql):
+        microcurriculo_id BIGINT FK → microcurriculos(id)
+        entity_type TEXT
+        model_name TEXT
+        embedding JSONB   ← float list, NOT bytea
+        dimensions INTEGER
+
+    Non-critical — errors are logged and swallowed.
+    """
     model = EMBED_MODEL_NAME
     n_prog = n_job = 0
     try:
@@ -976,33 +949,58 @@ def persist_embeddings(
             for p in programs:
                 if p.embedding is None:
                     continue
-                th = hashlib.md5(p.text.encode()).hexdigest()
+                # Resolve microcurriculo_id from especializacion_id
+                cur.execute(
+                    "SELECT id FROM microcurriculos WHERE specialization_id = %s "
+                    "ORDER BY id DESC LIMIT 1",
+                    (p.especializacion_id,),
+                )
+                mc_row = cur.fetchone()
+                if not mc_row:
+                    continue
+                mc_id = mc_row["id"]
+                vec = p.embedding.astype(np.float32).tolist()
                 cur.execute("""
                     INSERT INTO microcurriculo_embeddings
-                        (especializacion_id, model_name, embedding, text_hash)
-                    VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (especializacion_id, model_name) DO UPDATE
-                        SET embedding = EXCLUDED.embedding,
-                            text_hash = EXCLUDED.text_hash,
-                            created_at = now()
-                """, (p.especializacion_id, model,
-                      psycopg2.Binary(p.embedding.astype(np.float32).tobytes()), th))
+                        (microcurriculo_id, entity_type, entity_id,
+                         model_name, embedding, dimensions,
+                         source_document, confidence_score)
+                    VALUES (%s, 'programa', %s, %s, %s::jsonb, %s, 'academic_relevance_engine', 0.9)
+                    ON CONFLICT DO NOTHING
+                """, (mc_id, str(p.especializacion_id), model,
+                      json.dumps(vec), len(vec)))
                 n_prog += 1
 
+            # job_embeddings table is our own (not the production microcurriculo table)
+            # Only attempt if the table already exists — skip silently otherwise.
             for j in jobs:
                 if j.embedding is None:
                     continue
+                vec = j.embedding.astype(np.float32).tolist()
                 th = hashlib.md5(j.text.encode()).hexdigest()
-                cur.execute("""
-                    INSERT INTO job_embeddings
-                        (job_id, job_table, model_name, embedding, text_hash)
-                    VALUES (%s, %s, %s, %s, %s)
-                    ON CONFLICT (job_id, job_table, model_name) DO UPDATE
-                        SET embedding = EXCLUDED.embedding,
-                            text_hash = EXCLUDED.text_hash,
-                            created_at = now()
-                """, (j.job_id, "jobs", model,
-                      psycopg2.Binary(j.embedding.astype(np.float32).tobytes()), th))
+                try:
+                    cur.execute("""
+                        INSERT INTO job_embeddings
+                            (job_id, job_table, model_name, embedding, text_hash)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON CONFLICT (job_id, job_table, model_name) DO UPDATE
+                            SET embedding  = EXCLUDED.embedding,
+                                text_hash  = EXCLUDED.text_hash,
+                                created_at = now()
+                    """, (j.job_id, "jobs", model, psycopg2.Binary(
+                        j.embedding.astype(np.float32).tobytes()), th))
+                    n_job += 1
+                except Exception:
+                    conn.rollback()
+                    break
+
+        conn.commit()
+        logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
+    except Exception as exc:
+        logger.warning("persist_embeddings: error (no crítico): %s", exc)
+        conn.rollback()
+
+
                 n_job += 1
 
         conn.commit()
