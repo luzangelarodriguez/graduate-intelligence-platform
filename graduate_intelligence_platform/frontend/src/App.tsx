@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './layouts/AppLayout';
 import PertinenciaDashboard from './components/PertinenciaDashboard';
+import PertinenciaStorytelling from './pages/PertinenciaStorytelling';
 import { AlumniOnboardingPage } from './pages/AlumniOnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
@@ -22,6 +23,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/observatorio-institucional" element={<ExecutiveSummaryPage />} />
+          <Route path="/pertinencia-demo" element={<PertinenciaStorytelling />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/microcurriculum-demo" element={<MicrocurriculumDemoPage />} />
           <Route element={<ProtectedRoute />}>
