@@ -1051,16 +1051,62 @@ def _db_label(label: str) -> str:
     return _LABEL_TO_DB.get(label, "low")
 
 
+def _upsert_program_doc(cur, run_id: int, r: "MatchResult") -> int:
+    """Get or create a minimal ml_program_documents row, return its id."""
+    ext_id = str(r.especializacion_id)
+    cur.execute(
+        "SELECT id FROM ml_program_documents WHERE run_id = %s AND external_program_id = %s",
+        (run_id, ext_id),
+    )
+    row = cur.fetchone()
+    if row:
+        return row["id"]
+    norm = _normalize(r.program_name)
+    chash = hashlib.md5(f"{run_id}:{ext_id}".encode()).hexdigest()
+    cur.execute("""
+        INSERT INTO ml_program_documents
+            (run_id, external_program_id, program_name, normalized_text, content_hash)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (run_id, external_program_id) DO UPDATE SET program_name = EXCLUDED.program_name
+        RETURNING id
+    """, (run_id, ext_id, r.program_name, norm, chash))
+    return cur.fetchone()["id"]
+
+
+def _upsert_job_doc(cur, run_id: int, r: "MatchResult") -> int:
+    """Get or create a minimal ml_job_documents row, return its id."""
+    ext_id = str(r.job_id)
+    cur.execute(
+        "SELECT id FROM ml_job_documents WHERE run_id = %s AND external_job_id = %s",
+        (run_id, ext_id),
+    )
+    row = cur.fetchone()
+    if row:
+        return row["id"]
+    norm = _normalize(r.job_title)
+    chash = hashlib.md5(f"{run_id}:{ext_id}".encode()).hexdigest()
+    cur.execute("""
+        INSERT INTO ml_job_documents
+            (run_id, external_job_id, title, company, normalized_text, content_hash)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (run_id, external_job_id) DO UPDATE SET title = EXCLUDED.title
+        RETURNING id
+    """, (run_id, ext_id, r.job_title, r.company, norm, chash))
+    return cur.fetchone()["id"]
+
+
 def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
     """Persist matches to ml_program_job_matches.
 
-    Uses content_hash as the natural upsert key so every unique
-    (program, job) pair gets its own row regardless of doc-id surrogate keys.
+    Creates minimal stub rows in ml_program_documents / ml_job_documents when
+    they don't exist yet (required by FK constraints).
     Errors are raised so the caller can decide whether to rollback.
     """
     saved = 0
     with conn.cursor() as cur:
         for r in results:
+            prog_doc_id = _upsert_program_doc(cur, run_id, r)
+            job_doc_id = _upsert_job_doc(cur, run_id, r)
             raw_features = {
                 "semantic_score": r.semantic_score,
                 "bm25_score": r.bm25_score,
@@ -1069,11 +1115,6 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 "pertinence_score": r.pertinence_score,
                 "gap_score": r.gap_score,
             }
-            # program_document_id / job_document_id are surrogate FK columns
-            # that point to ml_program_documents / ml_job_documents.  When
-            # running the engine standalone (no training-pipeline docs), we
-            # don't have those rows.  We fall back to 0 and rely on
-            # content_hash for de-duplication via the unique index below.
             cur.execute("""
                 INSERT INTO ml_program_job_matches (
                     run_id, program_document_id, job_document_id,
@@ -1085,7 +1126,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     skills_en_comun, skills_faltantes, skills_programa, skills_empleo,
                     explanation, content_hash, raw_features
                 ) VALUES (
-                    %(run_id)s, 0, 0,
+                    %(run_id)s, %(prog_doc_id)s, %(job_doc_id)s,
                     %(especializacion_id)s, %(job_id)s,
                     %(program_name)s, %(job_title)s, %(company)s,
                     'hybrid_v2', %(model_name)s,
@@ -1113,6 +1154,8 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     raw_features        = EXCLUDED.raw_features
             """, {
                 "run_id": run_id,
+                "prog_doc_id": prog_doc_id,
+                "job_doc_id": job_doc_id,
                 "especializacion_id": r.especializacion_id,
                 "job_id": r.job_id,
                 "program_name": r.program_name,
