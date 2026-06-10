@@ -82,6 +82,8 @@ def _db_url() -> Optional[str]:
 def connect() -> psycopg2.extensions.connection:
     url = _db_url()
     if url:
+        # Use direct IP to avoid DNS resolution failures in some envs
+        url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
         return psycopg2.connect(url, sslmode="require",
                                 cursor_factory=psycopg2.extras.RealDictCursor)
     return psycopg2.connect(
@@ -716,7 +718,20 @@ def _pertinence_scores(
 # Relevance label
 # ---------------------------------------------------------------------------
 
-def _label(score: float, n_common: int) -> str:
+def _label(score: float, n_common: int, *, skills_match: bool = True) -> str:
+    """
+    skills_match=True  → standard F1-based labels (high/medium/low/no_match)
+    skills_match=False → semantic-only fallback labels (high_semantic/…)
+    """
+    if not skills_match:
+        # Semantic-only path: no skill overlap available
+        if score >= 75.0:
+            return "high_semantic"
+        if score >= 60.0:
+            return "medium_semantic"
+        if score >= 45.0:
+            return "low_semantic"
+        return "no_match"
     if score >= SCORE_HIGH and n_common >= 2:
         return "high"
     if score >= SCORE_MEDIUM and n_common >= 1:
@@ -829,10 +844,19 @@ def run_matching(
             # CAPA 2 — BM25
             bm25_norm = float(bm25_scores[j_idx]) * 100
 
-            # CAPA 3 — pertinence
-            coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
-                prog.skills, job.skills
-            )
+            # CAPA 3 — pertinence (only meaningful when both sides have skills)
+            has_skills = bool(prog.skills) and bool(job.skills)
+            if has_skills:
+                coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
+                    prog.skills, job.skills
+                )
+                final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
+            else:
+                # Fallback: no skill data on one side — use pure semantic score
+                coverage = density = pertinence = gap_pct = 0.0
+                common: List[str] = []
+                gap: List[str] = list(prog.skills)  # all program skills are "missing"
+                final = sem  # full weight on semantic
 
             # One-shot debug for first valid pair
             if not _debug_done and prog.skills and j_idx == 0:
@@ -843,14 +867,12 @@ def run_matching(
                 logger.info("[DEBUG] prog.skills[:5] = %s", prog.skills[:5])
                 logger.info("[DEBUG] job.skills[:5]  = %s", job.skills[:5])
                 logger.info("[DEBUG] common_skills   = %s", common[:5])
-                logger.info("[DEBUG] coverage=%.1f  density=%.1f  pertinence=%.1f  sem=%.1f",
-                            coverage, density, pertinence, sem)
+                logger.info("[DEBUG] has_skills=%s  coverage=%.1f  density=%.1f  "
+                            "pertinence=%.1f  sem=%.1f  final=%.1f",
+                            has_skills, coverage, density, pertinence, sem, final)
                 _debug_done = True
 
-            # Final score
-            final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
-
-            label = _label(final, len(common))
+            label = _label(final, len(common), skills_match=has_skills)
             if final < min_score and label == "no_match":
                 continue
 
