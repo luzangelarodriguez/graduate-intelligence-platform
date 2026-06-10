@@ -395,6 +395,110 @@ def program_intelligence_detail(program_id: int) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+@app.get("/api/dashboard/summary", tags=["dashboard"])
+def dashboard_summary() -> dict[str, Any]:
+    """Return aggregated match data from the latest ml run for the frontend dashboard."""
+    from api.database import fetch_all, fetch_one
+
+    run_row = fetch_one(
+        "SELECT id, created_at FROM ml_training_runs "
+        "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1"
+    )
+    if not run_row:
+        return {
+            "run_id": None, "fecha": None,
+            "programas": [], "top_matches": [],
+            "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+        }
+
+    run_id: int = run_row["id"]
+    fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
+
+    prog_rows = fetch_all(
+        """
+        SELECT
+            m.especializacion_id                          AS id,
+            COALESCE(e.nombre, m.program_name)            AS nombre,
+            COUNT(*)                                      AS matches_total,
+            ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
+            ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
+        FROM ml_program_job_matches m
+        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+        WHERE m.run_id = %s
+        GROUP BY m.especializacion_id, e.nombre, m.program_name
+        ORDER BY score_maximo DESC
+        """,
+        (run_id,),
+    )
+
+    programas = [
+        {
+            "id":             int(r["id"]) if r["id"] else None,
+            "nombre":         r["nombre"] or "",
+            "matches_total":  int(r["matches_total"]),
+            "score_promedio": float(r["score_promedio"] or 0),
+            "score_maximo":   float(r["score_maximo"] or 0),
+            "labels": {
+                "high":   int(r["lbl_high"]),
+                "medium": int(r["lbl_medium"]),
+                "low":    int(r["lbl_low"]),
+            },
+        }
+        for r in prog_rows
+    ]
+
+    top_rows = fetch_all(
+        """
+        SELECT
+            COALESCE(e.nombre, m.program_name) AS programa,
+            m.job_title                        AS empleo,
+            COALESCE(m.company, '')            AS empresa,
+            ROUND(m.score_match::numeric, 1)   AS score,
+            m.relevance_label                  AS label
+        FROM ml_program_job_matches m
+        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+        WHERE m.run_id = %s
+        ORDER BY m.score_match DESC
+        LIMIT 30
+        """,
+        (run_id,),
+    )
+
+    top_matches = [
+        {
+            "programa": r["programa"] or "",
+            "empleo":   r["empleo"] or "",
+            "empresa":  r["empresa"],
+            "score":    float(r["score"] or 0),
+            "label":    r["label"],
+        }
+        for r in top_rows
+    ]
+
+    tot_rows = fetch_all(
+        "SELECT relevance_label, COUNT(*) AS cnt "
+        "FROM ml_program_job_matches WHERE run_id = %s GROUP BY relevance_label",
+        (run_id,),
+    )
+    lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
+
+    return {
+        "run_id":      run_id,
+        "fecha":       fecha,
+        "programas":   programas,
+        "top_matches": top_matches,
+        "totales": {
+            "matches": sum(lbl.values()),
+            "alta":    lbl.get("high", 0),
+            "media":   lbl.get("medium", 0),
+            "baja":    lbl.get("low", 0),
+        },
+    }
+
+
 @app.get("/semantic-search", response_model=SearchResponse, tags=["search"])
 def semantic_search(
     q: str = Query(..., min_length=2, max_length=256),
