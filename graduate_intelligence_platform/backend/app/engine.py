@@ -156,6 +156,90 @@ for skill in SKILL_CATALOG:
         SKILL_LOOKUP[normalize_text(alias)] = {"name": skill["name"], "category": skill["category"]}
 
 
+# Job search terms by domain — used by academic_job_acquisition.py and skill
+# filtering logic.  Keyed by domain string matching DOMAIN_KEYWORDS.
+DOMAIN_JOB_TERMS: Dict[str, List[str]] = {
+    "technology": [
+        "software engineer", "data engineer", "data analyst", "data scientist",
+        "machine learning engineer", "backend developer", "frontend developer",
+        "full stack developer", "devops engineer", "cloud architect",
+        "business intelligence analyst", "ETL developer", "AI engineer",
+    ],
+    "data_analytics": [
+        "data analyst", "business intelligence", "analytics engineer",
+        "reporting analyst", "power bi developer", "tableau developer",
+        "data visualization", "BI consultant",
+    ],
+    "artificial_intelligence": [
+        "machine learning engineer", "AI researcher", "NLP engineer",
+        "deep learning engineer", "computer vision engineer",
+        "MLOps engineer", "data scientist",
+    ],
+    "business": [
+        "project manager", "product manager", "business analyst",
+        "operations manager", "strategy consultant", "financial analyst",
+        "management consultant", "gerente de proyectos",
+    ],
+    "law": [
+        "legal analyst", "compliance officer", "corporate lawyer",
+        "legal counsel", "regulatory affairs", "abogado corporativo",
+    ],
+    "education": [
+        "instructional designer", "e-learning developer", "academic coordinator",
+        "curriculum designer", "educational technologist",
+    ],
+    "health": [
+        "health manager", "clinical coordinator", "quality assurance",
+        "hospital administrator", "health data analyst",
+    ],
+    "criminology": [
+        "criminal analyst", "intelligence analyst", "forensic investigator",
+        "security analyst", "crime analyst", "investigador criminal",
+    ],
+}
+
+# Skill priority lists by domain — used to rank and filter skills in
+# pertinence scoring.  Keyed by domain string.
+DOMAIN_SKILL_PRIORITY: Dict[str, List[str]] = {
+    "technology": [
+        "Python", "SQL", "Java", "JavaScript", "TypeScript", "Go", "Rust",
+        "Docker", "Kubernetes", "AWS", "Azure", "GCP", "Git", "REST API",
+        "Microservices", "CI/CD", "Linux", "PostgreSQL", "MongoDB",
+    ],
+    "data_analytics": [
+        "SQL", "Python", "R", "Power BI", "Tableau", "Excel", "ETL",
+        "Data Warehouse", "OLAP", "Business Intelligence", "DAX",
+        "Data Modeling", "Statistics", "Looker", "Databricks",
+    ],
+    "artificial_intelligence": [
+        "Python", "TensorFlow", "PyTorch", "Scikit-learn", "Keras",
+        "Machine Learning", "Deep Learning", "NLP", "Computer Vision",
+        "MLflow", "Airflow", "Spark", "SQL", "Statistics",
+    ],
+    "business": [
+        "Project Management", "Scrum", "Agile", "Power BI", "Excel",
+        "Leadership", "Strategy", "Finance", "Communication",
+        "Data Analysis", "ERP", "CRM", "PMBOK",
+    ],
+    "law": [
+        "Legal Research", "Compliance", "Contract Law", "Regulatory Affairs",
+        "Legal Writing", "Litigation", "Corporate Law", "Data Privacy",
+    ],
+    "education": [
+        "Instructional Design", "LMS", "Curriculum Design", "Moodle",
+        "E-learning", "Assessment", "Learning Analytics", "SCORM",
+    ],
+    "health": [
+        "Health Management", "Risk Management", "Quality Assurance",
+        "Project Management", "Data Analysis", "Compliance", "EHR",
+    ],
+    "criminology": [
+        "Criminal Analysis", "Intelligence Analysis", "Forensics",
+        "Risk Assessment", "Data Analysis", "Legal Framework",
+        "Investigation Techniques", "GIS",
+    ],
+}
+
 PROGRAM_BLUEPRINTS: List[Dict[str, str]] = [
     {"name": "EspecializaciÃ³n en Alta Gerencia", "faculty": "Ciencias EconÃ³micas y Administrativas", "level": "EspecializaciÃ³n"},
     {"name": "EspecializaciÃ³n en GestiÃ³n de la Seguridad y Salud en el Trabajo", "faculty": "Ciencias de la Salud", "level": "EspecializaciÃ³n"},
@@ -340,6 +424,9 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
     except Exception:
         return None
     try:
+        # id >= 80: low ids are mojibake duplicates from initial import.
+        # detected_domain lives in microcurriculos, not especializaciones —
+        # use DISTINCT ON to get one row per especialización.
         rows = fetch_all(
             """
             SELECT
@@ -351,6 +438,8 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
                 COALESCE(e.plan_estudios, '')  AS plan_estudios,
                 COALESCE(e.campo_laboral, '')  AS campo_laboral
             FROM especializaciones e
+            LEFT JOIN microcurriculos m ON m.specialization_id = e.id
+            WHERE e.id >= 80
             ORDER BY e.id
             """
         )
@@ -361,17 +450,29 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
 
     # Fetch all microcurriculo skills in one query, keyed by programa name
     try:
+        count_rows = fetch_all("SELECT COUNT(*) AS total FROM microcurriculo_skills")
+        _skill_total = int((count_rows[0].get("total") or 0) if count_rows else 0)
+    except Exception:
+        _skill_total = -1
+
+    try:
+        # Navigate especializaciones → microcurriculos → microcurriculo_skills
+        # so the JOIN is anchored to e.id >= 80 and uses the canonical e.nombre
+        # as the program key (same as the rows query above).
         skill_rows = fetch_all(
             """
             SELECT
-                m.programa,
-                ms.skill_normalized,
+                e.nombre                                        AS programa,
+                COALESCE(NULLIF(ms.skill_normalized, ''),
+                         NULLIF(ms.skill_original,   ''))      AS skill_value,
                 ms.tipo_skill,
                 ms.confidence_score
-            FROM microcurriculo_skills ms
-            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
-            WHERE ms.skill_normalized IS NOT NULL
-              AND ms.skill_normalized <> ''
+            FROM especializaciones e
+            JOIN microcurriculos m  ON m.specialization_id  = e.id
+            JOIN microcurriculo_skills ms ON ms.microcurriculo_id = m.id
+            WHERE e.id >= 80
+              AND COALESCE(NULLIF(ms.skill_normalized, ''),
+                           NULLIF(ms.skill_original,   '')) IS NOT NULL
             ORDER BY ms.confidence_score DESC
             """
         )

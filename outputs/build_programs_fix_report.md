@@ -11,15 +11,10 @@
 **Respuesta: Solo de memoria (PROGRAM_BLUEPRINTS).**
 
 ```python
-# Línea 159 — lista estática hardcodeada con 36 programas
 PROGRAM_BLUEPRINTS: List[Dict[str, str]] = [
     {"name": "EspecializaciÃ³n en Alta Gerencia", "faculty": "Ciencias EconÃ³micas y Administrativas", ...},
     ...
 ]
-
-def build_programs():
-    for index, blueprint in enumerate(PROGRAM_BLUEPRINTS, start=1):
-        programs.append({"id": index, "name": blueprint["name"], ...})
 ```
 
 `engine.py` no tiene ninguna importación de `psycopg2`, `psycopg`, `sqlalchemy`, ni de `backend.repositories.base`. Toda la data proviene del dict Python estático.
@@ -70,9 +65,9 @@ La solución correcta es usar la DB como fuente de verdad.
 
 ---
 
-## FIX APLICADO
+## FIXES APLICADOS (3 correcciones)
 
-### Estrategia: DB-first con fallback a PROGRAM_BLUEPRINTS
+### Fix 1 — client_encoding=UTF8 en `backend/db.py`
 
 Se añadió `_fetch_db_programs()` (nueva función privada) que:
 
@@ -100,6 +95,11 @@ SELECT
     COALESCE(e.campo_laboral, '')  AS campo_laboral
 FROM especializaciones e
 ORDER BY e.id
+
+-- Después:
+FROM especializaciones e
+WHERE e.id >= 80
+ORDER BY e.id
 ```
 
 ---
@@ -107,6 +107,7 @@ ORDER BY e.id
 ### Query secundaria — microcurriculo_skills
 
 ```sql
+-- Antes:
 SELECT
     m.programa,
     ms.skill_normalized,
@@ -116,8 +117,21 @@ FROM microcurriculo_skills ms
 JOIN microcurriculos m ON m.id = ms.microcurriculo_id
 WHERE ms.skill_normalized IS NOT NULL
   AND ms.skill_normalized <> ''
-ORDER BY ms.confidence_score DESC
+
+-- Después:
+SELECT
+    m.programa,
+    COALESCE(NULLIF(ms.skill_normalized, ''),
+             NULLIF(ms.skill_original, ''))  AS skill_value,
+    ms.tipo_skill,
+    ms.confidence_score
+FROM microcurriculo_skills ms
+JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+WHERE COALESCE(NULLIF(ms.skill_normalized, ''),
+               NULLIF(ms.skill_original, '')) IS NOT NULL
 ```
+
+El campo en el loop cambia de `sr.get("skill_normalized")` a `sr.get("skill_value")`.
 
 ---
 

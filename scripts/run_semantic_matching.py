@@ -183,12 +183,21 @@ def main(argv: Optional[List[str]] = None) -> int:
         if results:
             conn2 = connect()
             try:
-                if args.persist_embeddings:
-                    persist_embeddings(programs, jobs, conn2)
+                # Step 1: save matches — critical, must succeed
                 run_id = _ensure_run(conn2, args.dataset_version)
                 saved = save_matches(results, run_id, conn2)
                 logger.info("Guardados %d matches en run_id=%d", saved, run_id)
+            except Exception as exc:
+                logger.error("Error guardando matches en ml_program_job_matches: %s", exc)
+                conn2.rollback()
+                raise
             finally:
+                # Step 2: embeddings — optional cache, never blocks match saving
+                if args.persist_embeddings:
+                    try:
+                        persist_embeddings(programs, jobs, conn2)
+                    except Exception as exc:
+                        logger.warning("persist_embeddings falló (no crítico): %s", exc)
                 conn2.close()
         else:
             logger.info("Sin matches que guardar.")

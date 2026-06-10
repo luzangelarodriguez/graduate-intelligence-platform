@@ -16,14 +16,23 @@ from typing import Any
 import psycopg2
 from psycopg2.extras import Json, RealDictCursor, execute_values
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env.local")
+except ImportError:
+    pass
 
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "127.0.0.1"),
-    "port": os.getenv("DB_PORT", "5433"),
-    "dbname": os.getenv("DB_NAME", "cliente_a_db"),
-    "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres"),
-}
+_RAILWAY_URL = os.getenv("RAILWAY_DATABASE_URL")
+if _RAILWAY_URL:
+    DB_CONFIG = {"dsn": _RAILWAY_URL, "sslmode": "require"}
+else:
+    DB_CONFIG = {
+        "host": os.getenv("DB_HOST", "127.0.0.1"),
+        "port": os.getenv("DB_PORT", "5433"),
+        "dbname": os.getenv("DB_NAME", "cliente_a_db"),
+        "user": os.getenv("DB_USER", "postgres"),
+        "password": os.getenv("DB_PASSWORD", "postgres"),
+    }
 
 TASK_NAME = "program_job_match"
 MATCH_METHOD = "rules_v1"
@@ -321,6 +330,8 @@ def stable_hash(payload: Any) -> str:
 
 
 def connect():
+    if "dsn" in DB_CONFIG:
+        return psycopg2.connect(DB_CONFIG["dsn"], sslmode=DB_CONFIG["sslmode"], cursor_factory=RealDictCursor)
     return psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
 
 
@@ -345,7 +356,7 @@ def create_run(cur, dataset_version: str, notes: str) -> int:
             f"program-job-match-{dataset_version}",
             TASK_NAME,
             dataset_version,
-            Json({"method": MATCH_METHOD, "model": MODEL_NAME, "db": DB_CONFIG["dbname"]}),
+            Json({"method": MATCH_METHOD, "model": MODEL_NAME, "db": DB_CONFIG.get("dbname", DB_CONFIG.get("dsn", "")[:40])}),
             notes,
         ),
     )
@@ -390,11 +401,24 @@ def load_latest_programs(cur) -> list[ProgramDocument]:
             COALESCE(
                 jsonb_agg(DISTINCT l.skill_name) FILTER (WHERE l.skill_name IS NOT NULL),
                 '[]'::jsonb
-            ) AS label_skills
+            ) AS label_skills,
+            -- Skills from microcurriculo_skills (preferred source, deduped via DISTINCT)
+            COALESCE(
+                jsonb_agg(DISTINCT
+                    COALESCE(NULLIF(ms.skill_normalized, ''), NULLIF(ms.skill_original, ''))
+                ) FILTER (
+                    WHERE COALESCE(NULLIF(ms.skill_normalized, ''), NULLIF(ms.skill_original, '')) IS NOT NULL
+                ),
+                '[]'::jsonb
+            ) AS micro_skills
         FROM mapped_programs mp
         LEFT JOIN ml_program_skill_labels l
             ON l.program_document_id = mp.id
             AND l.label_type = 'positive'
+        LEFT JOIN microcurriculos mc
+            ON mc.specialization_id = mp.especializacion_id
+        LEFT JOIN microcurriculo_skills ms
+            ON ms.microcurriculo_id = mc.id
         GROUP BY
             mp.id,
             mp.especializacion_id,
@@ -409,7 +433,11 @@ def load_latest_programs(cur) -> list[ProgramDocument]:
     )
     programs: list[ProgramDocument] = []
     for row in cur.fetchall():
-        skills = unique_clean_skills(list(row.get("label_skills") or []))
+        # microcurriculo_skills takes priority; fall back to ml_program_skill_labels
+        micro = list(row.get("micro_skills") or [])
+        labels = list(row.get("label_skills") or [])
+        combined = micro if micro else labels
+        skills = unique_clean_skills(combined)
         programs.append(
             ProgramDocument(
                 id=int(row["id"]),
@@ -427,42 +455,64 @@ def load_latest_programs(cur) -> list[ProgramDocument]:
 
 
 def load_jobs(cur) -> list[dict[str, Any]]:
+    # Check which tables exist to build the right query
     cur.execute(
         """
-        SELECT
-            e.id,
-            COALESCE(e.titulo, '') AS title,
-            COALESCE(e.empresa, '') AS company,
-            COALESCE(e.ubicacion, '') AS location,
-            COALESCE(e.fuente, '') AS source,
-            COALESCE(e.url, '') AS source_url,
-            COALESCE(e.descripcion, '') AS description,
-            COALESCE(e.matched_skills, '') AS matched_skills,
-            COALESCE(e.missing_skills, '') AS missing_skills,
-            COALESCE(e.skills_text, '') AS skills_text,
-            COALESCE(
-                jsonb_agg(DISTINCT s.nombre) FILTER (WHERE s.nombre IS NOT NULL),
-                '[]'::jsonb
-            ) AS skills
-        FROM empleos e
-        LEFT JOIN empleo_skills es
-            ON es.empleo_id = e.id
-        LEFT JOIN skills s
-            ON s.id = es.skill_id
-        GROUP BY
-            e.id,
-            e.titulo,
-            e.empresa,
-            e.ubicacion,
-            e.fuente,
-            e.url,
-            e.descripcion,
-            e.matched_skills,
-            e.missing_skills,
-            e.skills_text
-        ORDER BY e.id
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name IN ('empleos', 'jobs')
         """
     )
+    existing = {r["table_name"] for r in cur.fetchall()}
+
+    parts: list[str] = []
+    if "empleos" in existing:
+        parts.append(
+            """
+            SELECT
+                e.id::text AS id,
+                COALESCE(e.titulo, '') AS title,
+                COALESCE(e.empresa, '') AS company,
+                COALESCE(e.ubicacion, '') AS location,
+                COALESCE(e.fuente, 'empleos') AS source,
+                COALESCE(e.url, '') AS source_url,
+                COALESCE(e.descripcion, '') AS description,
+                COALESCE(e.matched_skills, '') AS matched_skills,
+                COALESCE(e.missing_skills, '') AS missing_skills,
+                COALESCE(e.skills_text, '') AS skills_text,
+                COALESCE(
+                    (SELECT jsonb_agg(DISTINCT s.nombre)
+                     FROM empleo_skills es
+                     JOIN skills s ON s.id = es.skill_id
+                     WHERE es.empleo_id = e.id),
+                    '[]'::jsonb
+                ) AS skills
+            FROM empleos e
+            """
+        )
+    if "jobs" in existing:
+        parts.append(
+            """
+            SELECT
+                j.id::text AS id,
+                COALESCE(j.title, '') AS title,
+                COALESCE(j.company, '') AS company,
+                COALESCE(j.location, '') AS location,
+                COALESCE(j.source, 'jobs') AS source,
+                COALESCE(j.source_url, '') AS source_url,
+                COALESCE(j.description, '') AS description,
+                '' AS matched_skills,
+                '' AS missing_skills,
+                '' AS skills_text,
+                '[]'::jsonb AS skills
+            FROM jobs j
+            """
+        )
+
+    if not parts:
+        return []
+
+    query = " UNION ALL ".join(parts) + " ORDER BY id"
+    cur.execute(query)
     return list(cur.fetchall())
 
 
@@ -607,7 +657,11 @@ def compute_matches(programs: list[ProgramDocument], jobs: list[JobDocument], *,
 
             program_coverage = (len(common_keys) / max(len(program_skill_keys), 1)) * 100.0 if program_skill_keys else 0.0
             job_density = (len(common_keys) / max(len(job_skill_keys), 1)) * 100.0 if job_skill_keys else 0.0
-            skill_overlap_score = clamp((program_coverage * 0.70) + (job_density * 0.30))
+            # F1-score: harmonic mean of recall (program_coverage) and precision (job_density)
+            if program_coverage + job_density > 0:
+                skill_overlap_score = clamp(2.0 * program_coverage * job_density / (program_coverage + job_density))
+            else:
+                skill_overlap_score = 0.0
             role_score = text_affinity(program_text, " ".join([job.title, job.company, job.location, ", ".join(job_skills)]))
             score = clamp((skill_overlap_score * 0.68) + (role_score * 0.32))
             conflict = has_role_conflict(program.name, program.role_target, job.title)

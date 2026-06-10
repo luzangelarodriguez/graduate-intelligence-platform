@@ -19,6 +19,16 @@ import { AIRecommendations } from '../components/programs-observatory/AIRecommen
 import { SimulationDashboard } from '../components/programs-observatory/SimulationDashboard';
 import { CriminologyValidation } from '../components/programs-observatory/CriminologyValidation';
 
+// Import new observatory components
+import { ActiveProgramPanel } from '../components/programs-observatory/ActiveProgramPanel';
+import { CurriculumVsMarketMatch } from '../components/programs-observatory/CurriculumVsMarketMatch';
+import { UniversityBenchmarks } from '../components/programs-observatory/UniversityBenchmarks';
+import { RelatedJobsPanel } from '../components/programs-observatory/RelatedJobsPanel';
+import { MicrocurriculumModules } from '../components/programs-observatory/MicrocurriculumModules';
+import { AIRecommendations } from '../components/programs-observatory/AIRecommendations';
+import { SimulationDashboard } from '../components/programs-observatory/SimulationDashboard';
+import { CriminologyValidation } from '../components/programs-observatory/CriminologyValidation';
+
 function toNumber(value: unknown, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;

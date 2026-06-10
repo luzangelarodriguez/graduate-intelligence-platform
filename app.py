@@ -833,72 +833,7 @@ def _fetch_program_base_row(especializacion_id: int) -> dict[str, Any] | None:
 
 
 def get_programas() -> list[dict[str, Any]]:
-    relation = _pick_relation(("mv_dashboard_especializacion", "vw_dashboard_especializacion"))
-    metrics_join = ""
-    metrics_select = """
-            COALESCE(v.promedio_match_mercado, 0) AS promedio_match_mercado,
-            COALESCE(v.max_match_mercado, 0) AS max_match_mercado,
-            COALESCE(v.total_empleos_relacionados, 0) AS total_empleos_relacionados
-    """
-    if relation:
-        metrics_join = f"LEFT JOIN {relation} v ON v.especializacion_id = s.id"
-    else:
-        metrics_select = """
-            0 AS promedio_match_mercado,
-            0 AS max_match_mercado,
-            0 AS total_empleos_relacionados
-        """
-
-    rows = _fetch_all(
-        f"""
-        WITH programa_skills AS (
-            SELECT especializacion_id, COUNT(DISTINCT skill_id)::int AS total_skills_programa
-            FROM especializacion_skills
-            GROUP BY especializacion_id
-        ),
-        programa_herramientas AS (
-            SELECT especializacion_id, COUNT(DISTINCT herramienta_id)::int AS total_herramientas
-            FROM especializacion_herramientas
-            GROUP BY especializacion_id
-        ),
-        programa_competencias AS (
-            SELECT especializacion_id, COUNT(DISTINCT competencia_id)::int AS total_competencias
-            FROM especializacion_competencias
-            GROUP BY especializacion_id
-        ),
-        programa_habilidades_blandas AS (
-            SELECT especializacion_id, COUNT(DISTINCT habilidad_id)::int AS total_habilidades_blandas
-            FROM especializacion_habilidades_blandas
-            GROUP BY especializacion_id
-        )
-        SELECT DISTINCT ON (lower(s.nombre))
-            s.id AS especializacion_id,
-            s.nombre AS nombre_especializacion,
-            COALESCE(s.rol, '') AS rol,
-            COALESCE(ps.total_skills_programa, 0) AS total_skills_programa,
-            COALESCE(ph.total_herramientas, 0) AS total_herramientas,
-            COALESCE(pc.total_competencias, 0) AS total_competencias,
-            COALESCE(pbl.total_habilidades_blandas, 0) AS total_habilidades_blandas,
-            {metrics_select}
-        FROM especializaciones s
-        LEFT JOIN programa_skills ps ON ps.especializacion_id = s.id
-        LEFT JOIN programa_herramientas ph ON ph.especializacion_id = s.id
-        LEFT JOIN programa_competencias pc ON pc.especializacion_id = s.id
-        LEFT JOIN programa_habilidades_blandas pbl ON pbl.especializacion_id = s.id
-        {metrics_join}
-        ORDER BY
-            lower(s.nombre),
-            CASE
-                WHEN COALESCE(s.source_url, '') <> '' OR COALESCE(s.plan_estudios, '') <> '' THEN 0
-                ELSE 1
-            END,
-            COALESCE(ps.total_skills_programa, 0) DESC,
-            CASE WHEN COALESCE(s.rol, '') <> '' THEN 0 ELSE 1 END,
-            CASE WHEN s.nombre ~ '^[A-Z]' THEN 0 ELSE 1 END,
-            s.id DESC
-        """,
-        db_name=PROGRAM_DB_NAME,
-    )
+    rows = dashboard_service.list_programs_base(db_name=PROGRAM_DB_NAME)
     ml_metrics = _ml_program_metric_map()
     programs = []
     for row in rows:
@@ -922,6 +857,9 @@ def get_programa(especializacion_id: int) -> dict[str, Any] | None:
     if not row:
         return None
     normalized = row
+    visible_program_ids = {int(item.get("especializacion_id") or 0) for item in get_programas()}
+    if especializacion_id not in visible_program_ids:
+        return None
     normalized.update(_market_metrics_for_program(especializacion_id))
     normalized["roles_sugeridos"] = _program_role_suggestions(especializacion_id, limit=4)
     normalized["total_skills_programa"] = len(get_program_skill_rows(especializacion_id))

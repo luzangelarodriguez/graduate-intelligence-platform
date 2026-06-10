@@ -82,6 +82,8 @@ def _db_url() -> Optional[str]:
 def connect() -> psycopg2.extensions.connection:
     url = _db_url()
     if url:
+        # Use direct IP to avoid DNS resolution failures in some envs
+        url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
         return psycopg2.connect(url, sslmode="require",
                                 cursor_factory=psycopg2.extras.RealDictCursor)
     return psycopg2.connect(
@@ -303,32 +305,171 @@ def _infer_domain(text: str) -> str:
     return best[0]
 
 
+# Domains that are considered compatible with each other even when not equal.
+# E.g. "datos" programs are relevant for "software" jobs and vice-versa.
+_COMPATIBLE_DOMAINS: Dict[str, set] = {
+    "datos":    {"datos", "software", "general"},
+    "software": {"software", "datos", "general"},
+    "gestion":  {"gestion", "general"},
+    "seguridad":{"seguridad", "general"},
+    "redes":    {"redes", "general"},
+    "criminologia": {"criminologia", "general"},
+    "finanzas": {"finanzas", "general"},
+    "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
+}
+
+
 def _domains_compatible(d1: str, d2: str) -> bool:
-    return d1 == "general" or d2 == "general" or d1 == d2
+    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1, "general"})
 
 
 # ---------------------------------------------------------------------------
-# Skill extraction from free text
+# Skill extraction — lookup-based (more robust than regex for Spanish text)
 # ---------------------------------------------------------------------------
 
-_SKILL_RE = re.compile(
-    r"\b(python|r\b|sql|nosql|java(?:script)?|typescript|scala|c\+\+|c#|"
-    r"power\s*bi|tableau|qlik|looker|metabase|"
-    r"pandas|numpy|scikit[- ]learn|tensorflow|pytorch|keras|"
-    r"excel|word|powerpoint|"
-    r"spark|hadoop|airflow|kafka|dbt|"
-    r"aws|azure|gcp|docker|kubernetes|terraform|"
-    r"postgresql|mysql|mongodb|redis|elasticsearch|"
-    r"machine\s*learning|deep\s*learning|nlp|"
-    r"git|jira|confluence|scrum|agile|"
-    r"analisis\s*de\s*datos?|visualizacion|estadistica|"
-    r"gestion\s*de\s*proyectos?|liderazgo)\b",
-    re.IGNORECASE,
-)
+# All terms are stored in their NORMALISED form (lowercase ASCII, no accents).
+# _normalize() is applied to both the lookup terms and the input text, so
+# accent/case differences between DB text and the lookup list are irrelevant.
+SKILLS_LOOKUP: List[str] = [
+    # --- Programming languages ---
+    "python", "sql", "java", "javascript", "typescript",
+    "scala", "golang", "rust", "php", "ruby", "c++", "c#", "kotlin", "swift",
+    "lenguaje r", "rstudio", "r studio",  # 'r' alone causes false positives
+    # --- BI / Visualisation tools ---
+    "power bi", "tableau", "qlik", "qliksense", "qlixview",
+    "looker", "metabase", "superset", "grafana",
+    "google data studio", "datastudio", "data studio",
+    # --- Data / ML libraries ---
+    "pandas", "numpy", "scikit learn", "sklearn",
+    "tensorflow", "pytorch", "keras", "hugging face",
+    "xgboost", "lightgbm", "transformers",
+    # --- Office / Productivity ---
+    "excel", "word", "powerpoint", "google sheets",
+    # --- Big Data / ETL / Orchestration ---
+    "spark", "hadoop", "airflow", "kafka", "dbt",
+    "flink", "hive", "presto", "databricks", "nifi",
+    "etl", "elt", "data pipeline",
+    # --- Cloud ---
+    "aws", "azure", "gcp", "google cloud",
+    # --- DevOps / Infra ---
+    "docker", "kubernetes", "terraform", "ansible",
+    "jenkins", "gitlab", "github", "devops", "ci cd",
+    # --- Databases ---
+    "postgresql", "mysql", "mariadb", "mongodb",
+    "redis", "elasticsearch", "cassandra",
+    "bigquery", "snowflake", "redshift", "oracle",
+    "bases de datos", "base de datos",
+    # --- Data warehouse / Lakehouse ---
+    "data warehouse", "data lake", "lakehouse", "data mart",
+    # --- ML / AI concepts ---
+    "machine learning", "aprendizaje automatico",
+    "deep learning", "redes neuronales",
+    "nlp", "procesamiento de lenguaje",
+    "inteligencia artificial",
+    "mineria de datos", "data mining",
+    "computer vision", "vision por computador",
+    "modelos predictivos", "modelo predictivo",
+    "algoritmos", "algoritmo",
+    # --- Statistics / Math ---
+    "estadistica", "estadisticas",
+    "r studio", "rstudio", "spss", "sas", "stata",
+    "regresion", "regresion lineal", "regresion logistica",
+    "series de tiempo", "clustering", "clasificacion",
+    "analisis estadistico", "inferencia estadistica",
+    "probabilidad",
+    # --- Analytics / Data Science ---
+    "analisis de datos", "analitica de datos",
+    "ciencia de datos", "data science",
+    "ingenieria de datos", "data engineering",
+    "analitica avanzada", "analitica descriptiva",
+    "analitica predictiva", "analitica prescriptiva",
+    "inteligencia de negocios", "business intelligence",
+    "visualizacion", "visualizacion de datos",
+    "dashboard", "dashboards", "reporte", "reportes",
+    "kpi", "metricas", "indicadores",
+    # --- APIs / Architecture ---
+    "api rest", "restful", "api", "microservicios",
+    "microservices", "arquitectura de datos",
+    "arquitectura de software",
+    # --- Project / Methodology ---
+    "scrum", "agile", "kanban", "jira", "confluence", "trello",
+    "gestion de proyectos", "project management",
+    "metodologias agiles",
+    # --- Security ---
+    "ciberseguridad", "cybersecurity",
+    "siem", "soc", "pentest", "seguridad informatica",
+    "forense digital", "analisis forense",
+    # --- Networks ---
+    "redes", "networking", "cisco", "telecomunicaciones",
+    # --- Soft / transferable skills (measurable) ---
+    "liderazgo", "trabajo en equipo", "comunicacion",
+    "pensamiento analitico", "pensamiento critico",
+    "resolucion de problemas", "toma de decisiones",
+    "orientacion a resultados",
+    # --- Criminology / Law / Social (for criminologia domain) ---
+    "criminologia", "criminalistica", "victimologia",
+    "investigacion criminal", "perfilacion criminal",
+    "psicologia forense", "psicologia criminal",
+    "derecho penal", "proceso penal", "sistema penal",
+    "investigacion judicial", "policia judicial",
+    "delitos informaticos", "evidencia digital",
+    "cadena de custodia",
+    # --- Finance / Accounting ---
+    "finanzas", "contabilidad", "financiero",
+    "tesoreria", "presupuesto", "auditoria", "tributario",
+    "estados financieros", "niif", "ifrs",
+    # --- Management / Strategy ---
+    "gestion", "gerencia", "administracion",
+    "estrategia", "planeacion estrategica",
+    "transformacion digital",
+    # --- Version control ---
+    "git", "control de versiones",
+]
+
+# Single-character and noise tokens that must never be treated as skills.
+SKILLS_EXCLUDE: frozenset = frozenset({
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "go", "no", "de", "en", "el", "la", "un", "se",
+})
+
+# Pre-normalise the lookup list once at import time; skip excluded tokens.
+_SKILLS_LOOKUP_NORM: List[str] = [
+    n for s in SKILLS_LOOKUP
+    if (n := _normalize(s)) and n not in SKILLS_EXCLUDE and len(n) >= 2
+]
+
+# Compile per-term word-boundary patterns for short terms (≤ 4 chars) to
+# avoid "r" matching "errors", "sql" matching "psql", etc.
+_SHORT_TERMS: Dict[str, re.Pattern] = {
+    term: re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])")
+    for term in _SKILLS_LOOKUP_NORM
+    if len(term) <= 4
+}
+
+
+def extract_skills_by_lookup(text: str) -> List[str]:
+    """
+    Lookup of SKILLS_LOOKUP terms in normalised text.
+    - Long terms (>4 chars): plain substring match (fast, low false-positive risk).
+    - Short terms (≤4 chars): word-boundary regex to avoid partial matches
+      ('sql' should not match 'psql', 'r' should not match 'errors').
+    """
+    n = _normalize(text)
+    found: set = set()
+    for term in _SKILLS_LOOKUP_NORM:
+        if term in _SHORT_TERMS:
+            if _SHORT_TERMS[term].search(n):
+                found.add(term)
+        else:
+            if term in n:
+                found.add(term)
+    return sorted(found)
 
 
 def _skills_from_text(text: str) -> List[str]:
-    return list({_normalize(m.group(0)) for m in _SKILL_RE.finditer(text)})
+    """Alias kept for backward compatibility — delegates to lookup."""
+    return extract_skills_by_lookup(text)
 
 
 # ---------------------------------------------------------------------------
@@ -388,13 +529,22 @@ class MatchResult:
 # ---------------------------------------------------------------------------
 
 def load_programs(conn) -> List[ProgramProfile]:
+    # Join strategy:
+    # 1. PRIMARY:  microcurriculos.specialization_id = especializaciones.id
+    #    (set by load_microcurriculos.py via migration 009)
+    # 2. FALLBACK: microcurriculos.programa ILIKE especializaciones.nombre
+    #    (for rows where specialization_id is still NULL)
+    # Both arms are UNION-ed so no skills are lost.
     with conn.cursor() as cur:
         cur.execute("""
             SELECT
-                e.id                            AS especializacion_id,
-                e.nombre                        AS program_name,
-                COALESCE(e.campo_laboral, '')   AS campo_laboral,
-                COALESCE(e.plan_estudios, '')   AS plan_estudios,
+                e.id                                AS especializacion_id,
+                e.nombre                            AS program_name,
+                COALESCE(e.descripcion, '')         AS descripcion,
+                COALESCE(e.rol, '')                 AS rol,
+                COALESCE(e.campo_laboral, '')       AS campo_laboral,
+                COALESCE(e.plan_estudios, '')       AS plan_estudios,
+                COALESCE(e.general_text, '')        AS general_text,
                 array_agg(
                     DISTINCT COALESCE(
                         NULLIF(ms.skill_normalized, ''),
@@ -402,9 +552,17 @@ def load_programs(conn) -> List[ProgramProfile]:
                     )
                 ) FILTER (WHERE ms.id IS NOT NULL) AS micro_skills
             FROM especializaciones e
-            LEFT JOIN microcurriculos mc ON mc.specialization_id = e.id
+            LEFT JOIN microcurriculos mc ON (
+                mc.specialization_id = e.id
+                OR (
+                    mc.specialization_id IS NULL
+                    AND mc.programa IS NOT NULL
+                    AND lower(mc.programa) = lower(e.nombre)
+                )
+            )
             LEFT JOIN microcurriculo_skills ms ON ms.microcurriculo_id = mc.id
-            GROUP BY e.id, e.nombre, e.campo_laboral, e.plan_estudios
+            GROUP BY e.id, e.nombre, e.descripcion, e.rol,
+                     e.campo_laboral, e.plan_estudios, e.general_text
         """)
         rows = cur.fetchall()
 
@@ -412,12 +570,17 @@ def load_programs(conn) -> List[ProgramProfile]:
     for row in rows:
         raw_skills: List[str] = [s for s in (row["micro_skills"] or []) if s]
         skills = [_normalize(s) for s in raw_skills if _normalize(s)]
-        text = " ".join([
-            row["program_name"] or "",
-            row["campo_laboral"] or "",
-            row["plan_estudios"] or "",
+        # Rich embedding text: name + description + role + academic fields + skills
+        # Truncated to 1000 chars so the embedding model sees the most relevant content.
+        text = " ".join(filter(None, [
+            row["program_name"],
+            row["descripcion"],
+            row["rol"],
+            row["campo_laboral"],
+            row["plan_estudios"],
+            row["general_text"],
             " ".join(raw_skills),
-        ])[:800]
+        ]))[:1000]
         skill_tokens = _tokenize(" ".join(skills))
         profiles.append(ProgramProfile(
             especializacion_id=row["especializacion_id"],
@@ -427,6 +590,13 @@ def load_programs(conn) -> List[ProgramProfile]:
             text=text,
             skill_tokens=skill_tokens,
         ))
+
+    # Debug: show skill counts per program so zero-skill cases are visible
+    for p in profiles:
+        logger.info("  programa %-45s  skills=%d  %s",
+                    p.program_name[:45], len(p.skills),
+                    str(p.skills[:3]) if p.skills else "(sin skills — pertinencia=0)")
+
     return profiles
 
 
@@ -438,15 +608,20 @@ def load_jobs(conn) -> List[JobProfile]:
         """)
         existing = {r["table_name"] for r in cur.fetchall()}
 
+    # empleos: skill columns are skill_normalized / skill_original (no skill_nombre)
+    # jobs:    skill column is canonical_skill in job_skills (job_id BIGINT FK)
     parts: List[str] = []
     if "empleos" in existing:
         parts.append("""
             SELECT
-                e.id::text                              AS job_id,
-                COALESCE(e.titulo, '')                  AS title,
-                COALESCE(e.empresa, '')                 AS company,
-                COALESCE(e.descripcion, '')             AS description,
-                COALESCE(es.skill_nombre, '')           AS skill_nombre
+                e.id::text                                          AS job_id,
+                COALESCE(e.titulo, '')                              AS title,
+                COALESCE(e.empresa, '')                             AS company,
+                COALESCE(e.descripcion, '')                         AS description,
+                COALESCE(
+                    NULLIF(es.skill_normalized, ''),
+                    NULLIF(es.skill_original, '')
+                )                                                   AS skill_name
             FROM empleos e
             LEFT JOIN empleo_skills es ON es.empleo_id = e.id
         """)
@@ -457,8 +632,9 @@ def load_jobs(conn) -> List[JobProfile]:
                 COALESCE(j.title, '')                   AS title,
                 COALESCE(j.company, '')                 AS company,
                 COALESCE(j.description, '')             AS description,
-                ''                                      AS skill_nombre
+                COALESCE(js.canonical_skill, '')        AS skill_name
             FROM jobs j
+            LEFT JOIN job_skills js ON js.job_id = j.id
         """)
 
     if not parts:
@@ -470,18 +646,32 @@ def load_jobs(conn) -> List[JobProfile]:
         cur.execute(f"""
             SELECT
                 job_id, title, company, description,
-                array_agg(DISTINCT skill_nombre)
-                    FILTER (WHERE skill_nombre <> '') AS db_skills
+                array_agg(DISTINCT skill_name)
+                    FILTER (WHERE skill_name IS NOT NULL AND skill_name <> '') AS db_skills
             FROM ({union_sql}) sub
             GROUP BY job_id, title, company, description
         """)
         rows = cur.fetchall()
 
     profiles: List[JobProfile] = []
+    n_from_db = 0
+    n_from_text = 0
     for row in rows:
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
-        text = " ".join([row["title"], row["company"], row["description"]])[:800]
-        skills = db_skills or _skills_from_text(text)
+        text = " ".join(filter(None, [
+            row["title"],
+            (row["description"] or "")[:500],
+            " ".join(db_skills),
+        ]))[:800]
+        # Always extract from text AND merge with DB skills so jobs inserted
+        # by run_acquisition.py (which may have empty job_skills rows) still
+        # get meaningful skill coverage for pertinence scoring.
+        text_skills = _skills_from_text(text)
+        skills = sorted(set(db_skills) | set(text_skills))
+        if db_skills:
+            n_from_db += 1
+        elif text_skills:
+            n_from_text += 1
         skill_tokens = _tokenize(" ".join(skills))
         profiles.append(JobProfile(
             job_id=row["job_id"],
@@ -492,6 +682,18 @@ def load_jobs(conn) -> List[JobProfile]:
             text=text,
             skill_tokens=skill_tokens,
         ))
+
+    logger.info(
+        "load_jobs: %d empleos cargados  "
+        "(con skills en DB: %d  |  solo extracción de texto: %d  |  sin skills: %d)",
+        len(profiles), n_from_db, n_from_text,
+        len(profiles) - n_from_db - n_from_text,
+    )
+    # Debug: show first 3 jobs with their skill counts
+    for j in profiles[:3]:
+        logger.info("  empleo %-45s  skills=%d  %s",
+                    j.title[:45], len(j.skills),
+                    str(j.skills[:5]) if j.skills else "(sin skills)")
     return profiles
 
 
@@ -529,7 +731,20 @@ def _pertinence_scores(
 # Relevance label
 # ---------------------------------------------------------------------------
 
-def _label(score: float, n_common: int) -> str:
+def _label(score: float, n_common: int, *, skills_match: bool = True) -> str:
+    """
+    skills_match=True  → standard F1-based labels (high/medium/low/no_match)
+    skills_match=False → semantic-only fallback labels (high_semantic/…)
+    """
+    if not skills_match:
+        # Semantic-only path: no skill overlap available
+        if score >= 75.0:
+            return "high_semantic"
+        if score >= 60.0:
+            return "medium_semantic"
+        if score >= 45.0:
+            return "low_semantic"
+        return "no_match"
     if score >= SCORE_HIGH and n_common >= 2:
         return "high"
     if score >= SCORE_MEDIUM and n_common >= 1:
@@ -613,6 +828,7 @@ def run_matching(
     bm25_index = _make_bm25(bm25_corpus)
 
     results: List[MatchResult] = []
+    _debug_done = False  # one-shot debug for first program-with-skills × first job
     for prog in programs:
         if prog.embedding is None:
             continue
@@ -623,7 +839,14 @@ def run_matching(
 
         for j_idx, job in enumerate(jobs):
             # --- Domain filter (OBLIGATORIO) ---
-            if domain_filter and not _domains_compatible(prog.domain, job.domain):
+            domain_ok = _domains_compatible(prog.domain, job.domain)
+            if domain_filter and not domain_ok:
+                if not _debug_done and prog.skills:
+                    logger.info(
+                        "[DEBUG-DOMAIN-BLOCK] prog='%s' domain=%s  job='%s' domain=%s  → BLOQUEADO",
+                        prog.program_name[:40], prog.domain, job.title[:40], job.domain,
+                    )
+                    _debug_done = True
                 continue
             if job.embedding is None:
                 continue
@@ -634,15 +857,35 @@ def run_matching(
             # CAPA 2 — BM25
             bm25_norm = float(bm25_scores[j_idx]) * 100
 
-            # CAPA 3 — pertinence
-            coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
-                prog.skills, job.skills
-            )
+            # CAPA 3 — pertinence (only meaningful when both sides have skills)
+            has_skills = bool(prog.skills) and bool(job.skills)
+            if has_skills:
+                coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
+                    prog.skills, job.skills
+                )
+                final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
+            else:
+                # Fallback: no skill data on one side — use pure semantic score
+                coverage = density = pertinence = gap_pct = 0.0
+                common: List[str] = []
+                gap: List[str] = list(prog.skills)  # all program skills are "missing"
+                final = sem  # full weight on semantic
 
-            # Final score
-            final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
+            # One-shot debug for first valid pair
+            if not _debug_done and prog.skills and j_idx == 0:
+                logger.info(
+                    "[DEBUG] prog='%s' domain=%s | job='%s' domain=%s",
+                    prog.program_name[:40], prog.domain, job.title[:40], job.domain,
+                )
+                logger.info("[DEBUG] prog.skills[:5] = %s", prog.skills[:5])
+                logger.info("[DEBUG] job.skills[:5]  = %s", job.skills[:5])
+                logger.info("[DEBUG] common_skills   = %s", common[:5])
+                logger.info("[DEBUG] has_skills=%s  coverage=%.1f  density=%.1f  "
+                            "pertinence=%.1f  sem=%.1f  final=%.1f",
+                            has_skills, coverage, density, pertinence, sem, final)
+                _debug_done = True
 
-            label = _label(final, len(common))
+            label = _label(final, len(common), skills_match=has_skills)
             if final < min_score and label == "no_match":
                 continue
 
@@ -680,78 +923,82 @@ def run_matching(
 
 
 # ---------------------------------------------------------------------------
-# DB schema for embedding tables
+# Persist embeddings (optional cache — uses the production table schema)
 # ---------------------------------------------------------------------------
-
-_EMBEDDING_TABLES_SQL = """
-CREATE TABLE IF NOT EXISTS microcurriculo_embeddings (
-    id                 BIGSERIAL PRIMARY KEY,
-    especializacion_id INTEGER   NOT NULL,
-    model_name         TEXT      NOT NULL DEFAULT 'all-MiniLM-L6-v2',
-    embedding          BYTEA     NOT NULL,
-    text_hash          TEXT      NOT NULL,
-    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (especializacion_id, model_name)
-);
-
-CREATE TABLE IF NOT EXISTS job_embeddings (
-    id          BIGSERIAL PRIMARY KEY,
-    job_id      TEXT      NOT NULL,
-    job_table   TEXT      NOT NULL DEFAULT 'jobs',
-    model_name  TEXT      NOT NULL DEFAULT 'all-MiniLM-L6-v2',
-    embedding   BYTEA     NOT NULL,
-    text_hash   TEXT      NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (job_id, job_table, model_name)
-);
-"""
-
-
-def ensure_embedding_tables(conn) -> None:
-    with conn.cursor() as cur:
-        cur.execute(_EMBEDDING_TABLES_SQL)
-    conn.commit()
-
 
 def persist_embeddings(
     programs: List[ProgramProfile],
     jobs: List[JobProfile],
     conn,
 ) -> None:
-    ensure_embedding_tables(conn)
-    model = EMBED_MODEL_NAME
-    with conn.cursor() as cur:
-        for p in programs:
-            if p.embedding is None:
-                continue
-            th = hashlib.md5(p.text.encode()).hexdigest()
-            cur.execute("""
-                INSERT INTO microcurriculo_embeddings
-                    (especializacion_id, model_name, embedding, text_hash)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (especializacion_id, model_name) DO UPDATE
-                    SET embedding = EXCLUDED.embedding,
-                        text_hash = EXCLUDED.text_hash,
-                        created_at = now()
-            """, (p.especializacion_id, model,
-                  psycopg2.Binary(p.embedding.astype(np.float32).tobytes()), th))
+    """Cache embeddings to DB using the production microcurriculo_embeddings schema.
 
-        for j in jobs:
-            if j.embedding is None:
-                continue
-            th = hashlib.md5(j.text.encode()).hexdigest()
-            cur.execute("""
-                INSERT INTO job_embeddings
-                    (job_id, job_table, model_name, embedding, text_hash)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (job_id, job_table, model_name) DO UPDATE
-                    SET embedding = EXCLUDED.embedding,
-                        text_hash = EXCLUDED.text_hash,
-                        created_at = now()
-            """, (j.job_id, "jobs", model,
-                  psycopg2.Binary(j.embedding.astype(np.float32).tobytes()), th))
-    conn.commit()
-    logger.info("Embeddings persistidos: %d programas, %d empleos.", len(programs), len(jobs))
+    Schema (from 003_enterprise_labor_intelligence_schema.sql):
+        microcurriculo_id BIGINT FK → microcurriculos(id)
+        entity_type TEXT
+        model_name TEXT
+        embedding JSONB   ← float list, NOT bytea
+        dimensions INTEGER
+
+    Non-critical — errors are logged and swallowed.
+    """
+    model = EMBED_MODEL_NAME
+    n_prog = n_job = 0
+    try:
+        with conn.cursor() as cur:
+            for p in programs:
+                if p.embedding is None:
+                    continue
+                # Resolve microcurriculo_id from especializacion_id
+                cur.execute(
+                    "SELECT id FROM microcurriculos WHERE specialization_id = %s "
+                    "ORDER BY id DESC LIMIT 1",
+                    (p.especializacion_id,),
+                )
+                mc_row = cur.fetchone()
+                if not mc_row:
+                    continue
+                mc_id = mc_row["id"]
+                vec = p.embedding.astype(np.float32).tolist()
+                cur.execute("""
+                    INSERT INTO microcurriculo_embeddings
+                        (microcurriculo_id, entity_type, entity_id,
+                         model_name, embedding, dimensions,
+                         source_document, confidence_score)
+                    VALUES (%s, 'programa', %s, %s, %s::jsonb, %s, 'academic_relevance_engine', 0.9)
+                    ON CONFLICT DO NOTHING
+                """, (mc_id, str(p.especializacion_id), model,
+                      json.dumps(vec), len(vec)))
+                n_prog += 1
+
+            # job_embeddings table is our own (not the production microcurriculo table)
+            # Only attempt if the table already exists — skip silently otherwise.
+            for j in jobs:
+                if j.embedding is None:
+                    continue
+                vec = j.embedding.astype(np.float32).tolist()
+                th = hashlib.md5(j.text.encode()).hexdigest()
+                try:
+                    cur.execute("""
+                        INSERT INTO job_embeddings
+                            (job_id, job_table, model_name, embedding, text_hash)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON CONFLICT (job_id, job_table, model_name) DO UPDATE
+                            SET embedding  = EXCLUDED.embedding,
+                                text_hash  = EXCLUDED.text_hash,
+                                created_at = now()
+                    """, (j.job_id, "jobs", model, psycopg2.Binary(
+                        j.embedding.astype(np.float32).tobytes()), th))
+                    n_job += 1
+                except Exception:
+                    conn.rollback()
+                    break
+
+        conn.commit()
+        logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
+    except Exception as exc:
+        logger.warning("persist_embeddings: error (no crítico): %s", exc)
+        conn.rollback()
 
 
 # ---------------------------------------------------------------------------
@@ -777,10 +1024,78 @@ def _ensure_run(conn, dataset_version: str = "hybrid_v2") -> int:
         return cur.fetchone()["id"]
 
 
+_LABEL_TO_DB: Dict[str, str] = {
+    "high":             "high",
+    "medium":           "medium",
+    "low":              "low",
+    "no_match":         "no_match",
+    "high_semantic":    "high",
+    "medium_semantic":  "medium",
+    "low_semantic":     "low",
+}
+
+
+def _db_label(label: str) -> str:
+    """Map internal relevance labels to the values accepted by the DB check constraint."""
+    return _LABEL_TO_DB.get(label, "low")
+
+
+def _upsert_program_doc(cur, run_id: int, r: "MatchResult") -> int:
+    """Get or create a minimal ml_program_documents row, return its id."""
+    ext_id = str(r.especializacion_id)
+    cur.execute(
+        "SELECT id FROM ml_program_documents WHERE run_id = %s AND external_program_id = %s",
+        (run_id, ext_id),
+    )
+    row = cur.fetchone()
+    if row:
+        return row["id"]
+    norm = _normalize(r.program_name)
+    chash = hashlib.md5(f"{run_id}:{ext_id}".encode()).hexdigest()
+    cur.execute("""
+        INSERT INTO ml_program_documents
+            (run_id, external_program_id, program_name, normalized_text, content_hash)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (run_id, external_program_id) DO UPDATE SET program_name = EXCLUDED.program_name
+        RETURNING id
+    """, (run_id, ext_id, r.program_name, norm, chash))
+    return cur.fetchone()["id"]
+
+
+def _upsert_job_doc(cur, run_id: int, r: "MatchResult") -> int:
+    """Get or create a minimal ml_job_documents row, return its id."""
+    ext_id = str(r.job_id)
+    cur.execute(
+        "SELECT id FROM ml_job_documents WHERE run_id = %s AND external_job_id = %s",
+        (run_id, ext_id),
+    )
+    row = cur.fetchone()
+    if row:
+        return row["id"]
+    norm = _normalize(r.job_title)
+    chash = hashlib.md5(f"{run_id}:{ext_id}".encode()).hexdigest()
+    cur.execute("""
+        INSERT INTO ml_job_documents
+            (run_id, external_job_id, title, company, normalized_text, content_hash)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (run_id, external_job_id) DO UPDATE SET title = EXCLUDED.title
+        RETURNING id
+    """, (run_id, ext_id, r.job_title, r.company, norm, chash))
+    return cur.fetchone()["id"]
+
+
 def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
+    """Persist matches to ml_program_job_matches.
+
+    Creates minimal stub rows in ml_program_documents / ml_job_documents when
+    they don't exist yet (required by FK constraints).
+    Errors are raised so the caller can decide whether to rollback.
+    """
     saved = 0
     with conn.cursor() as cur:
         for r in results:
+            prog_doc_id = _upsert_program_doc(cur, run_id, r)
+            job_doc_id = _upsert_job_doc(cur, run_id, r)
             raw_features = {
                 "semantic_score": r.semantic_score,
                 "bm25_score": r.bm25_score,
@@ -800,7 +1115,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     skills_en_comun, skills_faltantes, skills_programa, skills_empleo,
                     explanation, content_hash, raw_features
                 ) VALUES (
-                    %(run_id)s, 0, 0,
+                    %(run_id)s, %(prog_doc_id)s, %(job_doc_id)s,
                     %(especializacion_id)s, %(job_id)s,
                     %(program_name)s, %(job_title)s, %(company)s,
                     'hybrid_v2', %(model_name)s,
@@ -812,6 +1127,8 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 )
                 ON CONFLICT (run_id, program_document_id, job_document_id, match_method)
                 DO UPDATE SET
+                    especializacion_id  = EXCLUDED.especializacion_id,
+                    empleo_id           = EXCLUDED.empleo_id,
                     score_match         = EXCLUDED.score_match,
                     relevance_label     = EXCLUDED.relevance_label,
                     role_alignment      = EXCLUDED.role_alignment,
@@ -819,10 +1136,15 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     job_skill_density   = EXCLUDED.job_skill_density,
                     skills_en_comun     = EXCLUDED.skills_en_comun,
                     skills_faltantes    = EXCLUDED.skills_faltantes,
+                    skills_programa     = EXCLUDED.skills_programa,
+                    skills_empleo       = EXCLUDED.skills_empleo,
                     explanation         = EXCLUDED.explanation,
+                    content_hash        = EXCLUDED.content_hash,
                     raw_features        = EXCLUDED.raw_features
             """, {
                 "run_id": run_id,
+                "prog_doc_id": prog_doc_id,
+                "job_doc_id": job_doc_id,
                 "especializacion_id": r.especializacion_id,
                 "job_id": r.job_id,
                 "program_name": r.program_name,
@@ -830,7 +1152,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 "company": r.company,
                 "model_name": f"{EMBED_MODEL_NAME}+BM25",
                 "final_score": r.final_score,
-                "relevance_label": r.relevance_label,
+                "relevance_label": _db_label(r.relevance_label),
                 "semantic_score": r.semantic_score,
                 "pertinence_score": r.pertinence_score,
                 "density_score": r.density_score,
@@ -844,6 +1166,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
             })
             saved += 1
     conn.commit()
+    logger.info("save_matches: %d filas guardadas en ml_program_job_matches (run_id=%d).", saved, run_id)
     return saved
 
 
@@ -934,16 +1257,36 @@ def main(argv: Optional[List[str]] = None) -> None:
         for lbl, cnt in counts.items():
             f.write(f"  - `{lbl}`: {cnt}\n")
         f.write(f"\n## Top 20 matches\n")
-        f.write(f"| # | Programa | Empleo | Empresa | Score | Semántico | Pertinencia | Label |\n")
-        f.write(f"|---|---|---|---|---|---|---|---|\n")
+        f.write(f"| # | Programa | Empleo | Empresa | Score | Semántico | Pertinencia | Skills comunes | Label |\n")
+        f.write(f"|---|---|---|---|---|---|---|---|---|\n")
         for i, r in enumerate(results[:20], 1):
             f.write(
                 f"| {i} | {r.program_name[:35]} | {r.job_title[:35]} | {r.company[:20]} "
                 f"| {r.final_score:.1f} | {r.semantic_score:.1f} | {r.pertinence_score:.1f} "
+                f"| {', '.join(r.common_skills[:4]) or '—'} "
                 f"| {r.relevance_label} |\n"
             )
         if results:
             f.write(f"\n## Detalles primer match\n```\n{results[0].explanation}\n```\n")
+
+        # Show ALL low-label matches so quality can be assessed
+        low_matches = [r for r in results if r.relevance_label == "low"]
+        if low_matches:
+            f.write(f"\n## Matches de categoría 'low' ({len(low_matches)} total)\n")
+            f.write(f"| Programa | Empleo | Score | Sem | Pert | Skills comunes |\n")
+            f.write(f"|---|---|---|---|---|---|\n")
+            for r in low_matches:
+                f.write(
+                    f"| {r.program_name[:35]} | {r.job_title[:35]} "
+                    f"| {r.final_score:.1f} | {r.semantic_score:.1f} | {r.pertinence_score:.1f} "
+                    f"| {', '.join(r.common_skills[:5]) or '—'} |\n"
+                )
+            # Also log them to console
+            logger.info("=== Matches 'low' (%d) ===", len(low_matches))
+            for r in low_matches:
+                logger.info("  [low] %.1f  %-40s  ←→  %-40s  comunes=%s",
+                            r.final_score, r.program_name[:40], r.job_title[:40],
+                            r.common_skills[:3])
     logger.info("Reporte guardado en: %s", report_path)
 
 

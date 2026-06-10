@@ -48,7 +48,10 @@ DETAIL_ENDPOINT = f"{BASE_URL}/co/api/joboffers/getjoboffer"
 
 def get_connection() -> psycopg2.extensions.connection:
     if load_dotenv:
-        load_dotenv(ROOT_DIR / ".env")
+        load_dotenv(ROOT_DIR / ".env.local")
+    url = os.getenv("RAILWAY_DATABASE_URL")
+    if url:
+        return psycopg2.connect(url, sslmode="require", cursor_factory=RealDictCursor)
     return psycopg2.connect(
         host=os.getenv("DB_HOST", "127.0.0.1"),
         port=os.getenv("DB_PORT", "5433"),

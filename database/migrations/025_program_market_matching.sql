@@ -111,6 +111,22 @@ especializacion_skills_distinct AS (
         esp.skill
     FROM vw_programa_skills esp
 ),
+program_domains AS (
+    SELECT
+        program_id,
+        program_name,
+        domain_key AS program_domain,
+        domain_label AS program_domain_label
+    FROM public.vw_program_domain_taxonomy
+),
+job_domains AS (
+    SELECT
+        job_id,
+        job_title,
+        domain_key AS job_domain,
+        domain_label AS job_domain_label
+    FROM public.vw_job_domain_taxonomy
+),
 total_skills_empleo AS (
     SELECT
         empleo_id,
@@ -141,8 +157,12 @@ base_matches AS (
     SELECT
         e.id AS empleo_id,
         e.titulo AS titulo_empleo,
+        COALESCE(jd.job_domain, '') AS job_domain,
+        COALESCE(jd.job_domain_label, '') AS job_domain_label,
         s.id AS especializacion_id,
         s.nombre AS nombre_especializacion,
+        COALESCE(pd.program_domain, '') AS program_domain,
+        COALESCE(pd.program_domain_label, '') AS program_domain_label,
         COALESCE(te.total_skills_empleo, 0) AS total_skills_empleo,
         COALESCE(ts.total_skills_especializacion, 0) AS total_skills_especializacion,
         COALESCE(sec.skills_en_comun, 0) AS skills_en_comun
@@ -155,6 +175,10 @@ base_matches AS (
     LEFT JOIN skills_en_comun sec
         ON sec.empleo_id = e.id
        AND sec.especializacion_id = s.id
+    LEFT JOIN program_domains pd
+        ON pd.program_id = s.id
+    LEFT JOIN job_domains jd
+        ON jd.job_id = e.id
 ),
 scored_matches AS (
     SELECT
@@ -185,18 +209,82 @@ scored_matches AS (
 SELECT
     scored.*,
     ROUND(100 - scored.coverage_score, 2) AS gap_score,
-    ROUND((scored.jaccard_score + scored.cosine_score) / 2, 2) AS match_score,
-    ROUND((scored.jaccard_score + scored.cosine_score) / 2, 2) AS porcentaje_match
+    ROUND(((scored.jaccard_score + scored.cosine_score) / 2) * CASE
+        WHEN scored.program_domain = scored.job_domain THEN 1.0
+        WHEN (scored.program_domain = 'data_analytics' AND scored.job_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.job_domain = 'data_analytics' AND scored.program_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.program_domain = 'artificial_intelligence' AND scored.job_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.job_domain = 'artificial_intelligence' AND scored.program_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.program_domain = 'cybersecurity' AND scored.job_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.job_domain = 'cybersecurity' AND scored.program_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.program_domain = 'criminology_security' AND scored.job_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+          OR (scored.job_domain = 'criminology_security' AND scored.program_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+        THEN 0.5
+        ELSE 0.1
+    END, 2) AS match_score,
+    ROUND(((scored.jaccard_score + scored.cosine_score) / 2) * CASE
+        WHEN scored.program_domain = scored.job_domain THEN 1.0
+        WHEN (scored.program_domain = 'data_analytics' AND scored.job_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.job_domain = 'data_analytics' AND scored.program_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.program_domain = 'artificial_intelligence' AND scored.job_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.job_domain = 'artificial_intelligence' AND scored.program_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.program_domain = 'cybersecurity' AND scored.job_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.job_domain = 'cybersecurity' AND scored.program_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.program_domain = 'criminology_security' AND scored.job_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+          OR (scored.job_domain = 'criminology_security' AND scored.program_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+        THEN 0.5
+        ELSE 0.1
+    END, 2) AS porcentaje_match,
+    ROUND((scored.jaccard_score + scored.cosine_score) / 2, 2) AS base_similarity_score,
+    CASE
+        WHEN scored.program_domain = scored.job_domain THEN 1.0
+        WHEN (scored.program_domain = 'data_analytics' AND scored.job_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.job_domain = 'data_analytics' AND scored.program_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.program_domain = 'artificial_intelligence' AND scored.job_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.job_domain = 'artificial_intelligence' AND scored.program_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.program_domain = 'cybersecurity' AND scored.job_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.job_domain = 'cybersecurity' AND scored.program_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.program_domain = 'criminology_security' AND scored.job_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+          OR (scored.job_domain = 'criminology_security' AND scored.program_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+        THEN 0.5
+        ELSE 0.1
+    END AS domain_score,
+    CASE
+        WHEN scored.program_domain = scored.job_domain THEN 1.0
+        WHEN (scored.program_domain = 'data_analytics' AND scored.job_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.job_domain = 'data_analytics' AND scored.program_domain IN ('artificial_intelligence', 'cybersecurity', 'finance_accounting', 'project_management', 'business_management', 'marketing_commercial', 'logistics_operations', 'legal_compliance', 'education', 'health', 'criminology_security'))
+          OR (scored.program_domain = 'artificial_intelligence' AND scored.job_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.job_domain = 'artificial_intelligence' AND scored.program_domain IN ('data_analytics', 'cybersecurity'))
+          OR (scored.program_domain = 'cybersecurity' AND scored.job_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.job_domain = 'cybersecurity' AND scored.program_domain IN ('data_analytics', 'artificial_intelligence', 'criminology_security', 'legal_compliance'))
+          OR (scored.program_domain = 'criminology_security' AND scored.job_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+          OR (scored.job_domain = 'criminology_security' AND scored.program_domain IN ('cybersecurity', 'legal_compliance', 'business_management'))
+        THEN 0.5
+        ELSE 0.1
+    END AS domain_weight,
+    scored.skills_en_comun AS total_skills_comunes,
+    CASE
+        WHEN COALESCE(scored.skills_en_comun, 0) < 3
+         AND ROUND((scored.jaccard_score + scored.cosine_score) / 2, 2) <= 80
+        THEN FALSE
+        ELSE TRUE
+    END AS passes_skill_threshold
 FROM scored_matches scored;
 
 CREATE OR REPLACE VIEW public.vw_match_empleo_especializacion_positivo AS
 SELECT *
 FROM public.vw_match_empleo_especializacion
-WHERE skills_en_comun > 0;
+WHERE passes_skill_threshold = TRUE;
 
 CREATE OR REPLACE VIEW public.vw_program_recommended_jobs AS
 SELECT
     especializacion_id AS program_id,
+    program_domain,
+    job_domain,
+    domain_score,
+    domain_weight,
+    base_match_score,
+    base_similarity_score,
     empleo_id AS job_id,
     titulo_empleo AS job_title,
     porcentaje_match AS similarity_score,
@@ -205,9 +293,10 @@ SELECT
     match_score,
     total_skills_empleo,
     total_skills_especializacion,
-    skills_en_comun
+    skills_en_comun,
+    total_skills_comunes
 FROM public.vw_match_empleo_especializacion_positivo
-WHERE skills_en_comun >= 1;
+WHERE passes_skill_threshold = TRUE;
 
 CREATE OR REPLACE VIEW public.vw_program_skill_gaps AS
 WITH program_skill_keys AS (
@@ -216,12 +305,22 @@ WITH program_skill_keys AS (
         skill_key
     FROM public.vw_programa_skills
 ),
+program_domains AS (
+    SELECT
+        program_id,
+        program_name,
+        domain_key AS program_domain,
+        domain_label AS program_domain_label
+    FROM public.vw_program_domain_taxonomy
+),
 market_skill_hits AS (
     SELECT
         m.especializacion_id AS program_id,
         s.nombre AS skill,
         COUNT(DISTINCT m.empleo_id)::int AS gap_frequency
     FROM public.vw_match_empleo_especializacion_positivo m
+    INNER JOIN program_domains pd
+        ON pd.program_id = m.especializacion_id
     INNER JOIN public.empleo_skills es
         ON es.empleo_id = m.empleo_id
     INNER JOIN public.skills s
@@ -230,6 +329,9 @@ market_skill_hits AS (
         ON psk.especializacion_id = m.especializacion_id
        AND psk.skill_key = lower(unaccent(COALESCE(s.nombre, '')))
     WHERE psk.skill_key IS NULL
+      AND COALESCE(m.program_domain, '') <> ''
+      AND COALESCE(m.job_domain, '') <> ''
+      AND m.program_domain = m.job_domain
     GROUP BY m.especializacion_id, s.nombre
 )
 SELECT

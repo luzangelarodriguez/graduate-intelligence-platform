@@ -728,10 +728,14 @@ def program_by_id(program_id: int) -> dict[str, Any] | None:
     if not row:
         return None
     normalized = normalize_program_row(row)
+    found_in_visible_catalog = False
     for item in programs():
         if int(item.get("especializacion_id") or 0) == resolved_id:
             normalized.update(item)
+            found_in_visible_catalog = True
             break
+    if not found_in_visible_catalog:
+        return None
     normalized["skills"] = dashboard_service.normalize_skill_rows(
         programas_repository.fetch_program_skill_rows(resolved_id, db_name=DB_NAME)
     )
@@ -1102,6 +1106,8 @@ def related_universities_for_program(
     program = program_by_id(program_id)
     if not program:
         raise not_found("programa", program_id)
+    if not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=0)
     program_name = str(program.get("nombre_especializacion") or "")
     rows = programas_repository.fetch_related_virtual_programs(
         program_name,
@@ -1172,6 +1178,9 @@ def list_matches_for_program(
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     if not relation:
         return page([], limit=bounded_limit(limit), offset=offset)
+    program = program_by_id(program_id)
+    if not program or not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=offset)
     resolved_id = programas_repository.resolve_program_id(program_id, db_name=DB_NAME)
     limit = bounded_limit(limit)
     rows = matches_repository.fetch_match_rows_for_program(
@@ -1197,6 +1206,37 @@ def dashboard_programa(program_id: int, _current_user=Depends(require_current_us
     selected = program_by_id(program_id)
     if not selected:
         raise not_found("programa", program_id)
+    if not selected.get("microcurriculum_context"):
+        return {
+            "program_id": int(selected.get("especializacion_id") or program_id),
+            "program": selected,
+            "kpis": {
+                "alignment_score": 0.0,
+                "missing_critical_skills": 0,
+                "high_demand_roles": 0,
+                "employability_trend": 0.0,
+                "digital_coverage": 0.0,
+                "curricular_update_signal": "Sin evidencia",
+            },
+            "status": {
+                "curricular_status": "Sin evidencia curricular",
+                "curricular_status_detail": "No se encontró microcurrículo ni inteligencia específica del programa.",
+                "ai_signal": "No curricular evidence available.",
+                "trend_label": "Sin señal",
+            },
+            "missing_skills": [],
+            "matches": [],
+            "recommendations": [],
+            "insights": {
+                "detected": "No curricular evidence available.",
+                "ai_recommends": [
+                    "Cargar o procesar un microcurrículo para habilitar inteligencia académica específica del programa.",
+                ],
+                "emerging_gap": "Sin brechas tipificadas",
+                "critical_signal": "Sin evidencia curricular",
+            },
+            "source": "especializaciones",
+        }
 
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     resolved_id = int(selected.get("especializacion_id") or programas_repository.resolve_program_id(program_id, db_name=DB_NAME))
@@ -1597,6 +1637,8 @@ def recommendations_programs(
     selected = program_by_id(program_id)
     if not selected:
         raise not_found("programa", program_id)
+    if not selected.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=0)
     current_programs = programs()
     items = recommendation_service.recommended_program_cards(
         current_programs,
@@ -1622,6 +1664,9 @@ def recommendations_jobs(
     offset: int = Query(0, ge=0),
     _current_user=Depends(require_current_user),
 ) -> Page:
+    program = program_by_id(program_id)
+    if not program or not program.get("microcurriculum_context"):
+        return page([], limit=bounded_limit(limit), offset=offset)
     relation = matches_repository.match_relation_name(db_name=DB_NAME)
     if not relation:
         return page([], limit=bounded_limit(limit), offset=offset)
@@ -1633,3 +1678,123 @@ def recommendations_jobs(
         db_name=DB_NAME,
     )
     return page(rows[offset : offset + bounded_limit(limit)], limit=bounded_limit(limit), offset=offset)
+
+
+# ---------------------------------------------------------------------------
+# Dashboard summary — ml_program_job_matches data for PertinenciaDashboard
+# ---------------------------------------------------------------------------
+
+@router.get("/api/dashboard/summary")
+def dashboard_summary(_current_user=Depends(require_current_user)) -> dict[str, Any]:
+    """Return aggregated match data from the latest ml run for the frontend dashboard."""
+    from backend.repositories.base import fetch_all, fetch_one
+
+    run_row = fetch_one(
+        "SELECT id, created_at FROM ml_training_runs "
+        "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1",
+        db_name=DB_NAME,
+    )
+    if not run_row:
+        return {
+            "run_id": None, "fecha": None,
+            "programas": [], "top_matches": [],
+            "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+        }
+
+    run_id: int = run_row["id"]
+    fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row["created_at"] else ""
+
+    # Per-program aggregation
+    prog_rows = fetch_all(
+        """
+        SELECT
+            m.especializacion_id                          AS id,
+            COALESCE(e.nombre, m.program_name)            AS nombre,
+            COUNT(*)                                      AS matches_total,
+            ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
+            ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
+            COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
+        FROM ml_program_job_matches m
+        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+        WHERE m.run_id = %s
+        GROUP BY m.especializacion_id, e.nombre, m.program_name
+        ORDER BY score_maximo DESC
+        """,
+        (run_id,),
+        db_name=DB_NAME,
+    )
+
+    programas = [
+        {
+            "id":            r["id"],
+            "nombre":        r["nombre"] or "",
+            "matches_total": int(r["matches_total"]),
+            "score_promedio": float(r["score_promedio"] or 0),
+            "score_maximo":  float(r["score_maximo"] or 0),
+            "labels": {
+                "high":   int(r["lbl_high"]),
+                "medium": int(r["lbl_medium"]),
+                "low":    int(r["lbl_low"]),
+            },
+        }
+        for r in prog_rows
+    ]
+
+    # Top 30 matches
+    top_rows = fetch_all(
+        """
+        SELECT
+            COALESCE(e.nombre, m.program_name) AS programa,
+            m.job_title                        AS empleo,
+            COALESCE(m.company, '')            AS empresa,
+            ROUND(m.score_match::numeric, 1)   AS score,
+            m.relevance_label                  AS label
+        FROM ml_program_job_matches m
+        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+        WHERE m.run_id = %s
+        ORDER BY m.score_match DESC
+        LIMIT 30
+        """,
+        (run_id,),
+        db_name=DB_NAME,
+    )
+
+    top_matches = [
+        {
+            "programa": r["programa"] or "",
+            "empleo":   r["empleo"] or "",
+            "empresa":  r["empresa"],
+            "score":    float(r["score"] or 0),
+            "label":    r["label"],
+        }
+        for r in top_rows
+    ]
+
+    # Totals
+    tot_rows = fetch_all(
+        """
+        SELECT relevance_label, COUNT(*) AS cnt
+        FROM ml_program_job_matches
+        WHERE run_id = %s
+        GROUP BY relevance_label
+        """,
+        (run_id,),
+        db_name=DB_NAME,
+    )
+    lbl_counts = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
+    totales = {
+        "matches": sum(lbl_counts.values()),
+        "alta":    lbl_counts.get("high", 0),
+        "media":   lbl_counts.get("medium", 0),
+        "baja":    lbl_counts.get("low", 0),
+    }
+
+    return {
+        "run_id":      run_id,
+        "fecha":       fecha,
+        "programas":   programas,
+        "top_matches": top_matches,
+        "totales":     totales,
+    }

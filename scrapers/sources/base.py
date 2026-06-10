@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 import re
 import time
 from dataclasses import dataclass
@@ -26,6 +27,33 @@ except ModuleNotFoundError:
 
 LOGGER = logging.getLogger(__name__)
 
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
+]
+
+_VIEWPORTS = [
+    {"width": 1366, "height": 768},
+    {"width": 1440, "height": 900},
+    {"width": 1920, "height": 1080},
+    {"width": 1536, "height": 864},
+]
+
+_EXTRA_HEADERS = {
+    "Accept-Language": "es-CO,es;q=0.9,en;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "DNT": "1",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+}
+
 
 @dataclass(frozen=True)
 class SourceConfig:
@@ -41,6 +69,9 @@ class SourceConfig:
     max_pages: int = 3
     max_runtime_seconds: int = 75
     max_detail_attempts: int = 24
+    headless_override: bool | None = None
+    cookie_accept_selector: str | None = None
+    reuse_page_for_details: bool = False
 
 
 @dataclass(frozen=True)
@@ -187,11 +218,18 @@ async def extract_card_links(page: Page, config: SourceConfig) -> list[str]:
     return list(dict.fromkeys(links))
 
 
+_NON_JOB_TITLES = frozenset({
+    "inicio", "home", "buscar empleo", "registro de vacantes",
+    "ten cuidado con el fraude", "¡ten cuidado con el fraude!",
+    "cuidado con el fraude", "aviso de seguridad",
+})
+
+
 def looks_like_non_job_page(title: str, description: str, url: str) -> bool:
     title_norm = re.sub(r"\s+", " ", title or "").strip().casefold()
     description_norm = re.sub(r"\s+", " ", description or "").strip().casefold()
     url_norm = (url or "").casefold()
-    if title_norm in {"inicio", "home", "buscar empleo", "registro de vacantes"}:
+    if title_norm in _NON_JOB_TITLES:
         return True
     nav_terms = ("transparencia", "atencion a la ciudadania", "participa", "normativa", "prensa")
     if sum(1 for term in nav_terms if term in description_norm) >= 3:
@@ -215,8 +253,9 @@ class PlaywrightJobSource:
         screenshots_dir: str | Path = "logs/screenshots",
     ) -> list[dict[str, Any]]:
         Path(screenshots_dir).mkdir(parents=True, exist_ok=True)
+        effective_headless = self.config.headless_override if self.config.headless_override is not None else headless
         async with async_playwright() as pw:
-            browser = await pw.chromium.launch(headless=headless)
+            browser = await pw.chromium.launch(headless=effective_headless)
             try:
                 return await self._scrape_with_browser(
                     browser,
@@ -237,13 +276,21 @@ class PlaywrightJobSource:
         limit: int,
         screenshots_dir: Path,
     ) -> list[dict[str, Any]]:
+        user_agent = random.choice(_USER_AGENTS)
+        viewport = random.choice(_VIEWPORTS)
         context = await browser.new_context(
             locale="es-CO",
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-            ),
+            user_agent=user_agent,
+            viewport=viewport,
+            extra_http_headers=_EXTRA_HEADERS,
         )
+        # Mask Playwright's automation fingerprint
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3]});
+            Object.defineProperty(navigator, 'languages', {get: () => ['es-CO', 'es', 'en']});
+            window.chrome = {runtime: {}};
+        """)
         page = await context.new_page()
         page.set_default_timeout(10000)
         url = build_search_url(self.config.search_url_template, query=query, location=location)
@@ -252,6 +299,14 @@ class PlaywrightJobSource:
         detail_attempts = 0
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=15000)
+            if self.config.cookie_accept_selector:
+                try:
+                    btn = page.locator(self.config.cookie_accept_selector).first
+                    if await btn.is_visible(timeout=3000):
+                        await btn.click()
+                        await page.wait_for_timeout(1000)
+                except Exception:
+                    pass
             wait_result = await safe_wait_for_results(
                 page,
                 self.config.card_selectors,
@@ -295,7 +350,9 @@ class PlaywrightJobSource:
                         continue
                     seen_links.add(link)
                     detail_attempts += 1
-                    detail = await self._extract_detail(context, link)
+                    detail = await self._extract_detail(
+                        context, link, reuse_page=page if self.config.reuse_page_for_details else None
+                    )
                     if detail.get("titulo") or detail.get("descripcion"):
                         jobs.append(detail)
                 if (
@@ -322,19 +379,13 @@ class PlaywrightJobSource:
             await context.close()
         return jobs
 
-    async def _extract_detail(self, context: Any, url: str) -> dict[str, Any]:
-        page = await context.new_page()
+    async def _extract_detail(self, context: Any, url: str, *, reuse_page: Any = None) -> dict[str, Any]:
+        owned = reuse_page is None
+        page = reuse_page if reuse_page is not None else await context.new_page()
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=8000)
-            await safe_wait_for_results(
-                page,
-                ("h1", "h2", "main", "article", *self.config.description_selectors),
-                source=self.config.portal,
-                phase="detail",
-                timeout_ms=2500,
-                retries=0,
-                fallback_wait_ms=500,
-            )
+            await page.wait_for_timeout(random.randint(300, 900))
+            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            await page.wait_for_timeout(3000)
             title = await first_text(page, self.config.title_selectors)
             company = await first_text(page, self.config.company_selectors)
             city = await first_text(page, self.config.city_selectors)
@@ -368,7 +419,8 @@ class PlaywrightJobSource:
             LOGGER.warning("source=%s source_status=degraded phase=detail url=%s error=%s", self.config.portal, url, exc)
             return {}
         finally:
-            await page.close()
+            if owned:
+                await page.close()
 
     async def _go_next(self, page: Page) -> bool:
         for selector in self.config.next_selectors:

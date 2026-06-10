@@ -4,12 +4,12 @@ from scrapers.sources.base import PlaywrightJobSource, SourceConfig, run_async_s
 
 
 CONFIG = SourceConfig(
-    portal="elempleo",
-    base_url="https://www.elempleo.com",
-    search_url_template="https://www.elempleo.com/co/ofertas-empleo/?trabajo={query}",
+    portal="getonbrd",
+    base_url="https://www.getonbrd.com",
+    search_url_template="https://www.getonbrd.com/jobs?tag={query}",
     card_selectors=(
-        "a[href*='/co/ofertas-trabajo/']",
-        "a[href*='ofertas-trabajo']",
+        "a[href*='/jobs/']",
+        "a[href*='/empleos/']",
         "article a[href]",
     ),
     headless_override=False,
@@ -21,4 +21,3 @@ CONFIG = SourceConfig(
 
 def scrape_jobs(query: str, location: str = "Colombia", limit: int = 50, headless: bool = True):
     return run_async_scraper(PlaywrightJobSource(CONFIG), query=query, location=location, limit=limit, headless=headless)
-

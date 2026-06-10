@@ -85,7 +85,7 @@ class LinkedInCrawlerConfig:
     max_pages: int = DEFAULT_MAX_PAGES
     keyword_limit: int = DEFAULT_KEYWORD_LIMIT
     crawl_mode: str = DEFAULT_CRAWL_MODE
-    headless: bool = True
+    headless: bool = False
 
 
 @dataclass(frozen=True)
@@ -542,7 +542,11 @@ class LinkedInJobsCrawler:
                         break
                     search_url = _job_search_url(candidate.keyword, self.config.location, page_index)
                     try:
-                        page.goto(search_url, wait_until="domcontentloaded", timeout=35000)
+                        page.goto(search_url, wait_until="load", timeout=35000)
+                        try:
+                            page.wait_for_selector("a[href*='/jobs/view/']", timeout=10000)
+                        except Exception:
+                            pass
                         page.wait_for_timeout(random.randint(1600, 3200))
                         links = _collect_job_links(page, min_rounds=3, max_rounds=6)
                         if _is_security_checkpoint(page):
@@ -557,7 +561,12 @@ class LinkedInJobsCrawler:
                             seen_urls.add(job_url)
                             detail = context.new_page()
                             try:
-                                detail.goto(job_url, wait_until="domcontentloaded", timeout=35000)
+                                detail.goto(job_url, wait_until="load", timeout=35000)
+                                try:
+                                    detail.wait_for_selector("main", timeout=10000)
+                                except Exception:
+                                    pass
+                                detail.wait_for_timeout(3000)
                                 detail.wait_for_timeout(random.randint(1800, 3600))
                                 if _is_security_checkpoint(detail):
                                     errors.append({"source": "linkedin", "error_type": "security_checkpoint", "error_message": "captcha_or_checkpoint_detected"})

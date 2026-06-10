@@ -86,14 +86,16 @@ def finish_run(run_id: str, status: str, raw_count: int, silver_count: int, erro
 def endpoint_candidates(query: str, page: int, page_size: int) -> list[str]:
     encoded = quote_plus(query)
     return [
-        f"{BASE_URL}/jobs/v1/public/locations?term={encoded}&country_id=47",
-        f"{BASE_URL}/seo/v1/mega-menu/by-occupation",
-        f"{BASE_URL}/seo/v1/mega-menu/by-company",
-        f"{BASE_URL}/seo/v1/mega-menu/by-sector",
+        # Primary vacancy search endpoints (most likely formats for Magneto365)
+        f"{BASE_URL}/jobs/v1/public/vacancies?q={encoded}&country_id=47&page={page}&per_page={page_size}",
+        f"{BASE_URL}/jobs/v1/public/search?q={encoded}&country_id=47&page={page}&per_page={page_size}",
+        f"{BASE_URL}/jobs/v1/public/vacancies/search?q={encoded}&country_id=47&page={page}&per_page={page_size}",
+        # Fallback with search= param
         f"{BASE_URL}/jobs/v1/public/vacancies?search={encoded}&country_id=47&page={page}&per_page={page_size}",
-        f"{BASE_URL}/jobs/v1/vacancies?search={encoded}&country_id=47&page={page}&per_page={page_size}",
-        f"{BASE_URL}/jobs/v1/search/vacancies?search={encoded}&country_id=47&page={page}&per_page={page_size}",
-        f"{BASE_URL}/jobs/v1/vacancies/search?search={encoded}&country_id=47&page={page}&per_page={page_size}",
+        f"{BASE_URL}/jobs/v1/public/search?search={encoded}&country_id=47&page={page}&per_page={page_size}",
+        # Alternative API versions
+        f"{BASE_URL}/search/v1/vacancies?q={encoded}&country_id=47&page={page}&per_page={page_size}",
+        f"{BASE_URL}/api/v1/jobs?search={encoded}&country_id=47&page={page}&per_page={page_size}",
     ]
 
 
@@ -153,15 +155,31 @@ JOB_KEY_HINTS = {
     "location",
 }
 
+# Keys that belong to SEO/navigation records, not actual job listings
+_NAV_ONLY_KEYS = frozenset({
+    "_id", "id", "slug", "h1", "counter", "canonical", "ogtitle", "ogdescription",
+    "ogimage", "iconurl", "imageurl", "landings", "type", "field", "slugifylabel", "label",
+})
+
 
 def looks_like_job_record(item: dict[str, Any]) -> bool:
     keys = {str(key).casefold() for key in item.keys()}
+    # Exclude pure navigation/SEO records (no content beyond slug/counter/h1)
+    if keys <= _NAV_ONLY_KEYS:
+        return False
     text = json.dumps(item, ensure_ascii=False).casefold()
     if "mega-menu" in text or "canonical" in keys and "h1" in keys and "ogtitle" in keys:
         return False
     if len(keys & JOB_KEY_HINTS) >= 3:
         return True
-    return ("vacante" in text or "empleo" in text or "salary" in text) and ("company" in text or "empresa" in text)
+    # Require "empresa" to appear as a field value, not just embedded in a URL slug.
+    # Check that "empresa" appears outside of _id/slug values.
+    empresa_in_content = any(
+        "empresa" in json.dumps(v, ensure_ascii=False, default=str).casefold()
+        for k, v in item.items()
+        if str(k).casefold() not in {"_id", "id", "slug", "canonical"}
+    )
+    return ("vacante" in text or "empleo" in text or "salary" in text) and empresa_in_content
 
 
 def find_job_records(payload: Any) -> list[dict[str, Any]]:
@@ -433,6 +451,7 @@ def extract(query: str, *, pages: int, page_size: int, dry_run: bool = False) ->
             "error_count": error_count,
             "bronze_dir": str(dated_layer_path("bronze", SOURCE, run_id)),
             "silver_dir": str(dated_layer_path("silver", SOURCE, run_id)),
+            "jobs": normalized_jobs,
         }
     except Exception:
         finish_run(run_id, "failed", raw_count, len(normalized_jobs), error_count + 1)
