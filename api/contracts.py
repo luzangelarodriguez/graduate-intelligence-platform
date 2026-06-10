@@ -44,7 +44,7 @@ class SearchResponse(BaseModel):
 
 
 class ProgramSkill(BaseModel):
-    skill_id: int
+    skill_id: int | None = None
     nombre: str
     conteo: int = 0
 
