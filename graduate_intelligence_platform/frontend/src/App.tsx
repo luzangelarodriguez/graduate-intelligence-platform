@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './layouts/AppLayout';
 import PertinenciaDashboard from './components/PertinenciaDashboard';
 import PertinenciaStorytelling from './pages/PertinenciaStorytelling';
+import ObservatorioStorytelling from './pages/ObservatorioStorytelling';
 import { AlumniOnboardingPage } from './pages/AlumniOnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
@@ -24,6 +25,7 @@ export default function App() {
         <Routes>
           <Route path="/observatorio-institucional" element={<ExecutiveSummaryPage />} />
           <Route path="/pertinencia-demo" element={<PertinenciaStorytelling />} />
+          <Route path="/observatorio" element={<ObservatorioStorytelling />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/microcurriculum-demo" element={<MicrocurriculumDemoPage />} />
           <Route element={<ProtectedRoute />}>
