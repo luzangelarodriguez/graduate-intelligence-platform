@@ -1035,6 +1035,22 @@ def _ensure_run(conn, dataset_version: str = "hybrid_v2") -> int:
         return cur.fetchone()["id"]
 
 
+_LABEL_TO_DB: Dict[str, str] = {
+    "high":             "high",
+    "medium":           "medium",
+    "low":              "low",
+    "no_match":         "no_match",
+    "high_semantic":    "high",
+    "medium_semantic":  "medium",
+    "low_semantic":     "low",
+}
+
+
+def _db_label(label: str) -> str:
+    """Map internal relevance labels to the values accepted by the DB check constraint."""
+    return _LABEL_TO_DB.get(label, "low")
+
+
 def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
     """Persist matches to ml_program_job_matches.
 
@@ -1104,7 +1120,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 "company": r.company,
                 "model_name": f"{EMBED_MODEL_NAME}+BM25",
                 "final_score": r.final_score,
-                "relevance_label": r.relevance_label,
+                "relevance_label": _db_label(r.relevance_label),
                 "semantic_score": r.semantic_score,
                 "pertinence_score": r.pertinence_score,
                 "density_score": r.density_score,
