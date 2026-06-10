@@ -17,6 +17,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
         if request.url.scheme == "https":
             response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+        # Ensure JSON responses always declare UTF-8 charset
+        ct = response.headers.get("content-type", "")
+        if "application/json" in ct and "charset" not in ct:
+            response.headers["content-type"] = "application/json; charset=utf-8"
         return response
 
 
