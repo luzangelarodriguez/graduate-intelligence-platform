@@ -1001,15 +1001,6 @@ def persist_embeddings(
         conn.rollback()
 
 
-                n_job += 1
-
-        conn.commit()
-        logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
-    except Exception as exc:
-        logger.warning("persist_embeddings: error al guardar embeddings (no crítico): %s", exc)
-        conn.rollback()
-
-
 # ---------------------------------------------------------------------------
 # Persist matches
 # ---------------------------------------------------------------------------
