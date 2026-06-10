@@ -1036,6 +1036,12 @@ def _ensure_run(conn, dataset_version: str = "hybrid_v2") -> int:
 
 
 def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
+    """Persist matches to ml_program_job_matches.
+
+    Uses content_hash as the natural upsert key so every unique
+    (program, job) pair gets its own row regardless of doc-id surrogate keys.
+    Errors are raised so the caller can decide whether to rollback.
+    """
     saved = 0
     with conn.cursor() as cur:
         for r in results:
@@ -1047,6 +1053,11 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 "pertinence_score": r.pertinence_score,
                 "gap_score": r.gap_score,
             }
+            # program_document_id / job_document_id are surrogate FK columns
+            # that point to ml_program_documents / ml_job_documents.  When
+            # running the engine standalone (no training-pipeline docs), we
+            # don't have those rows.  We fall back to 0 and rely on
+            # content_hash for de-duplication via the unique index below.
             cur.execute("""
                 INSERT INTO ml_program_job_matches (
                     run_id, program_document_id, job_document_id,
@@ -1070,6 +1081,8 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                 )
                 ON CONFLICT (run_id, program_document_id, job_document_id, match_method)
                 DO UPDATE SET
+                    especializacion_id  = EXCLUDED.especializacion_id,
+                    empleo_id           = EXCLUDED.empleo_id,
                     score_match         = EXCLUDED.score_match,
                     relevance_label     = EXCLUDED.relevance_label,
                     role_alignment      = EXCLUDED.role_alignment,
@@ -1077,7 +1090,10 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     job_skill_density   = EXCLUDED.job_skill_density,
                     skills_en_comun     = EXCLUDED.skills_en_comun,
                     skills_faltantes    = EXCLUDED.skills_faltantes,
+                    skills_programa     = EXCLUDED.skills_programa,
+                    skills_empleo       = EXCLUDED.skills_empleo,
                     explanation         = EXCLUDED.explanation,
+                    content_hash        = EXCLUDED.content_hash,
                     raw_features        = EXCLUDED.raw_features
             """, {
                 "run_id": run_id,
@@ -1102,6 +1118,7 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
             })
             saved += 1
     conn.commit()
+    logger.info("save_matches: %d filas guardadas en ml_program_job_matches (run_id=%d).", saved, run_id)
     return saved
 
 
