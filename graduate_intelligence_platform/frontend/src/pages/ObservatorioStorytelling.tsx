@@ -253,19 +253,120 @@ const PROGRAM_OPTIONS = [
   { id: 108, label: 'Especialización en Criminología' },
 ];
 
+const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
+  94: {
+    program_id: 94, cobertura_pct: 54,
+    skills_mercado:  [
+      { skill: 'Python',      frecuencia: 28 }, { skill: 'Power BI',    frecuencia: 24 },
+      { skill: 'SQL',         frecuencia: 22 }, { skill: 'Tableau',     frecuencia: 18 },
+      { skill: 'Spark',       frecuencia: 16 }, { skill: 'AWS',         frecuencia: 14 },
+      { skill: 'Airflow',     frecuencia: 12 }, { skill: 'dbt',         frecuencia: 10 },
+      { skill: 'Kafka',       frecuencia: 9  }, { skill: 'Databricks',  frecuencia: 8  },
+    ],
+    skills_programa: [
+      { skill: 'Python',      cobertura: 5 }, { skill: 'Power BI',    cobertura: 4 },
+      { skill: 'SQL',         cobertura: 4 }, { skill: 'Tableau',     cobertura: 3 },
+      { skill: 'R',           cobertura: 3 }, { skill: 'Estadística', cobertura: 3 },
+      { skill: 'Excel',       cobertura: 2 }, { skill: 'Matplotlib',  cobertura: 2 },
+    ],
+    fortalezas:  [
+      { skill: 'Python', frecuencia_mercado: 28, cobertura_programa: 5 },
+      { skill: 'Power BI', frecuencia_mercado: 24, cobertura_programa: 4 },
+      { skill: 'SQL', frecuencia_mercado: 22, cobertura_programa: 4 },
+      { skill: 'Tableau', frecuencia_mercado: 18, cobertura_programa: 3 },
+    ],
+    brechas: [
+      { skill: 'Spark',      frecuencia_mercado: 16 }, { skill: 'AWS',        frecuencia_mercado: 14 },
+      { skill: 'Airflow',    frecuencia_mercado: 12 }, { skill: 'dbt',        frecuencia_mercado: 10 },
+      { skill: 'Kafka',      frecuencia_mercado: 9  }, { skill: 'Databricks', frecuencia_mercado: 8  },
+    ],
+    exclusivas_programa: [
+      { skill: 'R', cobertura: 3 }, { skill: 'Estadística', cobertura: 3 },
+      { skill: 'Excel', cobertura: 2 }, { skill: 'Matplotlib', cobertura: 2 },
+    ],
+  },
+  92: {
+    program_id: 92, cobertura_pct: 61,
+    skills_mercado:  [
+      { skill: 'Python',         frecuencia: 31 }, { skill: 'TensorFlow',    frecuencia: 22 },
+      { skill: 'Machine Learning', frecuencia: 20 }, { skill: 'PyTorch',     frecuencia: 18 },
+      { skill: 'SQL',            frecuencia: 17 }, { skill: 'AWS',           frecuencia: 15 },
+      { skill: 'Docker',         frecuencia: 13 }, { skill: 'Kubernetes',    frecuencia: 11 },
+      { skill: 'Spark',          frecuencia: 10 }, { skill: 'MLflow',        frecuencia: 9  },
+    ],
+    skills_programa: [
+      { skill: 'Python',          cobertura: 6 }, { skill: 'TensorFlow',     cobertura: 5 },
+      { skill: 'Machine Learning', cobertura: 5 }, { skill: 'PyTorch',       cobertura: 4 },
+      { skill: 'Estadística',     cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 },
+      { skill: 'Scikit-learn',    cobertura: 3 }, { skill: 'NLP',            cobertura: 2 },
+    ],
+    fortalezas: [
+      { skill: 'Python', frecuencia_mercado: 31, cobertura_programa: 6 },
+      { skill: 'TensorFlow', frecuencia_mercado: 22, cobertura_programa: 5 },
+      { skill: 'Machine Learning', frecuencia_mercado: 20, cobertura_programa: 5 },
+      { skill: 'PyTorch', frecuencia_mercado: 18, cobertura_programa: 4 },
+    ],
+    brechas: [
+      { skill: 'AWS',        frecuencia_mercado: 15 }, { skill: 'Docker',    frecuencia_mercado: 13 },
+      { skill: 'Kubernetes', frecuencia_mercado: 11 }, { skill: 'Spark',     frecuencia_mercado: 10 },
+      { skill: 'MLflow',     frecuencia_mercado: 9  },
+    ],
+    exclusivas_programa: [
+      { skill: 'Estadística', cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 },
+      { skill: 'Scikit-learn', cobertura: 3 }, { skill: 'NLP', cobertura: 2 },
+    ],
+  },
+  108: {
+    program_id: 108, cobertura_pct: 38,
+    skills_mercado:  [
+      { skill: 'Investigación',   frecuencia: 18 }, { skill: 'Excel',          frecuencia: 15 },
+      { skill: 'Análisis datos',  frecuencia: 14 }, { skill: 'Derecho Penal',  frecuencia: 13 },
+      { skill: 'SPSS',            frecuencia: 11 }, { skill: 'Redacción',      frecuencia: 10 },
+      { skill: 'Python',          frecuencia: 8  }, { skill: 'Power BI',       frecuencia: 7  },
+      { skill: 'GIS',             frecuencia: 6  }, { skill: 'R',              frecuencia: 5  },
+    ],
+    skills_programa: [
+      { skill: 'Investigación',  cobertura: 5 }, { skill: 'Derecho Penal',   cobertura: 4 },
+      { skill: 'Criminología',   cobertura: 4 }, { skill: 'Excel',           cobertura: 2 },
+      { skill: 'Estadística',    cobertura: 3 }, { skill: 'Victimología',    cobertura: 3 },
+    ],
+    fortalezas: [
+      { skill: 'Investigación', frecuencia_mercado: 18, cobertura_programa: 5 },
+      { skill: 'Excel', frecuencia_mercado: 15, cobertura_programa: 2 },
+      { skill: 'Derecho Penal', frecuencia_mercado: 13, cobertura_programa: 4 },
+    ],
+    brechas: [
+      { skill: 'Análisis datos', frecuencia_mercado: 14 }, { skill: 'SPSS',     frecuencia_mercado: 11 },
+      { skill: 'Redacción',      frecuencia_mercado: 10 }, { skill: 'Python',   frecuencia_mercado: 8  },
+      { skill: 'Power BI',       frecuencia_mercado: 7  }, { skill: 'GIS',      frecuencia_mercado: 6  },
+      { skill: 'R',              frecuencia_mercado: 5  },
+    ],
+    exclusivas_programa: [
+      { skill: 'Criminología', cobertura: 4 }, { skill: 'Victimología', cobertura: 3 },
+      { skill: 'Estadística', cobertura: 3 },
+    ],
+  },
+};
+
 function SkillsGapChart() {
   const [programId, setProgramId]   = useState(94);
   const [data, setData]             = useState<SkillsAnalysis | null>(null);
   const [loading, setLoading]       = useState(false);
+  const [isFallback, setIsFallback] = useState(false);
   const [activeTab, setActiveTab]   = useState('Todos');
 
   useEffect(() => {
     setLoading(true);
     setData(null);
+    setIsFallback(false);
     fetch(`${API}/api/dashboard/skills-analysis/${programId}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: SkillsAnalysis) => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setData(FALLBACK_SKILLS[programId] ?? FALLBACK_SKILLS[94]);
+        setIsFallback(true);
+        setLoading(false);
+      });
   }, [programId]);
 
   // Build unified skill list for mirror chart
@@ -307,6 +408,13 @@ function SkillsGapChart() {
       {loading && (
         <div className="flex items-center justify-center py-16">
           <div className="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-700 animate-spin" />
+        </div>
+      )}
+
+      {!loading && isFallback && (
+        <div className="mx-4 mt-3 rounded-lg px-3 py-1.5 text-xs text-center"
+          style={{ background: C.goldBg, color: C.gold }}>
+          ⚠ Datos de referencia — API no disponible
         </div>
       )}
 
@@ -377,9 +485,6 @@ function SkillsGapChart() {
         </>
       )}
 
-      {!loading && !data && (
-        <p className="text-center text-sm text-gray-400 py-10">No se pudieron cargar los datos del análisis</p>
-      )}
     </div>
   );
 }
