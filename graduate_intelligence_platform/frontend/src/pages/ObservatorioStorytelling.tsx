@@ -652,8 +652,8 @@ function UniversityBenchmark() {
 
           {/* competitors table */}
           {data.competitors.length > 0 ? (
-            <div className="rounded-2xl overflow-hidden border shadow-sm">
-              <table className="min-w-full text-xs">
+            <div className="rounded-2xl border shadow-sm" style={{ overflowX: 'auto' }}>
+              <table className="text-xs" style={{ minWidth: '700px', width: '100%' }}>
                 <thead style={{ background: C.navy }}>
                   <tr>
                     {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad'].map(h => (
@@ -664,9 +664,9 @@ function UniversityBenchmark() {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {data.competitors.map((c, i) => (
                     <tr key={i} className="hover:bg-blue-50 transition-colors">
-                      <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px] truncate">{c.nombre_ies}</td>
-                      <td className="px-3 py-2 text-gray-600 max-w-[220px] truncate">{c.nombre_programa}</td>
-                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.municipio || c.ciudad || '—'}</td>
+                      <td className="px-3 py-2 font-medium text-gray-800" style={{ minWidth: '220px' }}>{c.nombre_ies}</td>
+                      <td className="px-3 py-2 text-gray-600" style={{ minWidth: '280px' }}>{c.nombre_programa}</td>
+                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap" style={{ minWidth: '120px' }}>{c.municipio || c.ciudad || '—'}</td>
                       <td className="px-3 py-2 text-center font-mono" style={{ color: C.navy }}>{c.creditos ?? '—'}</td>
                       <td className="px-3 py-2 text-center text-gray-500">{c.duracion || '—'}</td>
                       <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.periodicidad_admision || '—'}</td>
