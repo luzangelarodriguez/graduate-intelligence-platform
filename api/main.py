@@ -405,8 +405,10 @@ def program_intelligence_detail(program_id: int) -> dict[str, Any]:
 
 
 @app.get("/api/dashboard/summary", tags=["dashboard"])
-def dashboard_summary() -> dict[str, Any]:
-    """Return aggregated match data from the latest ml run for the frontend dashboard."""
+def dashboard_summary(program_id: int | None = Query(default=None, ge=1)) -> dict[str, Any]:
+    """Return aggregated match data from the latest ml run for the frontend dashboard.
+    If program_id is provided, results are filtered to that specialization only.
+    """
     from api.database import fetch_all, fetch_one
 
     run_row = fetch_one(
@@ -423,8 +425,11 @@ def dashboard_summary() -> dict[str, Any]:
     run_id: int = run_row["id"]
     fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
 
+    pid_filter = "AND m.especializacion_id = %s" if program_id else ""
+    base_params: tuple = (run_id, program_id) if program_id else (run_id,)
+
     prog_rows = fetch_all(
-        """
+        f"""
         SELECT
             m.especializacion_id                          AS id,
             COALESCE(e.nombre, m.program_name)            AS nombre,
@@ -436,11 +441,11 @@ def dashboard_summary() -> dict[str, Any]:
             COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
         FROM ml_program_job_matches m
         LEFT JOIN especializaciones e ON e.id = m.especializacion_id
-        WHERE m.run_id = %s
+        WHERE m.run_id = %s {pid_filter}
         GROUP BY m.especializacion_id, e.nombre, m.program_name
         ORDER BY score_maximo DESC
         """,
-        (run_id,),
+        base_params,
     )
 
     programas = [
@@ -460,7 +465,7 @@ def dashboard_summary() -> dict[str, Any]:
     ]
 
     top_rows = fetch_all(
-        """
+        f"""
         SELECT
             COALESCE(e.nombre, m.program_name) AS programa,
             m.job_title                        AS empleo,
@@ -471,11 +476,11 @@ def dashboard_summary() -> dict[str, Any]:
             m.skills_faltantes                 AS skills_faltantes
         FROM ml_program_job_matches m
         LEFT JOIN especializaciones e ON e.id = m.especializacion_id
-        WHERE m.run_id = %s
+        WHERE m.run_id = %s {pid_filter}
         ORDER BY m.score_match DESC
         LIMIT 30
         """,
-        (run_id,),
+        base_params,
     )
 
     top_matches = [
@@ -492,9 +497,9 @@ def dashboard_summary() -> dict[str, Any]:
     ]
 
     tot_rows = fetch_all(
-        "SELECT relevance_label, COUNT(*) AS cnt "
-        "FROM ml_program_job_matches WHERE run_id = %s GROUP BY relevance_label",
-        (run_id,),
+        f"SELECT relevance_label, COUNT(*) AS cnt "
+        f"FROM ml_program_job_matches WHERE run_id = %s {pid_filter} GROUP BY relevance_label",
+        base_params,
     )
     lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
 

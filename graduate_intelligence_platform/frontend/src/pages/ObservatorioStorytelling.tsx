@@ -691,11 +691,33 @@ export default function ObservatorioStorytelling() {
   const [programaId, setProgramaId] = useState(94);
 
   useEffect(() => {
-    fetch(`${API}/api/dashboard/summary`)
+    setLoading(true);
+    setUsingFallback(false);
+    fetch(`${API}/api/dashboard/summary?program_id=${programaId}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: Summary) => { setData(d); setLoading(false); })
-      .catch(() => { setData(FALLBACK); setUsingFallback(true); setLoading(false); });
-  }, []);
+      .catch(() => {
+        // Show fallback data filtered to the selected program
+        const fb = {
+          ...FALLBACK,
+          programas: FALLBACK.programas.filter(p => p.id === programaId),
+          top_matches: FALLBACK.top_matches.filter(m =>
+            FALLBACK.programas.find(p => p.id === programaId)?.nombre.split(' ')[0]
+              ? m.programa.toLowerCase().includes(
+                  (FALLBACK.programas.find(p => p.id === programaId)?.nombre.split(' ')[0] ?? '').toLowerCase()
+                )
+              : true
+          ),
+        };
+        const fbProg = fb.programas[0];
+        fb.totales = fbProg
+          ? { matches: fbProg.matches_total, alta: fbProg.labels.high, media: fbProg.labels.medium, baja: fbProg.labels.low }
+          : FALLBACK.totales;
+        setData(fb);
+        setUsingFallback(true);
+        setLoading(false);
+      });
+  }, [programaId]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
@@ -765,10 +787,10 @@ export default function ObservatorioStorytelling() {
             Motor de Pertinencia Académica
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-            Inteligencia Curricular<br />& Pertinencia Académica
-          </h1>
-          <p className="text-base font-semibold max-w-xl mx-auto" style={{ color: '#fcd34d' }}>
             {programaLabel}
+          </h1>
+          <p className="text-sm font-medium max-w-xl mx-auto" style={{ color: C.light }}>
+            Inteligencia Curricular · Pertinencia Académica · UNIR Colombia
           </p>
           <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
             {totales.matches.toLocaleString()} pares programa–empleo analizados
@@ -897,10 +919,7 @@ export default function ObservatorioStorytelling() {
       {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
       <Section n="4" title="Mejores Matches & Brechas Curriculares" dark>
         <div className="space-y-3 mb-6">
-          {top_matches.filter(m => {
-              const pNom = programas.find(p => p.id === programaId)?.nombre ?? '';
-              return pNom ? m.programa.toLowerCase().includes(pNom.split(' ')[0].toLowerCase()) : true;
-            }).slice(0, 10).map((m, i) => (
+          {top_matches.slice(0, 10).map((m, i) => (
             <div key={i} className="rounded-xl px-4 py-3"
               style={{ background: 'rgba(255,255,255,0.07)' }}>
               <div className="flex items-center gap-3">
