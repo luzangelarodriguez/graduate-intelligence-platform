@@ -750,21 +750,28 @@ def _pertinence_scores(
     """
     Returns: coverage, density, pertinence_f1, gap_pct, common_list, gap_list.
     All percentages in 0-100 range.
+
+    common_list  = skills the program covers that the job demands (skills_en_comun)
+    gap_list     = skills the job demands that the program does NOT cover (skills_faltantes)
+                   Empty if job_skills is empty — avoids showing program skills as "missing".
     """
     ps = set(program_skills)
     js = set(job_skills)
     common = sorted(ps & js)
-    gap = sorted(ps - js)            # micro skills NOT covered by this job
+    # skills_faltantes = what the job asks for that the program doesn't have
+    # If js is empty we return [] — no job skills known → no gap can be computed
+    gap = sorted(js - ps) if js else []
 
-    coverage = len(common) / max(len(ps), 1) * 100   # recall
-    density = len(common) / max(len(js), 1) * 100    # precision
+    coverage = len(common) / max(len(ps), 1) * 100   # recall: how much of program maps to job
+    density  = len(common) / max(len(js), 1) * 100   # precision: how much of job is covered
 
     if coverage + density > 0:
         pertinence = 2 * coverage * density / (coverage + density)
     else:
         pertinence = 0.0
 
-    gap_pct = len(gap) / max(len(ps), 1) * 100
+    # gap_pct relative to job demands (not program size)
+    gap_pct = len(gap) / max(len(js), 1) * 100 if js else 0.0
 
     return coverage, density, pertinence, gap_pct, common, gap
 
