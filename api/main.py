@@ -508,41 +508,60 @@ def related_universities(program_id: int) -> dict[str, Any]:
     """Return competitor programs from mineducacion_programas_virtuales matching the domain keywords."""
     from api.database import fetch_all
 
-    KEYWORDS: dict[int, list[str]] = {
-        94:  ['analytics', 'datos', 'big data', 'data', 'inteligencia de negocios', 'business intelligence'],
-        92:  ['inteligencia artificial', 'machine learning', 'ciencia de datos', 'data science'],
-        108: ['criminolog', 'seguridad', 'forense', 'criminalística', 'investigación criminal'],
-    }
-
-    keywords = KEYWORDS.get(program_id, [])
-    if not keywords:
-        return {"program_id": program_id, "competitors": [], "total": 0}
-
-    patterns = [f"%{kw}%" for kw in keywords]
-    placeholders = ", ".join(["%s"] * len(patterns))
-
-    try:
-        rows = fetch_all(
-            f"""
-            SELECT
-                nombre_ies,
-                nombre_programa,
-                municipio,
-                departamento,
-                modalidad,
-                nivel_academico,
-                creditos,
-                duracion,
-                area_conocimiento,
-                periodicidad_admision
+    QUERIES: dict[int, str] = {
+        94: """
+            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
+                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
             FROM mineducacion_programas_virtuales
-            WHERE nombre_programa ILIKE ANY(ARRAY[{placeholders}])
-              AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
+            WHERE (
+                nombre_programa ILIKE '%analytic%' OR
+                nombre_programa ILIKE '%datos%' OR
+                nombre_programa ILIKE '%data%' OR
+                nombre_programa ILIKE '%inteligencia de negocio%' OR
+                nombre_programa ILIKE '%business intelligence%' OR
+                nombre_programa ILIKE '%big data%'
+            )
+            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
             ORDER BY nombre_ies
             LIMIT 50
-            """,
-            tuple(patterns),
-        )
+        """,
+        92: """
+            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
+                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
+            FROM mineducacion_programas_virtuales
+            WHERE (
+                nombre_programa ILIKE '%inteligencia artificial%' OR
+                nombre_programa ILIKE '%machine learning%' OR
+                nombre_programa ILIKE '%ciencia de datos%' OR
+                nombre_programa ILIKE '%data science%'
+            )
+            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
+            ORDER BY nombre_ies
+            LIMIT 50
+        """,
+        108: """
+            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
+                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
+            FROM mineducacion_programas_virtuales
+            WHERE (
+                nombre_programa ILIKE '%criminolog%' OR
+                nombre_programa ILIKE '%forense%' OR
+                nombre_programa ILIKE '%criminalistica%' OR
+                nombre_programa ILIKE '%seguridad ciudadana%' OR
+                nombre_programa ILIKE '%investigacion criminal%'
+            )
+            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
+            ORDER BY nombre_ies
+            LIMIT 50
+        """,
+    }
+
+    sql = QUERIES.get(program_id)
+    if not sql:
+        return {"program_id": program_id, "competitors": [], "total": 0}
+
+    try:
+        rows = fetch_all(sql)
     except Exception as exc:
         logger.error("related_universities query failed for program_id=%s: %s", program_id, exc)
         return {"program_id": program_id, "competitors": [], "total": 0, "error": str(exc)}
