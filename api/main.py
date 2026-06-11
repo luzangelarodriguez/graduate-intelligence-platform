@@ -566,22 +566,26 @@ def related_universities(program_id: int) -> dict[str, Any]:
         logger.error("related_universities query failed for program_id=%s: %s", program_id, exc)
         return {"program_id": program_id, "competitors": [], "total": 0, "error": str(exc)}
 
-    competitors = [
-        {
-            "nombre_ies":            r["nombre_ies"] or "",
-            "nombre_programa":       r["nombre_programa"] or "",
-            "ciudad":                r["municipio"] or "",
-            "municipio":             r["municipio"] or "",
-            "departamento":          r["departamento"] or "",
-            "modalidad":             r["modalidad"] or "",
-            "nivel_academico":       r["nivel_academico"] or "",
-            "creditos":              r["creditos"],
-            "duracion":              r["duracion"] or "",
-            "area_conocimiento":     r["area_conocimiento"] or "",
-            "periodicidad_admision": r["periodicidad_admision"] or "",
-        }
-        for r in rows
-    ]
+    logger.info("related_universities program_id=%s rows_returned=%s", program_id, len(rows))
+
+    competitors = []
+    for r in rows:
+        try:
+            competitors.append({
+                "nombre_ies":            r.get("nombre_ies") or "",
+                "nombre_programa":       r.get("nombre_programa") or "",
+                "ciudad":                r.get("municipio") or "",
+                "municipio":             r.get("municipio") or "",
+                "departamento":          r.get("departamento") or "",
+                "modalidad":             r.get("modalidad") or "",
+                "nivel_academico":       r.get("nivel_academico") or "",
+                "creditos":              r.get("creditos"),
+                "duracion":              r.get("duracion") or "",
+                "area_conocimiento":     r.get("area_conocimiento") or "",
+                "periodicidad_admision": r.get("periodicidad_admision") or "",
+            })
+        except Exception as row_exc:
+            logger.warning("related_universities skipping row: %s — %s", r, row_exc)
 
     return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
 
