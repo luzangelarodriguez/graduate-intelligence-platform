@@ -499,6 +499,86 @@ def dashboard_summary() -> dict[str, Any]:
     }
 
 
+@app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
+def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
+    """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
+    from api.database import fetch_all
+
+    # 1. Skills from market (job matches for this program, latest run)
+    market_rows = fetch_all(
+        """
+        SELECT unnest(skills_empleo) AS skill, COUNT(*) AS frecuencia
+        FROM ml_program_job_matches
+        WHERE especializacion_id = %s
+          AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches)
+        GROUP BY skill
+        ORDER BY frecuencia DESC
+        LIMIT 30
+        """,
+        (program_id,),
+    )
+    skills_mercado = [
+        {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
+        for r in market_rows
+        if r["skill"]
+    ]
+
+    # 2. Skills from program curriculum (microcurriculo)
+    prog_rows = fetch_all(
+        """
+        SELECT ms.skill_name, COUNT(*) AS cobertura
+        FROM microcurriculo_skills ms
+        JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+        WHERE m.specialization_id = %s
+        GROUP BY ms.skill_name
+        ORDER BY cobertura DESC
+        """,
+        (program_id,),
+    )
+    skills_programa = [
+        {"skill": r["skill_name"], "cobertura": int(r["cobertura"])}
+        for r in prog_rows
+        if r["skill_name"]
+    ]
+
+    # 3. Cross analysis
+    mercado_set = {s["skill"].lower(): s for s in skills_mercado}
+    programa_set = {s["skill"].lower(): s for s in skills_programa}
+
+    brechas = [
+        {"skill": s["skill"], "frecuencia_mercado": s["frecuencia"]}
+        for key, s in mercado_set.items()
+        if key not in programa_set
+    ]
+    fortalezas = [
+        {
+            "skill": s["skill"],
+            "frecuencia_mercado": s["frecuencia"],
+            "cobertura_programa": programa_set[key]["cobertura"],
+        }
+        for key, s in mercado_set.items()
+        if key in programa_set
+    ]
+    exclusivas_programa = [
+        {"skill": s["skill"], "cobertura": s["cobertura"]}
+        for key, s in programa_set.items()
+        if key not in mercado_set
+    ]
+
+    total_mercado = len(mercado_set)
+    cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
+
+    return {
+        "program_id":          program_id,
+        "skills_mercado":      skills_mercado,
+        "skills_programa":     skills_programa,
+        "brechas":             brechas,
+        "fortalezas":          fortalezas,
+        "exclusivas_programa": exclusivas_programa,
+        "cobertura_pct":       cobertura_pct,
+    }
+
+
 @app.get("/semantic-search", response_model=SearchResponse, tags=["search"])
 def semantic_search(
     q: str = Query(..., min_length=2, max_length=256),
