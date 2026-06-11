@@ -54,10 +54,7 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     "criminology": [
         "perito judicial",
         "psicólogo forense",
-        "investigador judicial Colombia",
-        "analista forense",
-        "oficial de cumplimiento penal",
-        "criminólogo",
+        "analista de inteligencia criminal",
     ],
     "technology": ["desarrollador software", "ingeniero de sistemas", "programador"],
     "business": ["analista financiero", "gerente de proyectos", "consultor empresarial"],

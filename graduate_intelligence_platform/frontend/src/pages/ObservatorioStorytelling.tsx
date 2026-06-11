@@ -918,8 +918,13 @@ export default function ObservatorioStorytelling() {
 
       {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
       <Section n="4" title="Mejores Matches & Brechas Curriculares" dark>
-        <div className="space-y-3 mb-6">
-          {top_matches.slice(0, 10).map((m, i) => (
+        {(() => {
+          const validMatches = top_matches.filter(
+            m => ['high', 'medium', 'low'].includes(m.label) && m.score >= 45
+          ).slice(0, 10);
+          return validMatches.length >= 3 ? (
+            <div className="space-y-3 mb-6">
+              {validMatches.map((m, i) => (
             <div key={i} className="rounded-xl px-4 py-3"
               style={{ background: 'rgba(255,255,255,0.07)' }}>
               <div className="flex items-center gap-3">
@@ -954,8 +959,21 @@ export default function ObservatorioStorytelling() {
                 ))}
               </div>
             </div>
-          ))}
-        </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl px-5 py-6 mb-6 text-center"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              <p className="text-sm text-blue-200 leading-relaxed">
+                Datos de mercado en construcción para este programa.<br />
+                <span className="text-blue-300">
+                  Elempleo tiene oferta limitada para perfiles de <strong className="text-white">{programaLabel}</strong>.
+                  Los datos se enriquecerán en la próxima adquisición.
+                </span>
+              </p>
+            </div>
+          );
+        })()}
         <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
           className="rounded-r-xl px-5 py-4 mb-8">
           <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
