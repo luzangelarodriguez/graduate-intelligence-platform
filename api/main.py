@@ -518,45 +518,47 @@ def related_universities(program_id: int) -> dict[str, Any]:
     if not keywords:
         return {"program_id": program_id, "competitors": [], "total": 0}
 
-    # Build ARRAY[...] of ILIKE patterns
     patterns = [f"%{kw}%" for kw in keywords]
     placeholders = ", ".join(["%s"] * len(patterns))
 
-    rows = fetch_all(
-        f"""
-        SELECT
-            nombre_ies,
-            nombre_programa,
-            municipio           AS ciudad,
-            modalidad,
-            nivel_academico,
-            creditos,
-            duracion,
-            area_conocimiento,
-            municipio,
-            departamento,
-            periodicidad_admision
-        FROM mineducacion_programas_virtuales
-        WHERE nombre_programa ILIKE ANY(ARRAY[{placeholders}])
-          AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
-        ORDER BY nombre_ies
-        LIMIT 50
-        """,
-        tuple(patterns),
-    )
+    try:
+        rows = fetch_all(
+            f"""
+            SELECT
+                nombre_ies,
+                nombre_programa,
+                municipio,
+                departamento,
+                modalidad,
+                nivel_academico,
+                creditos,
+                duracion,
+                area_conocimiento,
+                periodicidad_admision
+            FROM mineducacion_programas_virtuales
+            WHERE nombre_programa ILIKE ANY(ARRAY[{placeholders}])
+              AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
+            ORDER BY nombre_ies
+            LIMIT 50
+            """,
+            tuple(patterns),
+        )
+    except Exception as exc:
+        logger.error("related_universities query failed for program_id=%s: %s", program_id, exc)
+        return {"program_id": program_id, "competitors": [], "total": 0, "error": str(exc)}
 
     competitors = [
         {
-            "nombre_ies":           r["nombre_ies"] or "",
-            "nombre_programa":      r["nombre_programa"] or "",
-            "ciudad":               r["ciudad"] or "",
-            "modalidad":            r["modalidad"] or "",
-            "nivel_academico":      r["nivel_academico"] or "",
-            "creditos":             r["creditos"],
-            "duracion":             r["duracion"] or "",
-            "area_conocimiento":    r["area_conocimiento"] or "",
-            "municipio":            r["municipio"] or "",
-            "departamento":         r["departamento"] or "",
+            "nombre_ies":            r["nombre_ies"] or "",
+            "nombre_programa":       r["nombre_programa"] or "",
+            "ciudad":                r["municipio"] or "",
+            "municipio":             r["municipio"] or "",
+            "departamento":          r["departamento"] or "",
+            "modalidad":             r["modalidad"] or "",
+            "nivel_academico":       r["nivel_academico"] or "",
+            "creditos":              r["creditos"],
+            "duracion":              r["duracion"] or "",
+            "area_conocimiento":     r["area_conocimiento"] or "",
             "periodicidad_admision": r["periodicidad_admision"] or "",
         }
         for r in rows
