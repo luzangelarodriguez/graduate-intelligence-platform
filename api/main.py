@@ -517,7 +517,8 @@ def related_universities(program_id: int) -> dict[str, Any]:
                       OR nombre_programa ILIKE '%business intelligence%')
                      AND estado_programa ILIKE '%activo%'
                      AND modalidad ILIKE '%virtual%'
-                     AND nivel_academico ILIKE '%especializ%'
+                     AND nivel_academico = 'Posgrado'
+                     AND nombre_programa ILIKE '%especializ%'
                    ORDER BY nombre_ies LIMIT 50""",
             92: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
                           nivel_academico, creditos, duracion, periodicidad_admision
@@ -528,7 +529,8 @@ def related_universities(program_id: int) -> dict[str, Any]:
                       OR nombre_programa ILIKE '%data science%')
                      AND estado_programa ILIKE '%activo%'
                      AND modalidad ILIKE '%virtual%'
-                     AND nivel_academico ILIKE '%especializ%'
+                     AND nivel_academico = 'Posgrado'
+                     AND nombre_programa ILIKE '%especializ%'
                    ORDER BY nombre_ies LIMIT 50""",
             108: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
                            nivel_academico, creditos, duracion, periodicidad_admision
@@ -539,7 +541,8 @@ def related_universities(program_id: int) -> dict[str, Any]:
                        OR nombre_programa ILIKE '%seguridad ciudadana%')
                       AND estado_programa ILIKE '%activo%'
                       AND modalidad ILIKE '%virtual%'
-                      AND nivel_academico ILIKE '%especializ%'
+                      AND nivel_academico = 'Posgrado'
+                      AND nombre_programa ILIKE '%especializ%'
                     ORDER BY nombre_ies LIMIT 50""",
         }
         sql = QUERIES.get(program_id)
