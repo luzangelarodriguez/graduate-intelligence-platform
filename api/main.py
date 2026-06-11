@@ -508,8 +508,7 @@ def related_universities(program_id: int) -> dict[str, Any]:
     try:
         JOIN_TEMPLATE = """
             LEFT JOIN snies_estadisticas_programa s
-              ON s.nombre_ies ILIKE '%' || split_part(m.nombre_ies, ' ', 1) || '%'
-             AND s.nombre_programa ILIKE '%' || split_part(m.nombre_programa, ' ', 2) || '%'
+              ON s.codigo_snies = m.codigo_snies_programa::INTEGER
              AND s.anio = 2024
         """
         BASE_SELECT = """SELECT m.nombre_ies, m.nombre_programa, m.municipio, m.modalidad,
