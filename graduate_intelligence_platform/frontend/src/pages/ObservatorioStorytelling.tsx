@@ -164,6 +164,226 @@ function buildLecturas(d: Summary) {
   };
 }
 
+// ─── Skills Gap types ─────────────────────────────────────────────────────────
+interface SkillMercado  { skill: string; frecuencia: number }
+interface SkillPrograma { skill: string; cobertura: number }
+interface Brecha        { skill: string; frecuencia_mercado: number }
+interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number }
+interface Exclusiva     { skill: string; cobertura: number }
+interface SkillsAnalysis {
+  program_id: number;
+  skills_mercado: SkillMercado[];
+  skills_programa: SkillPrograma[];
+  brechas: Brecha[];
+  fortalezas: Fortaleza[];
+  exclusivas_programa: Exclusiva[];
+  cobertura_pct: number;
+}
+
+// skill keyword → category
+const SKILL_CATEGORIES: Record<string, string> = {
+  // Cloud
+  aws: 'Cloud', azure: 'Cloud', gcp: 'Cloud', cloud: 'Cloud', docker: 'Cloud',
+  kubernetes: 'Cloud', terraform: 'Cloud', lambda: 'Cloud', ec2: 'Cloud', s3: 'Cloud',
+  // ML / IA
+  'machine learning': 'ML/IA', tensorflow: 'ML/IA', pytorch: 'ML/IA', keras: 'ML/IA',
+  'deep learning': 'ML/IA', nlp: 'ML/IA', 'scikit-learn': 'ML/IA', sklearn: 'ML/IA',
+  'ia': 'ML/IA', 'inteligencia artificial': 'ML/IA', 'computer vision': 'ML/IA',
+  // Ing. Datos
+  spark: 'Ing. Datos', kafka: 'Ing. Datos', airflow: 'Ing. Datos', dbt: 'Ing. Datos',
+  hadoop: 'Ing. Datos', etl: 'Ing. Datos', databricks: 'Ing. Datos', sql: 'Ing. Datos',
+  postgresql: 'Ing. Datos', mysql: 'Ing. Datos', mongodb: 'Ing. Datos', redis: 'Ing. Datos',
+  // Visualización
+  'power bi': 'Visualización', tableau: 'Visualización', looker: 'Visualización',
+  'data studio': 'Visualización', matplotlib: 'Visualización', plotly: 'Visualización',
+  grafana: 'Visualización', 'd3': 'Visualización',
+  // Programación
+  python: 'Programación', r: 'Programación', java: 'Programación', scala: 'Programación',
+  javascript: 'Programación', typescript: 'Programación', 'c++': 'Programación',
+  go: 'Programación', rust: 'Programación', bash: 'Programación',
+  // Negocio
+  agile: 'Negocio', scrum: 'Negocio', kanban: 'Negocio', 'project management': 'Negocio',
+  excel: 'Negocio', powerpoint: 'Negocio', comunicación: 'Negocio', liderazgo: 'Negocio',
+};
+const ALL_CATS = ['Todos', 'Cloud', 'ML/IA', 'Ing. Datos', 'Visualización', 'Programación', 'Negocio'];
+
+function categorize(skill: string): string {
+  const low = skill.toLowerCase();
+  for (const [kw, cat] of Object.entries(SKILL_CATEGORIES)) {
+    if (low.includes(kw)) return cat;
+  }
+  return 'Otros';
+}
+
+// ─── Mirror bar ───────────────────────────────────────────────────────────────
+function MirrorBar({
+  skill, leftVal, rightVal, maxVal, inProgram,
+}: { skill: string; leftVal: number; rightVal: number; maxVal: number; inProgram: boolean }) {
+  const leftPct  = maxVal ? (leftVal  / maxVal) * 100 : 0;
+  const rightPct = maxVal ? (rightVal / maxVal) * 100 : 0;
+  return (
+    <div className="flex items-center gap-1 text-xs">
+      {/* left label (program cobertura) */}
+      <span className="w-6 text-right font-mono text-green-700">{leftVal || ''}</span>
+      {/* left bar (programa) */}
+      <div className="flex justify-end" style={{ width: '38%' }}>
+        <div
+          className="h-5 rounded-l-sm transition-all duration-700"
+          style={{ width: `${leftPct}%`, background: inProgram ? '#15803d' : 'transparent', minWidth: leftVal ? 2 : 0 }}
+        />
+      </div>
+      {/* skill label */}
+      <div className="w-[24%] text-center truncate font-medium text-gray-700 text-[11px]">{skill}</div>
+      {/* right bar (mercado) */}
+      <div className="flex justify-start" style={{ width: '38%' }}>
+        <div
+          className="h-5 rounded-r-sm transition-all duration-700"
+          style={{ width: `${rightPct}%`, background: inProgram ? '#2563eb' : '#ef4444', minWidth: rightVal ? 2 : 0 }}
+        />
+      </div>
+      <span className="w-6 font-mono" style={{ color: inProgram ? '#2563eb' : '#ef4444' }}>{rightVal}</span>
+    </div>
+  );
+}
+
+// ─── Skills Gap Chart ─────────────────────────────────────────────────────────
+const PROGRAM_OPTIONS = [
+  { id: 94,  label: 'Visual Analytics & Big Data' },
+  { id: 92,  label: 'Inteligencia Artificial' },
+  { id: 108, label: 'Especialización en Criminología' },
+];
+
+function SkillsGapChart() {
+  const [programId, setProgramId]   = useState(94);
+  const [data, setData]             = useState<SkillsAnalysis | null>(null);
+  const [loading, setLoading]       = useState(false);
+  const [activeTab, setActiveTab]   = useState('Todos');
+
+  useEffect(() => {
+    setLoading(true);
+    setData(null);
+    fetch(`${API}/api/dashboard/skills-analysis/${programId}`)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d: SkillsAnalysis) => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [programId]);
+
+  // Build unified skill list for mirror chart
+  const rows = (() => {
+    if (!data) return [];
+    const mercadoMap = new Map(data.skills_mercado.map(s => [s.skill.toLowerCase(), s.frecuencia]));
+    const programaMap = new Map(data.skills_programa.map(s => [s.skill.toLowerCase(), s.cobertura]));
+    const allSkills = new Set([...mercadoMap.keys(), ...programaMap.keys()]);
+    return [...allSkills].map(key => ({
+      skill:      key,
+      leftVal:    programaMap.get(key) ?? 0,
+      rightVal:   mercadoMap.get(key)  ?? 0,
+      inProgram:  programaMap.has(key),
+      category:   categorize(key),
+    })).sort((a, b) => b.rightVal - a.rightVal);
+  })();
+
+  const filtered = activeTab === 'Todos' ? rows : rows.filter(r => r.category === activeTab);
+  const maxVal = Math.max(...rows.map(r => Math.max(r.leftVal, r.rightVal)), 1);
+
+  return (
+    <div className="rounded-2xl overflow-hidden border" style={{ background: C.cream }}>
+      {/* header + selector */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b"
+        style={{ background: C.green }}>
+        <h3 className="text-base font-bold text-white">Análisis de Brechas de Skills</h3>
+        <select
+          value={programId}
+          onChange={e => setProgramId(Number(e.target.value))}
+          className="text-xs rounded-lg px-3 py-1.5 font-medium border-0 focus:ring-2 focus:ring-offset-1"
+          style={{ background: 'rgba(255,255,255,0.12)', color: C.white }}
+        >
+          {PROGRAM_OPTIONS.map(p => (
+            <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-700 animate-spin" />
+        </div>
+      )}
+
+      {!loading && data && (
+        <>
+          {/* KPI summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4">
+            {[
+              { k: 'Cobertura',    v: `${data.cobertura_pct}%`, c: '#15803d' },
+              { k: 'Fortalezas',   v: data.fortalezas.length,   c: '#2563eb' },
+              { k: 'Brechas',      v: data.brechas.length,      c: '#dc2626' },
+              { k: 'Exclusivas',   v: data.exclusivas_programa.length, c: C.gold },
+            ].map(({ k, v, c }) => (
+              <div key={k} className="rounded-xl border bg-white p-3 text-center shadow-sm">
+                <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{k}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* legend */}
+          <div className="flex gap-4 px-5 pb-2 text-xs text-gray-500">
+            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#15803d' }} />Programa (cobertura)</span>
+            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#2563eb' }} />Mercado cubierto</span>
+            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#ef4444' }} />Brecha (solo en mercado)</span>
+          </div>
+
+          {/* tabs */}
+          <div className="flex flex-wrap gap-1 px-5 pb-3">
+            {ALL_CATS.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveTab(cat)}
+                className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+                style={activeTab === cat
+                  ? { background: C.green, color: C.white }
+                  : { background: '#e5e7eb', color: '#374151' }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* mirror bars */}
+          <div className="px-4 pb-5 space-y-1">
+            {/* axis header */}
+            <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-2">
+              <span className="w-6" />
+              <div className="text-right" style={{ width: '38%' }}>← Programa</div>
+              <div className="w-[24%] text-center">Skill</div>
+              <div style={{ width: '38%' }}>Mercado →</div>
+              <span className="w-6" />
+            </div>
+            {filtered.slice(0, 25).map(r => (
+              <MirrorBar
+                key={r.skill}
+                skill={r.skill}
+                leftVal={r.leftVal}
+                rightVal={r.rightVal}
+                maxVal={maxVal}
+                inProgram={r.inProgram}
+              />
+            ))}
+            {filtered.length === 0 && (
+              <p className="text-center text-sm text-gray-400 py-6">Sin skills en esta categoría</p>
+            )}
+          </div>
+        </>
+      )}
+
+      {!loading && !data && (
+        <p className="text-center text-sm text-gray-400 py-10">No se pudieron cargar los datos del análisis</p>
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
   const [data, setData]       = useState<Summary | null>(null);
@@ -409,36 +629,10 @@ export default function ObservatorioStorytelling() {
         <LecturaKey text={lec.brechas} />
       </Section>
 
-      {/* ── SECCIÓN 6: Brechas ── */}
-      <Section n="6" title="Programas con Mayor Brecha" dark>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[...programas]
-            .sort((a, b) => b.labels.low - a.labels.low)
-            .filter(p => p.labels.low > 0)
-            .map(p => {
-              const tot  = p.labels.high + p.labels.medium + p.labels.low || 1;
-              const lowP = Math.round((p.labels.low / tot) * 100);
-              return (
-                <div key={p.id} className="rounded-2xl p-5"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                  <p className="text-sm font-semibold text-white mb-3">{p.nombre}</p>
-                  <div className="flex items-center gap-4">
-                    <Ring score={lowP} color="#fca5a5" size={80} thick={7} />
-                    <div className="text-xs text-green-200 space-y-1">
-                      <p><span className="text-red-300 font-bold">{p.labels.low}</span> empleos de baja pertinencia</p>
-                      <p>Score máx. <span className="font-bold text-white">{p.score_maximo.toFixed(1)}</span></p>
-                      <p>Promedio <span className="font-bold text-white">{p.score_promedio.toFixed(1)}</span></p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-        </div>
-        <div style={{ borderLeft: `4px solid #fca5a5`, background: 'rgba(252,165,165,0.1)' }}
-          className="rounded-r-xl px-5 py-4 mt-6">
-          <p className="text-xs font-bold uppercase tracking-widest mb-1 text-red-300">✦ Brecha Detectada</p>
-          <p className="text-sm text-green-100">{lec.brechas}</p>
-        </div>
+      {/* ── SECCIÓN 6: Skills Gap ── */}
+      <Section n="6" title="Brechas de Skills: Programa vs. Mercado">
+        <SkillsGapChart />
+        <LecturaKey text={lec.brechas} />
       </Section>
 
       {/* ── SECCIÓN 7: Por programa — rings ── */}
