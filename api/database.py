@@ -17,6 +17,10 @@ def _pool() -> ThreadedConnectionPool:
     minconn = int(params.get("pool_min_size") or 1)
     maxconn = int(params.get("pool_max_size") or 4)
     dsn = get_database_url()
+    # ensure UTF-8 so Spanish characters aren't mangled
+    if dsn and "client_encoding" not in dsn:
+        sep = "&" if "?" in dsn else "?"
+        dsn = f"{dsn}{sep}client_encoding=UTF8"
     last_error: Exception | None = None
     for attempt in range(3):
         try:

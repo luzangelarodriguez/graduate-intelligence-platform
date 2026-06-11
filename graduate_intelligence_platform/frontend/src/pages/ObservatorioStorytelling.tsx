@@ -28,6 +28,8 @@ interface TopMatch {
   empresa: string;
   score: number;
   label: string;
+  skills_en_comun: string[];
+  skills_faltantes: string[];
 }
 interface Summary {
   run_id: number | null;
@@ -47,9 +49,9 @@ const FALLBACK: Summary = {
     { id: 108, nombre: 'Especialización en Criminología',  matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4,  medium: 10, low: 8  } },
   ],
   top_matches: [
-    { programa: 'Inteligencia Artificial', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high' },
-    { programa: 'Visual Analytics', empleo: 'Analista BI', empresa: 'Rappi', score: 85.1, label: 'high' },
-    { programa: 'Inteligencia Artificial', empleo: 'ML Engineer', empresa: 'Mercado Libre', score: 83.7, label: 'high' },
+    { programa: 'Inteligencia Artificial', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },
+    { programa: 'Visual Analytics', empleo: 'Analista BI', empresa: 'Rappi', score: 85.1, label: 'high', skills_en_comun: ['Power BI', 'SQL'], skills_faltantes: ['dbt', 'Airflow'] },
+    { programa: 'Inteligencia Artificial', empleo: 'ML Engineer', empresa: 'Mercado Libre', score: 83.7, label: 'high', skills_en_comun: ['TensorFlow', 'Python'], skills_faltantes: ['Kubernetes'] },
   ],
   totales: { matches: 91, alta: 36, media: 36, baja: 19 },
 };
@@ -336,18 +338,38 @@ export default function ObservatorioStorytelling() {
       <Section n="4" title="Mejores Matches Programa–Empleo" dark>
         <div className="space-y-3 mb-6">
           {top_matches.slice(0, 10).map((m, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3"
+            <div key={i} className="rounded-xl px-4 py-3"
               style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <span className="text-xl font-black w-7 text-center" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                {i + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
-                <p className="text-xs text-green-300 truncate">{m.programa} · {m.empresa}</p>
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-black w-7 text-center flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                  {i + 1}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
+                  <p className="text-xs text-green-300 truncate">{m.programa} · {m.empresa}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-lg font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
+                  <LBadge l={m.label} />
+                </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-lg font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
-                <LBadge l={m.label} />
+              {/* skill tags */}
+              <div className="mt-2 ml-10 flex flex-wrap gap-1">
+                {m.skills_en_comun.length > 0
+                  ? m.skills_en_comun.map(s => (
+                      <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                        style={{ background: 'rgba(134,239,172,0.15)', color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
+                        {s}
+                      </span>
+                    ))
+                  : <span className="text-xs text-green-500 italic">Sin overlap de skills</span>
+                }
+                {m.skills_faltantes.slice(0, 3).map(s => (
+                  <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                    style={{ background: 'rgba(252,165,165,0.15)', color: '#fca5a5', border: '1px solid rgba(252,165,165,0.3)' }}>
+                    -{s}
+                  </span>
+                ))}
               </div>
             </div>
           ))}

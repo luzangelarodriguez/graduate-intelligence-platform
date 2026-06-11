@@ -457,7 +457,9 @@ def dashboard_summary() -> dict[str, Any]:
             m.job_title                        AS empleo,
             COALESCE(m.company, '')            AS empresa,
             ROUND(m.score_match::numeric, 1)   AS score,
-            m.relevance_label                  AS label
+            m.relevance_label                  AS label,
+            m.skills_en_comun                  AS skills_en_comun,
+            m.skills_faltantes                 AS skills_faltantes
         FROM ml_program_job_matches m
         LEFT JOIN especializaciones e ON e.id = m.especializacion_id
         WHERE m.run_id = %s
@@ -469,11 +471,13 @@ def dashboard_summary() -> dict[str, Any]:
 
     top_matches = [
         {
-            "programa": r["programa"] or "",
-            "empleo":   r["empleo"] or "",
-            "empresa":  r["empresa"],
-            "score":    float(r["score"] or 0),
-            "label":    r["label"],
+            "programa":        r["programa"] or "",
+            "empleo":          r["empleo"] or "",
+            "empresa":         r["empresa"],
+            "score":           float(r["score"] or 0),
+            "label":           r["label"],
+            "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
+            "skills_faltantes": r["skills_faltantes"] if r["skills_faltantes"] is not None else [],
         }
         for r in top_rows
     ]
