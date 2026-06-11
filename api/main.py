@@ -506,53 +506,48 @@ def dashboard_summary() -> dict[str, Any]:
 @app.get("/api/programs/related-universities/{program_id}")
 def related_universities(program_id: int) -> dict[str, Any]:
     try:
-        QUERIES = {
-            94: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
-                          nivel_academico, creditos, duracion, periodicidad_admision
-                   FROM mineducacion_programas_virtuales
-                   WHERE (nombre_programa ILIKE '%analytic%'
-                      OR nombre_programa ILIKE '%datos%'
-                      OR nombre_programa ILIKE '%big data%'
-                      OR nombre_programa ILIKE '%inteligencia de negocio%'
-                      OR nombre_programa ILIKE '%business intelligence%')
-                     AND estado_programa ILIKE '%activo%'
-                     AND modalidad ILIKE '%virtual%'
-                     AND nivel_academico = 'Posgrado'
-                     AND nombre_programa ILIKE '%especializ%'
-                   ORDER BY nombre_ies LIMIT 50""",
-            92: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
-                          nivel_academico, creditos, duracion, periodicidad_admision
-                   FROM mineducacion_programas_virtuales
-                   WHERE (nombre_programa ILIKE '%inteligencia artificial%'
-                      OR nombre_programa ILIKE '%machine learning%'
-                      OR nombre_programa ILIKE '%ciencia de datos%'
-                      OR nombre_programa ILIKE '%data science%')
-                     AND estado_programa ILIKE '%activo%'
-                     AND modalidad ILIKE '%virtual%'
-                     AND nivel_academico = 'Posgrado'
-                     AND nombre_programa ILIKE '%especializ%'
-                   ORDER BY nombre_ies LIMIT 50""",
-            108: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
-                           nivel_academico, creditos, duracion, periodicidad_admision
-                    FROM mineducacion_programas_virtuales
-                    WHERE (nombre_programa ILIKE '%criminolog%'
-                       OR nombre_programa ILIKE '%forense%'
-                       OR nombre_programa ILIKE '%criminalistica%'
-                       OR nombre_programa ILIKE '%seguridad ciudadana%')
-                      AND estado_programa ILIKE '%activo%'
-                      AND modalidad ILIKE '%virtual%'
-                      AND nivel_academico = 'Posgrado'
-                      AND nombre_programa ILIKE '%especializ%'
-                    ORDER BY nombre_ies LIMIT 50""",
+        JOIN_TEMPLATE = """
+            LEFT JOIN snies_estadisticas_programa s
+              ON s.nombre_ies ILIKE '%' || split_part(m.nombre_ies, ' ', 1) || '%'
+             AND s.nombre_programa ILIKE '%' || split_part(m.nombre_programa, ' ', 2) || '%'
+             AND s.anio = 2024
+        """
+        BASE_SELECT = """SELECT m.nombre_ies, m.nombre_programa, m.municipio, m.modalidad,
+                                m.nivel_academico, m.creditos, m.duracion, m.periodicidad_admision,
+                                COALESCE(s.matriculados, 0) AS matriculados,
+                                COALESCE(s.graduados, 0)    AS graduados,
+                                COALESCE(s.inscritos, 0)    AS inscritos
+                         FROM mineducacion_programas_virtuales m"""
+        FILTERS = """AND m.estado_programa ILIKE '%activo%'
+                     AND m.modalidad ILIKE '%virtual%'
+                     AND m.nivel_academico = 'Posgrado'
+                     AND m.nombre_programa ILIKE '%especializ%'
+                     ORDER BY COALESCE(s.matriculados, 0) DESC LIMIT 50"""
+
+        PROGRAM_WHERE = {
+            94: """WHERE (m.nombre_programa ILIKE '%analytic%'
+                      OR m.nombre_programa ILIKE '%datos%'
+                      OR m.nombre_programa ILIKE '%big data%'
+                      OR m.nombre_programa ILIKE '%inteligencia de negocio%'
+                      OR m.nombre_programa ILIKE '%business intelligence%')""",
+            92: """WHERE (m.nombre_programa ILIKE '%inteligencia artificial%'
+                      OR m.nombre_programa ILIKE '%machine learning%'
+                      OR m.nombre_programa ILIKE '%ciencia de datos%'
+                      OR m.nombre_programa ILIKE '%data science%')""",
+            108: """WHERE (m.nombre_programa ILIKE '%criminolog%'
+                       OR m.nombre_programa ILIKE '%forense%'
+                       OR m.nombre_programa ILIKE '%criminalistica%'
+                       OR m.nombre_programa ILIKE '%seguridad ciudadana%')""",
         }
-        sql = QUERIES.get(program_id)
-        if not sql:
+        where = PROGRAM_WHERE.get(program_id)
+        if not where:
             return {"program_id": program_id, "competitors": [], "total": 0}
 
+        sql = f"{BASE_SELECT} {JOIN_TEMPLATE} {where} {FILTERS}"
+
         from api.database import connection
-        import psycopg2.extras  # noqa: F401
         with connection() as conn:
-            with conn.cursor() as cur:  # plain cursor → tuple rows
+            with conn.cursor() as cur:
                 cur.execute(sql)
                 rows = cur.fetchall()
 
@@ -567,6 +562,9 @@ def related_universities(program_id: int) -> dict[str, Any]:
                 "creditos":              r[5],
                 "duracion":              str(r[6] or ""),
                 "periodicidad_admision": str(r[7] or ""),
+                "matriculados":          int(r[8] or 0),
+                "graduados":             int(r[9] or 0),
+                "inscritos":             int(r[10] or 0),
             })
         return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
     except Exception as e:

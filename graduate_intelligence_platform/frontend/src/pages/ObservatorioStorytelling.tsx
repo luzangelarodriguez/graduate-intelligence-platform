@@ -509,6 +509,9 @@ interface Competitor {
   municipio: string;
   departamento: string;
   periodicidad_admision: string;
+  matriculados: number;
+  graduados: number;
+  inscritos: number;
 }
 interface UniversityData {
   program_id: number;
@@ -543,6 +546,13 @@ function UniversityBenchmark() {
       .catch(() => setLoading(false));
   }, [programId]);
 
+  // UNIR self-reported stats per program (used for ranking computation)
+  const UNIR_STATS: Record<number, { matriculados: number; graduados: number }> = {
+    94:  { matriculados: 0, graduados: 0 }, // populated from real data when available
+    92:  { matriculados: 0, graduados: 0 },
+    108: { matriculados: 0, graduados: 0 },
+  };
+
   // Derived metrics
   const metrics = (() => {
     if (!data || !data.competitors.length) return null;
@@ -560,7 +570,15 @@ function UniversityBenchmark() {
       cityCount[city] = (cityCount[city] ?? 0) + 1;
     });
     const topCities = Object.entries(cityCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
-    return { avgCredits, avgDur, topCities };
+
+    // UNIR ranking: insert UNIR into sorted competitor list and find position
+    const unirStats = UNIR_STATS[programId] ?? { matriculados: 0, graduados: 0 };
+    const allGrad = [...data.competitors.map(c => c.graduados), unirStats.graduados].sort((a, b) => b - a);
+    const allMat  = [...data.competitors.map(c => c.matriculados), unirStats.matriculados].sort((a, b) => b - a);
+    const unirRankGrad = unirStats.graduados   > 0 ? allGrad.indexOf(unirStats.graduados) + 1   : null;
+    const unirRankMat  = unirStats.matriculados > 0 ? allMat.indexOf(unirStats.matriculados) + 1 : null;
+
+    return { avgCredits, avgDur, topCities, unirRankGrad, unirRankMat };
   })();
 
   const unir = UNIR_PROGRAMS[programId];
@@ -620,12 +638,14 @@ function UniversityBenchmark() {
 
           {/* KPI cards */}
           {metrics && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {[
-                { k: 'Competidores SNIES', v: data.total,              c: C.navy  },
-                { k: 'Créditos prom. mercado', v: metrics.avgCredits ?? '—', c: '#2563eb' },
-                { k: 'Duración prom. (sem.)',  v: metrics.avgDur ?? '—',     c: C.gold   },
-                { k: 'Top ciudad',             v: metrics.topCities[0]?.[0] ?? '—', c: '#7c3aed' },
+                { k: 'Competidores SNIES',    v: data.total,                             c: C.navy    },
+                { k: 'Créditos prom.',         v: metrics.avgCredits ?? '—',             c: '#2563eb' },
+                { k: 'Duración prom. (sem.)',  v: metrics.avgDur ?? '—',                 c: C.gold    },
+                { k: 'Top ciudad',             v: metrics.topCities[0]?.[0] ?? '—',      c: '#7c3aed' },
+                { k: 'Pos. UNIR · Graduados',  v: metrics.unirRankGrad  != null ? `#${metrics.unirRankGrad}`  : '—', c: C.red  },
+                { k: 'Pos. UNIR · Matrículas', v: metrics.unirRankMat   != null ? `#${metrics.unirRankMat}`   : '—', c: C.red  },
               ].map(({ k, v, c }) => (
                 <div key={k} className="rounded-xl border bg-white p-4 text-center shadow-sm">
                   <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
@@ -653,10 +673,10 @@ function UniversityBenchmark() {
           {/* competitors table */}
           {data.competitors.length > 0 ? (
             <div className="rounded-2xl border shadow-sm" style={{ overflowX: 'auto' }}>
-              <table className="text-xs" style={{ minWidth: '700px', width: '100%' }}>
+              <table className="text-xs" style={{ minWidth: '920px', width: '100%' }}>
                 <thead style={{ background: C.navy }}>
                   <tr>
-                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad'].map(h => (
+                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad', 'Matriculados 2024', 'Graduados 2024', 'Inscritos 2024'].map(h => (
                       <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -670,6 +690,9 @@ function UniversityBenchmark() {
                       <td className="px-3 py-2 text-center font-mono" style={{ color: C.navy }}>{c.creditos ?? '—'}</td>
                       <td className="px-3 py-2 text-center text-gray-500">{c.duracion || '—'}</td>
                       <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.periodicidad_admision || '—'}</td>
+                      <td className="px-3 py-2 text-center font-semibold" style={{ color: c.matriculados > 0 ? C.navy : '#9ca3af' }}>{c.matriculados > 0 ? c.matriculados.toLocaleString('es-CO') : '—'}</td>
+                      <td className="px-3 py-2 text-center font-semibold" style={{ color: c.graduados > 0 ? '#059669' : '#9ca3af' }}>{c.graduados > 0 ? c.graduados.toLocaleString('es-CO') : '—'}</td>
+                      <td className="px-3 py-2 text-center text-gray-500">{c.inscritos > 0 ? c.inscritos.toLocaleString('es-CO') : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
