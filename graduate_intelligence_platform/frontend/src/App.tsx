@@ -23,14 +23,15 @@ export default function App() {
     <AppProvider>
       <AuthProvider>
         <Routes>
+          <Route index element={<ObservatorioStorytelling />} />
+          <Route path="/observatorio" element={<ObservatorioStorytelling />} />
           <Route path="/observatorio-institucional" element={<ExecutiveSummaryPage />} />
           <Route path="/pertinencia-demo" element={<PertinenciaStorytelling />} />
-          <Route path="/observatorio" element={<ObservatorioStorytelling />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin" element={<LoginPage />} />
           <Route path="/microcurriculum-demo" element={<MicrocurriculumDemoPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route index element={<DashboardPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
               <Route path="/programs/:programId" element={<ProgramIntelligenceDetailPage />} />
