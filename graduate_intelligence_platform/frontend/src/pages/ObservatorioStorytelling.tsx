@@ -355,8 +355,7 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
   },
 };
 
-function SkillsGapChart() {
-  const [programId, setProgramId]   = useState(94);
+function SkillsGapChart({ programId }: { programId: number }) {
   const [data, setData]             = useState<SkillsAnalysis | null>(null);
   const [loading, setLoading]       = useState(false);
   const [isFallback, setIsFallback] = useState(false);
@@ -396,22 +395,6 @@ function SkillsGapChart() {
 
   return (
     <div className="rounded-2xl overflow-hidden border" style={{ background: C.bg }}>
-      {/* header + selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b"
-        style={{ background: C.navy }}>
-        <h3 className="text-base font-bold text-white">Análisis de Brechas de Skills</h3>
-        <select
-          value={programId}
-          onChange={e => setProgramId(Number(e.target.value))}
-          className="text-xs rounded-lg px-3 py-1.5 font-medium border-0 focus:ring-2 focus:ring-offset-1"
-          style={{ background: 'rgba(255,255,255,0.12)', color: C.white }}
-        >
-          {PROGRAM_OPTIONS.map(p => (
-            <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
-          ))}
-        </select>
-      </div>
-
       {loading && (
         <div className="flex items-center justify-center py-16">
           <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-700 animate-spin" />
@@ -532,8 +515,7 @@ const BENCH_PROGRAMS = [
   { id: 108, label: 'Especialización en Criminología' },
 ];
 
-function UniversityBenchmark() {
-  const [programId, setProgramId] = useState(94);
+function UniversityBenchmark({ programId }: { programId: number }) {
   const [data, setData]           = useState<UniversityData | null>(null);
   const [loading, setLoading]     = useState(false);
 
@@ -585,20 +567,7 @@ function UniversityBenchmark() {
 
   return (
     <div className="space-y-5">
-      {/* selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-gray-500">Programas activos modalidad virtual registrados en SNIES / HECAA</p>
-        <select
-          value={programId}
-          onChange={e => { setProgramId(Number(e.target.value)); }}
-          className="text-xs rounded-lg px-3 py-1.5 font-medium border border-gray-200 bg-white focus:ring-2 focus:ring-green-600"
-          style={{ color: C.navy }}
-        >
-          {BENCH_PROGRAMS.map(p => (
-            <option key={p.id} value={p.id}>{p.label}</option>
-          ))}
-        </select>
-      </div>
+      <p className="text-xs text-gray-500 mb-4">Programas activos modalidad virtual registrados en SNIES / HECAA</p>
 
       {loading && (
         <div className="flex items-center justify-center py-16">
@@ -719,6 +688,7 @@ export default function ObservatorioStorytelling() {
   const [data, setData]       = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [programaId, setProgramaId] = useState(94);
 
   useEffect(() => {
     fetch(`${API}/api/dashboard/summary`)
@@ -737,6 +707,7 @@ export default function ObservatorioStorytelling() {
   );
 
   const d = data!;
+  const programaLabel = BENCH_PROGRAMS.find(p => p.id === programaId)?.label ?? 'Visual Analytics & Big Data';
   const lec = buildLecturas(d);
   const { totales, programas, top_matches } = d;
   const coveragePct = totales.matches ? Math.round(((totales.alta + totales.media) / totales.matches) * 100) : 0;
@@ -771,7 +742,16 @@ export default function ObservatorioStorytelling() {
             <p className="text-white font-bold text-base leading-tight">UNIR Colombia</p>
             <p className="text-xs font-medium" style={{ color: C.light }}>Observatorio Institucional</p>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <select
+              value={programaId}
+              onChange={e => setProgramaId(Number(e.target.value))}
+              style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 4, padding: '6px 12px', fontSize: 11 }}
+            >
+              <option value={94} style={{ color: '#111', background: '#fff' }}>Visual Analytics &amp; Big Data</option>
+              <option value={92} style={{ color: '#111', background: '#fff' }}>Inteligencia Artificial</option>
+              <option value={108} style={{ color: '#111', background: '#fff' }}>Criminología</option>
+            </select>
             <span className="rounded-full px-3 py-1 text-xs font-semibold"
               style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid ${C.border}40` }}>
               Run #{d.run_id} · {d.fecha}
@@ -787,6 +767,9 @@ export default function ObservatorioStorytelling() {
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             Inteligencia Curricular<br />& Pertinencia Académica
           </h1>
+          <p className="text-base font-semibold max-w-xl mx-auto" style={{ color: '#fcd34d' }}>
+            {programaLabel}
+          </p>
           <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
             {totales.matches.toLocaleString()} pares programa–empleo analizados
           </p>
@@ -840,13 +823,18 @@ export default function ObservatorioStorytelling() {
       <Section n="2" title="Ranking de Programas" dark>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[...programas]
-            .sort((a, b) => b.score_maximo - a.score_maximo)
+            .sort((a, b) => {
+              if (a.id === programaId) return -1;
+              if (b.id === programaId) return 1;
+              return b.score_maximo - a.score_maximo;
+            })
             .map((p, i) => {
+              const isSelected = p.id === programaId;
               const tot = p.labels.high + p.labels.medium + p.labels.low || 1;
               const ringC = p.score_maximo >= 75 ? C.mid : p.score_maximo >= 55 ? C.gold : '#fca5a5';
               return (
                 <div key={p.id} className="rounded-2xl p-5 flex flex-col gap-3"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  style={{ background: isSelected ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)', border: isSelected ? `2px solid ${C.gold}` : '1px solid rgba(255,255,255,0.12)' }}>
                   <div className="flex items-center gap-3">
                     <span className="text-2xl font-black" style={{ color: 'rgba(255,255,255,0.2)' }}>
                       #{i + 1}
@@ -909,7 +897,10 @@ export default function ObservatorioStorytelling() {
       {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
       <Section n="4" title="Mejores Matches & Brechas Curriculares" dark>
         <div className="space-y-3 mb-6">
-          {top_matches.slice(0, 10).map((m, i) => (
+          {top_matches.filter(m => {
+              const pNom = programas.find(p => p.id === programaId)?.nombre ?? '';
+              return pNom ? m.programa.toLowerCase().includes(pNom.split(' ')[0].toLowerCase()) : true;
+            }).slice(0, 10).map((m, i) => (
             <div key={i} className="rounded-xl px-4 py-3"
               style={{ background: 'rgba(255,255,255,0.07)' }}>
               <div className="flex items-center gap-3">
@@ -953,7 +944,7 @@ export default function ObservatorioStorytelling() {
         </div>
 
         {/* Skills Gap Chart within section 4 */}
-        <SkillsGapChart />
+        <SkillsGapChart programId={programaId} />
       </Section>
 
       {/* ── SECCIÓN 5: Tabla completa ── */}
@@ -1077,7 +1068,7 @@ export default function ObservatorioStorytelling() {
 
       {/* ── SECCIÓN 7: Benchmark y Competencia ── */}
       <Section n="7" title="Benchmark y Competencia SNIES">
-        <UniversityBenchmark />
+        <UniversityBenchmark programId={programaId} />
       </Section>
 
       {/* ── CIERRE ── */}
