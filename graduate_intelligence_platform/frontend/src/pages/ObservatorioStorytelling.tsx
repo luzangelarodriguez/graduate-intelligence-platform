@@ -66,12 +66,14 @@ const FALLBACK: Summary = {
 // ─── SVG Ring ─────────────────────────────────────────────────────────────────
 const R = 42, CIRC = 2 * Math.PI * R;
 
-function Ring({ score, color = C.navy, size = 120, thick = 9 }: {
-  score: number; color?: string; size?: number; thick?: number;
+function Ring({ score, color = C.navy, size = 120, thick = 9, label }: {
+  score: number; color?: string; size?: number; thick?: number; label?: string;
 }) {
   const [v, setV] = useState(0);
   useEffect(() => { const id = requestAnimationFrame(() => setV(score)); return () => cancelAnimationFrame(id); }, [score]);
   const dash = (v / 100) * CIRC;
+  const displayText = label ?? String(Math.round(v));
+  const fontSize = label && label.length > 3 ? '14' : '18';
   return (
     <svg width={size} height={size} viewBox="0 0 100 100">
       <circle cx="50" cy="50" r={R} fill="none" stroke="#e5e7eb" strokeWidth={thick} />
@@ -81,8 +83,7 @@ function Ring({ score, color = C.navy, size = 120, thick = 9 }: {
         strokeDashoffset={CIRC * 0.25}
         style={{ transition: 'stroke-dasharray 1.4s cubic-bezier(.4,0,.2,1)' }}
       />
-      <text x="50" y="48" textAnchor="middle" fontSize="18" fontWeight="800" fill={color}>{Math.round(v)}</text>
-      <text x="50" y="62" textAnchor="middle" fontSize="9" fill="#9ca3af">/ 100</text>
+      <text x="50" y="50" textAnchor="middle" dominantBaseline="middle" fontSize={fontSize} fontWeight="800" fill={color}>{displayText}</text>
     </svg>
   );
 }
@@ -795,16 +796,16 @@ export default function ObservatorioStorytelling() {
           <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
             {totales.matches.toLocaleString()} pares programa–empleo analizados
           </p>
-          {/* hero rings */}
+          {/* hero rings — fill proportional to total, display count */}
           <div className="flex flex-wrap justify-center gap-8 pt-8">
             {[
-              { label: 'Cobertura pertinente', val: coveragePct, color: C.light   },
-              { label: 'Alta pertinencia',     val: altaPct,     color: '#93c5fd' },
-              { label: 'Pertinencia media',    val: mediaPct,    color: '#fcd34d' },
-              { label: 'Baja pertinencia',     val: bajaPct,     color: '#fca5a5' },
-            ].map(({ label, val, color }) => (
+              { label: 'Total matches',    count: totales.matches, color: C.light,    fill: 100 },
+              { label: 'Alta pertinencia', count: totales.alta,    color: '#93c5fd',  fill: altaPct  },
+              { label: 'Pertinencia media',count: totales.media,   color: '#fcd34d',  fill: mediaPct },
+              { label: 'Baja pertinencia', count: totales.baja,    color: '#fca5a5',  fill: bajaPct  },
+            ].map(({ label, count, color, fill }) => (
               <div key={label} className="flex flex-col items-center gap-2">
-                <Ring score={val} color={color} size={120} />
+                <Ring score={fill} color={color} size={120} label={String(count)} />
                 <span className="text-xs" style={{ color: C.light }}>{label}</span>
               </div>
             ))}
