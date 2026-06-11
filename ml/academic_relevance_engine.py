@@ -424,6 +424,36 @@ SKILLS_LOOKUP: List[str] = [
     "transformacion digital",
     # --- Version control ---
     "git", "control de versiones",
+    # --- Additional keywords for Elempleo job descriptions ---
+    "r studio",                      # already present but repeated for clarity
+    "tableau", "looker",             # already present
+    "data lake", "data warehouse",   # already present
+    "mlops", "feature engineering",
+    "analisis forense", "victimologia",
+    "perfilacion criminal", "compliance", "derecho penal",
+    "gestión de proyectos", "gestion de proyectos",
+    "estadistica descriptiva", "estadistica inferencial",
+    "mineria de texto", "text mining",
+    "series temporales", "forecasting", "pronostico",
+    "redes sociales", "social media analytics",
+    "inteligencia de negocios",
+    "reporteria", "reportes gerenciales",
+    "analisis de riesgo", "riesgo crediticio", "riesgo operacional",
+    "microsegmentacion", "segmentacion de clientes",
+    "modelos de clasificacion", "modelos de regresion",
+    "arboles de decision", "random forest", "gradient boosting",
+    "procesamiento de datos", "calidad de datos",
+    "gobierno de datos", "data governance",
+    "analista de datos", "cientifico de datos",
+    "ingeniero de datos", "arquitecto de datos",
+    "looker studio", "google analytics", "google tag manager",
+    "meta ads", "google ads", "crm",
+    "sap", "salesforce", "oracle",
+    "numpy", "matplotlib", "seaborn",
+    "jupyter", "colab",
+    "excel avanzado", "tablas dinamicas", "pivot",
+    "presentaciones ejecutivas", "storytelling con datos",
+    "sql avanzado", "pl/sql", "t-sql",
 ]
 
 # Single-character and noise tokens that must never be treated as skills.
@@ -465,6 +495,15 @@ def extract_skills_by_lookup(text: str) -> List[str]:
             if term in n:
                 found.add(term)
     return sorted(found)
+
+
+def extract_skills_from_text(text: str) -> List[str]:
+    """
+    Extract skills from free text (job description, title, etc.) using keyword lookup.
+    Case-insensitive; accent-insensitive via _normalize().
+    Used inline during matching when empleo_skills table is empty or mismatched.
+    """
+    return extract_skills_by_lookup(text)
 
 
 def _skills_from_text(text: str) -> List[str]:
@@ -658,15 +697,18 @@ def load_jobs(conn) -> List[JobProfile]:
     n_from_text = 0
     for row in rows:
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
+        # Use full description (up to 3000 chars) so inline keyword extraction
+        # covers complete job postings from Elempleo, even when empleo_skills
+        # is empty or has ID-mismatch issues.
         text = " ".join(filter(None, [
             row["title"],
-            (row["description"] or "")[:500],
+            (row["description"] or "")[:3000],
             " ".join(db_skills),
-        ]))[:800]
+        ]))[:3500]
         # Always extract from text AND merge with DB skills so jobs inserted
         # by run_acquisition.py (which may have empty job_skills rows) still
         # get meaningful skill coverage for pertinence scoring.
-        text_skills = _skills_from_text(text)
+        text_skills = extract_skills_from_text(text)
         skills = sorted(set(db_skills) | set(text_skills))
         if db_skills:
             n_from_db += 1
