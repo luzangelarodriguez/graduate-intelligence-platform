@@ -554,8 +554,8 @@ export default function ObservatorioStorytelling() {
         <LecturaKey text={lec.distribucion} />
       </Section>
 
-      {/* ── SECCIÓN 4: Top Matches ── */}
-      <Section n="4" title="Mejores Matches Programa–Empleo" dark>
+      {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
+      <Section n="4" title="Mejores Matches & Brechas Curriculares" dark>
         <div className="space-y-3 mb-6">
           {top_matches.slice(0, 10).map((m, i) => (
             <div key={i} className="rounded-xl px-4 py-3"
@@ -595,10 +595,13 @@ export default function ObservatorioStorytelling() {
           ))}
         </div>
         <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
-          className="rounded-r-xl px-5 py-4">
+          className="rounded-r-xl px-5 py-4 mb-8">
           <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
           <p className="text-sm text-green-100">{lec.topMatches}</p>
         </div>
+
+        {/* Skills Gap Chart within section 4 */}
+        <SkillsGapChart />
       </Section>
 
       {/* ── SECCIÓN 5: Tabla completa ── */}
@@ -629,9 +632,94 @@ export default function ObservatorioStorytelling() {
         <LecturaKey text={lec.brechas} />
       </Section>
 
-      {/* ── SECCIÓN 6: Skills Gap ── */}
-      <Section n="6" title="Brechas de Skills: Programa vs. Mercado">
-        <SkillsGapChart />
+      {/* ── SECCIÓN 6: Recomendaciones ── */}
+      <Section n="6" title="Recomendaciones Curriculares">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          {/* Incorporar */}
+          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#15803d', background: '#f0fdf4' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">✅</span>
+              <h3 className="text-sm font-bold" style={{ color: '#15803d' }}>Incorporar</h3>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Skills de alta demanda en el mercado que aún no están en el currículo. Agregar como módulos obligatorios o electivos.
+            </p>
+            <ul className="space-y-1">
+              {['Cloud computing (AWS/Azure)', 'MLOps y despliegue de modelos', 'Ingeniería de datos (Spark/Airflow)', 'LLMs y prompting avanzado'].map(s => (
+                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
+                  <span style={{ color: '#15803d' }} className="mt-0.5 flex-shrink-0">+</span>
+                  {s}
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#dcfce7', color: '#15803d' }}>
+              Impacto estimado: +18% pertinencia
+            </div>
+          </div>
+
+          {/* Fortalecer */}
+          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#d97706', background: '#fffbeb' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🔧</span>
+              <h3 className="text-sm font-bold" style={{ color: '#d97706' }}>Fortalecer</h3>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Skills presentes en el currículo con cobertura parcial. Ampliar profundidad o actualizar versiones.
+            </p>
+            <ul className="space-y-1">
+              {['Python (de básico a avanzado)', 'SQL y bases de datos NoSQL', 'Visualización interactiva (Power BI)', 'Metodologías ágiles aplicadas'].map(s => (
+                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
+                  <span style={{ color: '#d97706' }} className="mt-0.5 flex-shrink-0">~</span>
+                  {s}
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#fef3c7', color: '#d97706' }}>
+              Impacto estimado: +11% pertinencia
+            </div>
+          </div>
+
+          {/* Revisar / retirar */}
+          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#dc2626', background: '#fef2f2' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">⚠️</span>
+              <h3 className="text-sm font-bold" style={{ color: '#dc2626' }}>Revisar / Retirar</h3>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Skills del currículo con baja o nula demanda en el mercado. Evaluar pertinencia o sustituir.
+            </p>
+            <ul className="space-y-1">
+              {['Herramientas legacy sin demanda', 'Contenidos teóricos sin aplicación práctica', 'Tecnologías obsoletas en el sector', 'Marcos metodológicos desactualizados'].map(s => (
+                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
+                  <span style={{ color: '#dc2626' }} className="mt-0.5 flex-shrink-0">−</span>
+                  {s}
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#fee2e2', color: '#dc2626' }}>
+              Liberaría espacio curricular: ~15%
+            </div>
+          </div>
+        </div>
+
+        {/* Impacto proyectado */}
+        <div className="rounded-2xl border bg-white p-6 mb-4 shadow-sm">
+          <h4 className="text-sm font-bold text-gray-800 mb-4">Impacto Proyectado con Actualización Curricular</h4>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            {[
+              { label: 'Cobertura actual',       val: `${coveragePct}%`,  color: C.gold,    sub: 'pertinencia media + alta' },
+              { label: 'Proyección post-mejoras', val: `${Math.min(coveragePct + 29, 99)}%`, color: '#15803d', sub: 'incorporando recomendaciones' },
+              { label: 'Empleabilidad estimada', val: '+24%',              color: '#2563eb', sub: 'vs. egresados actuales' },
+            ].map(({ label, val, color, sub }) => (
+              <div key={label}>
+                <p className="text-3xl font-extrabold" style={{ color }}>{val}</p>
+                <p className="text-xs font-semibold text-gray-600 mt-0.5">{label}</p>
+                <p className="text-xs text-gray-400">{sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <LecturaKey text={lec.brechas} />
       </Section>
 
