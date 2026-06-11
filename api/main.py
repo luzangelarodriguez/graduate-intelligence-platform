@@ -503,6 +503,68 @@ def dashboard_summary() -> dict[str, Any]:
     }
 
 
+@app.get("/api/programs/related-universities/{program_id}", tags=["programs"])
+def related_universities(program_id: int) -> dict[str, Any]:
+    """Return competitor programs from mineducacion_programas_virtuales matching the domain keywords."""
+    from api.database import fetch_all
+
+    KEYWORDS: dict[int, list[str]] = {
+        94:  ['analytics', 'datos', 'big data', 'data', 'inteligencia de negocios', 'business intelligence'],
+        92:  ['inteligencia artificial', 'machine learning', 'ciencia de datos', 'data science'],
+        108: ['criminolog', 'seguridad', 'forense', 'criminalística', 'investigación criminal'],
+    }
+
+    keywords = KEYWORDS.get(program_id, [])
+    if not keywords:
+        return {"program_id": program_id, "competitors": [], "total": 0}
+
+    # Build ARRAY[...] of ILIKE patterns
+    patterns = [f"%{kw}%" for kw in keywords]
+    placeholders = ", ".join(["%s"] * len(patterns))
+
+    rows = fetch_all(
+        f"""
+        SELECT
+            nombre_ies,
+            nombre_programa,
+            municipio           AS ciudad,
+            modalidad,
+            nivel_academico,
+            creditos,
+            duracion,
+            area_conocimiento,
+            municipio,
+            departamento,
+            periodicidad_admision
+        FROM mineducacion_programas_virtuales
+        WHERE nombre_programa ILIKE ANY(ARRAY[{placeholders}])
+          AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
+        ORDER BY nombre_ies
+        LIMIT 50
+        """,
+        tuple(patterns),
+    )
+
+    competitors = [
+        {
+            "nombre_ies":           r["nombre_ies"] or "",
+            "nombre_programa":      r["nombre_programa"] or "",
+            "ciudad":               r["ciudad"] or "",
+            "modalidad":            r["modalidad"] or "",
+            "nivel_academico":      r["nivel_academico"] or "",
+            "creditos":             r["creditos"],
+            "duracion":             r["duracion"] or "",
+            "area_conocimiento":    r["area_conocimiento"] or "",
+            "municipio":            r["municipio"] or "",
+            "departamento":         r["departamento"] or "",
+            "periodicidad_admision": r["periodicidad_admision"] or "",
+        }
+        for r in rows
+    ]
+
+    return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
+
+
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
