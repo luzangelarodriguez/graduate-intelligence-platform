@@ -507,10 +507,12 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     # 1. Skills from market (job matches for this program, latest run)
     market_rows = fetch_all(
         """
-        SELECT unnest(skills_empleo) AS skill, COUNT(*) AS frecuencia
-        FROM ml_program_job_matches
+        SELECT skill, COUNT(*) AS frecuencia
+        FROM ml_program_job_matches,
+             jsonb_array_elements_text(skills_empleo) AS skill
         WHERE especializacion_id = %s
           AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches)
+          AND jsonb_typeof(skills_empleo) = 'array'
         GROUP BY skill
         ORDER BY frecuencia DESC
         LIMIT 30
