@@ -4,13 +4,20 @@ import { useEffect, useRef, useState } from 'react';
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 const C = {
-  green:  '#1B4332',
-  cream:  '#F8F4EE',
-  gold:   '#B7791F',
-  goldBg: '#FEF3C7',
-  light:  '#D1FAE5',
-  mid:    '#6EE7B7',
-  white:  '#FFFFFF',
+  navy:    '#0D2158',
+  red:     '#E63329',
+  bg:      '#F4F6FA',
+  navyBg:  '#EEF2FB',
+  border:  '#D8DEF0',
+  white:   '#FFFFFF',
+  // accent shades
+  navyLight: '#1A3580',
+  redLight:  '#FDECEA',
+  gold:    '#B7791F',
+  goldBg:  '#FEF3C7',
+  // kept for legacy ring colors
+  mid:     '#7B93D4',
+  light:   '#C7D3F5',
 };
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -59,7 +66,7 @@ const FALLBACK: Summary = {
 // ─── SVG Ring ─────────────────────────────────────────────────────────────────
 const R = 42, CIRC = 2 * Math.PI * R;
 
-function Ring({ score, color = C.green, size = 120, thick = 9 }: {
+function Ring({ score, color = C.navy, size = 120, thick = 9 }: {
   score: number; color?: string; size?: number; thick?: number;
 }) {
   const [v, setV] = useState(0);
@@ -83,9 +90,9 @@ function Ring({ score, color = C.green, size = 120, thick = 9 }: {
 // ─── Lectura Clave block ───────────────────────────────────────────────────────
 function LecturaKey({ text }: { text: string }) {
   return (
-    <div style={{ background: C.goldBg, borderLeft: `4px solid ${C.gold}` }}
+    <div style={{ background: C.navyBg, borderLeft: `4px solid ${C.navy}` }}
       className="rounded-r-xl px-5 py-4 my-4">
-      <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
+      <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.navy }}>
         ✦ Lectura Clave
       </p>
       <p className="text-sm leading-relaxed text-gray-800">{text}</p>
@@ -100,25 +107,25 @@ function Section({ n, title, children, dark = false }: {
   return (
     <section
       className="relative py-14 px-4"
-      style={{ background: dark ? C.green : C.cream }}
+      style={{ background: dark ? C.navy : C.bg }}
     >
       {/* decorative number */}
       <span
         className="absolute top-4 right-6 font-black select-none pointer-events-none"
         style={{
-          fontSize: '7rem', lineHeight: 1, opacity: dark ? 0.08 : 0.06,
-          color: dark ? C.white : C.green,
+          fontSize: '7rem', lineHeight: 1, opacity: dark ? 0.08 : 0.05,
+          color: dark ? C.white : C.navy,
         }}
       >
         {n}
       </span>
       <div className="max-w-4xl mx-auto relative z-10">
         <p className="text-xs font-bold uppercase tracking-widest mb-1"
-          style={{ color: dark ? C.mid : C.gold }}>
+          style={{ color: dark ? C.light : C.red }}>
           Sección {n}
         </p>
         <h2 className="text-2xl sm:text-3xl font-extrabold mb-6"
-          style={{ color: dark ? C.white : C.green }}>
+          style={{ color: dark ? C.white : C.navy }}>
           {title}
         </h2>
         {children}
@@ -129,7 +136,7 @@ function Section({ n, title, children, dark = false }: {
 
 // ─── Label badge ──────────────────────────────────────────────────────────────
 const LBL: Record<string, [string, string, string]> = {
-  high:   ['Alta',  '#dcfce7', '#15803d'],
+  high:   ['Alta',  '#D8DEF0', '#0D2158'],
   medium: ['Media', '#fef9c3', '#b45309'],
   low:    ['Baja',  '#fee2e2', '#b91c1c'],
 };
@@ -229,7 +236,7 @@ function MirrorBar({
       <div className="flex justify-end" style={{ width: '38%' }}>
         <div
           className="h-5 rounded-l-sm transition-all duration-700"
-          style={{ width: `${leftPct}%`, background: inProgram ? '#15803d' : 'transparent', minWidth: leftVal ? 2 : 0 }}
+          style={{ width: `${leftPct}%`, background: inProgram ? '#0D2158' : 'transparent', minWidth: leftVal ? 2 : 0 }}
         />
       </div>
       {/* skill label */}
@@ -388,10 +395,10 @@ function SkillsGapChart() {
   const maxVal = Math.max(...rows.map(r => Math.max(r.leftVal, r.rightVal)), 1);
 
   return (
-    <div className="rounded-2xl overflow-hidden border" style={{ background: C.cream }}>
+    <div className="rounded-2xl overflow-hidden border" style={{ background: C.bg }}>
       {/* header + selector */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b"
-        style={{ background: C.green }}>
+        style={{ background: C.navy }}>
         <h3 className="text-base font-bold text-white">Análisis de Brechas de Skills</h3>
         <select
           value={programId}
@@ -407,7 +414,7 @@ function SkillsGapChart() {
 
       {loading && (
         <div className="flex items-center justify-center py-16">
-          <div className="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-700 animate-spin" />
+          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-700 animate-spin" />
         </div>
       )}
 
@@ -423,7 +430,7 @@ function SkillsGapChart() {
           {/* KPI summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4">
             {[
-              { k: 'Cobertura',    v: `${data.cobertura_pct}%`, c: '#15803d' },
+              { k: 'Cobertura',    v: `${data.cobertura_pct}%`, c: '#0D2158' },
               { k: 'Fortalezas',   v: data.fortalezas.length,   c: '#2563eb' },
               { k: 'Brechas',      v: data.brechas.length,      c: '#dc2626' },
               { k: 'Exclusivas',   v: data.exclusivas_programa.length, c: C.gold },
@@ -437,7 +444,7 @@ function SkillsGapChart() {
 
           {/* legend */}
           <div className="flex gap-4 px-5 pb-2 text-xs text-gray-500">
-            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#15803d' }} />Programa (cobertura)</span>
+            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#0D2158' }} />Programa (cobertura)</span>
             <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#2563eb' }} />Mercado cubierto</span>
             <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#ef4444' }} />Brecha (solo en mercado)</span>
           </div>
@@ -450,7 +457,7 @@ function SkillsGapChart() {
                 onClick={() => setActiveTab(cat)}
                 className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
                 style={activeTab === cat
-                  ? { background: C.green, color: C.white }
+                  ? { background: C.navy, color: C.white }
                   : { background: '#e5e7eb', color: '#374151' }}
               >
                 {cat}
@@ -567,7 +574,7 @@ function UniversityBenchmark() {
           value={programId}
           onChange={e => { setProgramId(Number(e.target.value)); }}
           className="text-xs rounded-lg px-3 py-1.5 font-medium border border-gray-200 bg-white focus:ring-2 focus:ring-green-600"
-          style={{ color: C.green }}
+          style={{ color: C.navy }}
         >
           {BENCH_PROGRAMS.map(p => (
             <option key={p.id} value={p.id}>{p.label}</option>
@@ -577,7 +584,7 @@ function UniversityBenchmark() {
 
       {loading && (
         <div className="flex items-center justify-center py-16">
-          <div className="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-700 animate-spin" />
+          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-700 animate-spin" />
         </div>
       )}
 
@@ -585,13 +592,13 @@ function UniversityBenchmark() {
         <>
           {/* UNIR positioning badge */}
           <div className="rounded-2xl p-5 flex flex-wrap items-center gap-5"
-            style={{ background: C.green, border: `2px solid ${C.gold}` }}>
+            style={{ background: C.navy, border: `2px solid ${C.gold}` }}>
             <div className="flex-1 min-w-[200px]">
               <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
                 ✦ Posicionamiento UNIR Colombia
               </p>
               <p className="text-sm font-semibold text-white leading-snug">{unir.nombre}</p>
-              <p className="text-xs text-green-300 mt-1">Modalidad Virtual · Colombia</p>
+              <p className="text-xs text-blue-300 mt-1">Modalidad Virtual · Colombia</p>
             </div>
             <div className="flex gap-6">
               {[
@@ -601,7 +608,7 @@ function UniversityBenchmark() {
               ].map(({ k, v }) => (
                 <div key={k} className="text-center">
                   <p className="text-2xl font-extrabold" style={{ color: C.mid }}>{v}</p>
-                  <p className="text-xs text-green-300">{k}</p>
+                  <p className="text-xs text-blue-300">{k}</p>
                 </div>
               ))}
             </div>
@@ -615,7 +622,7 @@ function UniversityBenchmark() {
           {metrics && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { k: 'Competidores SNIES', v: data.total,              c: C.green  },
+                { k: 'Competidores SNIES', v: data.total,              c: C.navy  },
                 { k: 'Créditos prom. mercado', v: metrics.avgCredits ?? '—', c: '#2563eb' },
                 { k: 'Duración prom. (sem.)',  v: metrics.avgDur ?? '—',     c: C.gold   },
                 { k: 'Top ciudad',             v: metrics.topCities[0]?.[0] ?? '—', c: '#7c3aed' },
@@ -635,7 +642,7 @@ function UniversityBenchmark() {
               <div className="flex flex-wrap gap-2">
                 {metrics.topCities.map(([city, count]) => (
                   <span key={city} className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: '#f0fdf4', color: C.green, border: `1px solid #bbf7d0` }}>
+                    style={{ background: '#EEF2FB', color: C.navy, border: `1px solid #D8DEF0` }}>
                     {city} · {count} prog.
                   </span>
                 ))}
@@ -647,20 +654,20 @@ function UniversityBenchmark() {
           {data.competitors.length > 0 ? (
             <div className="rounded-2xl overflow-hidden border shadow-sm">
               <table className="min-w-full text-xs">
-                <thead style={{ background: C.green }}>
+                <thead style={{ background: C.navy }}>
                   <tr>
                     {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad'].map(h => (
-                      <th key={h} className="px-3 py-2 text-left font-semibold text-green-200 whitespace-nowrap">{h}</th>
+                      <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {data.competitors.map((c, i) => (
-                    <tr key={i} className="hover:bg-green-50 transition-colors">
+                    <tr key={i} className="hover:bg-blue-50 transition-colors">
                       <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px] truncate">{c.nombre_ies}</td>
                       <td className="px-3 py-2 text-gray-600 max-w-[220px] truncate">{c.nombre_programa}</td>
                       <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.municipio || c.ciudad || '—'}</td>
-                      <td className="px-3 py-2 text-center font-mono" style={{ color: C.green }}>{c.creditos ?? '—'}</td>
+                      <td className="px-3 py-2 text-center font-mono" style={{ color: C.navy }}>{c.creditos ?? '—'}</td>
                       <td className="px-3 py-2 text-center text-gray-500">{c.duracion || '—'}</td>
                       <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.periodicidad_admision || '—'}</td>
                     </tr>
@@ -698,10 +705,10 @@ export default function ObservatorioStorytelling() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: C.cream }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
       <div className="text-center space-y-4">
-        <div className="mx-auto w-14 h-14 rounded-full border-4 border-green-200 border-t-green-800 animate-spin" />
-        <p style={{ color: C.green }} className="text-sm font-medium">Cargando observatorio…</p>
+        <div className="mx-auto w-14 h-14 rounded-full border-4 border-blue-200 border-t-blue-900 animate-spin" />
+        <p style={{ color: C.navy }} className="text-sm font-medium">Cargando observatorio…</p>
       </div>
     </div>
   );
@@ -715,7 +722,7 @@ export default function ObservatorioStorytelling() {
   const bajaPct     = totales.matches ? Math.round((totales.baja  / totales.matches) * 100) : 0;
 
   return (
-    <div style={{ background: C.cream, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ background: C.bg, fontFamily: 'system-ui, sans-serif' }}>
 
       {usingFallback && (
         <div className="text-center text-xs py-2 px-4" style={{ background: C.goldBg, color: C.gold }}>
@@ -724,31 +731,53 @@ export default function ObservatorioStorytelling() {
       )}
 
       {/* ── PORTADA ── */}
-      <header className="relative overflow-hidden py-20 px-4 text-center"
-        style={{ background: C.green }}>
+      <header className="relative overflow-hidden py-16 px-4"
+        style={{ background: C.navy }}>
+        {/* watermark */}
         <span className="absolute inset-0 flex items-center justify-center text-white font-black select-none pointer-events-none"
           style={{ fontSize: '20rem', opacity: 0.04 }}>OI</span>
-        <div className="relative z-10 max-w-3xl mx-auto space-y-4">
-          <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.mid }}>
-            UNIR Colombia · Observatorio Institucional
+
+        {/* nav logo bar */}
+        <div className="relative z-10 max-w-4xl mx-auto flex items-center gap-4 mb-10">
+          {/* UNIR square logo */}
+          <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center font-extrabold text-white text-xl"
+            style={{ background: C.red }}>
+            U
+          </div>
+          <div className="text-left">
+            <p className="text-white font-bold text-base leading-tight">UNIR Colombia</p>
+            <p className="text-xs font-medium" style={{ color: C.light }}>Observatorio Institucional</p>
+          </div>
+          <div className="ml-auto">
+            <span className="rounded-full px-3 py-1 text-xs font-semibold"
+              style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid ${C.border}40` }}>
+              Run #{d.run_id} · {d.fecha}
+            </span>
+          </div>
+        </div>
+
+        {/* hero content */}
+        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-4">
+          <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.light }}>
+            Motor de Pertinencia Académica
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             Inteligencia Curricular<br />& Pertinencia Académica
           </h1>
-          <p className="text-green-200 text-sm max-w-xl mx-auto">
-            Run #{d.run_id} · {d.fecha} · {totales.matches.toLocaleString()} pares programa–empleo analizados
+          <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
+            {totales.matches.toLocaleString()} pares programa–empleo analizados
           </p>
           {/* hero rings */}
           <div className="flex flex-wrap justify-center gap-8 pt-8">
             {[
-              { label: 'Cobertura pertinente', val: coveragePct, color: C.mid    },
-              { label: 'Alta pertinencia',     val: altaPct,     color: '#86efac' },
-              { label: 'Pertinencia media',    val: mediaPct,    color: C.gold    },
+              { label: 'Cobertura pertinente', val: coveragePct, color: C.light   },
+              { label: 'Alta pertinencia',     val: altaPct,     color: '#93c5fd' },
+              { label: 'Pertinencia media',    val: mediaPct,    color: '#fcd34d' },
               { label: 'Baja pertinencia',     val: bajaPct,     color: '#fca5a5' },
             ].map(({ label, val, color }) => (
               <div key={label} className="flex flex-col items-center gap-2">
                 <Ring score={val} color={color} size={120} />
-                <span className="text-xs text-green-200">{label}</span>
+                <span className="text-xs" style={{ color: C.light }}>{label}</span>
               </div>
             ))}
           </div>
@@ -759,10 +788,10 @@ export default function ObservatorioStorytelling() {
       <Section n="1" title="Cobertura de Pertinencia">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           {[
-            { k: 'Matches totales', v: totales.matches, c: C.green },
-            { k: 'Alta pertinencia', v: totales.alta,   c: '#15803d' },
-            { k: 'Media',           v: totales.media,   c: C.gold },
-            { k: 'Baja',            v: totales.baja,    c: '#b91c1c' },
+            { k: 'Matches totales', v: totales.matches, c: C.navy  },
+            { k: 'Alta pertinencia', v: totales.alta,   c: '#2563eb' },
+            { k: 'Media',           v: totales.media,   c: C.gold  },
+            { k: 'Baja',            v: totales.baja,    c: C.red   },
           ].map(({ k, v, c }) => (
             <div key={k} className="rounded-2xl border bg-white p-4 text-center shadow-sm">
               <p className="text-3xl font-extrabold" style={{ color: c }}>{v}</p>
@@ -772,12 +801,12 @@ export default function ObservatorioStorytelling() {
         </div>
         {/* stacked bar */}
         <div className="rounded-xl overflow-hidden h-6 flex mb-2">
-          <div style={{ width: `${altaPct}%`,  background: '#15803d', transition: 'width 1.2s ease' }} />
+          <div style={{ width: `${altaPct}%`,  background: '#0D2158', transition: 'width 1.2s ease' }} />
           <div style={{ width: `${mediaPct}%`, background: C.gold,    transition: 'width 1.2s ease' }} />
           <div style={{ width: `${bajaPct}%`,  background: '#ef4444', transition: 'width 1.2s ease' }} />
         </div>
         <div className="flex gap-4 text-xs text-gray-500 mb-4">
-          <span><span style={{ color: '#15803d' }}>■</span> Alta {altaPct}%</span>
+          <span><span style={{ color: '#0D2158' }}>■</span> Alta {altaPct}%</span>
           <span><span style={{ color: C.gold   }}>■</span> Media {mediaPct}%</span>
           <span><span style={{ color: '#ef4444' }}>■</span> Baja {bajaPct}%</span>
         </div>
@@ -812,7 +841,7 @@ export default function ObservatorioStorytelling() {
                         <div key={l}>
                           <div className="flex justify-between mb-0.5">
                             <span style={{ color: c }}>{l}</span>
-                            <span className="text-green-200">{v}</span>
+                            <span className="text-blue-200">{v}</span>
                           </div>
                           <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
                             <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c, transition: 'width 1.2s ease' }} />
@@ -821,7 +850,7 @@ export default function ObservatorioStorytelling() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex justify-between text-xs text-green-300">
+                  <div className="flex justify-between text-xs text-blue-300">
                     <span>{p.matches_total} empleos</span>
                     <span>Prom. {p.score_promedio}</span>
                   </div>
@@ -832,7 +861,7 @@ export default function ObservatorioStorytelling() {
         <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
           className="rounded-r-xl px-5 py-4 mt-6">
           <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
-          <p className="text-sm text-green-100">{lec.ranking}</p>
+          <p className="text-sm text-blue-100">{lec.ranking}</p>
         </div>
       </Section>
 
@@ -840,7 +869,7 @@ export default function ObservatorioStorytelling() {
       <Section n="3" title="Distribución de Pertinencia">
         <div className="flex flex-wrap justify-center gap-10 mb-6">
           {[
-            { label: 'Alta pertinencia',  val: altaPct,  color: '#15803d', count: totales.alta  },
+            { label: 'Alta pertinencia',  val: altaPct,  color: '#0D2158', count: totales.alta  },
             { label: 'Pertinencia media', val: mediaPct, color: C.gold,    count: totales.media },
             { label: 'Baja pertinencia',  val: bajaPct,  color: '#b91c1c', count: totales.baja  },
           ].map(({ label, val, color, count }) => (
@@ -866,7 +895,7 @@ export default function ObservatorioStorytelling() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
-                  <p className="text-xs text-green-300 truncate">{m.programa} · {m.empresa}</p>
+                  <p className="text-xs text-blue-300 truncate">{m.programa} · {m.empresa}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span className="text-lg font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
@@ -897,7 +926,7 @@ export default function ObservatorioStorytelling() {
         <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
           className="rounded-r-xl px-5 py-4 mb-8">
           <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
-          <p className="text-sm text-green-100">{lec.topMatches}</p>
+          <p className="text-sm text-blue-100">{lec.topMatches}</p>
         </div>
 
         {/* Skills Gap Chart within section 4 */}
@@ -908,21 +937,21 @@ export default function ObservatorioStorytelling() {
       <Section n="5" title="Análisis Detallado de Matches">
         <div className="rounded-2xl overflow-hidden shadow-sm border">
           <table className="min-w-full text-sm">
-            <thead style={{ background: C.green }}>
+            <thead style={{ background: C.navy }}>
               <tr>
                 {['#', 'Programa', 'Empleo', 'Empresa', 'Score', 'Label'].map(h => (
-                  <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-green-200">{h}</th>
+                  <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-blue-200">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {top_matches.slice(0, 20).map((m, i) => (
-                <tr key={i} className="hover:bg-green-50 transition-colors">
+                <tr key={i} className="hover:bg-blue-50 transition-colors">
                   <td className="px-3 py-2 text-gray-400 font-mono text-xs">{i + 1}</td>
                   <td className="px-3 py-2 text-gray-700 max-w-[150px] truncate text-xs">{m.programa}</td>
                   <td className="px-3 py-2 text-gray-800 font-medium max-w-[180px] truncate text-xs">{m.empleo}</td>
                   <td className="px-3 py-2 text-gray-400 max-w-[110px] truncate text-xs">{m.empresa}</td>
-                  <td className="px-3 py-2 font-bold" style={{ color: C.green }}>{m.score.toFixed(1)}</td>
+                  <td className="px-3 py-2 font-bold" style={{ color: C.navy }}>{m.score.toFixed(1)}</td>
                   <td className="px-3 py-2"><LBadge l={m.label} /></td>
                 </tr>
               ))}
@@ -936,10 +965,10 @@ export default function ObservatorioStorytelling() {
       <Section n="6" title="Recomendaciones Curriculares">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
           {/* Incorporar */}
-          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#15803d', background: '#f0fdf4' }}>
+          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#0D2158', background: '#EEF2FB' }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">✅</span>
-              <h3 className="text-sm font-bold" style={{ color: '#15803d' }}>Incorporar</h3>
+              <h3 className="text-sm font-bold" style={{ color: '#0D2158' }}>Incorporar</h3>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
               Skills de alta demanda en el mercado que aún no están en el currículo. Agregar como módulos obligatorios o electivos.
@@ -947,12 +976,12 @@ export default function ObservatorioStorytelling() {
             <ul className="space-y-1">
               {['Cloud computing (AWS/Azure)', 'MLOps y despliegue de modelos', 'Ingeniería de datos (Spark/Airflow)', 'LLMs y prompting avanzado'].map(s => (
                 <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
-                  <span style={{ color: '#15803d' }} className="mt-0.5 flex-shrink-0">+</span>
+                  <span style={{ color: '#0D2158' }} className="mt-0.5 flex-shrink-0">+</span>
                   {s}
                 </li>
               ))}
             </ul>
-            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#dcfce7', color: '#15803d' }}>
+            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#D8DEF0', color: '#0D2158' }}>
               Impacto estimado: +18% pertinencia
             </div>
           </div>
@@ -1008,7 +1037,7 @@ export default function ObservatorioStorytelling() {
           <div className="grid grid-cols-3 gap-4 text-center">
             {[
               { label: 'Cobertura actual',       val: `${coveragePct}%`,  color: C.gold,    sub: 'pertinencia media + alta' },
-              { label: 'Proyección post-mejoras', val: `${Math.min(coveragePct + 29, 99)}%`, color: '#15803d', sub: 'incorporando recomendaciones' },
+              { label: 'Proyección post-mejoras', val: `${Math.min(coveragePct + 29, 99)}%`, color: '#0D2158', sub: 'incorporando recomendaciones' },
               { label: 'Empleabilidad estimada', val: '+24%',              color: '#2563eb', sub: 'vs. egresados actuales' },
             ].map(({ label, val, color, sub }) => (
               <div key={label}>
@@ -1029,16 +1058,16 @@ export default function ObservatorioStorytelling() {
       </Section>
 
       {/* ── CIERRE ── */}
-      <section className="py-20 px-4 text-center" style={{ background: C.green }}>
+      <section className="py-20 px-4 text-center" style={{ background: C.navy }}>
         <div className="max-w-2xl mx-auto space-y-5">
           <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.mid }}>Sección 8 · Conclusión</p>
           <h2 className="text-3xl font-extrabold text-white">Evidencia para la Decisión Curricular</h2>
-          <p className="text-green-200 text-sm leading-relaxed">{lec.cierre}</p>
+          <p className="text-blue-200 text-sm leading-relaxed">{lec.cierre}</p>
           <div className="inline-block rounded-2xl px-8 py-4 mt-4" style={{ background: 'rgba(255,255,255,0.08)' }}>
             <p className="text-4xl font-extrabold" style={{ color: C.mid }}>{coveragePct}%</p>
-            <p className="text-xs text-green-300 mt-1">cobertura pertinente global</p>
+            <p className="text-xs text-blue-300 mt-1">cobertura pertinente global</p>
           </div>
-          <p className="text-xs text-green-400 pt-4">
+          <p className="text-xs text-blue-400 pt-4">
             Run #{d.run_id} · {d.fecha} · Motor de Pertinencia Académica v2
           </p>
         </div>
