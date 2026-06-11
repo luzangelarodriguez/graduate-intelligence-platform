@@ -51,7 +51,14 @@ logger = logging.getLogger(__name__)
 FALLBACK_QUERIES: dict[str, list[str]] = {
     "data_analytics": ["analista de datos", "business intelligence", "power bi"],
     "artificial_intelligence": ["inteligencia artificial", "machine learning", "data scientist"],
-    "criminology": ["criminólogo", "investigador criminal", "seguridad ciudadana"],
+    "criminology": [
+        "perito judicial",
+        "psicólogo forense",
+        "investigador judicial Colombia",
+        "analista forense",
+        "oficial de cumplimiento penal",
+        "criminólogo",
+    ],
     "technology": ["desarrollador software", "ingeniero de sistemas", "programador"],
     "business": ["analista financiero", "gerente de proyectos", "consultor empresarial"],
 }
