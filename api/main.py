@@ -405,116 +405,125 @@ def program_intelligence_detail(program_id: int) -> dict[str, Any]:
 
 
 @app.get("/api/dashboard/summary", tags=["dashboard"])
-def dashboard_summary(program_id: int | None = Query(default=None, ge=1)) -> dict[str, Any]:
+def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str, Any]:
     """Return aggregated match data from the latest ml run for the frontend dashboard.
     If program_id is provided, results are filtered to that specialization only.
     """
-    from api.database import fetch_all, fetch_one
+    try:
+        from api.database import fetch_all, fetch_one
 
-    run_row = fetch_one(
-        "SELECT id, created_at FROM ml_training_runs "
-        "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1"
-    )
-    if not run_row:
+        run_row = fetch_one(
+            "SELECT id, created_at FROM ml_training_runs "
+            "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1"
+        )
+        if not run_row:
+            return {
+                "run_id": None, "fecha": None,
+                "programas": [], "top_matches": [],
+                "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+            }
+
+        run_id: int = int(run_row["id"])
+        fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
+
+        # Use literal interpolation for the optional filter to avoid param-count mismatches
+        pid_filter = f"AND m.especializacion_id = {int(program_id)}" if program_id else ""
+        pid_filter_bare = f"AND especializacion_id = {int(program_id)}" if program_id else ""
+
+        prog_rows = fetch_all(
+            f"""
+            SELECT
+                m.especializacion_id                          AS id,
+                COALESCE(e.nombre, m.program_name)            AS nombre,
+                COUNT(*)                                      AS matches_total,
+                ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
+                ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = {run_id} {pid_filter}
+            GROUP BY m.especializacion_id, e.nombre, m.program_name
+            ORDER BY score_maximo DESC
+            """,
+        )
+
+        programas = [
+            {
+                "id":             int(r["id"]) if r["id"] else None,
+                "nombre":         r["nombre"] or "",
+                "matches_total":  int(r["matches_total"]),
+                "score_promedio": float(r["score_promedio"] or 0),
+                "score_maximo":   float(r["score_maximo"] or 0),
+                "labels": {
+                    "high":   int(r["lbl_high"]),
+                    "medium": int(r["lbl_medium"]),
+                    "low":    int(r["lbl_low"]),
+                },
+            }
+            for r in prog_rows
+        ]
+
+        top_rows = fetch_all(
+            f"""
+            SELECT
+                COALESCE(e.nombre, m.program_name) AS programa,
+                m.job_title                        AS empleo,
+                COALESCE(m.company, '')            AS empresa,
+                ROUND(m.score_match::numeric, 1)   AS score,
+                m.relevance_label                  AS label,
+                m.skills_en_comun                  AS skills_en_comun,
+                m.skills_faltantes                 AS skills_faltantes
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = {run_id} {pid_filter}
+            ORDER BY m.score_match DESC
+            LIMIT 30
+            """,
+        )
+
+        top_matches = [
+            {
+                "programa":        r["programa"] or "",
+                "empleo":          r["empleo"] or "",
+                "empresa":         r["empresa"],
+                "score":           float(r["score"] or 0),
+                "label":           r["label"],
+                "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
+                "skills_faltantes": r["skills_faltantes"] if r["skills_faltantes"] is not None else [],
+            }
+            for r in top_rows
+        ]
+
+        tot_rows = fetch_all(
+            f"SELECT relevance_label, COUNT(*) AS cnt "
+            f"FROM ml_program_job_matches "
+            f"WHERE run_id = {run_id} {pid_filter_bare} "
+            f"GROUP BY relevance_label",
+        )
+        lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
+
+        return {
+            "run_id":      run_id,
+            "fecha":       fecha,
+            "programas":   programas,
+            "top_matches": top_matches,
+            "totales": {
+                "matches": sum(lbl.values()),
+                "alta":    lbl.get("high", 0),
+                "media":   lbl.get("medium", 0),
+                "baja":    lbl.get("low", 0),
+            },
+        }
+    except Exception as exc:
+        logger.error("dashboard_summary error program_id=%s: %s", program_id, exc, exc_info=True)
         return {
             "run_id": None, "fecha": None,
             "programas": [], "top_matches": [],
             "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+            "error": str(exc),
         }
-
-    run_id: int = run_row["id"]
-    fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
-
-    pid_filter = "AND m.especializacion_id = %s" if program_id else ""
-    base_params: tuple = (run_id, program_id) if program_id else (run_id,)
-
-    prog_rows = fetch_all(
-        f"""
-        SELECT
-            m.especializacion_id                          AS id,
-            COALESCE(e.nombre, m.program_name)            AS nombre,
-            COUNT(*)                                      AS matches_total,
-            ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
-            ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
-            COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
-            COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
-            COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
-        FROM ml_program_job_matches m
-        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
-        WHERE m.run_id = %s {pid_filter}
-        GROUP BY m.especializacion_id, e.nombre, m.program_name
-        ORDER BY score_maximo DESC
-        """,
-        base_params,
-    )
-
-    programas = [
-        {
-            "id":             int(r["id"]) if r["id"] else None,
-            "nombre":         r["nombre"] or "",
-            "matches_total":  int(r["matches_total"]),
-            "score_promedio": float(r["score_promedio"] or 0),
-            "score_maximo":   float(r["score_maximo"] or 0),
-            "labels": {
-                "high":   int(r["lbl_high"]),
-                "medium": int(r["lbl_medium"]),
-                "low":    int(r["lbl_low"]),
-            },
-        }
-        for r in prog_rows
-    ]
-
-    top_rows = fetch_all(
-        f"""
-        SELECT
-            COALESCE(e.nombre, m.program_name) AS programa,
-            m.job_title                        AS empleo,
-            COALESCE(m.company, '')            AS empresa,
-            ROUND(m.score_match::numeric, 1)   AS score,
-            m.relevance_label                  AS label,
-            m.skills_en_comun                  AS skills_en_comun,
-            m.skills_faltantes                 AS skills_faltantes
-        FROM ml_program_job_matches m
-        LEFT JOIN especializaciones e ON e.id = m.especializacion_id
-        WHERE m.run_id = %s {pid_filter}
-        ORDER BY m.score_match DESC
-        LIMIT 30
-        """,
-        base_params,
-    )
-
-    top_matches = [
-        {
-            "programa":        r["programa"] or "",
-            "empleo":          r["empleo"] or "",
-            "empresa":         r["empresa"],
-            "score":           float(r["score"] or 0),
-            "label":           r["label"],
-            "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
-            "skills_faltantes": r["skills_faltantes"] if r["skills_faltantes"] is not None else [],
-        }
-        for r in top_rows
-    ]
-
-    tot_rows = fetch_all(
-        f"SELECT relevance_label, COUNT(*) AS cnt "
-        f"FROM ml_program_job_matches WHERE run_id = %s {pid_filter} GROUP BY relevance_label",
-        base_params,
-    )
-    lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
-
-    return {
-        "run_id":      run_id,
-        "fecha":       fecha,
-        "programas":   programas,
-        "top_matches": top_matches,
-        "totales": {
-            "matches": sum(lbl.values()),
-            "alta":    lbl.get("high", 0),
-            "media":   lbl.get("medium", 0),
-            "baja":    lbl.get("low", 0),
-        },
-    }
 
 
 @app.get("/api/programs/related-universities/{program_id}")
