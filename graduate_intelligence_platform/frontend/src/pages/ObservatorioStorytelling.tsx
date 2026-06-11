@@ -959,70 +959,85 @@ export default function ObservatorioStorytelling() {
       </Section>
 
       {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
-      <Section n="4" title="Mejores Matches & Brechas Curriculares" dark>
+      <Section n="4" title="Empleos con Mayor Alineación & Brechas de Skills" dark>
+
+        {/* ── BLOQUE 1: Empleos con skill overlap ── */}
+        <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: C.gold }}>
+          ✦ Empleos con mayor alineación
+        </h3>
         {(() => {
-          const validMatches = top_matches.filter(
-            m => ['high', 'medium', 'low'].includes(m.label) && m.score >= 45
-          ).slice(0, 10);
-          return validMatches.length >= 3 ? (
-            <div className="space-y-3 mb-6">
-              {validMatches.map((m, i) => (
-            <div key={i} className="rounded-xl px-4 py-3"
-              style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <div className="flex items-center gap-3">
-                <span className="text-xl font-black w-7 text-center flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                  {i + 1}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
-                  <p className="text-xs text-blue-300 truncate">{m.programa} · {m.empresa}</p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-lg font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
-                  <LBadge l={m.label} />
-                </div>
-              </div>
-              {/* skill tags */}
-              <div className="mt-2 ml-10 flex flex-wrap gap-1">
-                {m.skills_en_comun.length > 0
-                  ? m.skills_en_comun.map(s => (
-                      <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
-                        style={{ background: 'rgba(134,239,172,0.15)', color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
-                        {s}
-                      </span>
-                    ))
-                  : <span className="text-xs text-green-500 italic">Sin overlap de skills</span>
-                }
-                {m.skills_faltantes.slice(0, 3).map(s => (
-                  <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
-                    style={{ background: 'rgba(252,165,165,0.15)', color: '#fca5a5', border: '1px solid rgba(252,165,165,0.3)' }}>
-                    -{s}
-                  </span>
-                ))}
-              </div>
-            </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl px-5 py-6 mb-6 text-center"
+          const withSkills = top_matches
+            .filter(m => ['high', 'medium', 'low'].includes(m.label) && m.score >= 45 && m.skills_en_comun.length > 0)
+            .slice(0, 5);
+
+          if (withSkills.length === 0) return (
+            <div className="rounded-xl px-5 py-5 mb-8 text-center"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <p className="text-sm text-blue-200 leading-relaxed">
-                Datos de mercado en construcción para este programa.<br />
-                <span className="text-blue-300">
-                  Elempleo tiene oferta limitada para perfiles de <strong className="text-white">{programaLabel}</strong>.
-                  Los datos se enriquecerán en la próxima adquisición.
-                </span>
+              <p className="text-sm text-blue-300 leading-relaxed">
+                El programa aún no tiene matches con overlap de skills.<br />
+                Ver análisis de brechas abajo.
               </p>
             </div>
           );
-        })()}
-        <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
-          className="rounded-r-xl px-5 py-4 mb-8">
-          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
-          <p className="text-sm text-blue-100">{lec.topMatches}</p>
-        </div>
 
-        {/* Skills Gap Chart within section 4 */}
+          return (
+            <div className="space-y-3 mb-8">
+              {withSkills.map((m, i) => {
+                const totalRequired = m.skills_en_comun.length + m.skills_faltantes.length;
+                const coverPct = totalRequired ? Math.round((m.skills_en_comun.length / totalRequired) * 100) : 0;
+                return (
+                  <div key={i} className="rounded-xl px-4 py-3"
+                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {/* header row */}
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-lg font-black w-6 text-center flex-shrink-0"
+                        style={{ color: 'rgba(255,255,255,0.2)' }}>{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
+                        <p className="text-xs text-blue-300 truncate">{m.empresa}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-base font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
+                        <LBadge l={m.label} />
+                      </div>
+                    </div>
+                    {/* coverage bar */}
+                    <div className="ml-9 mb-2">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span style={{ color: '#86efac' }}>Cubre {m.skills_en_comun.length} de {totalRequired} skills requeridas</span>
+                        <span style={{ color: C.mid }}>{coverPct}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${coverPct}%`, background: '#86efac' }} />
+                      </div>
+                    </div>
+                    {/* skill tags */}
+                    <div className="ml-9 flex flex-wrap gap-1">
+                      {m.skills_en_comun.slice(0, 4).map(s => (
+                        <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                          style={{ background: 'rgba(134,239,172,0.15)', color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
+                          {s}
+                        </span>
+                      ))}
+                      {m.skills_faltantes.slice(0, 2).map(s => (
+                        <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                          style={{ background: 'rgba(252,165,165,0.15)', color: '#fca5a5', border: '1px solid rgba(252,165,165,0.3)' }}>
+                          −{s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        {/* ── BLOQUE 2: Análisis de brechas de skills ── */}
+        <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: C.gold }}>
+          ✦ Análisis de brechas de skills
+        </h3>
         <SkillsGapChart programId={programaId} />
       </Section>
 
