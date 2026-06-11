@@ -686,10 +686,11 @@ function UniversityBenchmark({ programId }: { programId: number }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
-  const [data, setData]       = useState<Summary | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData]             = useState<Summary | null>(null);
+  const [loading, setLoading]       = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
   const [programaId, setProgramaId] = useState(94);
+  const [skillsData, setSkillsData] = useState<SkillsAnalysis | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -698,7 +699,6 @@ export default function ObservatorioStorytelling() {
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: Summary) => { setData(d); setLoading(false); })
       .catch(() => {
-        // Show fallback data filtered to the selected program
         const fb = {
           ...FALLBACK,
           programas: FALLBACK.programas.filter(p => p.id === programaId),
@@ -718,6 +718,14 @@ export default function ObservatorioStorytelling() {
         setUsingFallback(true);
         setLoading(false);
       });
+  }, [programaId]);
+
+  useEffect(() => {
+    setSkillsData(null);
+    fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d: SkillsAnalysis) => setSkillsData(d))
+      .catch(() => setSkillsData(FALLBACK_SKILLS[programaId] ?? FALLBACK_SKILLS[94]));
   }, [programaId]);
 
   if (loading) return (
@@ -796,19 +804,52 @@ export default function ObservatorioStorytelling() {
           <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
             {totales.matches.toLocaleString()} pares programa–empleo analizados
           </p>
-          {/* hero rings — fill proportional to total, display count */}
+          {/* hero rings — skills-analysis KPIs */}
           <div className="flex flex-wrap justify-center gap-8 pt-8">
-            {[
-              { label: 'Total matches',    count: totales.matches, color: C.light,    fill: 100 },
-              { label: 'Alta pertinencia', count: totales.alta,    color: '#93c5fd',  fill: altaPct  },
-              { label: 'Pertinencia media',count: totales.media,   color: '#fcd34d',  fill: mediaPct },
-              { label: 'Baja pertinencia', count: totales.baja,    color: '#fca5a5',  fill: bajaPct  },
-            ].map(({ label, count, color, fill }) => (
-              <div key={label} className="flex flex-col items-center gap-2">
-                <Ring score={fill} color={color} size={120} label={String(count)} />
-                <span className="text-xs" style={{ color: C.light }}>{label}</span>
-              </div>
-            ))}
+            {(() => {
+              const cobertura = skillsData?.cobertura_pct ?? 0;
+              const fortalezas = skillsData?.fortalezas.length ?? 0;
+              const brechas    = skillsData?.brechas.length ?? 0;
+              const total      = fortalezas + brechas || 1;
+              const cobColor   = cobertura >= 50 ? '#86efac' : cobertura >= 30 ? '#fcd34d' : '#fca5a5';
+              const MATCH_BENCHMARK = 150;
+              const matchFill = Math.min((totales.matches / MATCH_BENCHMARK) * 100, 100);
+              return [
+                {
+                  label: 'Cobertura de Skills',
+                  value: `${cobertura}%`,
+                  fill:  cobertura,
+                  color: cobColor,
+                  desc:  '% skills del mercado cubiertas',
+                },
+                {
+                  label: 'Skills en Común',
+                  value: String(fortalezas),
+                  fill:  (fortalezas / total) * 100,
+                  color: '#93c5fd',
+                  desc:  'skills alineadas con el mercado',
+                },
+                {
+                  label: 'Brechas Críticas',
+                  value: String(brechas),
+                  fill:  (brechas / total) * 100,
+                  color: '#fca5a5',
+                  desc:  'skills faltantes en el programa',
+                },
+                {
+                  label: 'Vacantes Analizadas',
+                  value: String(totales.matches),
+                  fill:  matchFill,
+                  color: C.light,
+                  desc:  'empleos del mercado analizados',
+                },
+              ].map(({ label, value, fill, color }) => (
+                <div key={label} className="flex flex-col items-center gap-2">
+                  <Ring score={fill} color={color} size={120} label={value} />
+                  <span className="text-xs text-center" style={{ color: C.light }}>{label}</span>
+                </div>
+              ));
+            })()}
           </div>
         </div>
       </header>
