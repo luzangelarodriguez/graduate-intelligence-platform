@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from api.auth import auth_router
 from api.contracts import (
@@ -124,11 +125,19 @@ async def lifespan(_app: FastAPI):
     yield
 
 
+class _UnicodeJSONResponse(JSONResponse):
+    """Emit Spanish characters as-is instead of \\uXXXX escapes."""
+    def render(self, content: Any) -> bytes:
+        import json
+        return json.dumps(content, ensure_ascii=False, allow_nan=False).encode("utf-8")
+
+
 app = FastAPI(
     title="AI Labor & Curriculum Observatory API",
     version="1.0.0",
     description="Public API for observatory metrics, recommendations, semantic roles, company intelligence and market forecasts.",
     lifespan=lifespan,
+    default_response_class=_UnicodeJSONResponse,
 )
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(

@@ -20,7 +20,7 @@ def _pool() -> ThreadedConnectionPool:
     # ensure UTF-8 so Spanish characters aren't mangled
     if dsn and "client_encoding" not in dsn:
         sep = "&" if "?" in dsn else "?"
-        dsn = f"{dsn}{sep}client_encoding=UTF8"
+        dsn = f"{dsn}{sep}options=-c%20client_encoding%3DUTF8"
     last_error: Exception | None = None
     for attempt in range(3):
         try:
@@ -35,6 +35,7 @@ def _pool() -> ThreadedConnectionPool:
 @contextmanager
 def connection():
     conn = _pool().getconn()
+    conn.set_client_encoding("UTF8")
     try:
         yield conn
         conn.commit()
