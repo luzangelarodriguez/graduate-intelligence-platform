@@ -503,91 +503,63 @@ def dashboard_summary() -> dict[str, Any]:
     }
 
 
-@app.get("/api/programs/related-universities/{program_id}", tags=["programs"])
+@app.get("/api/programs/related-universities/{program_id}")
 def related_universities(program_id: int) -> dict[str, Any]:
-    """Return competitor programs from mineducacion_programas_virtuales matching the domain keywords."""
-    from api.database import fetch_all
-
-    QUERIES: dict[int, str] = {
-        94: """
-            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
-                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
-            FROM mineducacion_programas_virtuales
-            WHERE (
-                nombre_programa ILIKE '%analytic%' OR
-                nombre_programa ILIKE '%datos%' OR
-                nombre_programa ILIKE '%data%' OR
-                nombre_programa ILIKE '%inteligencia de negocio%' OR
-                nombre_programa ILIKE '%business intelligence%' OR
-                nombre_programa ILIKE '%big data%'
-            )
-            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
-            ORDER BY nombre_ies
-            LIMIT 50
-        """,
-        92: """
-            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
-                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
-            FROM mineducacion_programas_virtuales
-            WHERE (
-                nombre_programa ILIKE '%inteligencia artificial%' OR
-                nombre_programa ILIKE '%machine learning%' OR
-                nombre_programa ILIKE '%ciencia de datos%' OR
-                nombre_programa ILIKE '%data science%'
-            )
-            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
-            ORDER BY nombre_ies
-            LIMIT 50
-        """,
-        108: """
-            SELECT nombre_ies, nombre_programa, municipio, departamento, modalidad,
-                   nivel_academico, creditos, duracion, area_conocimiento, periodicidad_admision
-            FROM mineducacion_programas_virtuales
-            WHERE (
-                nombre_programa ILIKE '%criminolog%' OR
-                nombre_programa ILIKE '%forense%' OR
-                nombre_programa ILIKE '%criminalistica%' OR
-                nombre_programa ILIKE '%seguridad ciudadana%' OR
-                nombre_programa ILIKE '%investigacion criminal%'
-            )
-            AND (nombre_ies IS NULL OR nombre_ies NOT ILIKE '%UNIR%')
-            ORDER BY nombre_ies
-            LIMIT 50
-        """,
-    }
-
-    sql = QUERIES.get(program_id)
-    if not sql:
-        return {"program_id": program_id, "competitors": [], "total": 0}
-
     try:
-        rows = fetch_all(sql)
-    except Exception as exc:
-        logger.error("related_universities query failed for program_id=%s: %s", program_id, exc)
-        return {"program_id": program_id, "competitors": [], "total": 0, "error": str(exc)}
+        QUERIES = {
+            94: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
+                          nivel_academico, creditos, duracion, periodicidad_admision
+                   FROM mineducacion_programas_virtuales
+                   WHERE (nombre_programa ILIKE '%analytic%'
+                      OR nombre_programa ILIKE '%datos%'
+                      OR nombre_programa ILIKE '%big data%'
+                      OR nombre_programa ILIKE '%inteligencia de negocio%'
+                      OR nombre_programa ILIKE '%business intelligence%')
+                   ORDER BY nombre_ies LIMIT 50""",
+            92: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
+                          nivel_academico, creditos, duracion, periodicidad_admision
+                   FROM mineducacion_programas_virtuales
+                   WHERE (nombre_programa ILIKE '%inteligencia artificial%'
+                      OR nombre_programa ILIKE '%machine learning%'
+                      OR nombre_programa ILIKE '%ciencia de datos%'
+                      OR nombre_programa ILIKE '%data science%')
+                   ORDER BY nombre_ies LIMIT 50""",
+            108: """SELECT nombre_ies, nombre_programa, municipio, modalidad,
+                           nivel_academico, creditos, duracion, periodicidad_admision
+                    FROM mineducacion_programas_virtuales
+                    WHERE (nombre_programa ILIKE '%criminolog%'
+                       OR nombre_programa ILIKE '%forense%'
+                       OR nombre_programa ILIKE '%criminalistica%'
+                       OR nombre_programa ILIKE '%seguridad ciudadana%')
+                    ORDER BY nombre_ies LIMIT 50""",
+        }
+        sql = QUERIES.get(program_id)
+        if not sql:
+            return {"program_id": program_id, "competitors": [], "total": 0}
 
-    logger.info("related_universities program_id=%s rows_returned=%s", program_id, len(rows))
+        from api.database import connection
+        import psycopg2.extras  # noqa: F401
+        with connection() as conn:
+            with conn.cursor() as cur:  # plain cursor → tuple rows
+                cur.execute(sql)
+                rows = cur.fetchall()
 
-    competitors = []
-    for r in rows:
-        try:
+        competitors = []
+        for r in rows:
             competitors.append({
-                "nombre_ies":            r.get("nombre_ies") or "",
-                "nombre_programa":       r.get("nombre_programa") or "",
-                "ciudad":                r.get("municipio") or "",
-                "municipio":             r.get("municipio") or "",
-                "departamento":          r.get("departamento") or "",
-                "modalidad":             r.get("modalidad") or "",
-                "nivel_academico":       r.get("nivel_academico") or "",
-                "creditos":              r.get("creditos"),
-                "duracion":              r.get("duracion") or "",
-                "area_conocimiento":     r.get("area_conocimiento") or "",
-                "periodicidad_admision": r.get("periodicidad_admision") or "",
+                "nombre_ies":            str(r[0] or ""),
+                "nombre_programa":       str(r[1] or ""),
+                "ciudad":                str(r[2] or ""),
+                "modalidad":             str(r[3] or ""),
+                "nivel_academico":       str(r[4] or ""),
+                "creditos":              r[5],
+                "duracion":              str(r[6] or ""),
+                "periodicidad_admision": str(r[7] or ""),
             })
-        except Exception as row_exc:
-            logger.warning("related_universities skipping row: %s — %s", r, row_exc)
-
-    return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
+        return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
+    except Exception as e:
+        logger.error("related_universities error program_id=%s: %s", program_id, e)
+        return {"program_id": program_id, "competitors": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
