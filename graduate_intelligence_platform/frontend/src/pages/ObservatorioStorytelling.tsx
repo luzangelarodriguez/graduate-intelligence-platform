@@ -489,6 +489,201 @@ function SkillsGapChart() {
   );
 }
 
+// ─── University Benchmark types ───────────────────────────────────────────────
+interface Competitor {
+  nombre_ies: string;
+  nombre_programa: string;
+  ciudad: string;
+  modalidad: string;
+  nivel_academico: string;
+  creditos: number | null;
+  duracion: string;
+  area_conocimiento: string;
+  municipio: string;
+  departamento: string;
+  periodicidad_admision: string;
+}
+interface UniversityData {
+  program_id: number;
+  competitors: Competitor[];
+  total: number;
+}
+
+// UNIR's own program reference data
+const UNIR_PROGRAMS: Record<number, { nombre: string; creditos: number; duracion: string; periodicidad: string }> = {
+  94:  { nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  92:  { nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  108: { nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
+};
+
+const BENCH_PROGRAMS = [
+  { id: 94,  label: 'Visual Analytics & Big Data' },
+  { id: 92,  label: 'Inteligencia Artificial' },
+  { id: 108, label: 'Especialización en Criminología' },
+];
+
+function UniversityBenchmark() {
+  const [programId, setProgramId] = useState(94);
+  const [data, setData]           = useState<UniversityData | null>(null);
+  const [loading, setLoading]     = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setData(null);
+    fetch(`${API}/api/programs/related-universities/${programId}`)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d: UniversityData) => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [programId]);
+
+  // Derived metrics
+  const metrics = (() => {
+    if (!data || !data.competitors.length) return null;
+    const withCredits = data.competitors.filter(c => c.creditos != null);
+    const avgCredits = withCredits.length
+      ? Math.round(withCredits.reduce((s, c) => s + (c.creditos ?? 0), 0) / withCredits.length)
+      : null;
+    const withDur = data.competitors.filter(c => c.duracion && !isNaN(Number(c.duracion)));
+    const avgDur = withDur.length
+      ? (withDur.reduce((s, c) => s + Number(c.duracion), 0) / withDur.length).toFixed(1)
+      : null;
+    const cityCount: Record<string, number> = {};
+    data.competitors.forEach(c => {
+      const city = c.municipio || c.ciudad || 'N/D';
+      cityCount[city] = (cityCount[city] ?? 0) + 1;
+    });
+    const topCities = Object.entries(cityCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    return { avgCredits, avgDur, topCities };
+  })();
+
+  const unir = UNIR_PROGRAMS[programId];
+
+  return (
+    <div className="space-y-5">
+      {/* selector */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-gray-500">Programas activos modalidad virtual registrados en SNIES / HECAA</p>
+        <select
+          value={programId}
+          onChange={e => { setProgramId(Number(e.target.value)); }}
+          className="text-xs rounded-lg px-3 py-1.5 font-medium border border-gray-200 bg-white focus:ring-2 focus:ring-green-600"
+          style={{ color: C.green }}
+        >
+          {BENCH_PROGRAMS.map(p => (
+            <option key={p.id} value={p.id}>{p.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="w-10 h-10 rounded-full border-4 border-green-200 border-t-green-700 animate-spin" />
+        </div>
+      )}
+
+      {!loading && data && (
+        <>
+          {/* UNIR positioning badge */}
+          <div className="rounded-2xl p-5 flex flex-wrap items-center gap-5"
+            style={{ background: C.green, border: `2px solid ${C.gold}` }}>
+            <div className="flex-1 min-w-[200px]">
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
+                ✦ Posicionamiento UNIR Colombia
+              </p>
+              <p className="text-sm font-semibold text-white leading-snug">{unir.nombre}</p>
+              <p className="text-xs text-green-300 mt-1">Modalidad Virtual · Colombia</p>
+            </div>
+            <div className="flex gap-6">
+              {[
+                { k: 'Créditos', v: unir.creditos },
+                { k: 'Duración (sem.)', v: unir.duracion },
+                { k: 'Admisión', v: unir.periodicidad },
+              ].map(({ k, v }) => (
+                <div key={k} className="text-center">
+                  <p className="text-2xl font-extrabold" style={{ color: C.mid }}>{v}</p>
+                  <p className="text-xs text-green-300">{k}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl px-4 py-2 text-xs font-bold text-center"
+              style={{ background: C.gold, color: '#fff' }}>
+              {data.total} competidores<br />en SNIES
+            </div>
+          </div>
+
+          {/* KPI cards */}
+          {metrics && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { k: 'Competidores SNIES', v: data.total,              c: C.green  },
+                { k: 'Créditos prom. mercado', v: metrics.avgCredits ?? '—', c: '#2563eb' },
+                { k: 'Duración prom. (sem.)',  v: metrics.avgDur ?? '—',     c: C.gold   },
+                { k: 'Top ciudad',             v: metrics.topCities[0]?.[0] ?? '—', c: '#7c3aed' },
+              ].map(({ k, v, c }) => (
+                <div key={k} className="rounded-xl border bg-white p-4 text-center shadow-sm">
+                  <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{k}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* city distribution */}
+          {metrics && metrics.topCities.length > 0 && (
+            <div className="rounded-xl border bg-white p-4">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Top ciudades con oferta similar</p>
+              <div className="flex flex-wrap gap-2">
+                {metrics.topCities.map(([city, count]) => (
+                  <span key={city} className="rounded-full px-3 py-1 text-xs font-semibold"
+                    style={{ background: '#f0fdf4', color: C.green, border: `1px solid #bbf7d0` }}>
+                    {city} · {count} prog.
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* competitors table */}
+          {data.competitors.length > 0 ? (
+            <div className="rounded-2xl overflow-hidden border shadow-sm">
+              <table className="min-w-full text-xs">
+                <thead style={{ background: C.green }}>
+                  <tr>
+                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad'].map(h => (
+                      <th key={h} className="px-3 py-2 text-left font-semibold text-green-200 whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {data.competitors.map((c, i) => (
+                    <tr key={i} className="hover:bg-green-50 transition-colors">
+                      <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px] truncate">{c.nombre_ies}</td>
+                      <td className="px-3 py-2 text-gray-600 max-w-[220px] truncate">{c.nombre_programa}</td>
+                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.municipio || c.ciudad || '—'}</td>
+                      <td className="px-3 py-2 text-center font-mono" style={{ color: C.green }}>{c.creditos ?? '—'}</td>
+                      <td className="px-3 py-2 text-center text-gray-500">{c.duracion || '—'}</td>
+                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.periodicidad_admision || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-center text-sm text-gray-400 py-8">
+              No se encontraron programas competidores en SNIES para este dominio.<br />
+              <span className="text-xs">Verifica que la tabla mineducacion_programas_virtuales tenga datos.</span>
+            </p>
+          )}
+        </>
+      )}
+
+      {!loading && !data && (
+        <p className="text-center text-sm text-gray-400 py-10">No se pudieron cargar los datos de benchmark</p>
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
   const [data, setData]       = useState<Summary | null>(null);
@@ -828,21 +1023,9 @@ export default function ObservatorioStorytelling() {
         <LecturaKey text={lec.brechas} />
       </Section>
 
-      {/* ── SECCIÓN 7: Por programa — rings ── */}
-      <Section n="7" title="Score Máximo por Programa">
-        <div className="flex flex-wrap justify-center gap-10">
-          {[...programas].sort((a, b) => b.score_maximo - a.score_maximo).map(p => {
-            const c = p.score_maximo >= 75 ? '#15803d' : p.score_maximo >= 55 ? C.gold : '#b91c1c';
-            return (
-              <div key={p.id} className="flex flex-col items-center gap-2 max-w-[130px] text-center">
-                <Ring score={p.score_maximo} color={c} size={120} />
-                <p className="text-xs font-semibold text-gray-700 leading-tight">{p.nombre}</p>
-                <p className="text-xs text-gray-400">{p.matches_total} empleos</p>
-              </div>
-            );
-          })}
-        </div>
-        <LecturaKey text={lec.ranking} />
+      {/* ── SECCIÓN 7: Benchmark y Competencia ── */}
+      <Section n="7" title="Benchmark y Competencia SNIES">
+        <UniversityBenchmark />
       </Section>
 
       {/* ── CIERRE ── */}
