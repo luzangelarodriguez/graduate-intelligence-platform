@@ -511,9 +511,9 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             "top_matches": top_matches,
             "totales": {
                 "matches": sum(lbl.values()),
-                "alta":    lbl.get("high", 0),
-                "media":   lbl.get("medium", 0),
-                "baja":    lbl.get("low", 0),
+                "alta":    lbl.get("high", 0) + lbl.get("high_semantic", 0),
+                "media":   lbl.get("medium", 0) + lbl.get("medium_semantic", 0),
+                "baja":    lbl.get("low", 0) + lbl.get("low_semantic", 0),
             },
         }
     except Exception as exc:

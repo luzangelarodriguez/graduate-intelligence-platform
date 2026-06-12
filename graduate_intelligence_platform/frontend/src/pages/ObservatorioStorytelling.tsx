@@ -516,6 +516,44 @@ const BENCH_PROGRAMS = [
   { id: 108, label: 'Especialización en Criminología' },
 ];
 
+// ─── Skill category classification ───────────────────────────────────────────
+const SKILL_CATS = {
+  herramienta: new Set([
+    'python','sql','power bi','tableau','excel','aws','azure','gcp','docker',
+    'spark','databricks','tensorflow','r','hadoop','kafka','looker','salesforce',
+    'pytorch','kubernetes','git','postgresql','mysql','mongodb','redis',
+    'numpy','pandas','sklearn','scikit-learn','jupyter','colab','sap','crm',
+  ]),
+  competencia: new Set([
+    'machine learning','deep learning','nlp','data visualization','big data','etl',
+    'business intelligence','analisis de datos','data engineering','mlops',
+    'estadistica','data warehouse','data lake','cloud computing','feature engineering',
+    'computer vision','forecasting','data governance','data mining','series de tiempo',
+  ]),
+  habilidad: new Set([
+    'gestion','liderazgo','comunicacion','trabajo en equipo','pensamiento critico',
+    'innovacion','negociacion','planeacion','scrum','agile','kanban',
+    'gestion de proyectos','orientacion a resultados','toma de decisiones',
+  ]),
+};
+
+type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
+
+function classifySkill(s: string): SkillCat {
+  const key = s.toLowerCase();
+  if (SKILL_CATS.herramienta.has(key)) return 'herramienta';
+  if (SKILL_CATS.competencia.has(key)) return 'competencia';
+  if (SKILL_CATS.habilidad.has(key))   return 'habilidad';
+  return 'otro';
+}
+
+const CAT_STYLE: Record<SkillCat, { bg: string; color: string; label: string }> = {
+  herramienta: { bg: 'rgba(147,197,253,0.18)', color: '#93c5fd', label: '⚙' },
+  competencia:  { bg: 'rgba(134,239,172,0.18)', color: '#86efac', label: '◈' },
+  habilidad:    { bg: 'rgba(253,224,71,0.18)',  color: '#fcd34d', label: '◇' },
+  otro:         { bg: 'rgba(255,255,255,0.10)', color: '#cbd5e1', label: '·' },
+};
+
 function UniversityBenchmark({ programId }: { programId: number }) {
   const [data, setData]           = useState<UniversityData | null>(null);
   const [loading, setLoading]     = useState(false);
@@ -804,44 +842,41 @@ export default function ObservatorioStorytelling() {
           <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
             {totales.matches.toLocaleString()} pares programa–empleo analizados
           </p>
-          {/* hero rings — skills-analysis KPIs */}
+          {/* hero rings — honest KPIs */}
           <div className="flex flex-wrap justify-center gap-8 pt-8">
             {(() => {
-              const cobertura = skillsData?.cobertura_pct ?? 0;
-              const fortalezas = skillsData?.fortalezas.length ?? 0;
-              const brechas    = skillsData?.brechas.length ?? 0;
-              const total      = fortalezas + brechas || 1;
-              const cobColor   = cobertura >= 50 ? '#86efac' : cobertura >= 30 ? '#fcd34d' : '#fca5a5';
+              const progData    = programas.find(p => p.id === programaId) ?? programas[0];
+              const scorePromedio = progData?.score_promedio ?? 0;
+              const matchesConSkills = top_matches.filter(m => m.skills_en_comun.length > 0).length;
               const MATCH_BENCHMARK = 150;
               const matchFill = Math.min((totales.matches / MATCH_BENCHMARK) * 100, 100);
+              const skillsFill = totales.matches > 0
+                ? Math.min((matchesConSkills / totales.matches) * 100, 100)
+                : 0;
               return [
                 {
-                  label: 'Cobertura de Skills',
-                  value: `${cobertura}%`,
-                  fill:  cobertura,
-                  color: cobColor,
-                  desc:  '% skills del mercado cubiertas',
+                  label: 'Score promedio',
+                  value: String(scorePromedio),
+                  fill:  scorePromedio,
+                  color: scorePromedio >= 70 ? '#86efac' : scorePromedio >= 50 ? '#fcd34d' : '#fca5a5',
                 },
                 {
-                  label: 'Skills en Común',
-                  value: String(fortalezas),
-                  fill:  (fortalezas / total) * 100,
-                  color: '#93c5fd',
-                  desc:  'skills alineadas con el mercado',
-                },
-                {
-                  label: 'Brechas Críticas',
-                  value: String(brechas),
-                  fill:  (brechas / total) * 100,
-                  color: '#fca5a5',
-                  desc:  'skills faltantes en el programa',
-                },
-                {
-                  label: 'Vacantes Analizadas',
+                  label: 'Matches totales',
                   value: String(totales.matches),
                   fill:  matchFill,
                   color: C.light,
-                  desc:  'empleos del mercado analizados',
+                },
+                {
+                  label: 'Con skills',
+                  value: String(matchesConSkills),
+                  fill:  skillsFill,
+                  color: '#93c5fd',
+                },
+                {
+                  label: 'Alta pertinencia',
+                  value: String(totales.alta),
+                  fill:  altaPct,
+                  color: '#86efac',
                 },
               ].map(({ label, value, fill, color }) => (
                 <div key={label} className="flex flex-col items-center gap-2">
@@ -1012,14 +1047,19 @@ export default function ObservatorioStorytelling() {
                           style={{ width: `${coverPct}%`, background: '#86efac' }} />
                       </div>
                     </div>
-                    {/* skill tags */}
+                    {/* skill tags — categorized */}
                     <div className="ml-9 flex flex-wrap gap-1">
-                      {m.skills_en_comun.slice(0, 4).map(s => (
-                        <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={{ background: 'rgba(134,239,172,0.15)', color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
-                          {s}
-                        </span>
-                      ))}
+                      {m.skills_en_comun.slice(0, 5).map(s => {
+                        const cat = classifySkill(s);
+                        const st  = CAT_STYLE[cat];
+                        return (
+                          <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                            style={{ background: st.bg, color: st.color, border: `1px solid ${st.color}44` }}
+                            title={cat}>
+                            {st.label} {s}
+                          </span>
+                        );
+                      })}
                       {m.skills_faltantes.slice(0, 2).map(s => (
                         <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
                           style={{ background: 'rgba(252,165,165,0.15)', color: '#fca5a5', border: '1px solid rgba(252,165,165,0.3)' }}>
