@@ -366,19 +366,21 @@ function HBar({ label, val, max, color }: { label: string; val: number; max: num
   );
 }
 
-// ─── Collapsible ──────────────────────────────────────────────────────────────
-function Collapsible({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+
+// ─── Explorando msg ────────────────────────────────────────────────────────────
+function ExplorandoMsg() {
   return (
-    <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border }}>
-      <button
-        className="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold"
-        style={{ background: C.navyBg, color: C.navy }}
-        onClick={() => setOpen(o => !o)}>
-        {title}
-        <span style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s', display: 'inline-block' }}>▾</span>
-      </button>
-      {open && <div className="px-5 py-4 bg-white">{children}</div>}
+    <div style={{ textAlign: 'center', padding: '40px 20px', background: '#F8F9FC', borderRadius: 8, border: '1px dashed #D8DEF0' }}>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
+      <div style={{ fontSize: 15, fontWeight: 600, color: '#334670', marginBottom: 8 }}>
+        Mercado laboral en exploración
+      </div>
+      <div style={{ fontSize: 13, color: '#6B7A9E', maxWidth: 400, margin: '0 auto', lineHeight: 1.6 }}>
+        La oferta digital para este perfil en Colombia es limitada.
+        Estamos ampliando la cobertura de vacantes con términos
+        especializados. Los datos estarán disponibles en la próxima
+        adquisición.
+      </div>
     </div>
   );
 }
@@ -400,7 +402,6 @@ export default function ObservatorioStorytelling() {
   const [loading, setLoading]     = useState(true);
   const [isFallback, setIsFallback] = useState(false);
   const [programaId, setProgramaId] = useState(94);
-  const [anexoOpen, setAnexoOpen]  = useState(false);
 
   // fetch summary
   useEffect(() => {
@@ -476,6 +477,10 @@ export default function ObservatorioStorytelling() {
   const empleosCompatibles = top_matches
     .filter(m => m.skills_en_comun.length > 0 && m.score >= 45)
     .slice(0, 8);
+
+  // Insufficient data guard (e.g. Criminología)
+  const qualityMatches = top_matches.filter(m => (m.skills_en_comun?.length ?? 0) > 0).length;
+  const dataPobre = totales.matches < 10 || qualityMatches < 3;
 
   return (
     <div style={{ background: C.bg, fontFamily: 'system-ui, sans-serif' }}>
@@ -581,7 +586,7 @@ export default function ObservatorioStorytelling() {
 
       {/* ── S2: Qué Demanda el Mercado ── */}
       <Section n="2" title="Qué Demanda el Mercado" dark id="s2">
-        {!skills ? <Spinner /> : (
+        {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (
           <>
             <p className="text-sm text-blue-200 mb-5">
               Skills más frecuentes en las {totales.matches} vacantes analizadas para este perfil de programa.
@@ -661,7 +666,7 @@ export default function ObservatorioStorytelling() {
 
       {/* ── S4: Cobertura Curricular ── */}
       <Section n="4" title="Cobertura Curricular" dark id="s4">
-        {!skills ? <Spinner /> : (
+        {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (
           <>
             <p className="text-sm text-blue-200 mb-6">
               Porcentaje de las skills demandadas por el mercado que ya están cubiertas en el plan de estudios.
@@ -724,7 +729,7 @@ export default function ObservatorioStorytelling() {
 
       {/* ── S5: Brechas Curriculares ── */}
       <Section n="5" title="Brechas Curriculares" id="s5">
-        {!skills ? <Spinner /> : (
+        {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (
           <>
             <p className="text-sm text-gray-600 mb-6">
               Skills con alta demanda en el mercado que el programa aún no cubre.
@@ -968,95 +973,6 @@ export default function ObservatorioStorytelling() {
           ))}
         </div>
       </Section>
-
-      {/* ── ANEXO TÉCNICO (collapsible) ── */}
-      <div className="max-w-4xl mx-auto px-4 py-10 space-y-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Anexo Técnico</p>
-
-        <Collapsible title="Distribución de pertinencia (Alta / Media / Baja)">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            {[
-              { k: 'Matches totales',  v: totales.matches, c: C.navy  },
-              { k: 'Alta pertinencia', v: totales.alta,    c: '#059669' },
-              { k: 'Media',            v: totales.media,   c: C.gold  },
-              { k: 'Baja',             v: totales.baja,    c: '#dc2626'},
-            ].map(({ k, v, c }) => (
-              <div key={k} className="rounded-xl border p-4">
-                <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
-                <p className="text-xs text-gray-500 mt-1">{k}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-3 rounded-full overflow-hidden h-4 flex">
-            {totales.matches > 0 && <>
-              <div style={{ width: `${(totales.alta  / totales.matches) * 100}%`, background: '#059669' }} />
-              <div style={{ width: `${(totales.media / totales.matches) * 100}%`, background: C.gold   }} />
-              <div style={{ width: `${(totales.baja  / totales.matches) * 100}%`, background: '#dc2626'}} />
-            </>}
-          </div>
-          <div className="flex gap-4 mt-2 text-xs text-gray-500">
-            <span>■ Alta {totales.matches ? Math.round((totales.alta  / totales.matches) * 100) : 0}%</span>
-            <span>■ Media {totales.matches ? Math.round((totales.media / totales.matches) * 100) : 0}%</span>
-            <span>■ Baja {totales.matches ? Math.round((totales.baja  / totales.matches) * 100) : 0}%</span>
-          </div>
-        </Collapsible>
-
-        <Collapsible title="Tabla completa de matches (top 20)">
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="min-w-full text-xs">
-              <thead style={{ background: C.navy }}>
-                <tr>
-                  {['#', 'Empleo', 'Empresa', 'Score', 'Label', 'Skills comunes'].map(h => (
-                    <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
-                {top_matches.slice(0, 20).map((m, i) => (
-                  <tr key={i} className="hover:bg-blue-50">
-                    <td className="px-3 py-2 text-gray-400 font-mono">{i + 1}</td>
-                    <td className="px-3 py-2 font-medium text-gray-800 max-w-[180px] truncate">{m.empleo}</td>
-                    <td className="px-3 py-2 text-gray-500 max-w-[120px] truncate">{m.empresa}</td>
-                    <td className="px-3 py-2 font-bold" style={{ color: C.navy }}>{m.score.toFixed(1)}</td>
-                    <td className="px-3 py-2 text-gray-600">{m.label}</td>
-                    <td className="px-3 py-2 text-gray-500 max-w-[200px] truncate">{m.skills_en_comun.join(', ') || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Collapsible>
-
-        {univ && (
-          <Collapsible title={`Benchmark SNIES — ${univ.total} programas competidores`}>
-            <p className="text-xs text-gray-500 mb-3">Programas activos de posgrado virtual registrados en SNIES · Colombia 2024</p>
-            <div className="overflow-x-auto rounded-xl border">
-              <table className="text-xs" style={{ minWidth: '860px', width: '100%' }}>
-                <thead style={{ background: C.navy }}>
-                  <tr>
-                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Matriculados 2024', 'Graduados 2024', 'Inscritos 2024'].map(h => (
-                      <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200 whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {univ.competitors.map((c, i) => (
-                    <tr key={i} className="hover:bg-blue-50">
-                      <td className="px-3 py-2 font-medium text-gray-800" style={{ minWidth: '200px' }}>{c.nombre_ies}</td>
-                      <td className="px-3 py-2 text-gray-600" style={{ minWidth: '260px' }}>{c.nombre_programa}</td>
-                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.municipio || c.ciudad || '—'}</td>
-                      <td className="px-3 py-2 text-center font-mono" style={{ color: C.navy }}>{c.creditos ?? '—'}</td>
-                      <td className="px-3 py-2 text-center font-semibold" style={{ color: c.matriculados > 0 ? C.navy : '#9ca3af' }}>{c.matriculados > 0 ? c.matriculados.toLocaleString('es-CO') : '—'}</td>
-                      <td className="px-3 py-2 text-center font-semibold" style={{ color: c.graduados > 0 ? '#059669' : '#9ca3af' }}>{c.graduados > 0 ? c.graduados.toLocaleString('es-CO') : '—'}</td>
-                      <td className="px-3 py-2 text-center text-gray-500">{c.inscritos > 0 ? c.inscritos.toLocaleString('es-CO') : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Collapsible>
-        )}
-      </div>
 
       {/* ── CIERRE ── */}
       <section className="py-16 px-4 text-center" style={{ background: C.navy }}>
