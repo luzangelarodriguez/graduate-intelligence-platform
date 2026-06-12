@@ -4,20 +4,18 @@ import { useEffect, useRef, useState } from 'react';
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 const C = {
-  navy:    '#0D2158',
-  red:     '#E63329',
-  bg:      '#F4F6FA',
-  navyBg:  '#EEF2FB',
-  border:  '#D8DEF0',
-  white:   '#FFFFFF',
-  // accent shades
+  navy:      '#0D2158',
+  red:       '#E63329',
+  bg:        '#F4F6FA',
+  navyBg:    '#EEF2FB',
+  border:    '#D8DEF0',
+  white:     '#FFFFFF',
   navyLight: '#1A3580',
   redLight:  '#FDECEA',
-  gold:    '#B7791F',
-  goldBg:  '#FEF3C7',
-  // kept for legacy ring colors
-  mid:     '#7B93D4',
-  light:   '#C7D3F5',
+  gold:      '#B7791F',
+  goldBg:    '#FEF3C7',
+  mid:       '#7B93D4',
+  light:     '#C7D3F5',
 };
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -45,134 +43,6 @@ interface Summary {
   top_matches: TopMatch[];
   totales: { matches: number; alta: number; media: number; baja: number };
 }
-
-// ─── Fallback data (run_id = 6) ───────────────────────────────────────────────
-const FALLBACK: Summary = {
-  run_id: 6,
-  fecha: '2026-06-01',
-  programas: [
-    { id: 92,  nombre: 'Inteligencia Artificial',          matches_total: 38, score_promedio: 71.2, score_maximo: 88.4, labels: { high: 18, medium: 14, low: 6  } },
-    { id: 94,  nombre: 'Visual Analytics and Big Data',    matches_total: 31, score_promedio: 68.5, score_maximo: 85.1, labels: { high: 14, medium: 12, low: 5  } },
-    { id: 108, nombre: 'Especialización en Criminología',  matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4,  medium: 10, low: 8  } },
-  ],
-  top_matches: [
-    { programa: 'Inteligencia Artificial', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },
-    { programa: 'Visual Analytics', empleo: 'Analista BI', empresa: 'Rappi', score: 85.1, label: 'high', skills_en_comun: ['Power BI', 'SQL'], skills_faltantes: ['dbt', 'Airflow'] },
-    { programa: 'Inteligencia Artificial', empleo: 'ML Engineer', empresa: 'Mercado Libre', score: 83.7, label: 'high', skills_en_comun: ['TensorFlow', 'Python'], skills_faltantes: ['Kubernetes'] },
-  ],
-  totales: { matches: 91, alta: 36, media: 36, baja: 19 },
-};
-
-// ─── SVG Ring ─────────────────────────────────────────────────────────────────
-const R = 42, CIRC = 2 * Math.PI * R;
-
-function Ring({ score, color = C.navy, size = 120, thick = 9, label }: {
-  score: number; color?: string; size?: number; thick?: number; label?: string;
-}) {
-  const [v, setV] = useState(0);
-  useEffect(() => { const id = requestAnimationFrame(() => setV(score)); return () => cancelAnimationFrame(id); }, [score]);
-  const dash = (v / 100) * CIRC;
-  const displayText = label ?? String(Math.round(v));
-  const fontSize = label && label.length > 3 ? '14' : '18';
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r={R} fill="none" stroke="#e5e7eb" strokeWidth={thick} />
-      <circle cx="50" cy="50" r={R} fill="none" stroke={color} strokeWidth={thick}
-        strokeLinecap="round"
-        strokeDasharray={`${dash} ${CIRC}`}
-        strokeDashoffset={CIRC * 0.25}
-        style={{ transition: 'stroke-dasharray 1.4s cubic-bezier(.4,0,.2,1)' }}
-      />
-      <text x="50" y="50" textAnchor="middle" dominantBaseline="middle" fontSize={fontSize} fontWeight="800" fill={color}>{displayText}</text>
-    </svg>
-  );
-}
-
-// ─── Lectura Clave block ───────────────────────────────────────────────────────
-function LecturaKey({ text }: { text: string }) {
-  return (
-    <div style={{ background: C.navyBg, borderLeft: `4px solid ${C.navy}` }}
-      className="rounded-r-xl px-5 py-4 my-4">
-      <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.navy }}>
-        ✦ Lectura Clave
-      </p>
-      <p className="text-sm leading-relaxed text-gray-800">{text}</p>
-    </div>
-  );
-}
-
-// ─── Section wrapper ──────────────────────────────────────────────────────────
-function Section({ n, title, children, dark = false }: {
-  n: string; title: string; children: React.ReactNode; dark?: boolean;
-}) {
-  return (
-    <section
-      className="relative py-14 px-4"
-      style={{ background: dark ? C.navy : C.bg }}
-    >
-      {/* decorative number */}
-      <span
-        className="absolute top-4 right-6 font-black select-none pointer-events-none"
-        style={{
-          fontSize: '7rem', lineHeight: 1, opacity: dark ? 0.08 : 0.05,
-          color: dark ? C.white : C.navy,
-        }}
-      >
-        {n}
-      </span>
-      <div className="max-w-4xl mx-auto relative z-10">
-        <p className="text-xs font-bold uppercase tracking-widest mb-1"
-          style={{ color: dark ? C.light : C.red }}>
-          Sección {n}
-        </p>
-        <h2 className="text-2xl sm:text-3xl font-extrabold mb-6"
-          style={{ color: dark ? C.white : C.navy }}>
-          {title}
-        </h2>
-        {children}
-      </div>
-    </section>
-  );
-}
-
-// ─── Label badge ──────────────────────────────────────────────────────────────
-const LBL: Record<string, [string, string, string]> = {
-  high:   ['Alta',  '#D8DEF0', '#0D2158'],
-  medium: ['Media', '#fef9c3', '#b45309'],
-  low:    ['Baja',  '#fee2e2', '#b91c1c'],
-};
-function LBadge({ l }: { l: string }) {
-  const [txt, bg, fg] = LBL[l] ?? [l, '#f3f4f6', '#374151'];
-  return <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: bg, color: fg }}>{txt}</span>;
-}
-
-// ─── Computed "Lecturas Clave" ────────────────────────────────────────────────
-function buildLecturas(d: Summary) {
-  const { totales, programas, top_matches } = d;
-  const pct = (n: number) => totales.matches ? Math.round((n / totales.matches) * 100) : 0;
-  const altaPct   = pct(totales.alta);
-  const mediaPct  = pct(totales.media);
-  const bestProg  = [...programas].sort((a, b) => b.score_maximo - a.score_maximo)[0];
-  const worstProg = [...programas].sort((a, b) => a.score_maximo - b.score_maximo)[0];
-  const bestMatch = top_matches[0];
-
-  return {
-    cobertura: `El ${altaPct + mediaPct}% de los empleos analizados tiene pertinencia media o alta con al menos un programa de UNIR. Esto indica una alineación curricular sólida con el mercado laboral colombiano.`,
-    ranking: bestProg
-      ? `"${bestProg.nombre}" lidera con un score máximo de ${bestProg.score_maximo.toFixed(1)}/100 y ${bestProg.labels.high} empleos de alta pertinencia. ${worstProg && worstProg.id !== bestProg.id ? `"${worstProg.nombre}" muestra mayor oportunidad de actualización curricular con score máximo de ${worstProg.score_maximo.toFixed(1)}.` : ''}`
-      : 'No hay datos de programas disponibles.',
-    distribucion: `El ${altaPct}% de matches son de alta pertinencia, ${mediaPct}% de media y ${pct(totales.baja)}% de baja. ${altaPct >= 40 ? 'La mayoría de programas están bien alineados con las demandas actuales del mercado.' : 'Existe espacio significativo para fortalecer la pertinencia curricular en varios programas.'}`,
-    topMatches: bestMatch
-      ? `El match más fuerte es "${bestMatch.empleo}" en ${bestMatch.empresa} con un score de ${bestMatch.score.toFixed(1)}/100 para el programa de ${bestMatch.programa}. Esto valida la relevancia del currículo frente a empleadores de primer nivel.`
-      : 'No hay matches disponibles.',
-    brechas: worstProg
-      ? `"${worstProg.nombre}" presenta ${worstProg.labels.low} empleos de baja pertinencia sobre ${worstProg.matches_total} analizados. Se recomienda revisar el plan de estudios incorporando competencias digitales y habilidades emergentes del sector.`
-      : 'Sin brechas identificadas.',
-    cierre: `Con ${totales.matches} pares analizados en este run, el motor de pertinencia académica provee evidencia cuantitativa para decisiones curriculares. El ${altaPct}% de alta pertinencia supera la referencia de calidad del 35% establecida institucionalmente.`,
-  };
-}
-
-// ─── Skills Gap types ─────────────────────────────────────────────────────────
 interface SkillMercado  { skill: string; frecuencia: number }
 interface SkillPrograma { skill: string; cobertura: number }
 interface Brecha        { skill: string; frecuencia_mercado: number }
@@ -187,300 +57,6 @@ interface SkillsAnalysis {
   exclusivas_programa: Exclusiva[];
   cobertura_pct: number;
 }
-
-// skill keyword → category
-const SKILL_CATEGORIES: Record<string, string> = {
-  // Cloud
-  aws: 'Cloud', azure: 'Cloud', gcp: 'Cloud', cloud: 'Cloud', docker: 'Cloud',
-  kubernetes: 'Cloud', terraform: 'Cloud', lambda: 'Cloud', ec2: 'Cloud', s3: 'Cloud',
-  // ML / IA
-  'machine learning': 'ML/IA', tensorflow: 'ML/IA', pytorch: 'ML/IA', keras: 'ML/IA',
-  'deep learning': 'ML/IA', nlp: 'ML/IA', 'scikit-learn': 'ML/IA', sklearn: 'ML/IA',
-  'ia': 'ML/IA', 'inteligencia artificial': 'ML/IA', 'computer vision': 'ML/IA',
-  // Ing. Datos
-  spark: 'Ing. Datos', kafka: 'Ing. Datos', airflow: 'Ing. Datos', dbt: 'Ing. Datos',
-  hadoop: 'Ing. Datos', etl: 'Ing. Datos', databricks: 'Ing. Datos', sql: 'Ing. Datos',
-  postgresql: 'Ing. Datos', mysql: 'Ing. Datos', mongodb: 'Ing. Datos', redis: 'Ing. Datos',
-  // Visualización
-  'power bi': 'Visualización', tableau: 'Visualización', looker: 'Visualización',
-  'data studio': 'Visualización', matplotlib: 'Visualización', plotly: 'Visualización',
-  grafana: 'Visualización', 'd3': 'Visualización',
-  // Programación
-  python: 'Programación', r: 'Programación', java: 'Programación', scala: 'Programación',
-  javascript: 'Programación', typescript: 'Programación', 'c++': 'Programación',
-  go: 'Programación', rust: 'Programación', bash: 'Programación',
-  // Negocio
-  agile: 'Negocio', scrum: 'Negocio', kanban: 'Negocio', 'project management': 'Negocio',
-  excel: 'Negocio', powerpoint: 'Negocio', comunicación: 'Negocio', liderazgo: 'Negocio',
-};
-const ALL_CATS = ['Todos', 'Cloud', 'ML/IA', 'Ing. Datos', 'Visualización', 'Programación', 'Negocio'];
-
-function categorize(skill: string): string {
-  const low = skill.toLowerCase();
-  for (const [kw, cat] of Object.entries(SKILL_CATEGORIES)) {
-    if (low.includes(kw)) return cat;
-  }
-  return 'Otros';
-}
-
-// ─── Mirror bar ───────────────────────────────────────────────────────────────
-function MirrorBar({
-  skill, leftVal, rightVal, maxVal, inProgram,
-}: { skill: string; leftVal: number; rightVal: number; maxVal: number; inProgram: boolean }) {
-  const leftPct  = maxVal ? (leftVal  / maxVal) * 100 : 0;
-  const rightPct = maxVal ? (rightVal / maxVal) * 100 : 0;
-  return (
-    <div className="flex items-center gap-1 text-xs">
-      {/* left label (program cobertura) */}
-      <span className="w-6 text-right font-mono text-green-700">{leftVal || ''}</span>
-      {/* left bar (programa) */}
-      <div className="flex justify-end" style={{ width: '38%' }}>
-        <div
-          className="h-5 rounded-l-sm transition-all duration-700"
-          style={{ width: `${leftPct}%`, background: inProgram ? '#0D2158' : 'transparent', minWidth: leftVal ? 2 : 0 }}
-        />
-      </div>
-      {/* skill label */}
-      <div className="w-[24%] text-center truncate font-medium text-gray-700 text-[11px]">{skill}</div>
-      {/* right bar (mercado) */}
-      <div className="flex justify-start" style={{ width: '38%' }}>
-        <div
-          className="h-5 rounded-r-sm transition-all duration-700"
-          style={{ width: `${rightPct}%`, background: inProgram ? '#2563eb' : '#ef4444', minWidth: rightVal ? 2 : 0 }}
-        />
-      </div>
-      <span className="w-6 font-mono" style={{ color: inProgram ? '#2563eb' : '#ef4444' }}>{rightVal}</span>
-    </div>
-  );
-}
-
-// ─── Skills Gap Chart ─────────────────────────────────────────────────────────
-const PROGRAM_OPTIONS = [
-  { id: 94,  label: 'Visual Analytics & Big Data' },
-  { id: 92,  label: 'Inteligencia Artificial' },
-  { id: 108, label: 'Especialización en Criminología' },
-];
-
-const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
-  94: {
-    program_id: 94, cobertura_pct: 54,
-    skills_mercado:  [
-      { skill: 'Python',      frecuencia: 28 }, { skill: 'Power BI',    frecuencia: 24 },
-      { skill: 'SQL',         frecuencia: 22 }, { skill: 'Tableau',     frecuencia: 18 },
-      { skill: 'Spark',       frecuencia: 16 }, { skill: 'AWS',         frecuencia: 14 },
-      { skill: 'Airflow',     frecuencia: 12 }, { skill: 'dbt',         frecuencia: 10 },
-      { skill: 'Kafka',       frecuencia: 9  }, { skill: 'Databricks',  frecuencia: 8  },
-    ],
-    skills_programa: [
-      { skill: 'Python',      cobertura: 5 }, { skill: 'Power BI',    cobertura: 4 },
-      { skill: 'SQL',         cobertura: 4 }, { skill: 'Tableau',     cobertura: 3 },
-      { skill: 'R',           cobertura: 3 }, { skill: 'Estadística', cobertura: 3 },
-      { skill: 'Excel',       cobertura: 2 }, { skill: 'Matplotlib',  cobertura: 2 },
-    ],
-    fortalezas:  [
-      { skill: 'Python', frecuencia_mercado: 28, cobertura_programa: 5 },
-      { skill: 'Power BI', frecuencia_mercado: 24, cobertura_programa: 4 },
-      { skill: 'SQL', frecuencia_mercado: 22, cobertura_programa: 4 },
-      { skill: 'Tableau', frecuencia_mercado: 18, cobertura_programa: 3 },
-    ],
-    brechas: [
-      { skill: 'Spark',      frecuencia_mercado: 16 }, { skill: 'AWS',        frecuencia_mercado: 14 },
-      { skill: 'Airflow',    frecuencia_mercado: 12 }, { skill: 'dbt',        frecuencia_mercado: 10 },
-      { skill: 'Kafka',      frecuencia_mercado: 9  }, { skill: 'Databricks', frecuencia_mercado: 8  },
-    ],
-    exclusivas_programa: [
-      { skill: 'R', cobertura: 3 }, { skill: 'Estadística', cobertura: 3 },
-      { skill: 'Excel', cobertura: 2 }, { skill: 'Matplotlib', cobertura: 2 },
-    ],
-  },
-  92: {
-    program_id: 92, cobertura_pct: 61,
-    skills_mercado:  [
-      { skill: 'Python',         frecuencia: 31 }, { skill: 'TensorFlow',    frecuencia: 22 },
-      { skill: 'Machine Learning', frecuencia: 20 }, { skill: 'PyTorch',     frecuencia: 18 },
-      { skill: 'SQL',            frecuencia: 17 }, { skill: 'AWS',           frecuencia: 15 },
-      { skill: 'Docker',         frecuencia: 13 }, { skill: 'Kubernetes',    frecuencia: 11 },
-      { skill: 'Spark',          frecuencia: 10 }, { skill: 'MLflow',        frecuencia: 9  },
-    ],
-    skills_programa: [
-      { skill: 'Python',          cobertura: 6 }, { skill: 'TensorFlow',     cobertura: 5 },
-      { skill: 'Machine Learning', cobertura: 5 }, { skill: 'PyTorch',       cobertura: 4 },
-      { skill: 'Estadística',     cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 },
-      { skill: 'Scikit-learn',    cobertura: 3 }, { skill: 'NLP',            cobertura: 2 },
-    ],
-    fortalezas: [
-      { skill: 'Python', frecuencia_mercado: 31, cobertura_programa: 6 },
-      { skill: 'TensorFlow', frecuencia_mercado: 22, cobertura_programa: 5 },
-      { skill: 'Machine Learning', frecuencia_mercado: 20, cobertura_programa: 5 },
-      { skill: 'PyTorch', frecuencia_mercado: 18, cobertura_programa: 4 },
-    ],
-    brechas: [
-      { skill: 'AWS',        frecuencia_mercado: 15 }, { skill: 'Docker',    frecuencia_mercado: 13 },
-      { skill: 'Kubernetes', frecuencia_mercado: 11 }, { skill: 'Spark',     frecuencia_mercado: 10 },
-      { skill: 'MLflow',     frecuencia_mercado: 9  },
-    ],
-    exclusivas_programa: [
-      { skill: 'Estadística', cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 },
-      { skill: 'Scikit-learn', cobertura: 3 }, { skill: 'NLP', cobertura: 2 },
-    ],
-  },
-  108: {
-    program_id: 108, cobertura_pct: 38,
-    skills_mercado:  [
-      { skill: 'Investigación',   frecuencia: 18 }, { skill: 'Excel',          frecuencia: 15 },
-      { skill: 'Análisis datos',  frecuencia: 14 }, { skill: 'Derecho Penal',  frecuencia: 13 },
-      { skill: 'SPSS',            frecuencia: 11 }, { skill: 'Redacción',      frecuencia: 10 },
-      { skill: 'Python',          frecuencia: 8  }, { skill: 'Power BI',       frecuencia: 7  },
-      { skill: 'GIS',             frecuencia: 6  }, { skill: 'R',              frecuencia: 5  },
-    ],
-    skills_programa: [
-      { skill: 'Investigación',  cobertura: 5 }, { skill: 'Derecho Penal',   cobertura: 4 },
-      { skill: 'Criminología',   cobertura: 4 }, { skill: 'Excel',           cobertura: 2 },
-      { skill: 'Estadística',    cobertura: 3 }, { skill: 'Victimología',    cobertura: 3 },
-    ],
-    fortalezas: [
-      { skill: 'Investigación', frecuencia_mercado: 18, cobertura_programa: 5 },
-      { skill: 'Excel', frecuencia_mercado: 15, cobertura_programa: 2 },
-      { skill: 'Derecho Penal', frecuencia_mercado: 13, cobertura_programa: 4 },
-    ],
-    brechas: [
-      { skill: 'Análisis datos', frecuencia_mercado: 14 }, { skill: 'SPSS',     frecuencia_mercado: 11 },
-      { skill: 'Redacción',      frecuencia_mercado: 10 }, { skill: 'Python',   frecuencia_mercado: 8  },
-      { skill: 'Power BI',       frecuencia_mercado: 7  }, { skill: 'GIS',      frecuencia_mercado: 6  },
-      { skill: 'R',              frecuencia_mercado: 5  },
-    ],
-    exclusivas_programa: [
-      { skill: 'Criminología', cobertura: 4 }, { skill: 'Victimología', cobertura: 3 },
-      { skill: 'Estadística', cobertura: 3 },
-    ],
-  },
-};
-
-function SkillsGapChart({ programId }: { programId: number }) {
-  const [data, setData]             = useState<SkillsAnalysis | null>(null);
-  const [loading, setLoading]       = useState(false);
-  const [isFallback, setIsFallback] = useState(false);
-  const [activeTab, setActiveTab]   = useState('Todos');
-
-  useEffect(() => {
-    setLoading(true);
-    setData(null);
-    setIsFallback(false);
-    fetch(`${API}/api/dashboard/skills-analysis/${programId}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then((d: SkillsAnalysis) => { setData(d); setLoading(false); })
-      .catch(() => {
-        setData(FALLBACK_SKILLS[programId] ?? FALLBACK_SKILLS[94]);
-        setIsFallback(true);
-        setLoading(false);
-      });
-  }, [programId]);
-
-  // Build unified skill list for mirror chart
-  const rows = (() => {
-    if (!data) return [];
-    const mercadoMap = new Map(data.skills_mercado.map(s => [s.skill.toLowerCase(), s.frecuencia]));
-    const programaMap = new Map(data.skills_programa.map(s => [s.skill.toLowerCase(), s.cobertura]));
-    const allSkills = new Set([...mercadoMap.keys(), ...programaMap.keys()]);
-    return [...allSkills].map(key => ({
-      skill:      key,
-      leftVal:    programaMap.get(key) ?? 0,
-      rightVal:   mercadoMap.get(key)  ?? 0,
-      inProgram:  programaMap.has(key),
-      category:   categorize(key),
-    })).sort((a, b) => b.rightVal - a.rightVal);
-  })();
-
-  const filtered = activeTab === 'Todos' ? rows : rows.filter(r => r.category === activeTab);
-  const maxVal = Math.max(...rows.map(r => Math.max(r.leftVal, r.rightVal)), 1);
-
-  return (
-    <div className="rounded-2xl overflow-hidden border" style={{ background: C.bg }}>
-      {loading && (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-700 animate-spin" />
-        </div>
-      )}
-
-      {!loading && isFallback && (
-        <div className="mx-4 mt-3 rounded-lg px-3 py-1.5 text-xs text-center"
-          style={{ background: C.goldBg, color: C.gold }}>
-          ⚠ Datos de referencia — API no disponible
-        </div>
-      )}
-
-      {!loading && data && (
-        <>
-          {/* KPI summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4">
-            {[
-              { k: 'Cobertura',    v: `${data.cobertura_pct}%`, c: '#0D2158' },
-              { k: 'Fortalezas',   v: data.fortalezas.length,   c: '#2563eb' },
-              { k: 'Brechas',      v: data.brechas.length,      c: '#dc2626' },
-              { k: 'Exclusivas',   v: data.exclusivas_programa.length, c: C.gold },
-            ].map(({ k, v, c }) => (
-              <div key={k} className="rounded-xl border bg-white p-3 text-center shadow-sm">
-                <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{k}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* legend */}
-          <div className="flex gap-4 px-5 pb-2 text-xs text-gray-500">
-            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#0D2158' }} />Programa (cobertura)</span>
-            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#2563eb' }} />Mercado cubierto</span>
-            <span><span className="inline-block w-3 h-3 rounded-sm mr-1" style={{ background: '#ef4444' }} />Brecha (solo en mercado)</span>
-          </div>
-
-          {/* tabs */}
-          <div className="flex flex-wrap gap-1 px-5 pb-3">
-            {ALL_CATS.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveTab(cat)}
-                className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                style={activeTab === cat
-                  ? { background: C.navy, color: C.white }
-                  : { background: '#e5e7eb', color: '#374151' }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* mirror bars */}
-          <div className="px-4 pb-5 space-y-1">
-            {/* axis header */}
-            <div className="flex items-center gap-1 text-[10px] text-gray-400 mb-2">
-              <span className="w-6" />
-              <div className="text-right" style={{ width: '38%' }}>← Programa</div>
-              <div className="w-[24%] text-center">Skill</div>
-              <div style={{ width: '38%' }}>Mercado →</div>
-              <span className="w-6" />
-            </div>
-            {filtered.slice(0, 25).map(r => (
-              <MirrorBar
-                key={r.skill}
-                skill={r.skill}
-                leftVal={r.leftVal}
-                rightVal={r.rightVal}
-                maxVal={maxVal}
-                inProgram={r.inProgram}
-              />
-            ))}
-            {filtered.length === 0 && (
-              <p className="text-center text-sm text-gray-400 py-6">Sin skills en esta categoría</p>
-            )}
-          </div>
-        </>
-      )}
-
-    </div>
-  );
-}
-
-// ─── University Benchmark types ───────────────────────────────────────────────
 interface Competitor {
   nombre_ies: string;
   nombre_programa: string;
@@ -503,20 +79,133 @@ interface UniversityData {
   total: number;
 }
 
-// UNIR's own program reference data
-const UNIR_PROGRAMS: Record<number, { nombre: string; creditos: number; duracion: string; periodicidad: string }> = {
-  94:  { nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
-  92:  { nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
-  108: { nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
-};
-
-const BENCH_PROGRAMS = [
-  { id: 94,  label: 'Visual Analytics & Big Data' },
-  { id: 92,  label: 'Inteligencia Artificial' },
-  { id: 108, label: 'Especialización en Criminología' },
+// ─── Static program metadata ──────────────────────────────────────────────────
+const PROGRAMS = [
+  { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  { id: 92,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
 ];
 
-// ─── Skill category classification ───────────────────────────────────────────
+// ─── Fallback data ─────────────────────────────────────────────────────────────
+const FALLBACK: Summary = {
+  run_id: 6, fecha: '2026-06-01',
+  programas: [
+    { id: 92,  nombre: 'Inteligencia Artificial',       matches_total: 38, score_promedio: 71.2, score_maximo: 88.4, labels: { high: 18, medium: 14, low: 6 } },
+    { id: 94,  nombre: 'Visual Analytics and Big Data', matches_total: 31, score_promedio: 68.5, score_maximo: 85.1, labels: { high: 14, medium: 12, low: 5 } },
+    { id: 108, nombre: 'Especialización en Criminología', matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4, medium: 10, low: 8 } },
+  ],
+  top_matches: [
+    { programa: 'Visual Analytics', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },
+    { programa: 'Visual Analytics', empleo: 'Analista BI', empresa: 'Rappi', score: 85.1, label: 'high', skills_en_comun: ['Power BI', 'SQL'], skills_faltantes: ['dbt', 'Airflow'] },
+    { programa: 'Visual Analytics', empleo: 'ML Engineer', empresa: 'Mercado Libre', score: 83.7, label: 'high', skills_en_comun: ['TensorFlow', 'Python'], skills_faltantes: ['Kubernetes'] },
+  ],
+  totales: { matches: 91, alta: 36, media: 36, baja: 19 },
+};
+
+const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
+  94: {
+    program_id: 94, cobertura_pct: 54,
+    skills_mercado:  [
+      { skill: 'Python', frecuencia: 28 }, { skill: 'Power BI', frecuencia: 24 },
+      { skill: 'SQL', frecuencia: 22 },    { skill: 'Tableau', frecuencia: 18 },
+      { skill: 'Spark', frecuencia: 16 },  { skill: 'AWS', frecuencia: 14 },
+      { skill: 'Airflow', frecuencia: 12 },{ skill: 'dbt', frecuencia: 10 },
+      { skill: 'Kafka', frecuencia: 9 },   { skill: 'Databricks', frecuencia: 8 },
+    ],
+    skills_programa:  [
+      { skill: 'Python', cobertura: 5 }, { skill: 'Power BI', cobertura: 4 },
+      { skill: 'SQL', cobertura: 4 },    { skill: 'Tableau', cobertura: 3 },
+      { skill: 'R', cobertura: 3 },      { skill: 'Estadística', cobertura: 3 },
+      { skill: 'Excel', cobertura: 2 },  { skill: 'Matplotlib', cobertura: 2 },
+    ],
+    fortalezas: [
+      { skill: 'Python', frecuencia_mercado: 28, cobertura_programa: 5 },
+      { skill: 'Power BI', frecuencia_mercado: 24, cobertura_programa: 4 },
+      { skill: 'SQL', frecuencia_mercado: 22, cobertura_programa: 4 },
+      { skill: 'Tableau', frecuencia_mercado: 18, cobertura_programa: 3 },
+    ],
+    brechas: [
+      { skill: 'Spark', frecuencia_mercado: 16 },  { skill: 'AWS', frecuencia_mercado: 14 },
+      { skill: 'Airflow', frecuencia_mercado: 12 }, { skill: 'dbt', frecuencia_mercado: 10 },
+      { skill: 'Kafka', frecuencia_mercado: 9 },    { skill: 'Databricks', frecuencia_mercado: 8 },
+    ],
+    exclusivas_programa: [
+      { skill: 'R', cobertura: 3 }, { skill: 'Estadística', cobertura: 3 },
+      { skill: 'Excel', cobertura: 2 }, { skill: 'Matplotlib', cobertura: 2 },
+    ],
+  },
+  92: {
+    program_id: 92, cobertura_pct: 61,
+    skills_mercado:  [
+      { skill: 'Python', frecuencia: 31 },         { skill: 'TensorFlow', frecuencia: 22 },
+      { skill: 'Machine Learning', frecuencia: 20 },{ skill: 'PyTorch', frecuencia: 18 },
+      { skill: 'SQL', frecuencia: 17 },             { skill: 'AWS', frecuencia: 15 },
+      { skill: 'Docker', frecuencia: 13 },           { skill: 'Kubernetes', frecuencia: 11 },
+      { skill: 'Spark', frecuencia: 10 },            { skill: 'MLflow', frecuencia: 9 },
+    ],
+    skills_programa:  [
+      { skill: 'Python', cobertura: 6 },          { skill: 'TensorFlow', cobertura: 5 },
+      { skill: 'Machine Learning', cobertura: 5 },{ skill: 'PyTorch', cobertura: 4 },
+      { skill: 'Estadística', cobertura: 4 },     { skill: 'Álgebra Lineal', cobertura: 3 },
+      { skill: 'Scikit-learn', cobertura: 3 },    { skill: 'NLP', cobertura: 2 },
+    ],
+    fortalezas: [
+      { skill: 'Python', frecuencia_mercado: 31, cobertura_programa: 6 },
+      { skill: 'TensorFlow', frecuencia_mercado: 22, cobertura_programa: 5 },
+      { skill: 'Machine Learning', frecuencia_mercado: 20, cobertura_programa: 5 },
+      { skill: 'PyTorch', frecuencia_mercado: 18, cobertura_programa: 4 },
+    ],
+    brechas: [
+      { skill: 'AWS', frecuencia_mercado: 15 },       { skill: 'Docker', frecuencia_mercado: 13 },
+      { skill: 'Kubernetes', frecuencia_mercado: 11 }, { skill: 'Spark', frecuencia_mercado: 10 },
+      { skill: 'MLflow', frecuencia_mercado: 9 },
+    ],
+    exclusivas_programa: [
+      { skill: 'Estadística', cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 },
+      { skill: 'Scikit-learn', cobertura: 3 }, { skill: 'NLP', cobertura: 2 },
+    ],
+  },
+  108: {
+    program_id: 108, cobertura_pct: 38,
+    skills_mercado:  [
+      { skill: 'Investigación', frecuencia: 18 },  { skill: 'Excel', frecuencia: 15 },
+      { skill: 'Análisis datos', frecuencia: 14 }, { skill: 'Derecho Penal', frecuencia: 13 },
+      { skill: 'SPSS', frecuencia: 11 },           { skill: 'Redacción', frecuencia: 10 },
+      { skill: 'Python', frecuencia: 8 },          { skill: 'Power BI', frecuencia: 7 },
+      { skill: 'GIS', frecuencia: 6 },             { skill: 'R', frecuencia: 5 },
+    ],
+    skills_programa:  [
+      { skill: 'Investigación', cobertura: 5 }, { skill: 'Derecho Penal', cobertura: 4 },
+      { skill: 'Criminología', cobertura: 4 },  { skill: 'Excel', cobertura: 2 },
+      { skill: 'Estadística', cobertura: 3 },   { skill: 'Victimología', cobertura: 3 },
+    ],
+    fortalezas: [
+      { skill: 'Investigación', frecuencia_mercado: 18, cobertura_programa: 5 },
+      { skill: 'Excel', frecuencia_mercado: 15, cobertura_programa: 2 },
+      { skill: 'Derecho Penal', frecuencia_mercado: 13, cobertura_programa: 4 },
+    ],
+    brechas: [
+      { skill: 'Análisis datos', frecuencia_mercado: 14 }, { skill: 'SPSS', frecuencia_mercado: 11 },
+      { skill: 'Redacción', frecuencia_mercado: 10 },      { skill: 'Python', frecuencia_mercado: 8 },
+      { skill: 'Power BI', frecuencia_mercado: 7 },        { skill: 'GIS', frecuencia_mercado: 6 },
+      { skill: 'R', frecuencia_mercado: 5 },
+    ],
+    exclusivas_programa: [
+      { skill: 'Criminología', cobertura: 4 }, { skill: 'Victimología', cobertura: 3 },
+      { skill: 'Estadística', cobertura: 3 },
+    ],
+  },
+};
+
+// ─── Pertinencia scale ─────────────────────────────────────────────────────────
+function pertinenciaLevel(score: number): { label: string; color: string; bg: string; desc: string } {
+  if (score >= 75) return { label: 'Excelente', color: '#059669', bg: '#d1fae5', desc: 'El currículo está muy bien alineado con las demandas actuales del mercado laboral.' };
+  if (score >= 60) return { label: 'Buena',     color: '#2563eb', bg: '#dbeafe', desc: 'Buena alineación general; existen oportunidades de fortalecimiento en áreas específicas.' };
+  if (score >= 40) return { label: 'Moderada',  color: C.gold,   bg: C.goldBg,  desc: 'Alineación parcial. Se recomienda actualización curricular prioritaria.' };
+  return              { label: 'Crítica',   color: '#dc2626', bg: '#fee2e2', desc: 'Brecha significativa entre el currículo y las competencias demandadas por el mercado.' };
+}
+
+// ─── Skill classification ─────────────────────────────────────────────────────
 const SKILL_CATS = {
   herramienta: new Set([
     'python','sql','power bi','tableau','excel','aws','azure','gcp','docker',
@@ -536,9 +225,7 @@ const SKILL_CATS = {
     'gestion de proyectos','orientacion a resultados','toma de decisiones',
   ]),
 };
-
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
-
 function classifySkill(s: string): SkillCat {
   const key = s.toLowerCase();
   if (SKILL_CATS.herramienta.has(key)) return 'herramienta';
@@ -546,158 +233,819 @@ function classifySkill(s: string): SkillCat {
   if (SKILL_CATS.habilidad.has(key))   return 'habilidad';
   return 'otro';
 }
-
-const CAT_STYLE: Record<SkillCat, { bg: string; color: string; label: string }> = {
-  herramienta: { bg: 'rgba(147,197,253,0.18)', color: '#93c5fd', label: '⚙' },
-  competencia:  { bg: 'rgba(134,239,172,0.18)', color: '#86efac', label: '◈' },
-  habilidad:    { bg: 'rgba(253,224,71,0.18)',  color: '#fcd34d', label: '◇' },
-  otro:         { bg: 'rgba(255,255,255,0.10)', color: '#cbd5e1', label: '·' },
+const CAT_STYLE: Record<SkillCat, { bg: string; color: string; icon: string; label: string }> = {
+  herramienta: { bg: 'rgba(147,197,253,0.2)', color: '#3b82f6', icon: '⚙', label: 'Herramienta' },
+  competencia:  { bg: 'rgba(134,239,172,0.2)', color: '#16a34a', icon: '◈', label: 'Competencia'  },
+  habilidad:    { bg: 'rgba(251,191,36,0.2)',  color: '#d97706', icon: '◇', label: 'Habilidad'    },
+  otro:         { bg: 'rgba(148,163,184,0.15)',color: '#64748b', icon: '·', label: 'Otro'         },
 };
 
-function UniversityBenchmark({ programId }: { programId: number }) {
-  const [data, setData]           = useState<UniversityData | null>(null);
-  const [loading, setLoading]     = useState(false);
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+function Section({ n, title, children, dark = false, id }: {
+  n: string; title: string; children: React.ReactNode; dark?: boolean; id?: string;
+}) {
+  return (
+    <section id={id} className="relative py-14 px-4" style={{ background: dark ? C.navy : C.bg }}>
+      <span className="absolute top-4 right-6 font-black select-none pointer-events-none"
+        style={{ fontSize: '7rem', lineHeight: 1, opacity: dark ? 0.07 : 0.04, color: dark ? C.white : C.navy }}>
+        {n}
+      </span>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: dark ? C.light : C.red }}>
+          Sección {n}
+        </p>
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-6" style={{ color: dark ? C.white : C.navy }}>
+          {title}
+        </h2>
+        {children}
+      </div>
+    </section>
+  );
+}
 
-  useEffect(() => {
-    setLoading(true);
-    setData(null);
-    fetch(`${API}/api/programs/related-universities/${programId}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then((d: UniversityData) => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [programId]);
+// ─── Insight block ─────────────────────────────────────────────────────────────
+function Insight({ text, dark = false }: { text: string; dark?: boolean }) {
+  const bg    = dark ? 'rgba(183,121,31,0.15)' : C.navyBg;
+  const bord  = dark ? C.gold : C.navy;
+  const label = dark ? C.gold : C.navy;
+  const body  = dark ? '#e2e8f0' : '#1e293b';
+  return (
+    <div className="rounded-r-xl px-5 py-4 my-5" style={{ background: bg, borderLeft: `4px solid ${bord}` }}>
+      <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: label }}>✦ Lectura Clave</p>
+      <p className="text-sm leading-relaxed" style={{ color: body }}>{text}</p>
+    </div>
+  );
+}
 
-  // UNIR self-reported stats per program (used for ranking computation)
-  const UNIR_STATS: Record<number, { matriculados: number; graduados: number }> = {
-    94:  { matriculados: 0, graduados: 0 }, // populated from real data when available
-    92:  { matriculados: 0, graduados: 0 },
-    108: { matriculados: 0, graduados: 0 },
-  };
+// ─── Semicircular SVG gauge ────────────────────────────────────────────────────
+function SemiGauge({ pct, color, size = 200 }: { pct: number; color: string; size?: number }) {
+  const [v, setV] = useState(0);
+  useEffect(() => { const id = setTimeout(() => setV(pct), 80); return () => clearTimeout(id); }, [pct]);
+  const r = 80;
+  const stroke = 14;
+  const cx = 100, cy = 100;
+  // arc from 180° to 0° (left to right, top)
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const arcX = (deg: number) => cx + r * Math.cos(toRad(deg));
+  const arcY = (deg: number) => cy + r * Math.sin(toRad(deg));
+  const startDeg = 180, endDeg = 0;
+  const totalAngle = 180;
+  const filled = (v / 100) * totalAngle;
+  const filledEnd = 180 - filled;
 
-  // Derived metrics
-  const metrics = (() => {
-    if (!data || !data.competitors.length) return null;
-    const withCredits = data.competitors.filter(c => c.creditos != null);
-    const avgCredits = withCredits.length
-      ? Math.round(withCredits.reduce((s, c) => s + (c.creditos ?? 0), 0) / withCredits.length)
-      : null;
-    const withDur = data.competitors.filter(c => c.duracion && !isNaN(Number(c.duracion)));
-    const avgDur = withDur.length
-      ? (withDur.reduce((s, c) => s + Number(c.duracion), 0) / withDur.length).toFixed(1)
-      : null;
-    const cityCount: Record<string, number> = {};
-    data.competitors.forEach(c => {
-      const city = c.municipio || c.ciudad || 'N/D';
-      cityCount[city] = (cityCount[city] ?? 0) + 1;
-    });
-    const topCities = Object.entries(cityCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  function describeArc(start: number, end: number) {
+    const s = { x: arcX(start), y: arcY(start) };
+    const e = { x: arcX(end),   y: arcY(end) };
+    const large = Math.abs(end - start) > 180 ? 1 : 0;
+    const sweep = end > start ? 1 : 0;
+    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} ${sweep} ${e.x} ${e.y}`;
+  }
 
-    // UNIR ranking: insert UNIR into sorted competitor list and find position
-    const unirStats = UNIR_STATS[programId] ?? { matriculados: 0, graduados: 0 };
-    const allGrad = [...data.competitors.map(c => c.graduados), unirStats.graduados].sort((a, b) => b - a);
-    const allMat  = [...data.competitors.map(c => c.matriculados), unirStats.matriculados].sort((a, b) => b - a);
-    const unirRankGrad = unirStats.graduados   > 0 ? allGrad.indexOf(unirStats.graduados) + 1   : null;
-    const unirRankMat  = unirStats.matriculados > 0 ? allMat.indexOf(unirStats.matriculados) + 1 : null;
-
-    return { avgCredits, avgDur, topCities, unirRankGrad, unirRankMat };
-  })();
-
-  const unir = UNIR_PROGRAMS[programId];
+  const scale = size / 200;
 
   return (
-    <div className="space-y-5">
-      <p className="text-xs text-gray-500 mb-4">Programas activos modalidad virtual registrados en SNIES / HECAA</p>
+    <svg width={size} height={size * 0.6} viewBox={`0 60 200 120`} style={{ overflow: 'visible' }}>
+      {/* track */}
+      <path d={describeArc(180, 0)} fill="none" stroke="#e5e7eb" strokeWidth={stroke} strokeLinecap="round" />
+      {/* fill */}
+      {v > 0 && (
+        <path
+          d={describeArc(180, 180 - filled)}
+          fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
+          style={{ transition: 'all 1.4s cubic-bezier(.4,0,.2,1)' }}
+        />
+      )}
+      {/* value text */}
+      <text x="100" y="115" textAnchor="middle" fontSize="28" fontWeight="800" fill={color}>
+        {Math.round(v)}%
+      </text>
+    </svg>
+  );
+}
 
-      {loading && (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-700 animate-spin" />
+// ─── Skill tag ─────────────────────────────────────────────────────────────────
+function SkillTag({ skill, variant = 'default' }: { skill: string; variant?: 'default' | 'gap' | 'match' }) {
+  if (variant === 'gap') {
+    return (
+      <span className="rounded-full px-2 py-0.5 text-xs font-medium"
+        style={{ background: 'rgba(220,38,38,0.1)', color: '#dc2626', border: '1px solid rgba(220,38,38,0.25)' }}>
+        − {skill}
+      </span>
+    );
+  }
+  if (variant === 'match') {
+    return (
+      <span className="rounded-full px-2 py-0.5 text-xs font-medium"
+        style={{ background: 'rgba(5,150,105,0.1)', color: '#059669', border: '1px solid rgba(5,150,105,0.25)' }}>
+        ✓ {skill}
+      </span>
+    );
+  }
+  const cat = classifySkill(skill);
+  const st  = CAT_STYLE[cat];
+  return (
+    <span className="rounded-full px-2 py-0.5 text-xs font-medium"
+      style={{ background: st.bg, color: st.color, border: `1px solid ${st.color}33` }}
+      title={st.label}>
+      {st.icon} {skill}
+    </span>
+  );
+}
+
+// ─── Horizontal bar ────────────────────────────────────────────────────────────
+function HBar({ label, val, max, color }: { label: string; val: number; max: number; color: string }) {
+  const pct = max > 0 ? (val / max) * 100 : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs text-gray-600 w-32 flex-shrink-0 truncate">{label}</span>
+      <div className="flex-1 h-3 rounded-full" style={{ background: '#e5e7eb' }}>
+        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
+      </div>
+      <span className="text-xs font-semibold w-6 text-right" style={{ color }}>{val}</span>
+    </div>
+  );
+}
+
+// ─── Collapsible ──────────────────────────────────────────────────────────────
+function Collapsible({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.border }}>
+      <button
+        className="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold"
+        style={{ background: C.navyBg, color: C.navy }}
+        onClick={() => setOpen(o => !o)}>
+        {title}
+        <span style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s', display: 'inline-block' }}>▾</span>
+      </button>
+      {open && <div className="px-5 py-4 bg-white">{children}</div>}
+    </div>
+  );
+}
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+function Spinner() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-800 animate-spin" />
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+export default function ObservatorioStorytelling() {
+  const [summary, setSummary]     = useState<Summary | null>(null);
+  const [skills, setSkills]       = useState<SkillsAnalysis | null>(null);
+  const [univ, setUniv]           = useState<UniversityData | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [isFallback, setIsFallback] = useState(false);
+  const [programaId, setProgramaId] = useState(94);
+  const [anexoOpen, setAnexoOpen]  = useState(false);
+
+  // fetch summary
+  useEffect(() => {
+    setLoading(true);
+    setIsFallback(false);
+    fetch(`${API}/api/dashboard/summary?program_id=${programaId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: Summary) => { setSummary(d); setLoading(false); })
+      .catch(() => {
+        const fb = { ...FALLBACK, programas: FALLBACK.programas.filter(p => p.id === programaId) };
+        const prog = fb.programas[0];
+        if (prog) fb.totales = { matches: prog.matches_total, alta: prog.labels.high, media: prog.labels.medium, baja: prog.labels.low };
+        setSummary(fb);
+        setIsFallback(true);
+        setLoading(false);
+      });
+  }, [programaId]);
+
+  // fetch skills analysis
+  useEffect(() => {
+    setSkills(null);
+    fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: SkillsAnalysis) => setSkills(d))
+      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? FALLBACK_SKILLS[94]));
+  }, [programaId]);
+
+  // fetch universities
+  useEffect(() => {
+    setUniv(null);
+    fetch(`${API}/api/programs/related-universities/${programaId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: UniversityData) => setUniv(d))
+      .catch(() => setUniv(null));
+  }, [programaId]);
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
+      <div className="text-center space-y-4">
+        <div className="mx-auto w-14 h-14 rounded-full border-4 border-blue-200 border-t-blue-900 animate-spin" />
+        <p className="text-sm font-medium" style={{ color: C.navy }}>Cargando observatorio…</p>
+      </div>
+    </div>
+  );
+
+  const d = summary!;
+  const { totales, programas, top_matches } = d;
+  const prog  = programas.find(p => p.id === programaId) ?? programas[0];
+  const meta  = PROGRAMS.find(p => p.id === programaId) ?? PROGRAMS[0];
+  const score = prog?.score_promedio ?? 0;
+  const nivel = pertinenciaLevel(score);
+  const coberturaPct = skills?.cobertura_pct ?? 0;
+  const brechaPct    = skills ? 100 - coberturaPct : 0;
+  const empCompatibles = top_matches.filter(m => m.skills_en_comun.length > 0).length;
+  const maxFrecuencia  = skills ? Math.max(...skills.skills_mercado.map(s => s.frecuencia), 1) : 1;
+  const maxCobertura   = skills ? Math.max(...skills.skills_programa.map(s => s.cobertura), 1) : 1;
+
+  // Group skills by category for section 3
+  const skillsByCategory: Record<string, SkillPrograma[]> = {};
+  if (skills) {
+    for (const s of skills.skills_programa) {
+      const cat = CAT_STYLE[classifySkill(s.skill)].label;
+      if (!skillsByCategory[cat]) skillsByCategory[cat] = [];
+      skillsByCategory[cat].push(s);
+    }
+  }
+
+  // Top-gap brechas split by priority
+  const brechasAlta  = skills?.brechas.filter(b => b.frecuencia_mercado >= 10) ?? [];
+  const brechasMedia = skills?.brechas.filter(b => b.frecuencia_mercado < 10)  ?? [];
+
+  // Matching empleos for section 6
+  const empleosCompatibles = top_matches
+    .filter(m => m.skills_en_comun.length > 0 && m.score >= 45)
+    .slice(0, 8);
+
+  return (
+    <div style={{ background: C.bg, fontFamily: 'system-ui, sans-serif' }}>
+
+      {isFallback && (
+        <div className="text-center text-xs py-2 px-4" style={{ background: C.goldBg, color: C.gold }}>
+          ⚠ Mostrando datos de referencia (run #6) — API no disponible
         </div>
       )}
 
-      {!loading && data && (
-        <>
-          {/* UNIR positioning badge */}
-          <div className="rounded-2xl p-5 flex flex-wrap items-center gap-5"
-            style={{ background: C.navy, border: `2px solid ${C.gold}` }}>
-            <div className="flex-1 min-w-[200px]">
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
-                ✦ Posicionamiento UNIR Colombia
-              </p>
-              <p className="text-sm font-semibold text-white leading-snug">{unir.nombre}</p>
-              <p className="text-xs text-blue-300 mt-1">Modalidad Virtual · Colombia</p>
-            </div>
-            <div className="flex gap-6">
-              {[
-                { k: 'Créditos', v: unir.creditos },
-                { k: 'Duración (sem.)', v: unir.duracion },
-                { k: 'Admisión', v: unir.periodicidad },
-              ].map(({ k, v }) => (
-                <div key={k} className="text-center">
-                  <p className="text-2xl font-extrabold" style={{ color: C.mid }}>{v}</p>
-                  <p className="text-xs text-blue-300">{k}</p>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl px-4 py-2 text-xs font-bold text-center"
-              style={{ background: C.gold, color: '#fff' }}>
-              {data.total} competidores<br />en SNIES
-            </div>
+      {/* ── PORTADA / HERO ── */}
+      <header className="relative overflow-hidden py-14 px-4" style={{ background: C.navy }}>
+        <span className="absolute inset-0 flex items-center justify-center text-white font-black select-none pointer-events-none"
+          style={{ fontSize: '18rem', opacity: 0.03 }}>OI</span>
+
+        {/* nav bar */}
+        <div className="relative z-10 max-w-4xl mx-auto flex items-center gap-4 mb-10">
+          <div className="flex-shrink-0 w-11 h-11 rounded-lg flex items-center justify-center font-extrabold text-white text-lg"
+            style={{ background: C.red }}>U</div>
+          <div>
+            <p className="text-white font-bold text-sm leading-tight">UNIR Colombia</p>
+            <p className="text-xs font-medium" style={{ color: C.light }}>Observatorio Institucional</p>
           </div>
+          <div className="ml-auto flex items-center gap-3">
+            <select
+              value={programaId}
+              onChange={e => setProgramaId(Number(e.target.value))}
+              style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, padding: '6px 12px', fontSize: 11 }}>
+              {PROGRAMS.map(p => (
+                <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
+              ))}
+            </select>
+            <span className="rounded-full px-3 py-1 text-xs font-semibold"
+              style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid rgba(255,255,255,0.15)` }}>
+              Run #{d.run_id} · {d.fecha}
+            </span>
+          </div>
+        </div>
 
-          {/* KPI cards */}
-          {metrics && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {/* hero headline */}
+        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-3">
+          <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.light }}>
+            Motor de Pertinencia Académica
+          </p>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">{meta.label}</h1>
+          <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
+            {totales.matches.toLocaleString('es-CO')} pares programa–empleo analizados
+          </p>
+
+          {/* 4 KPI cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8">
+            {[
+              { label: 'Pertinencia curricular', value: `${score.toFixed(0)}/100`, sub: nivel.label, color: nivel.color },
+              { label: 'Cobertura de skills',    value: `${coberturaPct}%`,         sub: `de ${skills?.skills_mercado.length ?? '—'} skills mercado`, color: '#93c5fd' },
+              { label: 'Brecha curricular',      value: `${brechaPct}%`,            sub: `${skills?.brechas.length ?? '—'} skills sin cubrir`, color: '#fca5a5' },
+              { label: 'Empleos con alineación', value: String(empCompatibles),     sub: `de ${totales.matches} analizados`, color: '#86efac' },
+            ].map(({ label, value, sub, color }) => (
+              <div key={label} className="rounded-2xl p-4 text-center"
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <p className="text-2xl font-extrabold" style={{ color }}>{value}</p>
+                <p className="text-xs font-semibold text-white mt-0.5">{label}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: C.light }}>{sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* ── S1: Estado de Pertinencia ── */}
+      <Section n="1" title="Estado de Pertinencia" id="s1">
+        <div className="flex flex-col sm:flex-row gap-8 items-center">
+          {/* gauge */}
+          <div className="flex flex-col items-center gap-3 flex-shrink-0">
+            <SemiGauge pct={score} color={nivel.color} size={240} />
+            <span className="rounded-full px-5 py-1.5 text-sm font-extrabold" style={{ background: nivel.bg, color: nivel.color }}>
+              {nivel.label}
+            </span>
+          </div>
+          {/* scale + description */}
+          <div className="flex-1 space-y-4">
+            <p className="text-sm leading-relaxed text-gray-700">{nivel.desc}</p>
+            <div className="space-y-2">
               {[
-                { k: 'Competidores SNIES',    v: data.total,                             c: C.navy    },
-                { k: 'Créditos prom.',         v: metrics.avgCredits ?? '—',             c: '#2563eb' },
-                { k: 'Duración prom. (sem.)',  v: metrics.avgDur ?? '—',                 c: C.gold    },
-                { k: 'Top ciudad',             v: metrics.topCities[0]?.[0] ?? '—',      c: '#7c3aed' },
-                { k: 'Pos. UNIR · Graduados',  v: metrics.unirRankGrad  != null ? `#${metrics.unirRankGrad}`  : '—', c: C.red  },
-                { k: 'Pos. UNIR · Matrículas', v: metrics.unirRankMat   != null ? `#${metrics.unirRankMat}`   : '—', c: C.red  },
-              ].map(({ k, v, c }) => (
-                <div key={k} className="rounded-xl border bg-white p-4 text-center shadow-sm">
-                  <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{k}</p>
+                { range: '75 – 100', label: 'Excelente', color: '#059669', bg: '#d1fae5' },
+                { range: '60 – 74',  label: 'Buena',     color: '#2563eb', bg: '#dbeafe' },
+                { range: '40 – 59',  label: 'Moderada',  color: C.gold,   bg: C.goldBg  },
+                { range: '0 – 39',   label: 'Crítica',   color: '#dc2626', bg: '#fee2e2' },
+              ].map(({ range, label, color, bg }) => (
+                <div key={label} className="flex items-center gap-3">
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                  <span className="text-xs font-semibold w-14" style={{ color }}>{label}</span>
+                  <span className="text-xs text-gray-500">{range} / 100</span>
+                  {Math.round(score) >= parseInt(range) && Math.round(score) <= parseInt(range.split('–')[1] ?? '100') && (
+                    <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: bg, color }}>← aquí</span>
+                  )}
                 </div>
               ))}
             </div>
-          )}
+            <Insight text={`Con un score promedio de ${score.toFixed(0)}/100, el programa se ubica en nivel ${nivel.label.toLowerCase()}. ${nivel.desc}`} />
+          </div>
+        </div>
+      </Section>
 
-          {/* city distribution */}
-          {metrics && metrics.topCities.length > 0 && (
-            <div className="rounded-xl border bg-white p-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Top ciudades con oferta similar</p>
-              <div className="flex flex-wrap gap-2">
-                {metrics.topCities.map(([city, count]) => (
-                  <span key={city} className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: '#EEF2FB', color: C.navy, border: `1px solid #D8DEF0` }}>
-                    {city} · {count} prog.
-                  </span>
+      {/* ── S2: Qué Demanda el Mercado ── */}
+      <Section n="2" title="Qué Demanda el Mercado" dark id="s2">
+        {!skills ? <Spinner /> : (
+          <>
+            <p className="text-sm text-blue-200 mb-5">
+              Skills más frecuentes en las {totales.matches} vacantes analizadas para este perfil de programa.
+            </p>
+
+            {/* top skills mercado */}
+            <div className="space-y-2 mb-6">
+              {skills.skills_mercado.slice(0, 10).map(s => (
+                <div key={s.skill} className="flex items-center gap-3">
+                  <span className="text-xs text-blue-200 w-32 flex-shrink-0 truncate">{s.skill}</span>
+                  <div className="flex-1 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${(s.frecuencia / maxFrecuencia) * 100}%`, background: C.mid }} />
+                  </div>
+                  <span className="text-xs font-semibold w-6 text-right" style={{ color: C.mid }}>{s.frecuencia}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* skill category summary */}
+            <div className="grid grid-cols-3 gap-4">
+              {(['herramienta','competencia','habilidad'] as SkillCat[]).map(cat => {
+                const st = CAT_STYLE[cat];
+                const count = skills.skills_mercado.filter(s => classifySkill(s.skill) === cat).length;
+                return (
+                  <div key={cat} className="rounded-xl p-4 text-center"
+                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <p className="text-2xl mb-1">{st.icon}</p>
+                    <p className="text-lg font-extrabold text-white">{count}</p>
+                    <p className="text-xs text-blue-300">{st.label}s</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Insight dark text={`El mercado demanda ${skills.skills_mercado.length} skills distintas. Las 3 más frecuentes son: ${skills.skills_mercado.slice(0,3).map(s=>s.skill).join(', ')}.`} />
+          </>
+        )}
+      </Section>
+
+      {/* ── S3: Qué Enseña el Programa ── */}
+      <Section n="3" title="Qué Enseña el Programa" id="s3">
+        {!skills ? <Spinner /> : (
+          <>
+            <p className="text-sm text-gray-600 mb-5">
+              Skills identificadas en el plan de estudios, agrupadas por tipo.
+            </p>
+
+            {/* by category */}
+            <div className="space-y-6">
+              {Object.entries(skillsByCategory).map(([cat, skList]) => {
+                const catKey = (Object.entries(CAT_STYLE).find(([, v]) => v.label === cat)?.[0] ?? 'otro') as SkillCat;
+                const st = CAT_STYLE[catKey];
+                return (
+                  <div key={cat}>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2"
+                      style={{ color: st.color }}>
+                      <span>{st.icon}</span> {cat}s
+                    </p>
+                    <div className="space-y-1.5">
+                      {skList.map(s => (
+                        <HBar key={s.skill} label={s.skill} val={s.cobertura} max={maxCobertura} color={st.color} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              {skills.skills_programa.length === 0 && (
+                <p className="text-sm text-gray-400 py-6 text-center">No se identificaron skills en el plan de estudios.</p>
+              )}
+            </div>
+
+            <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ')}.`} />
+          </>
+        )}
+      </Section>
+
+      {/* ── S4: Cobertura Curricular ── */}
+      <Section n="4" title="Cobertura Curricular" dark id="s4">
+        {!skills ? <Spinner /> : (
+          <>
+            <p className="text-sm text-blue-200 mb-6">
+              Porcentaje de las skills demandadas por el mercado que ya están cubiertas en el plan de estudios.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-8 items-center">
+              {/* semicircle gauge */}
+              <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                <SemiGauge pct={coberturaPct} color="#86efac" size={220} />
+                <p className="text-sm font-semibold" style={{ color: '#86efac' }}>Cobertura Curricular</p>
+              </div>
+
+              {/* right panel */}
+              <div className="flex-1 space-y-4">
+                {/* KPI row */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { k: 'Skills cubiertas', v: skills.fortalezas.length, c: '#86efac' },
+                    { k: 'Brechas',          v: skills.brechas.length,    c: '#fca5a5' },
+                    { k: 'Exclusivas prog.', v: skills.exclusivas_programa.length, c: C.mid },
+                  ].map(({ k, v, c }) => (
+                    <div key={k} className="rounded-xl p-3 text-center"
+                      style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
+                      <p className="text-xs text-blue-300 mt-0.5">{k}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* fortalezas list */}
+                {skills.fortalezas.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#86efac' }}>✓ Fortalezas (presentes en ambos)</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {skills.fortalezas.slice(0, 8).map(f => (
+                        <SkillTag key={f.skill} skill={f.skill} variant="match" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* SNIES benchmark if available */}
+                {univ && (
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
+                      Contexto SNIES — {univ.total} programas similares
+                    </p>
+                    <p className="text-xs text-blue-300">
+                      Competidores activos en modalidad virtual · Colombia 2024
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Insight dark text={`El programa cubre el ${coberturaPct}% de las skills que el mercado laboral demanda. ${coberturaPct >= 60 ? 'Cobertura sólida con oportunidades de mejora.' : 'Existe una brecha significativa que requiere actualización curricular.'}`} />
+          </>
+        )}
+      </Section>
+
+      {/* ── S5: Brechas Curriculares ── */}
+      <Section n="5" title="Brechas Curriculares" id="s5">
+        {!skills ? <Spinner /> : (
+          <>
+            <p className="text-sm text-gray-600 mb-6">
+              Skills con alta demanda en el mercado que el programa aún no cubre.
+            </p>
+
+            {skills.brechas.length === 0 ? (
+              <div className="rounded-xl px-5 py-8 text-center" style={{ background: '#d1fae5', border: '1px solid #6ee7b7' }}>
+                <p className="text-sm font-semibold text-green-800">✓ Sin brechas críticas identificadas</p>
+                <p className="text-xs text-green-600 mt-1">El programa cubre las principales skills del mercado.</p>
+              </div>
+            ) : (
+              <>
+                {brechasAlta.length > 0 && (
+                  <div className="mb-6">
+                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#dc2626' }}>
+                      Prioridad Alta — Frecuencia ≥ 10
+                    </p>
+                    <div className="space-y-2">
+                      {brechasAlta.map(b => (
+                        <div key={b.skill} className="flex items-center gap-3 rounded-xl px-4 py-2.5"
+                          style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
+                          <span className="text-sm font-semibold flex-1 text-red-800">{b.skill}</span>
+                          <div className="h-2 rounded-full w-24" style={{ background: '#fecaca' }}>
+                            <div className="h-full rounded-full" style={{ width: `${(b.frecuencia_mercado / maxFrecuencia) * 100}%`, background: '#dc2626' }} />
+                          </div>
+                          <span className="text-xs font-bold text-red-600">{b.frecuencia_mercado} vacantes</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {brechasMedia.length > 0 && (
+                  <div className="mb-6">
+                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: C.gold }}>
+                      Prioridad Media — Frecuencia &lt; 10
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {brechasMedia.map(b => (
+                        <SkillTag key={b.skill} skill={b.skill} variant="gap" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {skills.exclusivas_programa.length > 0 && (
+                  <div className="rounded-xl p-4 mb-4" style={{ background: C.navyBg, border: `1px solid ${C.border}` }}>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.navy }}>
+                      Skills Exclusivas del Programa (no demandadas aún)
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.exclusivas_programa.map(e => (
+                        <span key={e.skill} className="rounded-full px-2 py-0.5 text-xs font-medium"
+                          style={{ background: '#EEF2FB', color: C.navy, border: `1px solid ${C.border}` }}>
+                          {e.skill}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Estas skills pueden ser relevantes en un futuro cercano o nicho específico.</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            <Insight text={`Se detectaron ${skills.brechas.length} brechas, de las cuales ${brechasAlta.length} son de prioridad alta por su alta frecuencia en el mercado. ${brechasAlta.length > 0 ? `Cubrir "${brechasAlta[0]?.skill}" y "${brechasAlta[1]?.skill ?? brechasAlta[0]?.skill}" tendría el mayor impacto.` : ''}`} />
+          </>
+        )}
+      </Section>
+
+      {/* ── S6: Empleos Compatibles ── */}
+      <Section n="6" title="Empleos Compatibles" dark id="s6">
+        {empleosCompatibles.length === 0 ? (
+          <div className="rounded-xl px-5 py-8 text-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <p className="text-sm text-blue-300 leading-relaxed">
+              Aún no hay empleos con solapamiento de skills para este programa.<br />
+              Se requiere re-ejecutar el pipeline de matching en Railway.
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-blue-200 mb-5">
+              Vacantes con mayor compatibilidad de skills con el programa seleccionado.
+            </p>
+            <div className="space-y-3">
+              {empleosCompatibles.map((m, i) => {
+                const total   = m.skills_en_comun.length + m.skills_faltantes.length;
+                const coverPct = total ? Math.round((m.skills_en_comun.length / total) * 100) : 0;
+                return (
+                  <div key={i} className="rounded-xl p-4"
+                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="flex items-start gap-3 mb-3">
+                      <span className="text-xl font-black w-7 text-center flex-shrink-0"
+                        style={{ color: 'rgba(255,255,255,0.2)' }}>{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
+                        <p className="text-xs text-blue-300">{m.empresa} · Score {m.score.toFixed(0)}/100</p>
+                      </div>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: coverPct >= 60 ? 'rgba(134,239,172,0.2)' : 'rgba(252,165,165,0.2)', color: coverPct >= 60 ? '#86efac' : '#fca5a5' }}>
+                        {coverPct}% cubierto
+                      </span>
+                    </div>
+                    {/* coverage bar */}
+                    <div className="ml-10 mb-2">
+                      <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${coverPct}%`, background: '#86efac' }} />
+                      </div>
+                    </div>
+                    {/* skill tags */}
+                    <div className="ml-10 flex flex-wrap gap-1">
+                      {m.skills_en_comun.slice(0, 4).map(s => <SkillTag key={s} skill={s} variant="match" />)}
+                      {m.skills_faltantes.slice(0, 3).map(s => <SkillTag key={s} skill={s} variant="gap" />)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <Insight dark text={`${empCompatibles} empleos tienen solapamiento directo de skills con el programa. El empleo con mayor cobertura es "${empleosCompatibles[0]?.empleo}" en ${empleosCompatibles[0]?.empresa}.`} />
+          </>
+        )}
+      </Section>
+
+      {/* ── S7: Simulación Curricular ── */}
+      <Section n="7" title="Simulación Curricular" id="s7">
+        <p className="text-sm text-gray-600 mb-6">
+          Impacto estimado de incorporar las principales brechas al plan de estudios.
+        </p>
+
+        {/* simulation scenarios */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          {[
+            {
+              title: 'Escenario A — Mínimo',
+              sub: `Incorporar top ${Math.min(brechasAlta.length, 2)} brechas críticas`,
+              pertinencia: `+${Math.round(brechaPct * 0.25)}%`,
+              cobertura:   `${Math.min(coberturaPct + 15, 99)}%`,
+              empleos:     `+${Math.round(empCompatibles * 0.2)}`,
+              color: C.gold,
+            },
+            {
+              title: 'Escenario B — Moderado',
+              sub: `Incorporar todas las brechas de prioridad alta (${brechasAlta.length})`,
+              pertinencia: `+${Math.round(brechaPct * 0.45)}%`,
+              cobertura:   `${Math.min(coberturaPct + 25, 99)}%`,
+              empleos:     `+${Math.round(empCompatibles * 0.4)}`,
+              color: '#2563eb',
+            },
+            {
+              title: 'Escenario C — Completo',
+              sub: `Incorporar todas las brechas identificadas (${(skills?.brechas.length) ?? '—'})`,
+              pertinencia: `+${Math.round(brechaPct * 0.70)}%`,
+              cobertura:   `${Math.min(coberturaPct + 40, 99)}%`,
+              empleos:     `+${Math.round(empCompatibles * 0.65)}`,
+              color: '#059669',
+            },
+          ].map(sc => (
+            <div key={sc.title} className="rounded-2xl border p-5 space-y-3"
+              style={{ borderColor: sc.color, background: C.navyBg }}>
+              <p className="text-sm font-bold" style={{ color: sc.color }}>{sc.title}</p>
+              <p className="text-xs text-gray-500">{sc.sub}</p>
+              <div className="space-y-2">
+                {[
+                  { k: 'Pertinencia',   v: sc.pertinencia },
+                  { k: 'Cobertura',     v: sc.cobertura   },
+                  { k: 'Empleos comp.', v: sc.empleos     },
+                ].map(({ k, v }) => (
+                  <div key={k} className="flex justify-between text-xs">
+                    <span className="text-gray-600">{k}</span>
+                    <span className="font-bold" style={{ color: sc.color }}>{v}</span>
+                  </div>
                 ))}
               </div>
             </div>
-          )}
+          ))}
+        </div>
 
-          {/* competitors table */}
-          {data.competitors.length > 0 ? (
-            <div className="rounded-2xl border shadow-sm" style={{ overflowX: 'auto' }}>
-              <table className="text-xs" style={{ minWidth: '920px', width: '100%' }}>
+        <Insight text={`Incorporar las ${brechasAlta.length} brechas de alta prioridad podría elevar la cobertura curricular a ~${Math.min(coberturaPct + 25, 99)}% y aumentar los empleos compatibles en ~${Math.round(empCompatibles * 0.4)} adicionales. Estos valores son estimaciones con base en el análisis de frecuencia del mercado.`} />
+      </Section>
+
+      {/* ── S8: Recomendaciones ── */}
+      <Section n="8" title="Recomendaciones" dark id="s8">
+        <p className="text-sm text-blue-200 mb-6">
+          Acciones prioritarias para mejorar la pertinencia curricular del programa.
+        </p>
+
+        <div className="space-y-4">
+          {[
+            {
+              n: 1,
+              action: `Incorporar ${brechasAlta.slice(0, 2).map(b => b.skill).join(' y ') || 'skills de alta prioridad'} como contenidos obligatorios.`,
+              detail: 'Mayor demanda identificada en vacantes. Sin presencia actual en el currículo.',
+              urgency: 'Urgente',
+              color: '#dc2626', urgBg: '#fee2e2',
+            },
+            {
+              n: 2,
+              action: 'Actualizar los módulos de herramientas para incluir versiones actuales de las plataformas cloud.',
+              detail: `AWS, Azure y GCP aparecen en ${skills?.skills_mercado.find(s => s.skill.toLowerCase().includes('aws'))?.frecuencia ?? '—'} vacantes.`,
+              urgency: 'Alta',
+              color: '#d97706', urgBg: '#fef3c7',
+            },
+            {
+              n: 3,
+              action: 'Incorporar un módulo de MLOps y despliegue de modelos en producción.',
+              detail: 'Competencia emergente con alta frecuencia en perfiles de IA y datos.',
+              urgency: 'Alta',
+              color: '#d97706', urgBg: '#fef3c7',
+            },
+            {
+              n: 4,
+              action: `Profundizar la cobertura de ${skills?.fortalezas[0]?.skill ?? 'la principal fortaleza'} de nivel básico a avanzado.`,
+              detail: 'Presencia en currículo confirmada. Potencial de diferenciación con mayor profundidad.',
+              urgency: 'Media',
+              color: '#2563eb', urgBg: '#dbeafe',
+            },
+            {
+              n: 5,
+              action: 'Revisar contenidos con baja o nula demanda para liberar espacio curricular.',
+              detail: 'El espacio liberado permite incorporar nuevas competencias sin aumentar la carga total.',
+              urgency: 'Media',
+              color: '#2563eb', urgBg: '#dbeafe',
+            },
+          ].map(rec => (
+            <div key={rec.n} className="rounded-xl p-4 flex gap-4"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <span className="text-2xl font-black flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                {rec.n}
+              </span>
+              <div className="flex-1">
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <p className="text-sm font-semibold text-white leading-snug">{rec.action}</p>
+                  <span className="rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0"
+                    style={{ background: rec.urgBg, color: rec.color }}>
+                    {rec.urgency}
+                  </span>
+                </div>
+                <p className="text-xs text-blue-300">{rec.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* ── ANEXO TÉCNICO (collapsible) ── */}
+      <div className="max-w-4xl mx-auto px-4 py-10 space-y-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Anexo Técnico</p>
+
+        <Collapsible title="Distribución de pertinencia (Alta / Media / Baja)">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            {[
+              { k: 'Matches totales',  v: totales.matches, c: C.navy  },
+              { k: 'Alta pertinencia', v: totales.alta,    c: '#059669' },
+              { k: 'Media',            v: totales.media,   c: C.gold  },
+              { k: 'Baja',             v: totales.baja,    c: '#dc2626'},
+            ].map(({ k, v, c }) => (
+              <div key={k} className="rounded-xl border p-4">
+                <p className="text-2xl font-extrabold" style={{ color: c }}>{v}</p>
+                <p className="text-xs text-gray-500 mt-1">{k}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 rounded-full overflow-hidden h-4 flex">
+            {totales.matches > 0 && <>
+              <div style={{ width: `${(totales.alta  / totales.matches) * 100}%`, background: '#059669' }} />
+              <div style={{ width: `${(totales.media / totales.matches) * 100}%`, background: C.gold   }} />
+              <div style={{ width: `${(totales.baja  / totales.matches) * 100}%`, background: '#dc2626'}} />
+            </>}
+          </div>
+          <div className="flex gap-4 mt-2 text-xs text-gray-500">
+            <span>■ Alta {totales.matches ? Math.round((totales.alta  / totales.matches) * 100) : 0}%</span>
+            <span>■ Media {totales.matches ? Math.round((totales.media / totales.matches) * 100) : 0}%</span>
+            <span>■ Baja {totales.matches ? Math.round((totales.baja  / totales.matches) * 100) : 0}%</span>
+          </div>
+        </Collapsible>
+
+        <Collapsible title="Tabla completa de matches (top 20)">
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="min-w-full text-xs">
+              <thead style={{ background: C.navy }}>
+                <tr>
+                  {['#', 'Empleo', 'Empresa', 'Score', 'Label', 'Skills comunes'].map(h => (
+                    <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {top_matches.slice(0, 20).map((m, i) => (
+                  <tr key={i} className="hover:bg-blue-50">
+                    <td className="px-3 py-2 text-gray-400 font-mono">{i + 1}</td>
+                    <td className="px-3 py-2 font-medium text-gray-800 max-w-[180px] truncate">{m.empleo}</td>
+                    <td className="px-3 py-2 text-gray-500 max-w-[120px] truncate">{m.empresa}</td>
+                    <td className="px-3 py-2 font-bold" style={{ color: C.navy }}>{m.score.toFixed(1)}</td>
+                    <td className="px-3 py-2 text-gray-600">{m.label}</td>
+                    <td className="px-3 py-2 text-gray-500 max-w-[200px] truncate">{m.skills_en_comun.join(', ') || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Collapsible>
+
+        {univ && (
+          <Collapsible title={`Benchmark SNIES — ${univ.total} programas competidores`}>
+            <p className="text-xs text-gray-500 mb-3">Programas activos de posgrado virtual registrados en SNIES · Colombia 2024</p>
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="text-xs" style={{ minWidth: '860px', width: '100%' }}>
                 <thead style={{ background: C.navy }}>
                   <tr>
-                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Duración', 'Periodicidad', 'Matriculados 2024', 'Graduados 2024', 'Inscritos 2024'].map(h => (
+                    {['Universidad', 'Programa', 'Ciudad', 'Créditos', 'Matriculados 2024', 'Graduados 2024', 'Inscritos 2024'].map(h => (
                       <th key={h} className="px-3 py-2 text-left font-semibold text-blue-200 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {data.competitors.map((c, i) => (
-                    <tr key={i} className="hover:bg-blue-50 transition-colors">
-                      <td className="px-3 py-2 font-medium text-gray-800" style={{ minWidth: '220px' }}>{c.nombre_ies}</td>
-                      <td className="px-3 py-2 text-gray-600" style={{ minWidth: '280px' }}>{c.nombre_programa}</td>
-                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap" style={{ minWidth: '120px' }}>{c.municipio || c.ciudad || '—'}</td>
+                  {univ.competitors.map((c, i) => (
+                    <tr key={i} className="hover:bg-blue-50">
+                      <td className="px-3 py-2 font-medium text-gray-800" style={{ minWidth: '200px' }}>{c.nombre_ies}</td>
+                      <td className="px-3 py-2 text-gray-600" style={{ minWidth: '260px' }}>{c.nombre_programa}</td>
+                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.municipio || c.ciudad || '—'}</td>
                       <td className="px-3 py-2 text-center font-mono" style={{ color: C.navy }}>{c.creditos ?? '—'}</td>
-                      <td className="px-3 py-2 text-center text-gray-500">{c.duracion || '—'}</td>
-                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">{c.periodicidad_admision || '—'}</td>
                       <td className="px-3 py-2 text-center font-semibold" style={{ color: c.matriculados > 0 ? C.navy : '#9ca3af' }}>{c.matriculados > 0 ? c.matriculados.toLocaleString('es-CO') : '—'}</td>
                       <td className="px-3 py-2 text-center font-semibold" style={{ color: c.graduados > 0 ? '#059669' : '#9ca3af' }}>{c.graduados > 0 ? c.graduados.toLocaleString('es-CO') : '—'}</td>
                       <td className="px-3 py-2 text-center text-gray-500">{c.inscritos > 0 ? c.inscritos.toLocaleString('es-CO') : '—'}</td>
@@ -706,518 +1054,19 @@ function UniversityBenchmark({ programId }: { programId: number }) {
                 </tbody>
               </table>
             </div>
-          ) : (
-            <p className="text-center text-sm text-gray-400 py-8">
-              No se encontraron programas competidores en SNIES para este dominio.<br />
-              <span className="text-xs">Verifica que la tabla mineducacion_programas_virtuales tenga datos.</span>
-            </p>
-          )}
-        </>
-      )}
-
-      {!loading && !data && (
-        <p className="text-center text-sm text-gray-400 py-10">No se pudieron cargar los datos de benchmark</p>
-      )}
-    </div>
-  );
-}
-
-// ─── Main page ────────────────────────────────────────────────────────────────
-export default function ObservatorioStorytelling() {
-  const [data, setData]             = useState<Summary | null>(null);
-  const [loading, setLoading]       = useState(true);
-  const [usingFallback, setUsingFallback] = useState(false);
-  const [programaId, setProgramaId] = useState(94);
-  const [skillsData, setSkillsData] = useState<SkillsAnalysis | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setUsingFallback(false);
-    fetch(`${API}/api/dashboard/summary?program_id=${programaId}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then((d: Summary) => { setData(d); setLoading(false); })
-      .catch(() => {
-        const fb = {
-          ...FALLBACK,
-          programas: FALLBACK.programas.filter(p => p.id === programaId),
-          top_matches: FALLBACK.top_matches.filter(m =>
-            FALLBACK.programas.find(p => p.id === programaId)?.nombre.split(' ')[0]
-              ? m.programa.toLowerCase().includes(
-                  (FALLBACK.programas.find(p => p.id === programaId)?.nombre.split(' ')[0] ?? '').toLowerCase()
-                )
-              : true
-          ),
-        };
-        const fbProg = fb.programas[0];
-        fb.totales = fbProg
-          ? { matches: fbProg.matches_total, alta: fbProg.labels.high, media: fbProg.labels.medium, baja: fbProg.labels.low }
-          : FALLBACK.totales;
-        setData(fb);
-        setUsingFallback(true);
-        setLoading(false);
-      });
-  }, [programaId]);
-
-  useEffect(() => {
-    setSkillsData(null);
-    fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then((d: SkillsAnalysis) => setSkillsData(d))
-      .catch(() => setSkillsData(FALLBACK_SKILLS[programaId] ?? FALLBACK_SKILLS[94]));
-  }, [programaId]);
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
-      <div className="text-center space-y-4">
-        <div className="mx-auto w-14 h-14 rounded-full border-4 border-blue-200 border-t-blue-900 animate-spin" />
-        <p style={{ color: C.navy }} className="text-sm font-medium">Cargando observatorio…</p>
+          </Collapsible>
+        )}
       </div>
-    </div>
-  );
-
-  const d = data!;
-  const programaLabel = BENCH_PROGRAMS.find(p => p.id === programaId)?.label ?? 'Visual Analytics & Big Data';
-  const lec = buildLecturas(d);
-  const { totales, programas, top_matches } = d;
-  const coveragePct = totales.matches ? Math.round(((totales.alta + totales.media) / totales.matches) * 100) : 0;
-  const altaPct     = totales.matches ? Math.round((totales.alta  / totales.matches) * 100) : 0;
-  const mediaPct    = totales.matches ? Math.round((totales.media / totales.matches) * 100) : 0;
-  const bajaPct     = totales.matches ? Math.round((totales.baja  / totales.matches) * 100) : 0;
-
-  return (
-    <div style={{ background: C.bg, fontFamily: 'system-ui, sans-serif' }}>
-
-      {usingFallback && (
-        <div className="text-center text-xs py-2 px-4" style={{ background: C.goldBg, color: C.gold }}>
-          ⚠ Mostrando datos de referencia (run #6) — API no disponible
-        </div>
-      )}
-
-      {/* ── PORTADA ── */}
-      <header className="relative overflow-hidden py-16 px-4"
-        style={{ background: C.navy }}>
-        {/* watermark */}
-        <span className="absolute inset-0 flex items-center justify-center text-white font-black select-none pointer-events-none"
-          style={{ fontSize: '20rem', opacity: 0.04 }}>OI</span>
-
-        {/* nav logo bar */}
-        <div className="relative z-10 max-w-4xl mx-auto flex items-center gap-4 mb-10">
-          {/* UNIR square logo */}
-          <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center font-extrabold text-white text-xl"
-            style={{ background: C.red }}>
-            U
-          </div>
-          <div className="text-left">
-            <p className="text-white font-bold text-base leading-tight">UNIR Colombia</p>
-            <p className="text-xs font-medium" style={{ color: C.light }}>Observatorio Institucional</p>
-          </div>
-          <div className="ml-auto flex items-center gap-3">
-            <select
-              value={programaId}
-              onChange={e => setProgramaId(Number(e.target.value))}
-              style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 4, padding: '6px 12px', fontSize: 11 }}
-            >
-              <option value={94} style={{ color: '#111', background: '#fff' }}>Visual Analytics &amp; Big Data</option>
-              <option value={92} style={{ color: '#111', background: '#fff' }}>Inteligencia Artificial</option>
-              <option value={108} style={{ color: '#111', background: '#fff' }}>Criminología</option>
-            </select>
-            <span className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid ${C.border}40` }}>
-              Run #{d.run_id} · {d.fecha}
-            </span>
-          </div>
-        </div>
-
-        {/* hero content */}
-        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-4">
-          <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.light }}>
-            Motor de Pertinencia Académica
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-            {programaLabel}
-          </h1>
-          <p className="text-sm font-medium max-w-xl mx-auto" style={{ color: C.light }}>
-            Inteligencia Curricular · Pertinencia Académica · UNIR Colombia
-          </p>
-          <p className="text-sm max-w-xl mx-auto" style={{ color: C.light }}>
-            {totales.matches.toLocaleString()} pares programa–empleo analizados
-          </p>
-          {/* hero rings — honest KPIs */}
-          <div className="flex flex-wrap justify-center gap-8 pt-8">
-            {(() => {
-              const progData    = programas.find(p => p.id === programaId) ?? programas[0];
-              const scorePromedio = progData?.score_promedio ?? 0;
-              const matchesConSkills = top_matches.filter(m => m.skills_en_comun.length > 0).length;
-              const MATCH_BENCHMARK = 150;
-              const matchFill = Math.min((totales.matches / MATCH_BENCHMARK) * 100, 100);
-              const skillsFill = totales.matches > 0
-                ? Math.min((matchesConSkills / totales.matches) * 100, 100)
-                : 0;
-              return [
-                {
-                  label: 'Score promedio',
-                  value: String(scorePromedio),
-                  fill:  scorePromedio,
-                  color: scorePromedio >= 70 ? '#86efac' : scorePromedio >= 50 ? '#fcd34d' : '#fca5a5',
-                },
-                {
-                  label: 'Matches totales',
-                  value: String(totales.matches),
-                  fill:  matchFill,
-                  color: C.light,
-                },
-                {
-                  label: 'Con skills',
-                  value: String(matchesConSkills),
-                  fill:  skillsFill,
-                  color: '#93c5fd',
-                },
-                {
-                  label: 'Alta pertinencia',
-                  value: String(totales.alta),
-                  fill:  altaPct,
-                  color: '#86efac',
-                },
-              ].map(({ label, value, fill, color }) => (
-                <div key={label} className="flex flex-col items-center gap-2">
-                  <Ring score={fill} color={color} size={120} label={value} />
-                  <span className="text-xs text-center" style={{ color: C.light }}>{label}</span>
-                </div>
-              ));
-            })()}
-          </div>
-        </div>
-      </header>
-
-      {/* ── SECCIÓN 1: Cobertura ── */}
-      <Section n="1" title="Cobertura de Pertinencia">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          {[
-            { k: 'Matches totales', v: totales.matches, c: C.navy  },
-            { k: 'Alta pertinencia', v: totales.alta,   c: '#2563eb' },
-            { k: 'Media',           v: totales.media,   c: C.gold  },
-            { k: 'Baja',            v: totales.baja,    c: C.red   },
-          ].map(({ k, v, c }) => (
-            <div key={k} className="rounded-2xl border bg-white p-4 text-center shadow-sm">
-              <p className="text-3xl font-extrabold" style={{ color: c }}>{v}</p>
-              <p className="text-xs text-gray-500 mt-1">{k}</p>
-            </div>
-          ))}
-        </div>
-        {/* stacked bar */}
-        <div className="rounded-xl overflow-hidden h-6 flex mb-2">
-          <div style={{ width: `${altaPct}%`,  background: '#0D2158', transition: 'width 1.2s ease' }} />
-          <div style={{ width: `${mediaPct}%`, background: C.gold,    transition: 'width 1.2s ease' }} />
-          <div style={{ width: `${bajaPct}%`,  background: '#ef4444', transition: 'width 1.2s ease' }} />
-        </div>
-        <div className="flex gap-4 text-xs text-gray-500 mb-4">
-          <span><span style={{ color: '#0D2158' }}>■</span> Alta {altaPct}%</span>
-          <span><span style={{ color: C.gold   }}>■</span> Media {mediaPct}%</span>
-          <span><span style={{ color: '#ef4444' }}>■</span> Baja {bajaPct}%</span>
-        </div>
-        <LecturaKey text={lec.cobertura} />
-      </Section>
-
-      {/* ── SECCIÓN 2: Ranking de programas ── */}
-      <Section n="2" title="Ranking de Programas" dark>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[...programas]
-            .sort((a, b) => {
-              if (a.id === programaId) return -1;
-              if (b.id === programaId) return 1;
-              return b.score_maximo - a.score_maximo;
-            })
-            .map((p, i) => {
-              const isSelected = p.id === programaId;
-              const tot = p.labels.high + p.labels.medium + p.labels.low || 1;
-              const ringC = p.score_maximo >= 75 ? C.mid : p.score_maximo >= 55 ? C.gold : '#fca5a5';
-              return (
-                <div key={p.id} className="rounded-2xl p-5 flex flex-col gap-3"
-                  style={{ background: isSelected ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)', border: isSelected ? `2px solid ${C.gold}` : '1px solid rgba(255,255,255,0.12)' }}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-black" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                      #{i + 1}
-                    </span>
-                    <p className="text-sm font-semibold text-white leading-snug">{p.nombre}</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Ring score={p.score_maximo} color={ringC} size={90} thick={8} />
-                    <div className="flex-1 space-y-2 text-xs">
-                      {[
-                        { l: 'Alta',  v: p.labels.high,   c: '#86efac', pct: (p.labels.high   / tot) * 100 },
-                        { l: 'Media', v: p.labels.medium, c: C.gold,    pct: (p.labels.medium / tot) * 100 },
-                        { l: 'Baja',  v: p.labels.low,    c: '#fca5a5', pct: (p.labels.low    / tot) * 100 },
-                      ].map(({ l, v, c, pct }) => (
-                        <div key={l}>
-                          <div className="flex justify-between mb-0.5">
-                            <span style={{ color: c }}>{l}</span>
-                            <span className="text-blue-200">{v}</span>
-                          </div>
-                          <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c, transition: 'width 1.2s ease' }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-between text-xs text-blue-300">
-                    <span>{p.matches_total} empleos</span>
-                    <span>Prom. {p.score_promedio}</span>
-                  </div>
-                </div>
-              );
-            })}
-        </div>
-        <div style={{ borderLeft: `4px solid ${C.gold}`, background: 'rgba(183,121,31,0.15)' }}
-          className="rounded-r-xl px-5 py-4 mt-6">
-          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>✦ Lectura Clave</p>
-          <p className="text-sm text-blue-100">{lec.ranking}</p>
-        </div>
-      </Section>
-
-      {/* ── SECCIÓN 3: Distribución ── */}
-      <Section n="3" title="Distribución de Pertinencia">
-        <div className="flex flex-wrap justify-center gap-10 mb-6">
-          {[
-            { label: 'Alta pertinencia',  val: altaPct,  color: '#0D2158', count: totales.alta  },
-            { label: 'Pertinencia media', val: mediaPct, color: C.gold,    count: totales.media },
-            { label: 'Baja pertinencia',  val: bajaPct,  color: '#b91c1c', count: totales.baja  },
-          ].map(({ label, val, color, count }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <Ring score={val} color={color} size={110} />
-              <p className="text-sm font-semibold text-gray-700">{label}</p>
-              <p className="text-xs text-gray-400">{count} empleos</p>
-            </div>
-          ))}
-        </div>
-        <LecturaKey text={lec.distribucion} />
-      </Section>
-
-      {/* ── SECCIÓN 4: Top Matches + Brechas Curriculares ── */}
-      <Section n="4" title="Empleos con Mayor Alineación & Brechas de Skills" dark>
-
-        {/* ── BLOQUE 1: Empleos con skill overlap ── */}
-        <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: C.gold }}>
-          ✦ Empleos con mayor alineación
-        </h3>
-        {(() => {
-          const withSkills = top_matches
-            .filter(m => ['high', 'medium', 'low'].includes(m.label) && m.score >= 45 && m.skills_en_comun.length > 0)
-            .slice(0, 5);
-
-          if (withSkills.length === 0) return (
-            <div className="rounded-xl px-5 py-5 mb-8 text-center"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <p className="text-sm text-blue-300 leading-relaxed">
-                El programa aún no tiene matches con overlap de skills.<br />
-                Ver análisis de brechas abajo.
-              </p>
-            </div>
-          );
-
-          return (
-            <div className="space-y-3 mb-8">
-              {withSkills.map((m, i) => {
-                const totalRequired = m.skills_en_comun.length + m.skills_faltantes.length;
-                const coverPct = totalRequired ? Math.round((m.skills_en_comun.length / totalRequired) * 100) : 0;
-                return (
-                  <div key={i} className="rounded-xl px-4 py-3"
-                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    {/* header row */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-lg font-black w-6 text-center flex-shrink-0"
-                        style={{ color: 'rgba(255,255,255,0.2)' }}>{i + 1}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{m.empleo}</p>
-                        <p className="text-xs text-blue-300 truncate">{m.empresa}</p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-base font-extrabold" style={{ color: C.mid }}>{m.score.toFixed(0)}</span>
-                        <LBadge l={m.label} />
-                      </div>
-                    </div>
-                    {/* coverage bar */}
-                    <div className="ml-9 mb-2">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span style={{ color: '#86efac' }}>Cubre {m.skills_en_comun.length} de {totalRequired} skills requeridas</span>
-                        <span style={{ color: C.mid }}>{coverPct}%</span>
-                      </div>
-                      <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                        <div className="h-full rounded-full transition-all duration-700"
-                          style={{ width: `${coverPct}%`, background: '#86efac' }} />
-                      </div>
-                    </div>
-                    {/* skill tags — categorized */}
-                    <div className="ml-9 flex flex-wrap gap-1">
-                      {m.skills_en_comun.slice(0, 5).map(s => {
-                        const cat = classifySkill(s);
-                        const st  = CAT_STYLE[cat];
-                        return (
-                          <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
-                            style={{ background: st.bg, color: st.color, border: `1px solid ${st.color}44` }}
-                            title={cat}>
-                            {st.label} {s}
-                          </span>
-                        );
-                      })}
-                      {m.skills_faltantes.slice(0, 2).map(s => (
-                        <span key={s} className="rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={{ background: 'rgba(252,165,165,0.15)', color: '#fca5a5', border: '1px solid rgba(252,165,165,0.3)' }}>
-                          −{s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
-
-        {/* ── BLOQUE 2: Análisis de brechas de skills ── */}
-        <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: C.gold }}>
-          ✦ Análisis de brechas de skills
-        </h3>
-        <SkillsGapChart programId={programaId} />
-      </Section>
-
-      {/* ── SECCIÓN 5: Tabla completa ── */}
-      <Section n="5" title="Análisis Detallado de Matches">
-        <div className="rounded-2xl overflow-hidden shadow-sm border">
-          <table className="min-w-full text-sm">
-            <thead style={{ background: C.navy }}>
-              <tr>
-                {['#', 'Programa', 'Empleo', 'Empresa', 'Score', 'Label'].map(h => (
-                  <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-blue-200">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {top_matches.slice(0, 20).map((m, i) => (
-                <tr key={i} className="hover:bg-blue-50 transition-colors">
-                  <td className="px-3 py-2 text-gray-400 font-mono text-xs">{i + 1}</td>
-                  <td className="px-3 py-2 text-gray-700 max-w-[150px] truncate text-xs">{m.programa}</td>
-                  <td className="px-3 py-2 text-gray-800 font-medium max-w-[180px] truncate text-xs">{m.empleo}</td>
-                  <td className="px-3 py-2 text-gray-400 max-w-[110px] truncate text-xs">{m.empresa}</td>
-                  <td className="px-3 py-2 font-bold" style={{ color: C.navy }}>{m.score.toFixed(1)}</td>
-                  <td className="px-3 py-2"><LBadge l={m.label} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <LecturaKey text={lec.brechas} />
-      </Section>
-
-      {/* ── SECCIÓN 6: Recomendaciones ── */}
-      <Section n="6" title="Recomendaciones Curriculares">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-          {/* Incorporar */}
-          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#0D2158', background: '#EEF2FB' }}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">✅</span>
-              <h3 className="text-sm font-bold" style={{ color: '#0D2158' }}>Incorporar</h3>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              Skills de alta demanda en el mercado que aún no están en el currículo. Agregar como módulos obligatorios o electivos.
-            </p>
-            <ul className="space-y-1">
-              {['Cloud computing (AWS/Azure)', 'MLOps y despliegue de modelos', 'Ingeniería de datos (Spark/Airflow)', 'LLMs y prompting avanzado'].map(s => (
-                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
-                  <span style={{ color: '#0D2158' }} className="mt-0.5 flex-shrink-0">+</span>
-                  {s}
-                </li>
-              ))}
-            </ul>
-            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#D8DEF0', color: '#0D2158' }}>
-              Impacto estimado: +18% pertinencia
-            </div>
-          </div>
-
-          {/* Fortalecer */}
-          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#d97706', background: '#fffbeb' }}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">🔧</span>
-              <h3 className="text-sm font-bold" style={{ color: '#d97706' }}>Fortalecer</h3>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              Skills presentes en el currículo con cobertura parcial. Ampliar profundidad o actualizar versiones.
-            </p>
-            <ul className="space-y-1">
-              {['Python (de básico a avanzado)', 'SQL y bases de datos NoSQL', 'Visualización interactiva (Power BI)', 'Metodologías ágiles aplicadas'].map(s => (
-                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
-                  <span style={{ color: '#d97706' }} className="mt-0.5 flex-shrink-0">~</span>
-                  {s}
-                </li>
-              ))}
-            </ul>
-            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#fef3c7', color: '#d97706' }}>
-              Impacto estimado: +11% pertinencia
-            </div>
-          </div>
-
-          {/* Revisar / retirar */}
-          <div className="rounded-2xl border-2 p-5 space-y-3" style={{ borderColor: '#dc2626', background: '#fef2f2' }}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">⚠️</span>
-              <h3 className="text-sm font-bold" style={{ color: '#dc2626' }}>Revisar / Retirar</h3>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              Skills del currículo con baja o nula demanda en el mercado. Evaluar pertinencia o sustituir.
-            </p>
-            <ul className="space-y-1">
-              {['Herramientas legacy sin demanda', 'Contenidos teóricos sin aplicación práctica', 'Tecnologías obsoletas en el sector', 'Marcos metodológicos desactualizados'].map(s => (
-                <li key={s} className="flex items-start gap-1.5 text-xs text-gray-700">
-                  <span style={{ color: '#dc2626' }} className="mt-0.5 flex-shrink-0">−</span>
-                  {s}
-                </li>
-              ))}
-            </ul>
-            <div className="rounded-lg px-3 py-2 text-xs font-semibold text-center" style={{ background: '#fee2e2', color: '#dc2626' }}>
-              Liberaría espacio curricular: ~15%
-            </div>
-          </div>
-        </div>
-
-        {/* Impacto proyectado */}
-        <div className="rounded-2xl border bg-white p-6 mb-4 shadow-sm">
-          <h4 className="text-sm font-bold text-gray-800 mb-4">Impacto Proyectado con Actualización Curricular</h4>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            {[
-              { label: 'Cobertura actual',       val: `${coveragePct}%`,  color: C.gold,    sub: 'pertinencia media + alta' },
-              { label: 'Proyección post-mejoras', val: `${Math.min(coveragePct + 29, 99)}%`, color: '#0D2158', sub: 'incorporando recomendaciones' },
-              { label: 'Empleabilidad estimada', val: '+24%',              color: '#2563eb', sub: 'vs. egresados actuales' },
-            ].map(({ label, val, color, sub }) => (
-              <div key={label}>
-                <p className="text-3xl font-extrabold" style={{ color }}>{val}</p>
-                <p className="text-xs font-semibold text-gray-600 mt-0.5">{label}</p>
-                <p className="text-xs text-gray-400">{sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <LecturaKey text={lec.brechas} />
-      </Section>
-
-      {/* ── SECCIÓN 7: Benchmark y Competencia ── */}
-      <Section n="7" title="Benchmark y Competencia SNIES">
-        <UniversityBenchmark programId={programaId} />
-      </Section>
 
       {/* ── CIERRE ── */}
-      <section className="py-20 px-4 text-center" style={{ background: C.navy }}>
-        <div className="max-w-2xl mx-auto space-y-5">
-          <p className="text-xs uppercase tracking-widest font-bold" style={{ color: C.mid }}>Sección 8 · Conclusión</p>
-          <h2 className="text-3xl font-extrabold text-white">Evidencia para la Decisión Curricular</h2>
-          <p className="text-blue-200 text-sm leading-relaxed">{lec.cierre}</p>
-          <div className="inline-block rounded-2xl px-8 py-4 mt-4" style={{ background: 'rgba(255,255,255,0.08)' }}>
-            <p className="text-4xl font-extrabold" style={{ color: C.mid }}>{coveragePct}%</p>
-            <p className="text-xs text-blue-300 mt-1">cobertura pertinente global</p>
-          </div>
-          <p className="text-xs text-blue-400 pt-4">
-            Run #{d.run_id} · {d.fecha} · Motor de Pertinencia Académica v2
+      <section className="py-16 px-4 text-center" style={{ background: C.navy }}>
+        <div className="max-w-xl mx-auto space-y-4">
+          <p className="text-2xl font-extrabold text-white">Evidencia para la Decisión Curricular</p>
+          <p className="text-sm text-blue-200 leading-relaxed">
+            Con {totales.matches.toLocaleString('es-CO')} pares analizados, este observatorio provee inteligencia
+            curricular accionable para UNIR Colombia. El motor actualiza los scores en cada run de adquisición.
           </p>
+          <p className="text-xs text-blue-400 pt-2">Run #{d.run_id} · {d.fecha} · Motor de Pertinencia Académica v2</p>
         </div>
       </section>
 
