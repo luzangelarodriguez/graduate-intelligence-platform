@@ -855,123 +855,127 @@ export default function ObservatorioStorytelling() {
 
       {/* ── S7: Simulación Curricular ── */}
       <Section n="7" title="Simulación Curricular" id="s7">
-        <p className="text-sm text-gray-600 mb-6">
-          Impacto estimado de incorporar las principales brechas al plan de estudios.
-        </p>
-
-        {/* simulation scenarios */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {[
-            {
-              title: 'Escenario A — Mínimo',
-              sub: `Incorporar top ${Math.min(brechasAlta.length, 2)} brechas críticas`,
-              pertinencia: `+${Math.round(brechaPct * 0.25)}%`,
-              cobertura:   `${Math.min(coberturaPct + 15, 99)}%`,
-              empleos:     `+${Math.round(empCompatibles * 0.2)}`,
-              color: C.gold,
-            },
-            {
-              title: 'Escenario B — Moderado',
-              sub: `Incorporar todas las brechas de prioridad alta (${brechasAlta.length})`,
-              pertinencia: `+${Math.round(brechaPct * 0.45)}%`,
-              cobertura:   `${Math.min(coberturaPct + 25, 99)}%`,
-              empleos:     `+${Math.round(empCompatibles * 0.4)}`,
-              color: '#2563eb',
-            },
-            {
-              title: 'Escenario C — Completo',
-              sub: `Incorporar todas las brechas identificadas (${(skills?.brechas.length) ?? '—'})`,
-              pertinencia: `+${Math.round(brechaPct * 0.70)}%`,
-              cobertura:   `${Math.min(coberturaPct + 40, 99)}%`,
-              empleos:     `+${Math.round(empCompatibles * 0.65)}`,
-              color: '#059669',
-            },
-          ].map(sc => (
-            <div key={sc.title} className="rounded-2xl border p-5 space-y-3"
-              style={{ borderColor: sc.color, background: C.navyBg }}>
-              <p className="text-sm font-bold" style={{ color: sc.color }}>{sc.title}</p>
-              <p className="text-xs text-gray-500">{sc.sub}</p>
-              <div className="space-y-2">
-                {[
-                  { k: 'Pertinencia',   v: sc.pertinencia },
-                  { k: 'Cobertura',     v: sc.cobertura   },
-                  { k: 'Empleos comp.', v: sc.empleos     },
-                ].map(({ k, v }) => (
-                  <div key={k} className="flex justify-between text-xs">
-                    <span className="text-gray-600">{k}</span>
-                    <span className="font-bold" style={{ color: sc.color }}>{v}</span>
+        {dataPobre ? <ExplorandoMsg /> : (
+          <>
+            <p className="text-sm text-gray-600 mb-6">
+              Impacto estimado de incorporar las principales brechas al plan de estudios.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              {[
+                {
+                  title: 'Escenario A — Mínimo',
+                  sub: `Incorporar top ${Math.min(brechasAlta.length, 2)} brechas críticas`,
+                  pertinencia: `+${Math.round(brechaPct * 0.25)}%`,
+                  cobertura:   `${Math.min(coberturaPct + 15, 99)}%`,
+                  empleos:     `+${Math.round(empCompatibles * 0.2)}`,
+                  color: C.gold,
+                },
+                {
+                  title: 'Escenario B — Moderado',
+                  sub: `Incorporar todas las brechas de prioridad alta (${brechasAlta.length})`,
+                  pertinencia: `+${Math.round(brechaPct * 0.45)}%`,
+                  cobertura:   `${Math.min(coberturaPct + 25, 99)}%`,
+                  empleos:     `+${Math.round(empCompatibles * 0.4)}`,
+                  color: '#2563eb',
+                },
+                {
+                  title: 'Escenario C — Completo',
+                  sub: `Incorporar todas las brechas identificadas (${skills?.brechas.length ?? '—'})`,
+                  pertinencia: `+${Math.round(brechaPct * 0.70)}%`,
+                  cobertura:   `${Math.min(coberturaPct + 40, 99)}%`,
+                  empleos:     `+${Math.round(empCompatibles * 0.65)}`,
+                  color: '#059669',
+                },
+              ].map(sc => (
+                <div key={sc.title} className="rounded-2xl border p-5 space-y-3"
+                  style={{ borderColor: sc.color, background: C.navyBg }}>
+                  <p className="text-sm font-bold" style={{ color: sc.color }}>{sc.title}</p>
+                  <p className="text-xs text-gray-500">{sc.sub}</p>
+                  <div className="space-y-2">
+                    {[
+                      { k: 'Pertinencia',   v: sc.pertinencia },
+                      { k: 'Cobertura',     v: sc.cobertura   },
+                      { k: 'Empleos comp.', v: sc.empleos     },
+                    ].map(({ k, v }) => (
+                      <div key={k} className="flex justify-between text-xs">
+                        <span className="text-gray-600">{k}</span>
+                        <span className="font-bold" style={{ color: sc.color }}>{v}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <Insight text={`Incorporar las ${brechasAlta.length} brechas de alta prioridad podría elevar la cobertura curricular a ~${Math.min(coberturaPct + 25, 99)}% y aumentar los empleos compatibles en ~${Math.round(empCompatibles * 0.4)} adicionales. Estos valores son estimaciones con base en el análisis de frecuencia del mercado.`} />
+            <Insight text={`Incorporar las ${brechasAlta.length} brechas de alta prioridad podría elevar la cobertura curricular a ~${Math.min(coberturaPct + 25, 99)}% y aumentar los empleos compatibles en ~${Math.round(empCompatibles * 0.4)} adicionales. Estos valores son estimaciones con base en el análisis de frecuencia del mercado.`} />
+          </>
+        )}
       </Section>
 
       {/* ── S8: Recomendaciones ── */}
       <Section n="8" title="Recomendaciones" dark id="s8">
-        <p className="text-sm text-blue-200 mb-6">
-          Acciones prioritarias para mejorar la pertinencia curricular del programa.
-        </p>
-
-        <div className="space-y-4">
-          {[
-            {
-              n: 1,
-              action: `Incorporar ${brechasAlta.slice(0, 2).map(b => b.skill).join(' y ') || 'skills de alta prioridad'} como contenidos obligatorios.`,
-              detail: 'Mayor demanda identificada en vacantes. Sin presencia actual en el currículo.',
-              urgency: 'Urgente',
-              color: '#dc2626', urgBg: '#fee2e2',
-            },
-            {
-              n: 2,
-              action: 'Actualizar los módulos de herramientas para incluir versiones actuales de las plataformas cloud.',
-              detail: `AWS, Azure y GCP aparecen en ${skills?.skills_mercado.find(s => s.skill.toLowerCase().includes('aws'))?.frecuencia ?? '—'} vacantes.`,
-              urgency: 'Alta',
-              color: '#d97706', urgBg: '#fef3c7',
-            },
-            {
-              n: 3,
-              action: 'Incorporar un módulo de MLOps y despliegue de modelos en producción.',
-              detail: 'Competencia emergente con alta frecuencia en perfiles de IA y datos.',
-              urgency: 'Alta',
-              color: '#d97706', urgBg: '#fef3c7',
-            },
-            {
-              n: 4,
-              action: `Profundizar la cobertura de ${skills?.fortalezas[0]?.skill ?? 'la principal fortaleza'} de nivel básico a avanzado.`,
-              detail: 'Presencia en currículo confirmada. Potencial de diferenciación con mayor profundidad.',
-              urgency: 'Media',
-              color: '#2563eb', urgBg: '#dbeafe',
-            },
-            {
-              n: 5,
-              action: 'Revisar contenidos con baja o nula demanda para liberar espacio curricular.',
-              detail: 'El espacio liberado permite incorporar nuevas competencias sin aumentar la carga total.',
-              urgency: 'Media',
-              color: '#2563eb', urgBg: '#dbeafe',
-            },
-          ].map(rec => (
-            <div key={rec.n} className="rounded-xl p-4 flex gap-4"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <span className="text-2xl font-black flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                {rec.n}
-              </span>
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-3 mb-1">
-                  <p className="text-sm font-semibold text-white leading-snug">{rec.action}</p>
-                  <span className="rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0"
-                    style={{ background: rec.urgBg, color: rec.color }}>
-                    {rec.urgency}
+        {dataPobre ? <ExplorandoMsg /> : (
+          <>
+            <p className="text-sm text-blue-200 mb-6">
+              Acciones prioritarias para mejorar la pertinencia curricular del programa.
+            </p>
+            <div className="space-y-4">
+              {[
+                {
+                  n: 1,
+                  action: `Incorporar ${brechasAlta.slice(0, 2).map(b => b.skill).join(' y ') || 'skills de alta prioridad'} como contenidos obligatorios.`,
+                  detail: 'Mayor demanda identificada en vacantes. Sin presencia actual en el currículo.',
+                  urgency: 'Urgente',
+                  color: '#dc2626', urgBg: '#fee2e2',
+                },
+                {
+                  n: 2,
+                  action: 'Actualizar los módulos de herramientas para incluir versiones actuales de las plataformas cloud.',
+                  detail: `AWS, Azure y GCP aparecen en ${skills?.skills_mercado.find(s => s.skill.toLowerCase().includes('aws'))?.frecuencia ?? '—'} vacantes.`,
+                  urgency: 'Alta',
+                  color: '#d97706', urgBg: '#fef3c7',
+                },
+                {
+                  n: 3,
+                  action: 'Incorporar un módulo de MLOps y despliegue de modelos en producción.',
+                  detail: 'Competencia emergente con alta frecuencia en perfiles de IA y datos.',
+                  urgency: 'Alta',
+                  color: '#d97706', urgBg: '#fef3c7',
+                },
+                {
+                  n: 4,
+                  action: `Profundizar la cobertura de ${skills?.fortalezas[0]?.skill ?? 'la principal fortaleza'} de nivel básico a avanzado.`,
+                  detail: 'Presencia en currículo confirmada. Potencial de diferenciación con mayor profundidad.',
+                  urgency: 'Media',
+                  color: '#2563eb', urgBg: '#dbeafe',
+                },
+                {
+                  n: 5,
+                  action: 'Revisar contenidos con baja o nula demanda para liberar espacio curricular.',
+                  detail: 'El espacio liberado permite incorporar nuevas competencias sin aumentar la carga total.',
+                  urgency: 'Media',
+                  color: '#2563eb', urgBg: '#dbeafe',
+                },
+              ].map(rec => (
+                <div key={rec.n} className="rounded-xl p-4 flex gap-4"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span className="text-2xl font-black flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                    {rec.n}
                   </span>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <p className="text-sm font-semibold text-white leading-snug">{rec.action}</p>
+                      <span className="rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0"
+                        style={{ background: rec.urgBg, color: rec.color }}>
+                        {rec.urgency}
+                      </span>
+                    </div>
+                    <p className="text-xs text-blue-300">{rec.detail}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-blue-300">{rec.detail}</p>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </Section>
 
       {/* ── CIERRE ── */}
