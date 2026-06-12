@@ -700,9 +700,10 @@ def load_jobs(conn) -> List[JobProfile]:
         # Use full description (up to 3000 chars) so inline keyword extraction
         # covers complete job postings from Elempleo, even when empleo_skills
         # is empty or has ID-mismatch issues.
+        raw_desc = (row["description"] or "")[:3000]
         text = " ".join(filter(None, [
             row["title"],
-            (row["description"] or "")[:3000],
+            raw_desc,
             " ".join(db_skills),
         ]))[:3500]
         # Always extract from text AND merge with DB skills so jobs inserted
@@ -710,6 +711,12 @@ def load_jobs(conn) -> List[JobProfile]:
         # get meaningful skill coverage for pertinence scoring.
         text_skills = extract_skills_from_text(text)
         skills = sorted(set(db_skills) | set(text_skills))
+        # Debug: log extraction results for jobs whose title contains "big data"
+        if "big data" in (row["title"] or "").lower():
+            logger.info(
+                "[SKILLS-TEST] titulo=%r  text_len=%d  db_skills=%s  extracted=%s",
+                row["title"], len(raw_desc), db_skills, text_skills,
+            )
         if db_skills:
             n_from_db += 1
         elif text_skills:
