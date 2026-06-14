@@ -1,0 +1,44 @@
+name: Daily Acquisition & Matching Pipeline
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 3 AM Colombia (UTC-5)
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          pip install psycopg2-binary python-dotenv playwright \
+                      sentence-transformers scikit-learn numpy scipy rank-bm25
+          playwright install chromium --with-deps
+
+      - name: Acquisition - todos los dominios
+        env:
+          RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+          CI: "true"
+        run: |
+          python scripts/run_acquisition.py --domain data_analytics --source elempleo --limit 20
+          python scripts/run_acquisition.py --domain artificial_intelligence --source elempleo --limit 20
+          python scripts/run_acquisition.py --domain criminology --source elempleo --limit 15
+          python scripts/run_acquisition.py --domain education --source elempleo --limit 15
+
+      - name: Matching - todos los programas
+        env:
+          RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+        run: |
+          python scripts/run_semantic_matching.py --persist --min-score 40
+
+      - name: Update run timestamp
+        run: echo "Pipeline completado $(date)" >> outputs/last_run.txt
