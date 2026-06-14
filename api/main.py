@@ -791,7 +791,7 @@ def pipeline_run(
     background_tasks: BackgroundTasks,
     body: dict[str, Any] = {},
 ) -> _UnicodeJSONResponse:
-    steps_raw = body.get("steps") or ["microcurriculos", "matching"]
+    steps_raw = body.get("steps") or ["microcurriculos"]
     program_id = body.get("program_id") or None
     if program_id is not None:
         try:
@@ -813,7 +813,11 @@ def pipeline_run(
         "log": [],
     }
     background_tasks.add_task(_run_pipeline, job_id, steps_raw, program_id)
-    return _UnicodeJSONResponse({"job_id": job_id, "status": "queued"})
+    return _UnicodeJSONResponse({
+        "job_id": job_id,
+        "status": "queued",
+        "message": "El matching semántico corre localmente o via GitHub Actions (cada noche). El botón solo recarga microcurrículos desde Excel.",
+    })
 
 
 @app.get("/api/pipeline/status/{job_id}", tags=["pipeline"])

@@ -574,40 +574,37 @@ export default function ObservatorioStorytelling() {
               style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid rgba(255,255,255,0.15)` }}>
               Run #{d.run_id} · {d.fecha}
             </span>
-            {/* Pipeline button */}
+            {/* Last update info button */}
             <button
-              onClick={startPipeline}
-              disabled={pipelineStatus === 'running' || pipelineStatus === 'queued' || pipelineStatus === 'launching'}
+              onClick={() => setPipelineLogOpen(o => !o)}
               className="rounded-full px-3 py-1.5 text-xs font-bold transition-all"
               style={{
-                background: pipelineStatus === 'done' ? 'rgba(134,239,172,0.2)'
-                  : pipelineStatus === 'error' ? 'rgba(252,165,165,0.2)'
-                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? 'rgba(147,197,253,0.2)'
-                  : 'rgba(255,255,255,0.1)',
-                color: pipelineStatus === 'done' ? '#86efac'
-                  : pipelineStatus === 'error' ? '#fca5a5'
-                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? '#93c5fd'
-                  : C.light,
+                background: 'rgba(255,255,255,0.1)',
+                color: C.light,
                 border: '1px solid rgba(255,255,255,0.15)',
-                cursor: (pipelineStatus === 'running' || pipelineStatus === 'queued') ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
               }}
             >
-              {pipelineStatus === 'launching' ? '⏳ Iniciando…'
-                : pipelineStatus === 'queued'  ? '⏳ En cola…'
-                : pipelineStatus === 'running' ? `⚙ ${pipelineStep ?? 'Procesando'}…`
-                : pipelineStatus === 'done'    ? '✓ Actualizado'
-                : pipelineStatus === 'error'   ? '⚠ Error'
-                : '↻ Actualizar análisis'}
+              ↻ Ver última actualización
             </button>
           </div>
         </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-1 pb-1">
-          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            El botón re-ejecuta el matching con los empleos existentes en DB. La adquisición de nuevos empleos corre automáticamente cada noche via GitHub Actions.
-          </p>
-        </div>
+        {pipelineLogOpen && (
+          <div className="relative z-10 max-w-4xl mx-auto px-1 pb-2">
+            <div className="rounded-xl px-4 py-3"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: C.light }}>
+                Último análisis de matching: <span style={{ color: '#86efac' }}>{d.fecha ?? '—'}</span>
+              </p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                La adquisición de nuevos empleos y el matching semántico corren automáticamente cada noche via GitHub Actions.
+                El matching con SBERT requiere más RAM de la disponible en Railway y se ejecuta localmente o en el runner de GitHub.
+              </p>
+            </div>
+          </div>
+        )}
 
-        {/* Pipeline progress panel */}
+        {/* Pipeline progress panel (microcurrículos only) */}
         {pipelineStatus !== 'idle' && (
           <div className="relative z-10 max-w-4xl mx-auto mt-2 mb-0">
             <div className="rounded-xl px-4 py-3 flex items-center gap-3"
@@ -617,10 +614,10 @@ export default function ObservatorioStorytelling() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold" style={{ color: C.light }}>
-                  {pipelineStatus === 'queued'  && 'Pipeline en cola — iniciando…'}
+                  {pipelineStatus === 'queued'  && 'Cargando microcurrículos — iniciando…'}
                   {pipelineStatus === 'running' && `Ejecutando: ${pipelineStep ?? '…'}`}
-                  {pipelineStatus === 'done'    && '✓ Pipeline completado — recargando datos…'}
-                  {pipelineStatus === 'error'   && '⚠ Pipeline completado con errores'}
+                  {pipelineStatus === 'done'    && '✓ Microcurrículos cargados'}
+                  {pipelineStatus === 'error'   && '⚠ Error al cargar microcurrículos'}
                 </p>
                 {pipelineJobId && (
                   <p className="text-[10px] text-blue-400">job: {pipelineJobId}</p>
