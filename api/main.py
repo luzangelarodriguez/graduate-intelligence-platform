@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
+import subprocess
+import sys
+import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import BackgroundTasks, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -683,3 +688,139 @@ def semantic_search(
     limit: int = Query(10, ge=1, le=25),
 ) -> dict[str, Any]:
     return services.semantic_search_results(q, entity_type=entity_type, limit=limit)
+
+
+# ─── Pipeline endpoints ───────────────────────────────────────────────────────
+
+# In-memory job store (Railway restarts clear it — sufficient for UX feedback)
+_PIPELINE_JOBS: dict[str, dict[str, Any]] = {}
+
+_SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts")
+_PYTHON = sys.executable
+
+ACQUISITION_STEPS = [
+    ["run_acquisition.py", "--domain", "data_analytics",        "--source", "elempleo", "--limit", "20"],
+    ["run_acquisition.py", "--domain", "data_analytics",        "--source", "magneto",  "--limit", "20"],
+    ["run_acquisition.py", "--domain", "artificial_intelligence","--source", "elempleo", "--limit", "20"],
+    ["run_acquisition.py", "--domain", "criminology",            "--source", "elempleo", "--limit", "20"],
+]
+
+
+def _ts() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _run_step(job: dict, label: str, cmd: list[str]) -> bool:
+    job["current_step"] = label
+    job["log"].append(f"[{_ts()}] START {label}")
+    try:
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=600,
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        )
+        out = (result.stdout + result.stderr).strip()
+        for line in out.splitlines()[-30:]:     # keep last 30 lines per step
+            job["log"].append(line)
+        if result.returncode != 0:
+            job["log"].append(f"[{_ts()}] ERROR {label} (exit {result.returncode})")
+            return False
+        job["log"].append(f"[{_ts()}] DONE {label}")
+        return True
+    except subprocess.TimeoutExpired:
+        job["log"].append(f"[{_ts()}] TIMEOUT {label}")
+        return False
+    except Exception as exc:
+        job["log"].append(f"[{_ts()}] EXCEPTION {label}: {exc}")
+        return False
+
+
+def _run_pipeline(job_id: str, steps: list[str], program_id: int | None) -> None:
+    job = _PIPELINE_JOBS[job_id]
+    job["status"] = "running"
+    job["started_at"] = _ts()
+    errors: list[str] = []
+
+    try:
+        # Step 1 — load microcurrículos from Excel
+        if "microcurriculos" in steps:
+            ok = _run_step(
+                job,
+                "microcurriculos",
+                [_PYTHON, os.path.join(_SCRIPTS_DIR, "load_microcurriculo_excel.py"), "--execute", "--yes"],
+            )
+            if not ok:
+                errors.append("microcurriculos")
+
+        # Step 2 — acquisition
+        if "acquisition" in steps:
+            for args in ACQUISITION_STEPS:
+                script = args[0]
+                label = f"acquisition:{args[2]}:{args[4]}"
+                ok = _run_step(
+                    job, label,
+                    [_PYTHON, os.path.join(_SCRIPTS_DIR, script)] + args[1:],
+                )
+                if not ok:
+                    errors.append(label)
+
+        # Step 3 — matching
+        if "matching" in steps:
+            match_cmd = [
+                _PYTHON,
+                os.path.join(_SCRIPTS_DIR, "run_semantic_matching.py"),
+                "--persist", "--min-score", "40",
+            ]
+            if program_id:
+                match_cmd += ["--program-id", str(program_id)]
+            ok = _run_step(job, "matching", match_cmd)
+            if not ok:
+                errors.append("matching")
+
+    except Exception as exc:
+        job["log"].append(f"[{_ts()}] FATAL: {exc}")
+        errors.append("fatal")
+
+    job["status"] = "error" if errors else "done"
+    job["finished_at"] = _ts()
+    job["errors"] = errors
+    job["current_step"] = None
+
+
+@app.post("/api/pipeline/run", tags=["pipeline"])
+def pipeline_run(
+    background_tasks: BackgroundTasks,
+    body: dict[str, Any] = {},
+) -> _UnicodeJSONResponse:
+    steps_raw = body.get("steps") or ["microcurriculos", "acquisition", "matching"]
+    program_id = body.get("program_id") or None
+    if program_id is not None:
+        try:
+            program_id = int(program_id)
+        except (TypeError, ValueError):
+            program_id = None
+
+    job_id = str(uuid.uuid4())[:8]
+    _PIPELINE_JOBS[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "steps": steps_raw,
+        "program_id": program_id,
+        "created_at": _ts(),
+        "started_at": None,
+        "finished_at": None,
+        "current_step": None,
+        "errors": [],
+        "log": [],
+    }
+    background_tasks.add_task(_run_pipeline, job_id, steps_raw, program_id)
+    return _UnicodeJSONResponse({"job_id": job_id, "status": "queued"})
+
+
+@app.get("/api/pipeline/status/{job_id}", tags=["pipeline"])
+def pipeline_status(job_id: str) -> _UnicodeJSONResponse:
+    job = _PIPELINE_JOBS.get(job_id)
+    if not job:
+        return _UnicodeJSONResponse({"error": "job not found"}, status_code=404)  # type: ignore[name-defined]
+    # Return last 50 log lines to keep response light
+    payload = {**job, "log": job["log"][-50:]}
+    return _UnicodeJSONResponse(payload)  # type: ignore[name-defined]

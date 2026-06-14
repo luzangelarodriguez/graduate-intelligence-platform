@@ -438,6 +438,52 @@ export default function ObservatorioStorytelling() {
       .catch(() => setUniv(null));
   }, [programaId]);
 
+  // pipeline state
+  const [pipelineJobId, setPipelineJobId] = useState<string | null>(null);
+  const [pipelineStatus, setPipelineStatus] = useState<string>('idle');
+  const [pipelineStep, setPipelineStep]   = useState<string | null>(null);
+  const [pipelineLog, setPipelineLog]     = useState<string[]>([]);
+  const [pipelineLogOpen, setPipelineLogOpen] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function startPipeline() {
+    setPipelineStatus('launching');
+    setPipelineLog([]);
+    setPipelineStep(null);
+    fetch(`${API}/api/pipeline/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ program_id: programaId, steps: ['microcurriculos', 'acquisition', 'matching'] }),
+    })
+      .then(r => r.json())
+      .then((d: { job_id: string }) => {
+        setPipelineJobId(d.job_id);
+        setPipelineStatus('queued');
+        pollRef.current = setInterval(() => pollJob(d.job_id), 3000);
+      })
+      .catch(() => setPipelineStatus('error'));
+  }
+
+  function pollJob(jobId: string) {
+    fetch(`${API}/api/pipeline/status/${jobId}`)
+      .then(r => r.json())
+      .then((d: { status: string; current_step: string | null; log: string[] }) => {
+        setPipelineStatus(d.status);
+        setPipelineStep(d.current_step);
+        setPipelineLog(d.log);
+        if (d.status === 'done' || d.status === 'error') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          if (d.status === 'done') {
+            // Refresh all data
+            setTimeout(() => window.location.reload(), 1500);
+          }
+        }
+      })
+      .catch(() => {});
+  }
+
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: C.bg }}>
       <div className="text-center space-y-4">
@@ -517,8 +563,70 @@ export default function ObservatorioStorytelling() {
               style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid rgba(255,255,255,0.15)` }}>
               Run #{d.run_id} · {d.fecha}
             </span>
+            {/* Pipeline button */}
+            <button
+              onClick={startPipeline}
+              disabled={pipelineStatus === 'running' || pipelineStatus === 'queued' || pipelineStatus === 'launching'}
+              className="rounded-full px-3 py-1.5 text-xs font-bold transition-all"
+              style={{
+                background: pipelineStatus === 'done' ? 'rgba(134,239,172,0.2)'
+                  : pipelineStatus === 'error' ? 'rgba(252,165,165,0.2)'
+                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? 'rgba(147,197,253,0.2)'
+                  : 'rgba(255,255,255,0.1)',
+                color: pipelineStatus === 'done' ? '#86efac'
+                  : pipelineStatus === 'error' ? '#fca5a5'
+                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? '#93c5fd'
+                  : C.light,
+                border: '1px solid rgba(255,255,255,0.15)',
+                cursor: (pipelineStatus === 'running' || pipelineStatus === 'queued') ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {pipelineStatus === 'launching' ? '⏳ Iniciando…'
+                : pipelineStatus === 'queued'  ? '⏳ En cola…'
+                : pipelineStatus === 'running' ? `⚙ ${pipelineStep ?? 'Procesando'}…`
+                : pipelineStatus === 'done'    ? '✓ Actualizado'
+                : pipelineStatus === 'error'   ? '⚠ Error'
+                : '↻ Actualizar análisis'}
+            </button>
           </div>
         </div>
+
+        {/* Pipeline progress panel */}
+        {pipelineStatus !== 'idle' && (
+          <div className="relative z-10 max-w-4xl mx-auto mt-2 mb-0">
+            <div className="rounded-xl px-4 py-3 flex items-center gap-3"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              {(pipelineStatus === 'running' || pipelineStatus === 'queued') && (
+                <div className="w-4 h-4 rounded-full border-2 border-blue-300 border-t-transparent animate-spin flex-shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold" style={{ color: C.light }}>
+                  {pipelineStatus === 'queued'  && 'Pipeline en cola — iniciando…'}
+                  {pipelineStatus === 'running' && `Ejecutando: ${pipelineStep ?? '…'}`}
+                  {pipelineStatus === 'done'    && '✓ Pipeline completado — recargando datos…'}
+                  {pipelineStatus === 'error'   && '⚠ Pipeline completado con errores'}
+                </p>
+                {pipelineJobId && (
+                  <p className="text-[10px] text-blue-400">job: {pipelineJobId}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setPipelineLogOpen(o => !o)}
+                className="text-xs font-semibold flex-shrink-0"
+                style={{ color: C.mid }}>
+                {pipelineLogOpen ? 'ocultar log' : 'ver log'}
+              </button>
+            </div>
+            {pipelineLogOpen && pipelineLog.length > 0 && (
+              <div className="mt-1 rounded-xl p-3 overflow-y-auto max-h-48 font-mono text-[10px]"
+                style={{ background: 'rgba(0,0,0,0.4)', color: '#a5f3fc' }}>
+                {pipelineLog.slice(-30).map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* hero headline */}
         <div className="relative z-10 max-w-3xl mx-auto text-center space-y-3">
