@@ -197,6 +197,15 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
       { skill: 'Estadística', cobertura: 3 },
     ],
   },
+  20: {
+    program_id: 20,
+    skills_mercado:   [],
+    skills_programa:  [],
+    brechas:          [],
+    fortalezas:       [],
+    exclusivas_programa: [],
+    cobertura_pct:    0,
+  },
 };
 
 // ─── Pertinencia scale ─────────────────────────────────────────────────────────
@@ -428,7 +437,7 @@ export default function ObservatorioStorytelling() {
     fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: SkillsAnalysis) => setSkills(d))
-      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? FALLBACK_SKILLS[94]));
+      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? null));
   }, [programaId]);
 
   // fetch universities
@@ -765,11 +774,13 @@ export default function ObservatorioStorytelling() {
                 );
               })}
               {skills.skills_programa.length === 0 && (
-                <p className="text-sm text-gray-400 py-6 text-center">No se identificaron skills en el plan de estudios.</p>
+                <p className="text-sm text-gray-400 py-6 text-center">Cargando competencias del programa... (ejecuta el pipeline para poblar los datos)</p>
               )}
             </div>
 
-            <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ')}.`} />
+            {skills.skills_programa.length > 0 && (
+              <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ') || 'por determinar'}.`} />
+            )}
           </>
         )}
       </Section>
