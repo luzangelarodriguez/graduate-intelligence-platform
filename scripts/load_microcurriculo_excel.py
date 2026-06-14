@@ -192,44 +192,58 @@ def parse_excel(path: Path) -> list[dict[str, Any]]:
         folder_name = path.parent.name
     programa = folder_name.strip()
 
-    # Read rows from row 13 (1-indexed) = index 12 (0-indexed)
-    # openpyxl rows are 1-indexed; min_row=13
-    START_ROW = 13
-    COL_ASIGNATURA = 8   # columna 8
-    COL_RA         = 10  # columna 10
-    COL_CREDITOS   = 11  # columna 11
+    # Real column layout (1-indexed, verified from the Neuropsicología matrix):
+    #   Col  1 = CÓDIGO (CE1, CE2…) — non-empty signals a new asignatura row
+    #   Col  9 = ASIGNATURA name
+    #   Col 11 = Resultado de Aprendizaje (RA) text
+    #   Col 12 = CRÉDITOS
+    START_ROW    = 13
+    COL_CODIGO   = 1    # new-asignatura sentinel
+    COL_ASIG     = 9    # asignatura name
+    COL_RA       = 11   # RA text
+    COL_CREDITOS = 12   # credits
 
-    asig_data: dict[str, dict[str, Any]] = {}  # asignatura → {ras, creditos}
-    current_asig = ""
+    asig_data: dict[str, dict[str, Any]] = {}  # asignatura key → {name, ras, creditos}
+    current_key  = ""   # normalized key for dict lookup
+    current_name = ""   # original display name
 
     all_rows = list(target_sheet.iter_rows(min_row=START_ROW, values_only=True))
     print(f"  [INFO] {len(all_rows)} filas desde fila {START_ROW}")
 
     for row in all_rows:
-        # Pad row to at least COL_CREDITOS columns
-        row = list(row) + [None] * (COL_CREDITOS + 1)
+        row = list(row) + [None] * 15   # pad to avoid IndexError
 
-        asig_raw  = clean(row[COL_ASIGNATURA - 1])   # 0-indexed
-        ra_raw    = clean(row[COL_RA - 1])
-        cred_raw  = clean(row[COL_CREDITOS - 1])
+        codigo_raw = clean(row[COL_CODIGO - 1])    # col 1
+        asig_raw   = clean(row[COL_ASIG - 1])      # col 9
+        ra_raw     = clean(row[COL_RA - 1])         # col 11
+        cred_raw   = clean(row[COL_CREDITOS - 1])   # col 12
 
-        # New asignatura detected (non-empty, not a RA statement)
-        if asig_raw and len(asig_raw) > 3:
+        # New asignatura: código cell is non-empty AND asignatura cell is non-empty
+        if codigo_raw and asig_raw and len(asig_raw) > 3:
             norm_a = normalize(asig_raw)
-            # Skip header-like rows
-            if norm_a not in ("asignatura", "materia", "nombre"):
-                current_asig = asig_raw
-                if current_asig not in asig_data:
+            skip = {"asignatura", "materia", "nombre", "resultados de aprendizaje de la asignatura"}
+            if norm_a not in skip:
+                current_key  = norm_a[:60]
+                current_name = re.sub(r"\s+", " ", asig_raw.replace("\n", " ")).strip()
+                if current_key not in asig_data:
                     cred_val = None
                     try:
                         cred_val = int(float(cred_raw)) if cred_raw else None
                     except (ValueError, TypeError):
                         pass
-                    asig_data[current_asig] = {"ras": [], "creditos": cred_val}
+                    asig_data[current_key] = {
+                        "name": current_name,
+                        "ras": [],
+                        "creditos": cred_val,
+                    }
 
-        # Append RA to current asignatura
-        if ra_raw and len(ra_raw) > 10 and current_asig:
-            asig_data[current_asig]["ras"].append(ra_raw)
+        # Append any RA text to current asignatura (strip leading ENE-RA-XX codes optionally)
+        if ra_raw and len(ra_raw) > 10 and current_key:
+            # Split on embedded newlines (some cells pack multiple RAs)
+            for part in ra_raw.split("\n"):
+                part = part.strip()
+                if len(part) > 15:
+                    asig_data[current_key]["ras"].append(part)
 
     if not asig_data:
         print(f"  [WARN] No se encontraron asignaturas en {path.name}")
@@ -238,16 +252,17 @@ def parse_excel(path: Path) -> list[dict[str, Any]]:
     doc_hash_base = hashlib.md5(path.read_bytes()).hexdigest()
     results: list[dict[str, Any]] = []
 
-    for asig, info in asig_data.items():
-        ras: list[str] = info["ras"]
+    for key, info in asig_data.items():
+        asig_name: str    = info["name"]
+        ras: list[str]    = info["ras"]
         creditos: int | None = info["creditos"]
         full_text = "\n".join(ras)
         skills = extract_skills_from_text(full_text, NEURO_KEYWORDS)
-        doc_hash = doc_hash_base + f":{normalize(asig)[:30]}"
+        doc_hash = doc_hash_base + f":{key[:30]}"
 
         results.append({
             "programa": programa,
-            "asignatura": asig,
+            "asignatura": asig_name,
             "creditos": creditos,
             "resultados_aprendizaje": ras[:15],
             "contenido_tematico": [],
@@ -479,7 +494,18 @@ def main() -> None:
         print("\nNo se extrajeron registros. Verifica la estructura del Excel.")
         sys.exit(1)
 
-    # ── connect DB for esp lookup ────────────────────────────────────────────
+    # ── preview without DB (use EXPLICIT_ESP_MAP directly) ───────────────────
+    esp_map_local: dict[str, int | None] = {
+        rec["programa"]: infer_esp_id(rec["programa"], [])
+        for rec in all_records
+    }
+    print_preview(all_records, esp_map_local)
+
+    if args.preview:
+        print("[PREVIEW] Ejecutar con --execute para insertar en DB.")
+        return
+
+    # ── connect DB for execute ───────────────────────────────────────────────
     print("\n[DB] Conectando a Railway…")
     try:
         conn = get_conn()
@@ -489,19 +515,11 @@ def main() -> None:
         print(f"  ERROR de conexión: {exc}")
         sys.exit(1)
 
-    # Build esp_id map per programa name
+    # Refine esp_id with DB data
     esp_map: dict[str, int | None] = {}
     for rec in all_records:
         if rec["programa"] not in esp_map:
             esp_map[rec["programa"]] = infer_esp_id(rec["programa"], esps)
-
-    # ── preview ───────────────────────────────────────────────────────────────
-    print_preview(all_records, esp_map)
-
-    if args.preview:
-        conn.close()
-        print("[PREVIEW] Ejecutar con --execute para insertar en DB.")
-        return
 
     # ── execute ───────────────────────────────────────────────────────────────
     if not args.yes:
