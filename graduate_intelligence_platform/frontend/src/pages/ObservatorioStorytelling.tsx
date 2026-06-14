@@ -464,7 +464,7 @@ export default function ObservatorioStorytelling() {
     fetch(`${API}/api/pipeline/run`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ program_id: programaId, steps: ['microcurriculos', 'acquisition', 'matching'] }),
+      body: JSON.stringify({ program_id: programaId, steps: ['microcurriculos', 'matching'] }),
     })
       .then(r => r.json())
       .then((d: { job_id: string }) => {
@@ -600,6 +600,11 @@ export default function ObservatorioStorytelling() {
                 : '↻ Actualizar análisis'}
             </button>
           </div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-1 pb-1">
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            El botón re-ejecuta el matching con los empleos existentes en DB. La adquisición de nuevos empleos corre automáticamente cada noche via GitHub Actions.
+          </p>
         </div>
 
         {/* Pipeline progress panel */}
