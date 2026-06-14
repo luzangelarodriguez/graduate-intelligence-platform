@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import random
 import re
 import time
@@ -254,6 +255,8 @@ class PlaywrightJobSource:
     ) -> list[dict[str, Any]]:
         Path(screenshots_dir).mkdir(parents=True, exist_ok=True)
         effective_headless = self.config.headless_override if self.config.headless_override is not None else headless
+        if os.getenv("CI") == "true":
+            effective_headless = True
         async with async_playwright() as pw:
             browser = await pw.chromium.launch(headless=effective_headless)
             try:
