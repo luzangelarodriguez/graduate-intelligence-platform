@@ -286,17 +286,18 @@ def discover_excel_files(target_path: Path | None = None) -> list[Path]:
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 def _load_env() -> None:
-    if ENV_LOCAL.exists():
-        try:
-            from dotenv import load_dotenv  # type: ignore
-            from dotenv import load_dotenv
-            load_dotenv(ENV_LOCAL, override=True)
-        except ImportError:
-            for line in ENV_LOCAL.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    k, _, v = line.partition("=")
-                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+    if not ENV_LOCAL.exists():
+        return
+    try:
+        from dotenv import load_dotenv  # type: ignore
+        load_dotenv(ENV_LOCAL, override=True)
+    except ImportError:
+        # Manual fallback (no python-dotenv installed)
+        for line in ENV_LOCAL.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                os.environ[k.strip()] = v.strip().strip('"').strip("'")
 
 
 def get_conn():
