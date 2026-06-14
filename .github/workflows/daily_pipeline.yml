@@ -5,10 +5,14 @@ on:
     - cron: '0 8 * * *'  # 3 AM Colombia (UTC-5)
   workflow_dispatch:
 
+env:
+  CI: "true"
+  RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
 
     steps:
       - uses: actions/checkout@v4
@@ -24,21 +28,50 @@ jobs:
                       sentence-transformers scikit-learn numpy scipy rank-bm25
           playwright install chromium --with-deps
 
-      - name: Acquisition - todos los dominios
-        env:
-          RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
-          CI: "true"
+      - name: Acquisition - Elempleo
+        continue-on-error: true
         run: |
-          python scripts/run_acquisition.py --domain data_analytics --source elempleo --limit 20
-          python scripts/run_acquisition.py --domain artificial_intelligence --source elempleo --limit 20
-          python scripts/run_acquisition.py --domain criminology --source elempleo --limit 15
-          python scripts/run_acquisition.py --domain education --source elempleo --limit 15
+          python scripts/run_acquisition.py --source elempleo --domain data_analytics --limit 25
+          python scripts/run_acquisition.py --source elempleo --domain artificial_intelligence --limit 25
+          python scripts/run_acquisition.py --source elempleo --domain criminology --limit 20
+          python scripts/run_acquisition.py --source elempleo --domain education --limit 20
+
+      - name: Acquisition - Magneto
+        continue-on-error: true
+        run: |
+          python scripts/run_acquisition.py --source magneto --domain data_analytics --limit 25
+          python scripts/run_acquisition.py --source magneto --domain artificial_intelligence --limit 25
+
+      - name: Acquisition - Magneto API
+        continue-on-error: true
+        run: python scripts/run_acquisition.py --source magneto_api --domain data_analytics --limit 30
+
+      - name: Acquisition - Computrabajo
+        continue-on-error: true
+        run: |
+          python scripts/run_acquisition.py --source computrabajo --domain data_analytics --limit 20
+          python scripts/run_acquisition.py --source computrabajo --domain artificial_intelligence --limit 20
+
+      - name: Acquisition - Indeed Colombia
+        continue-on-error: true
+        run: |
+          python scripts/run_acquisition.py --source indeed_co --domain data_analytics --limit 20
+          python scripts/run_acquisition.py --source indeed_co --domain criminology --limit 15
+
+      - name: Acquisition - Torre.ai
+        continue-on-error: true
+        run: python scripts/run_acquisition.py --source torre --domain data_analytics --limit 20
+
+      - name: Acquisition - TicJob
+        continue-on-error: true
+        run: python scripts/run_acquisition.py --source ticjob --domain data_analytics --limit 20
+
+      - name: Acquisition - OCC
+        continue-on-error: true
+        run: python scripts/run_acquisition.py --source occ --domain data_analytics --limit 20
 
       - name: Matching - todos los programas
-        env:
-          RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
-        run: |
-          python scripts/run_semantic_matching.py --persist --min-score 40
+        run: python scripts/run_semantic_matching.py --persist --min-score 40
 
       - name: Update run timestamp
         run: echo "Pipeline completado $(date)" >> outputs/last_run.txt
