@@ -67,11 +67,11 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     "technology": ["desarrollador software", "ingeniero de sistemas", "programador"],
     "business": ["analista financiero", "gerente de proyectos", "consultor empresarial"],
     "education": [
-        "neuropsicólogo educativo",
+        "neuropsicólogo",
+        "neuropsicología",
         "psicólogo educativo",
-        "especialista necesidades educativas especiales",
-        "docente inclusión educativa",
-        "terapeuta aprendizaje",
+        "docente neuropsicología",
+        "psicología forense",
     ],
 }
 
