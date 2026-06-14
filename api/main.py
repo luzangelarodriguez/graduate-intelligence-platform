@@ -791,7 +791,7 @@ def pipeline_run(
     background_tasks: BackgroundTasks,
     body: dict[str, Any] = {},
 ) -> _UnicodeJSONResponse:
-    steps_raw = body.get("steps") or ["microcurriculos", "acquisition", "matching"]
+    steps_raw = body.get("steps") or ["microcurriculos", "matching"]
     program_id = body.get("program_id") or None
     if program_id is not None:
         try:
