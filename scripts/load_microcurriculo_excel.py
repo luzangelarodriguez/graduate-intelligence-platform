@@ -184,8 +184,12 @@ def parse_excel(path: Path) -> list[dict[str, Any]]:
     else:
         print(f"  [OK] Usando hoja: '{target_sheet.title}'")
 
-    # Detect program name from folder
-    folder_name = path.parent.name
+    # Detect program name: use folder name if file is inside a subfolder,
+    # otherwise fall back to the filename (without extension)
+    if path.parent.resolve() == STORAGE_DIR.resolve():
+        folder_name = path.stem  # root-level file → use filename
+    else:
+        folder_name = path.parent.name
     programa = folder_name.strip()
 
     # Read rows from row 13 (1-indexed) = index 12 (0-indexed)
@@ -260,10 +264,24 @@ def parse_excel(path: Path) -> list[dict[str, Any]]:
 
 # ── discover all .xlsx files ──────────────────────────────────────────────────
 def discover_excel_files(target_path: Path | None = None) -> list[Path]:
+    import glob as _glob
     base = target_path or STORAGE_DIR
-    files = sorted(base.rglob("*.xlsx"))
-    # Exclude Excel temp files
-    return [f for f in files if not f.name.startswith("~$")]
+    # Files in any subfolder
+    found = list(_glob.glob(str(base / "**" / "*.xlsx"), recursive=True))
+    # Files directly in the root of STORAGE_DIR
+    found += list(_glob.glob(str(base / "*.xlsx")))
+    # Deduplicate, exclude Excel temp files (~$...), sort
+    seen: set[str] = set()
+    result: list[Path] = []
+    for p in sorted(found):
+        path = Path(p).resolve()
+        if path.name.startswith("~$"):
+            continue
+        key = str(path)
+        if key not in seen:
+            seen.add(key)
+            result.append(path)
+    return result
 
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
