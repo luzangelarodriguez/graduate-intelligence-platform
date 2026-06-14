@@ -51,12 +51,24 @@ logger = logging.getLogger(__name__)
 FALLBACK_QUERIES: dict[str, list[str]] = {
     "data_analytics": ["analista de datos", "business intelligence", "power bi"],
     "artificial_intelligence": ["inteligencia artificial", "machine learning", "data scientist"],
-    "criminology": ["criminólogo", "investigador criminal", "seguridad ciudadana"],
+    "criminology": [
+        "perito judicial",
+        "analista forense",
+        "psicólogo forense",
+        "investigador judicial",
+        "oficial cumplimiento",
+        "analista inteligencia criminal",
+    ],
+    "cybersecurity": [
+        "analista ciberseguridad",
+        "investigador digital",
+        "analista riesgo",
+    ],
     "technology": ["desarrollador software", "ingeniero de sistemas", "programador"],
     "business": ["analista financiero", "gerente de proyectos", "consultor empresarial"],
 }
 
-DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology"]
+DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity"]
 
 
 # ---------------------------------------------------------------------------
@@ -74,7 +86,7 @@ def _get_search_terms_for_domain(domain: str, crawler_plans: dict[str, Any] | No
     """Extract Spanish search terms from the intelligence plans, falling back to hardcoded list."""
     if crawler_plans:
         # Try elempleo plan first (Colombian portal with search_terms)
-        for source_key in ("elempleo", "computrabajo", "magneto", "ticjob"):
+        for source_key in ("elempleo", "computrabajo", "magneto", "occ", "ticjob", "indeed_co"):
             plan = crawler_plans.get(source_key, {})
             if plan:
                 terms = plan.get("search_terms") or plan.get("keywords") or []
@@ -481,7 +493,11 @@ def parse_args() -> argparse.Namespace:
         "--source",
         metavar="SOURCE",
         default="elempleo",
-        help="Scraper to use (default: elempleo)",
+        help=(
+            "Scraper to use (default: elempleo). "
+            "Available: elempleo, magneto, magneto_api, computrabajo, indeed_co, "
+            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship"
+        ),
     )
     parser.add_argument(
         "--limit",

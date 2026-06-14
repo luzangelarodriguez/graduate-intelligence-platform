@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
+import subprocess
+import sys
+import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import BackgroundTasks, FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from api.auth import auth_router
 from api.contracts import (
@@ -124,11 +130,19 @@ async def lifespan(_app: FastAPI):
     yield
 
 
+class _UnicodeJSONResponse(JSONResponse):
+    """Emit Spanish characters as-is instead of \\uXXXX escapes."""
+    def render(self, content: Any) -> bytes:
+        import json
+        return json.dumps(content, ensure_ascii=False, allow_nan=False).encode("utf-8")
+
+
 app = FastAPI(
     title="AI Labor & Curriculum Observatory API",
     version="1.0.0",
     description="Public API for observatory metrics, recommendations, semantic roles, company intelligence and market forecasts.",
     lifespan=lifespan,
+    default_response_class=_UnicodeJSONResponse,
 )
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(
@@ -395,6 +409,278 @@ def program_intelligence_detail(program_id: int) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+@app.get("/api/dashboard/summary", tags=["dashboard"])
+def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str, Any]:
+    """Return aggregated match data from the latest ml run for the frontend dashboard.
+    If program_id is provided, results are filtered to that specialization only.
+    """
+    try:
+        from api.database import fetch_all, fetch_one
+
+        run_row = fetch_one(
+            "SELECT id, created_at FROM ml_training_runs "
+            "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1"
+        )
+        if not run_row:
+            return {
+                "run_id": None, "fecha": None,
+                "programas": [], "top_matches": [],
+                "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+            }
+
+        run_id: int = int(run_row["id"])
+        fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
+
+        # Use literal interpolation for the optional filter to avoid param-count mismatches
+        pid_filter = f"AND m.especializacion_id = {int(program_id)}" if program_id else ""
+        pid_filter_bare = f"AND especializacion_id = {int(program_id)}" if program_id else ""
+
+        prog_rows = fetch_all(
+            f"""
+            SELECT
+                m.especializacion_id                          AS id,
+                COALESCE(e.nombre, m.program_name)            AS nombre,
+                COUNT(*)                                      AS matches_total,
+                ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
+                ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = {run_id} {pid_filter}
+            GROUP BY m.especializacion_id, e.nombre, m.program_name
+            ORDER BY score_maximo DESC
+            """,
+        )
+
+        programas = [
+            {
+                "id":             int(r["id"]) if r["id"] else None,
+                "nombre":         r["nombre"] or "",
+                "matches_total":  int(r["matches_total"]),
+                "score_promedio": float(r["score_promedio"] or 0),
+                "score_maximo":   float(r["score_maximo"] or 0),
+                "labels": {
+                    "high":   int(r["lbl_high"]),
+                    "medium": int(r["lbl_medium"]),
+                    "low":    int(r["lbl_low"]),
+                },
+            }
+            for r in prog_rows
+        ]
+
+        top_rows = fetch_all(
+            f"""
+            SELECT
+                COALESCE(e.nombre, m.program_name) AS programa,
+                m.job_title                        AS empleo,
+                COALESCE(m.company, '')            AS empresa,
+                ROUND(m.score_match::numeric, 1)   AS score,
+                m.relevance_label                  AS label,
+                m.skills_en_comun                  AS skills_en_comun,
+                m.skills_faltantes                 AS skills_faltantes
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = {run_id} {pid_filter}
+            ORDER BY m.score_match DESC
+            LIMIT 30
+            """,
+        )
+
+        top_matches = [
+            {
+                "programa":        r["programa"] or "",
+                "empleo":          r["empleo"] or "",
+                "empresa":         r["empresa"],
+                "score":           float(r["score"] or 0),
+                "label":           r["label"],
+                "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
+                "skills_faltantes": r["skills_faltantes"] if r["skills_faltantes"] is not None else [],
+            }
+            for r in top_rows
+        ]
+
+        tot_rows = fetch_all(
+            f"SELECT relevance_label, COUNT(*) AS cnt "
+            f"FROM ml_program_job_matches "
+            f"WHERE run_id = {run_id} {pid_filter_bare} "
+            f"GROUP BY relevance_label",
+        )
+        lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
+
+        return {
+            "run_id":      run_id,
+            "fecha":       fecha,
+            "programas":   programas,
+            "top_matches": top_matches,
+            "totales": {
+                "matches": sum(lbl.values()),
+                "alta":    lbl.get("high", 0) + lbl.get("high_semantic", 0),
+                "media":   lbl.get("medium", 0) + lbl.get("medium_semantic", 0),
+                "baja":    lbl.get("low", 0) + lbl.get("low_semantic", 0),
+            },
+        }
+    except Exception as exc:
+        logger.error("dashboard_summary error program_id=%s: %s", program_id, exc, exc_info=True)
+        return {
+            "run_id": None, "fecha": None,
+            "programas": [], "top_matches": [],
+            "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+            "error": str(exc),
+        }
+
+
+@app.get("/api/programs/related-universities/{program_id}")
+def related_universities(program_id: int) -> dict[str, Any]:
+    try:
+        JOIN_TEMPLATE = """
+            LEFT JOIN snies_estadisticas_programa s
+              ON s.codigo_snies = m.codigo_snies_programa::INTEGER
+             AND s.anio = 2024
+        """
+        BASE_SELECT = """SELECT m.nombre_ies, m.nombre_programa, m.municipio, m.modalidad,
+                                m.nivel_academico, m.creditos, m.duracion, m.periodicidad_admision,
+                                COALESCE(s.matriculados, 0) AS matriculados,
+                                COALESCE(s.graduados, 0)    AS graduados,
+                                COALESCE(s.inscritos, 0)    AS inscritos
+                         FROM mineducacion_programas_virtuales m"""
+        FILTERS = """AND m.estado_programa ILIKE '%activo%'
+                     AND m.modalidad ILIKE '%virtual%'
+                     AND m.nivel_academico = 'Posgrado'
+                     AND m.nombre_programa ILIKE '%especializ%'
+                     ORDER BY COALESCE(s.matriculados, 0) DESC LIMIT 50"""
+
+        PROGRAM_WHERE = {
+            94: """WHERE (m.nombre_programa ILIKE '%analytic%'
+                      OR m.nombre_programa ILIKE '%datos%'
+                      OR m.nombre_programa ILIKE '%big data%'
+                      OR m.nombre_programa ILIKE '%inteligencia de negocio%'
+                      OR m.nombre_programa ILIKE '%business intelligence%')""",
+            92: """WHERE (m.nombre_programa ILIKE '%inteligencia artificial%'
+                      OR m.nombre_programa ILIKE '%machine learning%'
+                      OR m.nombre_programa ILIKE '%ciencia de datos%'
+                      OR m.nombre_programa ILIKE '%data science%')""",
+            108: """WHERE (m.nombre_programa ILIKE '%criminolog%'
+                       OR m.nombre_programa ILIKE '%forense%'
+                       OR m.nombre_programa ILIKE '%criminalistica%'
+                       OR m.nombre_programa ILIKE '%seguridad ciudadana%')""",
+        }
+        where = PROGRAM_WHERE.get(program_id)
+        if not where:
+            return {"program_id": program_id, "competitors": [], "total": 0}
+
+        sql = f"{BASE_SELECT} {JOIN_TEMPLATE} {where} {FILTERS}"
+
+        from api.database import connection
+        with connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                rows = cur.fetchall()
+
+        competitors = []
+        for r in rows:
+            competitors.append({
+                "nombre_ies":            str(r[0] or ""),
+                "nombre_programa":       str(r[1] or ""),
+                "ciudad":                str(r[2] or ""),
+                "modalidad":             str(r[3] or ""),
+                "nivel_academico":       str(r[4] or ""),
+                "creditos":              r[5],
+                "duracion":              str(r[6] or ""),
+                "periodicidad_admision": str(r[7] or ""),
+                "matriculados":          int(r[8] or 0),
+                "graduados":             int(r[9] or 0),
+                "inscritos":             int(r[10] or 0),
+            })
+        return {"program_id": program_id, "competitors": competitors, "total": len(competitors)}
+    except Exception as e:
+        logger.error("related_universities error program_id=%s: %s", program_id, e)
+        return {"program_id": program_id, "competitors": [], "total": 0, "error": str(e)}
+
+
+@app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
+def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
+    """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
+    from api.database import fetch_all
+
+    # 1. Skills from market (job matches for this program, latest run)
+    market_rows = fetch_all(
+        """
+        SELECT skill, COUNT(*) AS frecuencia
+        FROM ml_program_job_matches,
+             jsonb_array_elements_text(skills_empleo) AS skill
+        WHERE especializacion_id = %s
+          AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches)
+          AND jsonb_typeof(skills_empleo) = 'array'
+        GROUP BY skill
+        ORDER BY frecuencia DESC
+        LIMIT 30
+        """,
+        (program_id,),
+    )
+    skills_mercado = [
+        {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
+        for r in market_rows
+        if r["skill"]
+    ]
+
+    # 2. Skills from program curriculum (microcurriculo)
+    prog_rows = fetch_all(
+        """
+        SELECT ms.skill_name, COUNT(*) AS cobertura
+        FROM microcurriculo_skills ms
+        JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+        WHERE m.specialization_id = %s
+        GROUP BY ms.skill_name
+        ORDER BY cobertura DESC
+        """,
+        (program_id,),
+    )
+    skills_programa = [
+        {"skill": r["skill_name"], "cobertura": int(r["cobertura"])}
+        for r in prog_rows
+        if r["skill_name"]
+    ]
+
+    # 3. Cross analysis
+    mercado_set = {s["skill"].lower(): s for s in skills_mercado}
+    programa_set = {s["skill"].lower(): s for s in skills_programa}
+
+    brechas = [
+        {"skill": s["skill"], "frecuencia_mercado": s["frecuencia"]}
+        for key, s in mercado_set.items()
+        if key not in programa_set
+    ]
+    fortalezas = [
+        {
+            "skill": s["skill"],
+            "frecuencia_mercado": s["frecuencia"],
+            "cobertura_programa": programa_set[key]["cobertura"],
+        }
+        for key, s in mercado_set.items()
+        if key in programa_set
+    ]
+    exclusivas_programa = [
+        {"skill": s["skill"], "cobertura": s["cobertura"]}
+        for key, s in programa_set.items()
+        if key not in mercado_set
+    ]
+
+    total_mercado = len(mercado_set)
+    cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
+
+    return {
+        "program_id":          program_id,
+        "skills_mercado":      skills_mercado,
+        "skills_programa":     skills_programa,
+        "brechas":             brechas,
+        "fortalezas":          fortalezas,
+        "exclusivas_programa": exclusivas_programa,
+        "cobertura_pct":       cobertura_pct,
+    }
+
+
 @app.get("/semantic-search", response_model=SearchResponse, tags=["search"])
 def semantic_search(
     q: str = Query(..., min_length=2, max_length=256),
@@ -402,3 +688,139 @@ def semantic_search(
     limit: int = Query(10, ge=1, le=25),
 ) -> dict[str, Any]:
     return services.semantic_search_results(q, entity_type=entity_type, limit=limit)
+
+
+# ─── Pipeline endpoints ───────────────────────────────────────────────────────
+
+# In-memory job store (Railway restarts clear it — sufficient for UX feedback)
+_PIPELINE_JOBS: dict[str, dict[str, Any]] = {}
+
+_SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts")
+_PYTHON = sys.executable
+
+ACQUISITION_STEPS = [
+    ["run_acquisition.py", "--domain", "data_analytics",        "--source", "elempleo", "--limit", "20"],
+    ["run_acquisition.py", "--domain", "data_analytics",        "--source", "magneto",  "--limit", "20"],
+    ["run_acquisition.py", "--domain", "artificial_intelligence","--source", "elempleo", "--limit", "20"],
+    ["run_acquisition.py", "--domain", "criminology",            "--source", "elempleo", "--limit", "20"],
+]
+
+
+def _ts() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _run_step(job: dict, label: str, cmd: list[str]) -> bool:
+    job["current_step"] = label
+    job["log"].append(f"[{_ts()}] START {label}")
+    try:
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=600,
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        )
+        out = (result.stdout + result.stderr).strip()
+        for line in out.splitlines()[-30:]:     # keep last 30 lines per step
+            job["log"].append(line)
+        if result.returncode != 0:
+            job["log"].append(f"[{_ts()}] ERROR {label} (exit {result.returncode})")
+            return False
+        job["log"].append(f"[{_ts()}] DONE {label}")
+        return True
+    except subprocess.TimeoutExpired:
+        job["log"].append(f"[{_ts()}] TIMEOUT {label}")
+        return False
+    except Exception as exc:
+        job["log"].append(f"[{_ts()}] EXCEPTION {label}: {exc}")
+        return False
+
+
+def _run_pipeline(job_id: str, steps: list[str], program_id: int | None) -> None:
+    job = _PIPELINE_JOBS[job_id]
+    job["status"] = "running"
+    job["started_at"] = _ts()
+    errors: list[str] = []
+
+    try:
+        # Step 1 — load microcurrículos from Excel
+        if "microcurriculos" in steps:
+            ok = _run_step(
+                job,
+                "microcurriculos",
+                [_PYTHON, os.path.join(_SCRIPTS_DIR, "load_microcurriculo_excel.py"), "--execute", "--yes"],
+            )
+            if not ok:
+                errors.append("microcurriculos")
+
+        # Step 2 — acquisition
+        if "acquisition" in steps:
+            for args in ACQUISITION_STEPS:
+                script = args[0]
+                label = f"acquisition:{args[2]}:{args[4]}"
+                ok = _run_step(
+                    job, label,
+                    [_PYTHON, os.path.join(_SCRIPTS_DIR, script)] + args[1:],
+                )
+                if not ok:
+                    errors.append(label)
+
+        # Step 3 — matching
+        if "matching" in steps:
+            match_cmd = [
+                _PYTHON,
+                os.path.join(_SCRIPTS_DIR, "run_semantic_matching.py"),
+                "--persist", "--min-score", "40",
+            ]
+            if program_id:
+                match_cmd += ["--program-id", str(program_id)]
+            ok = _run_step(job, "matching", match_cmd)
+            if not ok:
+                errors.append("matching")
+
+    except Exception as exc:
+        job["log"].append(f"[{_ts()}] FATAL: {exc}")
+        errors.append("fatal")
+
+    job["status"] = "error" if errors else "done"
+    job["finished_at"] = _ts()
+    job["errors"] = errors
+    job["current_step"] = None
+
+
+@app.post("/api/pipeline/run", tags=["pipeline"])
+def pipeline_run(
+    background_tasks: BackgroundTasks,
+    body: dict[str, Any] = {},
+) -> _UnicodeJSONResponse:
+    steps_raw = body.get("steps") or ["microcurriculos", "acquisition", "matching"]
+    program_id = body.get("program_id") or None
+    if program_id is not None:
+        try:
+            program_id = int(program_id)
+        except (TypeError, ValueError):
+            program_id = None
+
+    job_id = str(uuid.uuid4())[:8]
+    _PIPELINE_JOBS[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "steps": steps_raw,
+        "program_id": program_id,
+        "created_at": _ts(),
+        "started_at": None,
+        "finished_at": None,
+        "current_step": None,
+        "errors": [],
+        "log": [],
+    }
+    background_tasks.add_task(_run_pipeline, job_id, steps_raw, program_id)
+    return _UnicodeJSONResponse({"job_id": job_id, "status": "queued"})
+
+
+@app.get("/api/pipeline/status/{job_id}", tags=["pipeline"])
+def pipeline_status(job_id: str) -> _UnicodeJSONResponse:
+    job = _PIPELINE_JOBS.get(job_id)
+    if not job:
+        return _UnicodeJSONResponse({"error": "job not found"}, status_code=404)  # type: ignore[name-defined]
+    # Return last 50 log lines to keep response light
+    payload = {**job, "log": job["log"][-50:]}
+    return _UnicodeJSONResponse(payload)  # type: ignore[name-defined]

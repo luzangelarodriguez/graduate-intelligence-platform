@@ -1,7 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd graduate_intelligence_platform/frontend && npm install && npm run build",
-  "outputDirectory": "graduate_intelligence_platform/frontend/dist",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://graduate-intelligence-platform-production.up.railway.app/api/:path*" },
     { "source": "/:path*", "destination": "/index.html" }
