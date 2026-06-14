@@ -84,6 +84,7 @@ const PROGRAMS = [
   { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 92,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
+  { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -93,6 +94,7 @@ const FALLBACK: Summary = {
     { id: 92,  nombre: 'Inteligencia Artificial',       matches_total: 38, score_promedio: 71.2, score_maximo: 88.4, labels: { high: 18, medium: 14, low: 6 } },
     { id: 94,  nombre: 'Visual Analytics and Big Data', matches_total: 31, score_promedio: 68.5, score_maximo: 85.1, labels: { high: 14, medium: 12, low: 5 } },
     { id: 108, nombre: 'Especialización en Criminología', matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4, medium: 10, low: 8 } },
+    { id: 20,  nombre: 'Neuropsicología y Educación',    matches_total: 0,  score_promedio: 0,    score_maximo: 0,    labels: { high: 0, medium: 0,  low: 0  } },
   ],
   top_matches: [
     { programa: 'Visual Analytics', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },

@@ -66,9 +66,16 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     ],
     "technology": ["desarrollador software", "ingeniero de sistemas", "programador"],
     "business": ["analista financiero", "gerente de proyectos", "consultor empresarial"],
+    "education": [
+        "neuropsicólogo educativo",
+        "psicólogo educativo",
+        "especialista necesidades educativas especiales",
+        "docente inclusión educativa",
+        "terapeuta aprendizaje",
+    ],
 }
 
-DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity"]
+DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education"]
 
 
 # ---------------------------------------------------------------------------
