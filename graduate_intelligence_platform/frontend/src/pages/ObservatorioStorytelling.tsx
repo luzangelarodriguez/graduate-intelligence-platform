@@ -84,6 +84,7 @@ const PROGRAMS = [
   { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 92,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
+  { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -93,6 +94,7 @@ const FALLBACK: Summary = {
     { id: 92,  nombre: 'Inteligencia Artificial',       matches_total: 38, score_promedio: 71.2, score_maximo: 88.4, labels: { high: 18, medium: 14, low: 6 } },
     { id: 94,  nombre: 'Visual Analytics and Big Data', matches_total: 31, score_promedio: 68.5, score_maximo: 85.1, labels: { high: 14, medium: 12, low: 5 } },
     { id: 108, nombre: 'Especialización en Criminología', matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4, medium: 10, low: 8 } },
+    { id: 20,  nombre: 'Neuropsicología y Educación',    matches_total: 0,  score_promedio: 0,    score_maximo: 0,    labels: { high: 0, medium: 0,  low: 0  } },
   ],
   top_matches: [
     { programa: 'Visual Analytics', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },
@@ -194,6 +196,15 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
       { skill: 'Criminología', cobertura: 4 }, { skill: 'Victimología', cobertura: 3 },
       { skill: 'Estadística', cobertura: 3 },
     ],
+  },
+  20: {
+    program_id: 20,
+    skills_mercado:   [],
+    skills_programa:  [],
+    brechas:          [],
+    fortalezas:       [],
+    exclusivas_programa: [],
+    cobertura_pct:    0,
   },
 };
 
@@ -426,7 +437,7 @@ export default function ObservatorioStorytelling() {
     fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: SkillsAnalysis) => setSkills(d))
-      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? FALLBACK_SKILLS[94]));
+      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? null));
   }, [programaId]);
 
   // fetch universities
@@ -453,7 +464,7 @@ export default function ObservatorioStorytelling() {
     fetch(`${API}/api/pipeline/run`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ program_id: programaId, steps: ['microcurriculos', 'acquisition', 'matching'] }),
+      body: JSON.stringify({ program_id: programaId, steps: ['microcurriculos', 'matching'] }),
     })
       .then(r => r.json())
       .then((d: { job_id: string }) => {
@@ -563,35 +574,37 @@ export default function ObservatorioStorytelling() {
               style={{ background: 'rgba(255,255,255,0.1)', color: C.light, border: `1px solid rgba(255,255,255,0.15)` }}>
               Run #{d.run_id} · {d.fecha}
             </span>
-            {/* Pipeline button */}
+            {/* Last update info button */}
             <button
-              onClick={startPipeline}
-              disabled={pipelineStatus === 'running' || pipelineStatus === 'queued' || pipelineStatus === 'launching'}
+              onClick={() => setPipelineLogOpen(o => !o)}
               className="rounded-full px-3 py-1.5 text-xs font-bold transition-all"
               style={{
-                background: pipelineStatus === 'done' ? 'rgba(134,239,172,0.2)'
-                  : pipelineStatus === 'error' ? 'rgba(252,165,165,0.2)'
-                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? 'rgba(147,197,253,0.2)'
-                  : 'rgba(255,255,255,0.1)',
-                color: pipelineStatus === 'done' ? '#86efac'
-                  : pipelineStatus === 'error' ? '#fca5a5'
-                  : pipelineStatus === 'running' || pipelineStatus === 'queued' ? '#93c5fd'
-                  : C.light,
+                background: 'rgba(255,255,255,0.1)',
+                color: C.light,
                 border: '1px solid rgba(255,255,255,0.15)',
-                cursor: (pipelineStatus === 'running' || pipelineStatus === 'queued') ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
               }}
             >
-              {pipelineStatus === 'launching' ? '⏳ Iniciando…'
-                : pipelineStatus === 'queued'  ? '⏳ En cola…'
-                : pipelineStatus === 'running' ? `⚙ ${pipelineStep ?? 'Procesando'}…`
-                : pipelineStatus === 'done'    ? '✓ Actualizado'
-                : pipelineStatus === 'error'   ? '⚠ Error'
-                : '↻ Actualizar análisis'}
+              ↻ Ver última actualización
             </button>
           </div>
         </div>
+        {pipelineLogOpen && (
+          <div className="relative z-10 max-w-4xl mx-auto px-1 pb-2">
+            <div className="rounded-xl px-4 py-3"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: C.light }}>
+                Último análisis de matching: <span style={{ color: '#86efac' }}>{d.fecha ?? '—'}</span>
+              </p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                La adquisición de nuevos empleos y el matching semántico corren automáticamente cada noche via GitHub Actions.
+                El matching con SBERT requiere más RAM de la disponible en Railway y se ejecuta localmente o en el runner de GitHub.
+              </p>
+            </div>
+          </div>
+        )}
 
-        {/* Pipeline progress panel */}
+        {/* Pipeline progress panel (microcurrículos only) */}
         {pipelineStatus !== 'idle' && (
           <div className="relative z-10 max-w-4xl mx-auto mt-2 mb-0">
             <div className="rounded-xl px-4 py-3 flex items-center gap-3"
@@ -601,10 +614,10 @@ export default function ObservatorioStorytelling() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold" style={{ color: C.light }}>
-                  {pipelineStatus === 'queued'  && 'Pipeline en cola — iniciando…'}
+                  {pipelineStatus === 'queued'  && 'Cargando microcurrículos — iniciando…'}
                   {pipelineStatus === 'running' && `Ejecutando: ${pipelineStep ?? '…'}`}
-                  {pipelineStatus === 'done'    && '✓ Pipeline completado — recargando datos…'}
-                  {pipelineStatus === 'error'   && '⚠ Pipeline completado con errores'}
+                  {pipelineStatus === 'done'    && '✓ Microcurrículos cargados'}
+                  {pipelineStatus === 'error'   && '⚠ Error al cargar microcurrículos'}
                 </p>
                 {pipelineJobId && (
                   <p className="text-[10px] text-blue-400">job: {pipelineJobId}</p>
@@ -763,11 +776,13 @@ export default function ObservatorioStorytelling() {
                 );
               })}
               {skills.skills_programa.length === 0 && (
-                <p className="text-sm text-gray-400 py-6 text-center">No se identificaron skills en el plan de estudios.</p>
+                <p className="text-sm text-gray-400 py-6 text-center">Cargando competencias del programa... (ejecuta el pipeline para poblar los datos)</p>
               )}
             </div>
 
-            <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ')}.`} />
+            {skills.skills_programa.length > 0 && (
+              <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ') || 'por determinar'}.`} />
+            )}
           </>
         )}
       </Section>
