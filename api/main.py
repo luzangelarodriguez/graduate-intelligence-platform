@@ -602,6 +602,15 @@ def related_universities(program_id: int) -> dict[str, Any]:
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
+    import unicodedata as _ud
+
+    def _norm(s: str) -> str:
+        """Lowercase + strip accents for cross-set comparison."""
+        return "".join(
+            c for c in _ud.normalize("NFD", s.lower())
+            if _ud.category(c) != "Mn"
+        )
+
     _EMPTY = {
         "program_id":          program_id,
         "skills_mercado":      [],
@@ -614,20 +623,28 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     try:
         from api.database import fetch_all
 
-        # 1. Skills from market (job matches for this program, latest run)
+        # 1. Skills from jobs that actually matched THIS program in the latest run
         market_rows = fetch_all(
             """
             SELECT skill, COUNT(*) AS frecuencia
-            FROM ml_program_job_matches,
-                 jsonb_array_elements_text(skills_empleo) AS skill
-            WHERE especializacion_id = %s
-              AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches)
-              AND jsonb_typeof(skills_empleo) = 'array'
+            FROM (
+                SELECT jsonb_array_elements_text(skills_empleo) AS skill
+                FROM ml_program_job_matches
+                WHERE especializacion_id = %s
+                  AND run_id = (
+                      SELECT MAX(run_id) FROM ml_program_job_matches
+                      WHERE especializacion_id = %s
+                  )
+                  AND skills_empleo IS NOT NULL
+                  AND skills_empleo != '[]'::jsonb
+                  AND jsonb_typeof(skills_empleo) = 'array'
+            ) t
             GROUP BY skill
+            HAVING COUNT(*) >= 2
             ORDER BY frecuencia DESC
             LIMIT 30
             """,
-            (program_id,),
+            (program_id, program_id),
         )
         skills_mercado = [
             {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
@@ -656,31 +673,31 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             if r["skill_name"]
         ]
 
-        # 3. Cross analysis
-        mercado_set = {s["skill"].lower(): s for s in skills_mercado}
-        programa_set = {s["skill"].lower(): s for s in skills_programa}
+        # 3. Cross analysis — normalize both sides before comparing
+        mercado_norm  = {_norm(s["skill"]): s for s in skills_mercado}
+        programa_norm = {_norm(s["skill"]): s for s in skills_programa}
 
-        brechas = [
-            {"skill": s["skill"], "frecuencia_mercado": s["frecuencia"]}
-            for key, s in mercado_set.items()
-            if key not in programa_set
-        ]
         fortalezas = [
             {
                 "skill": s["skill"],
                 "frecuencia_mercado": s["frecuencia"],
-                "cobertura_programa": programa_set[key]["cobertura"],
+                "cobertura_programa": programa_norm[key]["cobertura"],
             }
-            for key, s in mercado_set.items()
-            if key in programa_set
+            for key, s in mercado_norm.items()
+            if key in programa_norm
+        ]
+        brechas = [
+            {"skill": s["skill"], "frecuencia_mercado": s["frecuencia"]}
+            for key, s in mercado_norm.items()
+            if key not in programa_norm
         ]
         exclusivas_programa = [
             {"skill": s["skill"], "cobertura": s["cobertura"]}
-            for key, s in programa_set.items()
-            if key not in mercado_set
+            for key, s in programa_norm.items()
+            if key not in mercado_norm
         ]
 
-        total_mercado = len(mercado_set)
+        total_mercado = len(mercado_norm)
         cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
 
         return {
