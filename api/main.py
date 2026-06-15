@@ -636,13 +636,16 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         ]
 
         # 2. Skills from program curriculum (microcurriculo)
+        # Column is skill_normalized (with skill_original as fallback) per load_microcurriculo_excel.py
         prog_rows = fetch_all(
             """
-            SELECT ms.skill_name, COUNT(*) AS cobertura
+            SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
+                   COUNT(*) AS cobertura
             FROM microcurriculo_skills ms
             JOIN microcurriculos m ON m.id = ms.microcurriculo_id
             WHERE m.specialization_id = %s
-            GROUP BY ms.skill_name
+              AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
+            GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
             ORDER BY cobertura DESC
             """,
             (program_id,),
