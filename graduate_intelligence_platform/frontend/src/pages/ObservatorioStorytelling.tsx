@@ -1094,62 +1094,86 @@ export default function ObservatorioStorytelling() {
                 </p>
               </div>
             </div>
-            <div className="space-y-4">
-              {[
-                {
-                  n: 1,
-                  action: `Incorporar ${brechasAlta.slice(0, 2).map(b => b.skill).join(' y ') || 'skills de alta prioridad'} como contenidos obligatorios.`,
-                  detail: 'Mayor demanda identificada en vacantes. Sin presencia actual en el currículo.',
-                  urgency: 'Urgente',
-                  color: '#dc2626', urgBg: '#fee2e2',
-                },
-                {
-                  n: 2,
-                  action: 'Actualizar los módulos de herramientas para incluir versiones actuales de las plataformas cloud.',
-                  detail: `AWS, Azure y GCP aparecen en ${skills?.skills_mercado.find(s => s.skill.toLowerCase().includes('aws'))?.frecuencia ?? '—'} vacantes.`,
-                  urgency: 'Alta',
-                  color: '#d97706', urgBg: '#fef3c7',
-                },
-                {
-                  n: 3,
-                  action: 'Incorporar un módulo de MLOps y despliegue de modelos en producción.',
-                  detail: 'Competencia emergente con alta frecuencia en perfiles de IA y datos.',
-                  urgency: 'Alta',
-                  color: '#d97706', urgBg: '#fef3c7',
-                },
-                {
-                  n: 4,
-                  action: `Profundizar la cobertura de ${skills?.fortalezas[0]?.skill ?? 'la principal fortaleza'} de nivel básico a avanzado.`,
-                  detail: 'Presencia en currículo confirmada. Potencial de diferenciación con mayor profundidad.',
+            {(() => {
+              // Build dynamic recommendations from real skills data
+              const topBrechas = [...(skills?.brechas ?? [])]
+                .sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0))
+                .slice(0, 3);
+              const topFortalezas = [...(skills?.fortalezas ?? [])]
+                .sort((a, b) => (b.cobertura_programa ?? 0) - (a.cobertura_programa ?? 0))
+                .slice(0, 3);
+              const ruido = (skills?.brechas ?? []).filter(
+                b => classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3
+              );
+
+              type Rec = { action: string; detail: string; urgency: string; color: string; urgBg: string };
+              const recs: Rec[] = [];
+
+              // 1. Top brechas → incorporar
+              topBrechas.forEach(b => {
+                recs.push({
+                  action: `Incorporar "${b.skill}" como contenido del programa.`,
+                  detail: `${b.frecuencia_mercado ?? 0} vacante${(b.frecuencia_mercado ?? 0) !== 1 ? 's' : ''} en el mercado lo demandan actualmente y no está cubierto en el currículo.`,
+                  urgency: (b.frecuencia_mercado ?? 0) >= 8 ? 'Urgente' : 'Alta',
+                  color: (b.frecuencia_mercado ?? 0) >= 8 ? '#dc2626' : '#d97706',
+                  urgBg: (b.frecuencia_mercado ?? 0) >= 8 ? '#fee2e2' : '#fef3c7',
+                });
+              });
+
+              // 2. Top fortalezas → profundizar
+              topFortalezas.forEach(f => {
+                recs.push({
+                  action: `Profundizar "${f.skill}" — ya está en el currículo y el mercado lo valora.`,
+                  detail: `Presente en ${f.cobertura_programa} materia${f.cobertura_programa !== 1 ? 's' : ''} del programa y demandado en ${f.frecuencia_mercado} vacante${f.frecuencia_mercado !== 1 ? 's' : ''}. Potencial de diferenciación.`,
                   urgency: 'Media',
-                  color: '#2563eb', urgBg: '#dbeafe',
-                },
-                {
-                  n: 5,
-                  action: 'Revisar contenidos con baja o nula demanda para liberar espacio curricular.',
-                  detail: 'El espacio liberado permite incorporar nuevas competencias sin aumentar la carga total.',
-                  urgency: 'Media',
-                  color: '#2563eb', urgBg: '#dbeafe',
-                },
-              ].map(rec => (
-                <div key={rec.n} className="rounded-xl p-4 flex gap-4"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <span className="text-2xl font-black flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                    {rec.n}
-                  </span>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-3 mb-1">
-                      <p className="text-sm font-semibold text-white leading-snug">{rec.action}</p>
-                      <span className="rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0"
-                        style={{ background: rec.urgBg, color: rec.color }}>
-                        {rec.urgency}
+                  color: '#2563eb',
+                  urgBg: '#dbeafe',
+                });
+              });
+
+              // 3. Ruido → verificar antes de incluir
+              if (ruido.length > 0) {
+                recs.push({
+                  action: `Revisar pertinencia de: ${ruido.map(b => `"${b.skill}"`).join(', ')} antes de incorporar.`,
+                  detail: 'Estas skills aparecen en pocas vacantes y no tienen categoría clara — pueden ser ruido de mercado contextual.',
+                  urgency: 'Verificar',
+                  color: '#92400e',
+                  urgBg: '#fef9c3',
+                });
+              }
+
+              // 4. Recomendación genérica final
+              recs.push({
+                action: 'Actualizar microcurrículo con evidencia de este análisis en la próxima revisión curricular.',
+                detail: 'Documentar decisiones tomadas y skills incorporadas para trazabilidad del proceso de renovación curricular.',
+                urgency: 'Planear',
+                color: '#6b7280',
+                urgBg: 'rgba(255,255,255,0.1)',
+              });
+
+              return (
+                <div className="space-y-4">
+                  {recs.map((rec, i) => (
+                    <div key={i} className="rounded-xl p-4 flex gap-4"
+                      style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <span className="text-2xl font-black flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                        {i + 1}
                       </span>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between gap-3 mb-1">
+                          <p className="text-sm font-semibold text-white leading-snug">{rec.action}</p>
+                          <span className="rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0"
+                            style={{ background: rec.urgBg, color: rec.color }}>
+                            {rec.urgency}
+                          </span>
+                        </div>
+                        <p className="text-xs text-blue-300">{rec.detail}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-blue-300">{rec.detail}</p>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </>
         )}
       </Section>
