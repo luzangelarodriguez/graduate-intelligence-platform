@@ -53,6 +53,8 @@ jobs:
         run: |
           python scripts/run_acquisition.py --source computrabajo --domain data_analytics --limit 20
           python scripts/run_acquisition.py --source computrabajo --domain artificial_intelligence --limit 20
+          python scripts/run_acquisition.py --source computrabajo --domain criminology --limit 15
+          python scripts/run_acquisition.py --source computrabajo --domain education --limit 15
 
       - name: Acquisition - Indeed Colombia
         continue-on-error: true
@@ -71,14 +73,6 @@ jobs:
       - name: Acquisition - OCC
         continue-on-error: true
         run: python scripts/run_acquisition.py --source occ --domain data_analytics --limit 20
-
-      - name: Acquisition - Computrabajo (requests)
-        continue-on-error: true
-        run: |
-          python scripts/run_acquisition.py --source computrabajo --domain data_analytics --limit 20
-          python scripts/run_acquisition.py --source computrabajo --domain artificial_intelligence --limit 20
-          python scripts/run_acquisition.py --source computrabajo --domain criminology --limit 15
-          python scripts/run_acquisition.py --source computrabajo --domain education --limit 15
 
       - name: Acquisition - BeBee Colombia
         continue-on-error: true
