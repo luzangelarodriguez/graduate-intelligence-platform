@@ -611,6 +611,11 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             if _ud.category(c) != "Mn"
         )
 
+    def _match(a: str, b: str) -> bool:
+        """Exact or prefix match (min 6 chars) after normalization."""
+        na, nb = _norm(a), _norm(b)
+        return na == nb or (len(na) >= 6 and (na.startswith(nb) or nb.startswith(na)))
+
     _EMPTY = {
         "program_id":          program_id,
         "skills_mercado":      [],
@@ -673,31 +678,37 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             if r["skill_name"]
         ]
 
-        # 3. Cross analysis — normalize both sides before comparing
-        mercado_norm  = {_norm(s["skill"]): s for s in skills_mercado}
-        programa_norm = {_norm(s["skill"]): s for s in skills_programa}
+        # 3. Cross analysis — prefix match after normalization
+        def _find_prog_match(m_skill: str):
+            """Return matching programa skill or None."""
+            for p in skills_programa:
+                if _match(m_skill, p["skill"]):
+                    return p
+            return None
 
-        fortalezas = [
-            {
-                "skill": s["skill"],
-                "frecuencia_mercado": s["frecuencia"],
-                "cobertura_programa": programa_norm[key]["cobertura"],
-            }
-            for key, s in mercado_norm.items()
-            if key in programa_norm
-        ]
-        brechas = [
-            {"skill": s["skill"], "frecuencia_mercado": s["frecuencia"]}
-            for key, s in mercado_norm.items()
-            if key not in programa_norm
-        ]
+        fortalezas = []
+        brechas = []
+        matched_prog_skills: set[str] = set()
+
+        for m in skills_mercado:
+            p = _find_prog_match(m["skill"])
+            if p:
+                fortalezas.append({
+                    "skill": m["skill"],
+                    "frecuencia_mercado": m["frecuencia"],
+                    "cobertura_programa": p["cobertura"],
+                })
+                matched_prog_skills.add(p["skill"])
+            else:
+                brechas.append({"skill": m["skill"], "frecuencia_mercado": m["frecuencia"]})
+
         exclusivas_programa = [
             {"skill": s["skill"], "cobertura": s["cobertura"]}
-            for key, s in programa_norm.items()
-            if key not in mercado_norm
+            for s in skills_programa
+            if s["skill"] not in matched_prog_skills
         ]
 
-        total_mercado = len(mercado_norm)
+        total_mercado = len(skills_mercado)
         cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
 
         return {

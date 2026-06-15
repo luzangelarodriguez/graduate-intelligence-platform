@@ -223,25 +223,44 @@ const SKILL_CATS = {
     'spark','databricks','tensorflow','r','hadoop','kafka','looker','salesforce',
     'pytorch','kubernetes','git','postgresql','mysql','mongodb','redis',
     'numpy','pandas','sklearn','scikit-learn','jupyter','colab','sap','crm',
+    'spss','wais','wisc','rorschach','bender',
   ]),
   competencia: new Set([
     'machine learning','deep learning','nlp','data visualization','big data','etl',
     'business intelligence','analisis de datos','data engineering','mlops',
     'estadistica','data warehouse','data lake','cloud computing','feature engineering',
     'computer vision','forecasting','data governance','data mining','series de tiempo',
+    // Psicología / Neuropsicología
+    'neuropsicolog','neuropsicologia','cognitiv','funciones ejecutivas','funciones superiores',
+    'evaluacion','intervencion','psicodiagnostico','psicometria',
+    'aprendizaje','memoria','atencion','percepcion','lenguaje',
+    'trastorno','discapacidad','neuroling','rehabilitacion',
+    'psicologia','diagnostico','evaluacion neuropsicologica',
   ]),
   habilidad: new Set([
     'gestion','liderazgo','comunicacion','trabajo en equipo','pensamiento critico',
     'innovacion','negociacion','planeacion','scrum','agile','kanban',
     'gestion de proyectos','orientacion a resultados','toma de decisiones',
+    // Educación
+    'educacion','orientacion','diversidad','inclusion','desarrollo','inteligencia',
+    'pedagogia','docencia','didactica','ensenanza','formacion',
   ]),
 };
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
 function classifySkill(s: string): SkillCat {
   const key = s.toLowerCase();
+  // Exact match first
   if (SKILL_CATS.herramienta.has(key)) return 'herramienta';
   if (SKILL_CATS.competencia.has(key)) return 'competencia';
   if (SKILL_CATS.habilidad.has(key))   return 'habilidad';
+  // Prefix/stem matching (term in set is a stem of key, or key is a stem of term)
+  for (const cat of ['herramienta', 'competencia', 'habilidad'] as SkillCat[]) {
+    for (const term of SKILL_CATS[cat]) {
+      if (term.length >= 6 && (key.startsWith(term) || term.startsWith(key))) {
+        return cat;
+      }
+    }
+  }
   return 'otro';
 }
 const CAT_STYLE: Record<SkillCat, { bg: string; color: string; icon: string; label: string }> = {
