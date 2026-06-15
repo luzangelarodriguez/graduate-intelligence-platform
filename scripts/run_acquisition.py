@@ -90,6 +90,9 @@ def content_hash(job: dict[str, Any]) -> str:
 
 def _get_search_terms_for_domain(domain: str, crawler_plans: dict[str, Any] | None) -> list[str]:
     """Extract Spanish search terms from the intelligence plans, falling back to hardcoded list."""
+    # Always use hardcoded terms for domains not covered by the AI planner
+    if domain in ("education", "cybersecurity"):
+        return FALLBACK_QUERIES.get(domain, [])
     if crawler_plans:
         # Try elempleo plan first (Colombian portal with search_terms)
         for source_key in ("elempleo", "computrabajo", "magneto", "occ", "ticjob", "indeed_co", "google_jobs"):
