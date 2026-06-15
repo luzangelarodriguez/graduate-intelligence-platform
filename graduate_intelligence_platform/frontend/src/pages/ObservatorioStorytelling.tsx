@@ -901,10 +901,19 @@ export default function ObservatorioStorytelling() {
                         </span>
                       </p>
                       <div className="space-y-1.5">
-                        {catList.map(b => (
+                        {catList.map(b => {
+                          const esRuido = classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
+                          return (
                           <div key={b.skill} className="flex items-center gap-3 rounded-xl px-4 py-2"
                             style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
                             <span className="text-sm font-semibold flex-1 text-red-800">{b.skill}</span>
+                            {esRuido && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                                style={{ background: '#fef9c3', color: '#92400e', border: '1px solid #fde68a' }}
+                                title="Skill genérica o de bajo contexto — verificar si aplica al programa">
+                                ⚠ Verificar relevancia
+                              </span>
+                            )}
                             {b.frecuencia_mercado != null && b.frecuencia_mercado > 0 && (
                               <>
                                 <div className="h-1.5 rounded-full w-20 flex-shrink-0" style={{ background: '#fecaca' }}>
@@ -917,7 +926,8 @@ export default function ObservatorioStorytelling() {
                               </>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -1066,6 +1076,24 @@ export default function ObservatorioStorytelling() {
             <p className="text-sm text-blue-200 mb-6">
               Acciones prioritarias para mejorar la pertinencia curricular del programa.
             </p>
+            {/* Nota metodológica */}
+            <div className="rounded-xl px-5 py-4 mb-6 flex gap-3"
+              style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.35)' }}>
+              <span className="text-lg flex-shrink-0 mt-0.5">📋</span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#fbbf24' }}>
+                  Nota metodológica
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#fde68a' }}>
+                  Las skills identificadas como "faltantes" provienen de vacantes del mercado laboral activo.
+                  Algunas pueden representar ruido contextual (ej: <em>"financiero"</em> en clínicas IPS,
+                  {' '}<em>"sas"</em> como herramienta estadística alternativa) y no necesariamente requieren
+                  actualización curricular. El comité debe evaluar la pertinencia académica de cada brecha.
+                  Las skills marcadas con <span className="font-bold">⚠ Verificar relevancia</span> son las de
+                  mayor riesgo de ser ruido (clasificación genérica + menos de 3 vacantes).
+                </p>
+              </div>
+            </div>
             <div className="space-y-4">
               {[
                 {
