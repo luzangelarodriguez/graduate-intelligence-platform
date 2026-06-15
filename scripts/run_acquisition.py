@@ -73,8 +73,8 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
         "psicólogo educativo",
         "dificultades de aprendizaje",
         "necesidades educativas especiales",
-        "inclusión educativa",
-        "docente neuropsicología",
+        "docente psicología",
+        "terapeuta ocupacional educativo",
     ],
 }
 
@@ -99,7 +99,7 @@ def _get_search_terms_for_domain(domain: str, crawler_plans: dict[str, Any] | No
         return FALLBACK_QUERIES.get(domain, [])
     if crawler_plans:
         # Try elempleo plan first (Colombian portal with search_terms)
-        for source_key in ("elempleo", "computrabajo", "magneto", "occ", "ticjob", "indeed_co", "google_jobs"):
+        for source_key in ("elempleo", "computrabajo", "magneto", "occ", "ticjob", "indeed_co"):
             plan = crawler_plans.get(source_key, {})
             if plan:
                 terms = plan.get("search_terms") or plan.get("keywords") or []
@@ -327,9 +327,6 @@ def run_acquisition(
         if source_name == "elempleo":
             from scrapers.sources.elempleo_scraper import scrape_jobs
             scrape_fn = scrape_jobs
-        elif source_name == "google_jobs":
-            from scrapers.sources.google_jobs_scraper import scrape_jobs
-            scrape_fn = scrape_jobs
         else:
             # Generic lazy import
             import importlib
@@ -512,7 +509,7 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Scraper to use (default: elempleo). "
             "Available: elempleo, magneto, magneto_api, computrabajo, indeed_co, "
-            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship, google_jobs"
+            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship"
         ),
     )
     parser.add_argument(
