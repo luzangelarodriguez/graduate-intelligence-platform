@@ -852,13 +852,30 @@ export default function ObservatorioStorytelling() {
 
                 {/* SNIES benchmark if available */}
                 {univ && (
-                  <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>
                       Contexto SNIES — {univ.total} programas similares
                     </p>
-                    <p className="text-xs text-blue-300">
+                    <p className="text-xs text-blue-300 mb-3">
                       Competidores activos en modalidad virtual · Colombia 2024
                     </p>
+                    {univ.competitors.length > 0 && (
+                      <div className="space-y-2">
+                        {univ.competitors.slice(0, 6).map((c, i) => (
+                          <div key={i} className="flex items-start justify-between gap-3 rounded-lg px-3 py-2"
+                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-white truncate">{c.nombre_ies}</p>
+                              <p className="text-[10px] text-blue-400 truncate">{c.nombre_programa}</p>
+                            </div>
+                            <div className="flex-shrink-0 text-right">
+                              <p className="text-xs font-bold" style={{ color: C.gold }}>{(c.matriculados ?? 0).toLocaleString('es-CO')}</p>
+                              <p className="text-[10px] text-blue-400">{(c.graduados ?? 0).toLocaleString('es-CO')} grad.</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
