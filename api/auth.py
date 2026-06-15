@@ -343,9 +343,15 @@ def logout(current_user: AuthenticatedUser = Depends(get_current_user), credenti
     return {"status": "ok", "detail": detail}
 
 
-@auth_router.get("/me", response_model=AuthenticatedUser, summary="Return the authenticated user profile")
-def me(current_user: AuthenticatedUser = Depends(get_current_user)) -> dict[str, Any]:
-    return current_user.model_dump()
+@auth_router.get("/me", summary="Return the authenticated user profile or anonymous stub")
+def me(credentials: HTTPAuthorizationCredentials | None = Security(_bearer_scheme)) -> dict[str, Any]:
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        return {"user": "anonymous", "authenticated": False}
+    try:
+        user = get_current_user(credentials)
+        return user.model_dump()
+    except HTTPException:
+        return {"user": "anonymous", "authenticated": False}
 
 
 def ensure_admin_user(*, email: str, password: str, full_name: str, role_name: str = "admin") -> dict[str, Any]:
