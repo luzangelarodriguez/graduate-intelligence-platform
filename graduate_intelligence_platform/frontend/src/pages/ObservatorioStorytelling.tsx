@@ -254,7 +254,7 @@ function classifySkill(s: string): SkillCat {
   if (SKILL_CATS.competencia.has(key)) return 'competencia';
   if (SKILL_CATS.habilidad.has(key))   return 'habilidad';
   // Prefix/stem matching (term in set is a stem of key, or key is a stem of term)
-  for (const cat of ['herramienta', 'competencia', 'habilidad'] as SkillCat[]) {
+  for (const cat of ['herramienta', 'competencia', 'habilidad'] as ('herramienta' | 'competencia' | 'habilidad')[]) {
     for (const term of SKILL_CATS[cat]) {
       if (term.length >= 6 && (key.startsWith(term) || term.startsWith(key))) {
         return cat;
