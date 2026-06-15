@@ -855,7 +855,7 @@ export default function ObservatorioStorytelling() {
         {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (
           <>
             <p className="text-sm text-gray-600 mb-6">
-              Skills con alta demanda en el mercado que el programa aún no cubre.
+              Skills con alta demanda en el mercado que el programa aún no cubre, agrupadas por tipo.
             </p>
 
             {skills.brechas.length === 0 ? (
@@ -865,38 +865,44 @@ export default function ObservatorioStorytelling() {
               </div>
             ) : (
               <>
-                {brechasAlta.length > 0 && (
-                  <div className="mb-6">
-                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#dc2626' }}>
-                      Prioridad Alta — Frecuencia ≥ 10
-                    </p>
-                    <div className="space-y-2">
-                      {brechasAlta.map(b => (
-                        <div key={b.skill} className="flex items-center gap-3 rounded-xl px-4 py-2.5"
-                          style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
-                          <span className="text-sm font-semibold flex-1 text-red-800">{b.skill}</span>
-                          <div className="h-2 rounded-full w-24" style={{ background: '#fecaca' }}>
-                            <div className="h-full rounded-full" style={{ width: `${(b.frecuencia_mercado / maxFrecuencia) * 100}%`, background: '#dc2626' }} />
+                {/* Group brechas by category — same logic as S3 */}
+                {(['herramienta', 'competencia', 'habilidad', 'otro'] as SkillCat[]).map(cat => {
+                  const st      = CAT_STYLE[cat];
+                  const catList = skills.brechas.filter(b => classifySkill(b.skill) === cat);
+                  if (catList.length === 0) return null;
+                  return (
+                    <div key={cat} className="mb-6">
+                      <p className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"
+                        style={{ color: '#dc2626' }}>
+                        <span>{st.icon}</span>
+                        {st.label}s faltantes
+                        <span className="ml-1 rounded-full px-2 py-0.5 text-[10px]"
+                          style={{ background: '#fee2e2', color: '#dc2626' }}>
+                          {catList.length}
+                        </span>
+                      </p>
+                      <div className="space-y-1.5">
+                        {catList.map(b => (
+                          <div key={b.skill} className="flex items-center gap-3 rounded-xl px-4 py-2"
+                            style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
+                            <span className="text-sm font-semibold flex-1 text-red-800">{b.skill}</span>
+                            {b.frecuencia_mercado != null && b.frecuencia_mercado > 0 && (
+                              <>
+                                <div className="h-1.5 rounded-full w-20 flex-shrink-0" style={{ background: '#fecaca' }}>
+                                  <div className="h-full rounded-full"
+                                    style={{ width: `${Math.min((b.frecuencia_mercado / maxFrecuencia) * 100, 100)}%`, background: '#dc2626' }} />
+                                </div>
+                                <span className="text-xs font-bold text-red-500 flex-shrink-0">
+                                  {b.frecuencia_mercado} vacante{b.frecuencia_mercado !== 1 ? 's' : ''}
+                                </span>
+                              </>
+                            )}
                           </div>
-                          <span className="text-xs font-bold text-red-600">{b.frecuencia_mercado} vacantes</span>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-
-                {brechasMedia.length > 0 && (
-                  <div className="mb-6">
-                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: C.gold }}>
-                      Prioridad Media — Frecuencia &lt; 10
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {brechasMedia.map(b => (
-                        <SkillTag key={b.skill} skill={b.skill} variant="gap" />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  );
+                })}
 
                 {skills.exclusivas_programa.length > 0 && (
                   <div className="rounded-xl p-4 mb-4" style={{ background: C.navyBg, border: `1px solid ${C.border}` }}>
