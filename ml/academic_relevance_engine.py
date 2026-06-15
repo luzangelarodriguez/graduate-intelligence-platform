@@ -432,6 +432,20 @@ SKILLS_LOOKUP: List[str] = [
     "investigacion judicial", "policia judicial",
     "delitos informaticos", "evidencia digital",
     "cadena de custodia",
+    # --- Psychology / Neuropsychology (for education domain) ---
+    "neuropsicologia", "evaluacion neuropsicologica",
+    "intervencion neuropsicologica", "funciones ejecutivas",
+    "psicodiagnostico", "psicometria", "spss",
+    "prueba psicologica", "bender", "wais", "wisc", "rorschach",
+    "memoria de trabajo", "atencion sostenida", "tdah",
+    "autismo", "discapacidad cognitiva",
+    "psicologia educativa", "psicologia del aprendizaje",
+    # --- Education / Pedagogy ---
+    "inclusion educativa", "necesidades educativas especiales",
+    "dificultades de aprendizaje", "trastorno del aprendizaje",
+    "pedagogia", "didactica", "curriculo", "planeacion pedagogica",
+    "ambientes de aprendizaje", "evaluacion formativa",
+    "docencia", "ensenanza",
     # --- Finance / Accounting ---
     "finanzas", "contabilidad", "financiero",
     "tesoreria", "presupuesto", "auditoria", "tributario",
