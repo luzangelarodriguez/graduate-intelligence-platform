@@ -73,9 +73,14 @@ def _clean(text: str | None) -> str:
 
 async def _scrape(query: str, limit: int, headless: bool) -> list[dict[str, Any]]:
     from playwright.async_api import async_playwright, TimeoutError as PWTimeout
-    from scrapers.domain_classifier import classify_text_domain
-    from scrapers.skill_extractor import extract_skills
-    from scrapers.sources.base import normalize_role
+    try:
+        from scrapers.normalization.classify_domains import classify_text_domain
+        from scrapers.normalization.normalize_skills import extract_skills
+        from scrapers.normalization.normalize_roles import normalize_role
+    except ModuleNotFoundError:
+        from normalization.classify_domains import classify_text_domain
+        from normalization.normalize_skills import extract_skills
+        from normalization.normalize_roles import normalize_role
 
     encoded = urllib.parse.quote_plus(query)
     url = _SEARCH_URL.format(query=encoded)
