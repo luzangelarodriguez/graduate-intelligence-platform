@@ -708,7 +708,9 @@ def load_jobs(conn) -> List[JobProfile]:
                 j.id::text                              AS job_id,
                 COALESCE(j.title, '')                   AS title,
                 COALESCE(j.company, '')                 AS company,
-                COALESCE(j.description, '')             AS description,
+                TRIM(COALESCE(j.description, '') || ' ' ||
+                     COALESCE(j.responsibilities, '') || ' ' ||
+                     COALESCE(j.requirements, ''))      AS description,
                 COALESCE(js.canonical_skill, '')        AS skill_name
             FROM jobs j
             LEFT JOIN job_skills js ON js.job_id = j.id

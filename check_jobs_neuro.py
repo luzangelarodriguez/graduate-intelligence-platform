@@ -48,20 +48,23 @@ cur.execute("""
 """)
 print(f"\n=== Jobs matching *neuropsicolog* or *psicolog*: {cur.fetchone()['n']} ===")
 
-# ── 4. Sample 3 matching jobs ─────────────────────────────────────────────────
+# ── 4. Sample matching jobs — check all text columns ─────────────────────────
 cur.execute("""
-    SELECT title, company, LENGTH(description) AS desc_len, LEFT(description, 200) AS desc_preview
+    SELECT title,
+           LENGTH(COALESCE(description,''))      AS desc_len,
+           LENGTH(COALESCE(responsibilities,'')) AS resp_len,
+           LENGTH(COALESCE(requirements,''))     AS req_len,
+           LEFT(COALESCE(requirements, responsibilities, description, ''), 200) AS best_preview
     FROM jobs
-    WHERE title ILIKE '%neuropsicolog%' OR title ILIKE '%psicolog%'
-    LIMIT 3
+    WHERE title ILIKE '%psicolog%' OR title ILIKE '%neuropsicolog%'
+    LIMIT 5
 """)
 rows = cur.fetchall()
-print("\n=== Sample matching jobs ===")
+print("\n=== Sample matching jobs (all text columns) ===")
 for r in rows:
     print(f"\n  title      : {r['title']}")
-    print(f"  company    : {r['company']}")
-    print(f"  desc_len   : {r['desc_len']}")
-    print(f"  desc[:200] : {r['desc_preview']}")
+    print(f"  desc_len   : {r['desc_len']}  |  resp_len: {r['resp_len']}  |  req_len: {r['req_len']}")
+    print(f"  best[:200] : {r['best_preview']}")
 
 # ── 5. Domain column check ────────────────────────────────────────────────────
 has_domain = any(c["column_name"] == "domain" for c in cols)
