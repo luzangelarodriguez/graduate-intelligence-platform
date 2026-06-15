@@ -711,6 +711,11 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         total_mercado = len(skills_mercado)
         cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
 
+        logger.info(
+            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d",
+            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas),
+        )
+
         return {
             "program_id":          program_id,
             "skills_mercado":      skills_mercado,
