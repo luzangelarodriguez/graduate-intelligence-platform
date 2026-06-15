@@ -1094,7 +1094,29 @@ export default function ObservatorioStorytelling() {
                 </p>
               </div>
             </div>
-            {(() => {
+            {/* Debug: log skills payload for program 20 */}
+            {programaId === 20 && skills !== null && (
+              // eslint-disable-next-line no-console
+              (() => { console.log('[S8 debug] skills for program 20:', JSON.stringify(skills, null, 2)); return null; })()
+            )}
+
+            {/* Guard: no brechas data yet → show pending message instead of recs */}
+            {(!skills || (skills.brechas.length === 0 && skills.fortalezas.length === 0)) ? (
+              <div className="rounded-xl px-5 py-6 flex gap-3"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <span className="text-2xl flex-shrink-0">⏳</span>
+                <div>
+                  <p className="text-sm font-semibold text-white mb-1">Análisis en proceso</p>
+                  <p className="text-sm text-blue-300 leading-relaxed">
+                    Los datos de brechas se actualizarán cuando corra el próximo matching nocturno
+                    (todos los días a las 03:00 a.m. hora Colombia vía GitHub Actions).
+                    Mientras tanto, puedes explorar las secciones de perfiles y empleos compatibles.
+                  </p>
+                </div>
+              </div>
+            ) : (
+            // eslint-disable-next-line no-extra-parens
+            (() => {
               // Build dynamic recommendations from real skills data
               const topBrechas = [...(skills?.brechas ?? [])]
                 .sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0))
@@ -1173,7 +1195,8 @@ export default function ObservatorioStorytelling() {
                   ))}
                 </div>
               );
-            })()}
+            })()
+            )}
           </>
         )}
       </Section>
