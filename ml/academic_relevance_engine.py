@@ -299,14 +299,19 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
 }
 
 
-def _infer_domain(text: str) -> str:
-    n = _normalize(text)
-    # Hard overrides: strong single-keyword signals that beat generic bucket scoring
+def _infer_domain(text: str, program_name: str = "") -> str:
+    # Check program name first (strongest signal, not diluted by description text)
+    name_n = _normalize(program_name or text[:120])
     _EDUCATION_OVERRIDE = (
         "neuropsicolog", "psicolog educativ", "psicologia educativ",
         "inclusion educativ", "dificultades de aprendizaje",
         "necesidades educativ", "docente psicolog", "pedagogia",
+        "neuropsicologia", "psicologia",
     )
+    if any(kw in name_n for kw in _EDUCATION_OVERRIDE):
+        return "education"
+    n = _normalize(text)
+    # Also check full text for override keywords
     if any(kw in n for kw in _EDUCATION_OVERRIDE):
         return "education"
     best = ("general", 0)
@@ -638,7 +643,7 @@ def load_programs(conn) -> List[ProgramProfile]:
             especializacion_id=row["especializacion_id"],
             program_name=row["program_name"] or "",
             skills=skills,
-            domain=_infer_domain(text),
+            domain=_infer_domain(text, program_name=row["program_name"] or ""),
             text=text,
             skill_tokens=skill_tokens,
         ))
@@ -740,7 +745,7 @@ def load_jobs(conn) -> List[JobProfile]:
             title=row["title"],
             company=row["company"],
             skills=skills,
-            domain=_infer_domain(text),
+            domain=_infer_domain(text, program_name=row["title"] or ""),
             text=text,
             skill_tokens=skill_tokens,
         ))
