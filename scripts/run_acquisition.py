@@ -69,7 +69,11 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     "education": [
         "neuropsicólogo",
         "neuropsicología",
+        "neuropsicología educativa",
         "psicólogo educativo",
+        "dificultades de aprendizaje",
+        "necesidades educativas especiales",
+        "inclusión educativa",
         "docente neuropsicología",
     ],
 }
