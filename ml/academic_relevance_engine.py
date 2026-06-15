@@ -446,6 +446,12 @@ SKILLS_LOOKUP: List[str] = [
     "pedagogia", "didactica", "curriculo", "planeacion pedagogica",
     "ambientes de aprendizaje", "evaluacion formativa",
     "docencia", "ensenanza",
+    # --- Short-form stems for neuropsicología microcurrículo matching ---
+    # These catch skill_normalized values like 'neuropsicolog*', 'cognitiv*', etc.
+    "neuropsicolog", "cognitiv", "intervencion", "evaluacion",
+    "atencion", "funciones superiores", "aprendizaje", "diversidad",
+    "orientacion", "pensamiento", "lenguaje", "memoria", "conducta",
+    "percepcion", "rehabilitacion", "neurodesarrollo",
     # --- Finance / Accounting ---
     "finanzas", "contabilidad", "financiero",
     "tesoreria", "presupuesto", "auditoria", "tributario",
