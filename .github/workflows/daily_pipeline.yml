@@ -41,6 +41,7 @@ jobs:
         run: |
           python scripts/run_acquisition.py --source magneto --domain data_analytics --limit 25
           python scripts/run_acquisition.py --source magneto --domain artificial_intelligence --limit 25
+          python scripts/run_acquisition.py --source magneto --domain education --limit 20
 
       - name: Acquisition - Magneto API
         continue-on-error: true
@@ -69,14 +70,6 @@ jobs:
       - name: Acquisition - OCC
         continue-on-error: true
         run: python scripts/run_acquisition.py --source occ --domain data_analytics --limit 20
-
-      - name: Acquisition - Google Jobs
-        continue-on-error: true
-        run: |
-          python scripts/run_acquisition.py --source google_jobs --domain data_analytics --limit 30
-          python scripts/run_acquisition.py --source google_jobs --domain artificial_intelligence --limit 30
-          python scripts/run_acquisition.py --source google_jobs --domain criminology --limit 20
-          python scripts/run_acquisition.py --source google_jobs --domain education --limit 20
 
       - name: Matching - todos los programas
         run: python scripts/run_semantic_matching.py --persist --min-score 40
