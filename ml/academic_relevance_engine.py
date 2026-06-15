@@ -282,6 +282,10 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
     "software": ["software", "desarrollo", "developer", "programacion", "backend",
                  "frontend", "fullstack", "devops", "cloud", "api", "java", "javascript",
                  "react", "angular", "node"],
+    "education": ["neuropsicolog", "psicolog", "educacion", "pedagogia", "docencia",
+                   "aprendizaje", "inclusion educativa", "dificultades de aprendizaje",
+                   "necesidades educativas", "terapeuta", "docente", "ensenanza",
+                   "psicologia educativa", "psicologia forense"],
     "gestion": ["gestion", "gerencia", "administracion", "pmo", "proyecto", "liderazgo",
                  "estrategia", "negocios"],
     "seguridad": ["seguridad", "ciberseguridad", "cybersecurity", "forense", "pentest",
@@ -297,6 +301,14 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
 
 def _infer_domain(text: str) -> str:
     n = _normalize(text)
+    # Hard overrides: strong single-keyword signals that beat generic bucket scoring
+    _EDUCATION_OVERRIDE = (
+        "neuropsicolog", "psicolog educativ", "psicologia educativ",
+        "inclusion educativ", "dificultades de aprendizaje",
+        "necesidades educativ", "docente psicolog", "pedagogia",
+    )
+    if any(kw in n for kw in _EDUCATION_OVERRIDE):
+        return "education"
     best = ("general", 0)
     for dom, kws in _DOMAIN_BUCKETS.items():
         hits = sum(1 for kw in kws if kw in n)
@@ -314,6 +326,7 @@ _COMPATIBLE_DOMAINS: Dict[str, set] = {
     "seguridad":{"seguridad", "general"},
     "redes":    {"redes", "general"},
     "criminologia": {"criminologia", "general"},
+    "education":    {"education", "general"},
     "finanzas": {"finanzas", "general"},
     "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
 }
