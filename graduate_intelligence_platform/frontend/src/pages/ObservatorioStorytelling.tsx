@@ -92,8 +92,9 @@ const NAV_SECTIONS = [
   { id: 's1', n: '01', label: 'Estado de Pertinencia' },
   { id: 's2', n: '02', label: 'Qué Demanda el Mercado' },
   { id: 's3', n: '03', label: 'Qué Enseña el Programa' },
-  { id: 's4', n: '04', label: 'Cobertura Curricular' },
-  { id: 's5', n: '05', label: 'Brechas Curriculares' },
+  { id: 's4',  n: '04',  label: 'Cobertura Curricular' },
+  { id: 's4b', n: '04b', label: 'Benchmarking SNIES' },
+  { id: 's5',  n: '05',  label: 'Brechas Curriculares' },
   { id: 's6', n: '06', label: 'Empleos Compatibles' },
   { id: 's7', n: '07', label: 'Simulación Curricular' },
   { id: 's8', n: '08', label: 'Recomendaciones' },
@@ -804,31 +805,48 @@ export default function ObservatorioStorytelling() {
                         </div>
                       </div>
                     )}
-                    {univ && (
-                      <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: C.gold }}>Contexto SNIES — {univ.total} programas similares</p>
-                        <p className="text-xs text-blue-300 mb-3">Competidores activos en modalidad virtual · Colombia 2024</p>
-                        {univ.competitors.length > 0 && (
-                          <div className="space-y-2">
-                            {univ.competitors.slice(0, 6).map((c, i) => (
-                              <div key={i} className="flex items-start justify-between gap-3 rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-semibold text-white truncate">{c.nombre_ies}</p>
-                                  <p className="text-[10px] text-blue-400 truncate">{c.nombre_programa}</p>
-                                </div>
-                                <div className="flex-shrink-0 text-right">
-                                  <p className="text-xs font-bold" style={{ color: C.gold }}>{(c.matriculados ?? 0).toLocaleString('es-CO')}</p>
-                                  <p className="text-[10px] text-blue-400">{(c.graduados ?? 0).toLocaleString('es-CO')} grad.</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </div>
                 <Insight dark text={`El programa cubre el ${coberturaPct}% de las skills que el mercado laboral demanda. ${coberturaPct >= 60 ? 'Cobertura sólida con oportunidades de mejora.' : 'Existe una brecha significativa que requiere actualización curricular.'}`} />
+              </>
+            )}
+          </SectionBlock>
+
+          {/* S4b: SNIES Benchmarking */}
+          <SectionBlock id="s4b" n="04b" title="Benchmarking SNIES">
+            {!univ ? <Spinner /> : univ.competitors.length === 0 ? (
+              <p style={{ fontSize: 13, color: C.mid }}>Sin programas similares registrados para este perfil en SNIES.</p>
+            ) : (
+              <>
+                <p style={{ fontSize: 13, color: '#4b5563', marginBottom: 20, lineHeight: 1.5 }}>
+                  <strong style={{ color: C.navy }}>{univ.total}</strong> programas similares activos en Colombia
+                  en modalidad virtual · datos SNIES 2024.
+                </p>
+                <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden' }}>
+                  {/* table header */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 80px', padding: '8px 16px', background: C.navyBg, borderBottom: `1px solid ${C.border}` }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: C.mid }}>Universidad / Programa</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: C.mid, textAlign: 'right' as const }}>Matriculados</span>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: C.mid, textAlign: 'right' as const }}>Graduados</span>
+                  </div>
+                  {/* rows */}
+                  {univ.competitors.slice(0, 8).map((comp, i) => (
+                    <div key={i} style={{
+                      display: 'grid', gridTemplateColumns: '1fr 90px 80px',
+                      padding: '12px 16px',
+                      borderBottom: i < Math.min(univ.competitors.length, 8) - 1 ? `1px solid ${C.border}` : 'none',
+                      background: i % 2 === 0 ? C.white : '#fafbfd',
+                      alignItems: 'center',
+                    }}>
+                      <div style={{ minWidth: 0, paddingRight: 12 }}>
+                        <p style={{ fontSize: 12, fontWeight: 600, color: C.navy, margin: 0, lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{comp.nombre_ies}</p>
+                        <p style={{ fontSize: 10, color: C.mid, margin: 0, marginTop: 2, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{comp.nombre_programa}</p>
+                      </div>
+                      <p style={{ fontSize: 16, fontWeight: 800, color: C.red, margin: 0, textAlign: 'right' as const }}>{(comp.matriculados ?? 0).toLocaleString('es-CO')}</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: C.navy, margin: 0, textAlign: 'right' as const }}>{(comp.graduados ?? 0).toLocaleString('es-CO')}</p>
+                    </div>
+                  ))}
+                </div>
               </>
             )}
           </SectionBlock>
