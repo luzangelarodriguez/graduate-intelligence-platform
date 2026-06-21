@@ -879,31 +879,39 @@ _REDESIGN_JOBS: dict[str, dict[str, Any]] = {}
 
 def _compute_tfidf_relevance(text: str, skills: list[str]) -> tuple[float, list[tuple[str, float]]]:
     """
-    Return (max_similarity, [(skill, score), ...]) sorted by per-skill cosine score DESC.
-    Avoids loading SBERT to prevent OOM on Railway.
-    """
-    try:
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        from sklearn.metrics.pairwise import cosine_similarity as sk_cosine
-        import numpy as np
+    Return (max_similarity, [(skill, score), ...]) sorted by per-skill relevance to text DESC.
 
-        corpus = [text] + skills
-        vec = TfidfVectorizer(min_df=1, analyzer="word", ngram_range=(1, 2))
-        mat = vec.fit_transform(corpus)
-        text_vec = mat[0]
-        skill_vecs = mat[1:]
-        sims = sk_cosine(text_vec, skill_vecs).flatten()
-        # Return all (skill, score) pairs sorted by relevance so callers can slice
-        ranked = sorted(zip(skills, sims.tolist()), key=lambda x: x[1], reverse=True)
-        return float(np.max(sims)) if len(sims) else 0.0, ranked
-    except Exception:
-        # Last-resort: simple keyword overlap
-        text_lower = text.lower()
-        ranked = [
-            (s, 1.0) for s in skills
-            if s.lower() in text_lower or any(w in text_lower for w in s.lower().split())
-        ]
-        return (1.0 if ranked else 0.0), ranked
+    Uses token overlap against the subject text: each skill token that appears in the text
+    contributes to the score. This ensures each subject gets a different ranking because
+    the scores depend on the subject's actual vocabulary.
+    """
+    import unicodedata as _udn
+    import math
+
+    def _n(s: str) -> str:
+        return "".join(c for c in _udn.normalize("NFD", s.lower()) if _udn.category(c) != "Mn")
+
+    text_norm = _n(text)
+    text_tokens = set(text_norm.split())
+
+    ranked: list[tuple[str, float]] = []
+    for skill in skills:
+        skill_norm = _n(skill)
+        skill_tokens = skill_norm.split()
+        if not skill_tokens:
+            ranked.append((skill, 0.0))
+            continue
+        # Exact phrase match gets a big bonus
+        phrase_bonus = 2.0 if skill_norm in text_norm else 0.0
+        # Token overlap: fraction of skill tokens present in text
+        hits = sum(1 for t in skill_tokens if t in text_tokens and len(t) >= 4)
+        token_score = hits / len(skill_tokens)
+        score = phrase_bonus + token_score
+        ranked.append((skill, round(score, 4)))
+
+    ranked.sort(key=lambda x: x[1], reverse=True)
+    max_score = ranked[0][1] if ranked else 0.0
+    return max_score, ranked
 
 
 def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: list[str]) -> dict[str, Any]:
@@ -1062,13 +1070,29 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             return
 
         # FIX 1: Filter generic/noise skills before sending to OpenAI
-        _RUIDO_EXCLUIDO = {
+        # Use token-level matching + accent-stripping so "gestión financiera" matches "financiero"
+        import unicodedata as _ud2
+        def _norm_noise(s: str) -> str:
+            return "".join(c for c in _ud2.normalize("NFD", s.lower()) if _ud2.category(c) != "Mn")
+
+        _RUIDO_EXCLUIDO_TOKENS = {
             'financiero', 'sas', 'excel', 'trabajo en equipo', 'estrategia',
             'gestion', 'comunicacion', 'liderazgo', 'innovacion', 'negociacion',
             'planeacion', 'ventas', 'comercial', 'servicio al cliente', 'contabilidad',
             'presupuesto', 'facturacion', 'logistica', 'power bi', 'tableau',
+            'office', 'word', 'powerpoint', 'microsoft', 'erp', 'sap',
         }
-        brechas_filtradas = [b for b in brechas if b.lower() not in _RUIDO_EXCLUIDO]
+
+        def _is_ruido(skill: str) -> bool:
+            normed = _norm_noise(skill)
+            # Exact match after normalizing
+            if normed in _RUIDO_EXCLUIDO_TOKENS:
+                return True
+            # Any noise token appears as a word within the skill
+            tokens = set(normed.split())
+            return bool(tokens & _RUIDO_EXCLUIDO_TOKENS)
+
+        brechas_filtradas = [b for b in brechas if not _is_ruido(b)]
         if not brechas_filtradas:
             brechas_filtradas = brechas  # fallback: use all if filter removes everything
 
@@ -1115,9 +1139,12 @@ def _run_redesign(job_id: str, program_id: int) -> None:
 
         # Debug block included in every response
         debug_info = {
+            "fix_version":        "v4-token-overlap-noise-token-match",
             "brechas_count":      len(brechas),
+            "brechas_filtradas_count": len(brechas_filtradas),
             "brechas_sample":     brechas[:10],
-            "umbral":             "ninguno (top-5 por ranking)",
+            "brechas_filtradas_sample": brechas_filtradas[:10],
+            "umbral":             "ninguno (top-5 por ranking de token overlap)",
             "asignaturas_scores": sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
         }
 
