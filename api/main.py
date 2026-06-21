@@ -990,6 +990,10 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             (program_id,),
         )
 
+        logger.info("[REDESIGN-DEBUG] program_id=%s mc_rows_count=%d asignaturas=%s",
+                    program_id, len(mc_rows),
+                    [r.get("nombre") or r.get("asignatura") or str(r.get("id")) for r in mc_rows])
+
         if not mc_rows:
             _update("error", error="No se encontraron microcurrículos para este programa. Ejecuta primero el pipeline de carga.")
             return
@@ -1034,6 +1038,11 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             if not any(_match(ms, ps) for ps in skills_programa):
                 brechas.append(ms)
 
+        logger.info(
+            "[REDESIGN-DEBUG] program_id=%s market_skills=%d prog_skills=%d brechas=%d list=%s",
+            program_id, len(skills_mercado), len(skills_programa), len(brechas), brechas,
+        )
+
         if not brechas:
             _update("done", result={
                 "program_id": program_id,
@@ -1047,14 +1056,22 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         # 3. Score each asignatura by TF-IDF relevance to brechas
         _update("running", current_step="Calculando relevancia de asignaturas")
 
+        logger.info("[REDESIGN-DEBUG] program_id=%s brechas_count=%d brechas=%s",
+                    program_id, len(brechas), brechas)
+
         scored: list[dict[str, Any]] = []
         for row in mc_rows:
             text = (row["clean_text"] or "").strip()
             score, relevant_skills = _compute_tfidf_relevance(text, brechas)
+            asig_nombre = row["nombre"] or f"Asignatura {row['id']}"
+            logger.info(
+                "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f relevant_skills=%s",
+                asig_nombre, len(text), score, relevant_skills,
+            )
             if score >= 0.10 and relevant_skills:
                 scored.append({
                     "mc_id":             row["id"],
-                    "asignatura":        row["nombre"] or f"Asignatura {row['id']}",
+                    "asignatura":        asig_nombre,
                     "clean_text":        text,
                     "relevancia_score":  round(score, 3),
                     "brechas_relevantes": relevant_skills,
