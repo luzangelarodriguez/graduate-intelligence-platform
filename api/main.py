@@ -869,6 +869,384 @@ def pipeline_run(
     })
 
 
+# ─── Curriculum Redesign ──────────────────────────────────────────────────────
+
+# In-memory cache: program_id → redesign result (cleared on new POST)
+_REDESIGN_CACHE: dict[int, dict[str, Any]] = {}
+# Job tracker for async redesign
+_REDESIGN_JOBS: dict[str, dict[str, Any]] = {}
+
+
+def _compute_tfidf_relevance(text: str, skills: list[str]) -> tuple[float, list[str]]:
+    """
+    Return (max_similarity, relevant_skills) using TF-IDF cosine similarity.
+    Avoids loading SBERT to prevent OOM on Railway.
+    """
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity as sk_cosine
+        import numpy as np
+
+        corpus = [text] + skills
+        vec = TfidfVectorizer(min_df=1, analyzer="word", ngram_range=(1, 2))
+        mat = vec.fit_transform(corpus)
+        text_vec = mat[0]
+        skill_vecs = mat[1:]
+        sims = sk_cosine(text_vec, skill_vecs).flatten()
+        threshold = 0.10
+        relevant = [skills[i] for i, s in enumerate(sims) if s >= threshold]
+        return float(np.max(sims)) if len(sims) else 0.0, relevant
+    except Exception:
+        # Last-resort: simple keyword overlap
+        text_lower = text.lower()
+        relevant = [s for s in skills if s.lower() in text_lower or any(w in text_lower for w in s.lower().split())]
+        return (1.0 if relevant else 0.0), relevant
+
+
+def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: list[str]) -> dict[str, Any]:
+    """Call gpt-4o-mini to propose updated learning outcomes (RAs)."""
+    import json as _json
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return {
+            "ras_propuestos": [],
+            "justificacion": "OPENAI_API_KEY no configurada en el entorno.",
+        }
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+
+        texto_resumido = clean_text[:900] if clean_text else "(sin texto disponible)"
+        brechas_str = ", ".join(brechas_relevantes[:8])
+
+        prompt = (
+            f"Eres un diseñador curricular universitario colombiano. "
+            f"Aquí están los contenidos/resultados de aprendizaje (RA) actuales "
+            f"de la asignatura '{asignatura}':\n\n{texto_resumido}\n\n"
+            f"El mercado laboral demanda estas competencias que el programa NO cubre actualmente: "
+            f"{brechas_str}\n\n"
+            f"Propón 1 o 2 RAs NUEVOS o MODIFICADOS que incorporen estas competencias, "
+            f"manteniendo formato académico universitario (código RA-XXX, verbo de Bloom, contenido medible). "
+            f"Responde ÚNICAMENTE en JSON con esta estructura exacta:\n"
+            f'{{"ras_propuestos": [{{"codigo": "RA-001", "texto": "...", '
+            f'"skills_incorporadas": ["..."], "tipo": "nuevo", "ra_original_codigo": null}}], '
+            f'"justificacion": "..."}}'
+        )
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"},
+            temperature=0.4,
+            max_tokens=800,
+        )
+        result = _json.loads(response.choices[0].message.content)
+        # Ensure expected keys exist
+        result.setdefault("ras_propuestos", [])
+        result.setdefault("justificacion", "")
+        return result
+    except Exception as exc:
+        logger.error("openai_call_error asignatura=%s: %s", asignatura, exc)
+        return {
+            "ras_propuestos": [],
+            "justificacion": f"Error al llamar a OpenAI: {exc}",
+        }
+
+
+def _run_redesign(job_id: str, program_id: int) -> None:
+    """Background task: analyze curriculum vs brechas and call OpenAI for each relevant subject."""
+    import unicodedata as _ud
+
+    def _norm(s: str) -> str:
+        return "".join(c for c in _ud.normalize("NFD", s.lower()) if _ud.category(c) != "Mn")
+
+    def _match(a: str, b: str) -> bool:
+        na, nb = _norm(a), _norm(b)
+        return na == nb or (len(na) >= 6 and (na.startswith(nb) or nb.startswith(na)))
+
+    job = _REDESIGN_JOBS[job_id]
+
+    def _update(status: str, **kw: Any) -> None:
+        job.update({"status": status, **kw})
+
+    try:
+        from api.database import fetch_all
+
+        _update("running", current_step="Cargando microcurrículos")
+
+        # 1. Fetch microcurriculos for this program
+        mc_rows = fetch_all(
+            """
+            SELECT m.id, m.asignatura, m.clean_text,
+                   COALESCE(m.asignatura, m.source_document) AS nombre
+            FROM microcurriculos m
+            WHERE m.specialization_id = %s
+              AND m.clean_text IS NOT NULL
+              AND length(m.clean_text) > 50
+            ORDER BY m.asignatura NULLS LAST
+            """,
+            (program_id,),
+        )
+
+        if not mc_rows:
+            _update("error", error="No se encontraron microcurrículos para este programa. Ejecuta primero el pipeline de carga.")
+            return
+
+        # 2. Compute brechas using same logic as skills-analysis
+        _update("running", current_step="Calculando brechas curriculares")
+
+        market_rows = fetch_all(
+            """
+            SELECT skill, COUNT(*) AS frecuencia
+            FROM (
+                SELECT jsonb_array_elements_text(skills_empleo) AS skill
+                FROM ml_program_job_matches
+                WHERE especializacion_id = %s
+                  AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches WHERE especializacion_id = %s)
+                  AND skills_empleo IS NOT NULL AND skills_empleo != '[]'::jsonb
+                  AND jsonb_typeof(skills_empleo) = 'array'
+            ) t
+            GROUP BY skill HAVING COUNT(*) >= 2
+            ORDER BY frecuencia DESC LIMIT 30
+            """,
+            (program_id, program_id),
+        )
+        skills_mercado = [r["skill"] for r in market_rows if r["skill"]]
+
+        prog_rows = fetch_all(
+            """
+            SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name
+            FROM microcurriculo_skills ms
+            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+            WHERE m.specialization_id = %s
+              AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
+            GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
+            """,
+            (program_id,),
+        )
+        skills_programa = [r["skill_name"] for r in prog_rows if r["skill_name"]]
+
+        # Brechas = market skills not matched by program skills
+        brechas: list[str] = []
+        for ms in skills_mercado:
+            if not any(_match(ms, ps) for ps in skills_programa):
+                brechas.append(ms)
+
+        if not brechas:
+            _update("done", result={
+                "program_id": program_id,
+                "asignaturas_analizadas": len(mc_rows),
+                "advertencia": "No se encontraron brechas curriculares — el programa ya cubre las skills del mercado.",
+                "propuestas": [],
+            })
+            _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
+            return
+
+        # 3. Score each asignatura by TF-IDF relevance to brechas
+        _update("running", current_step="Calculando relevancia de asignaturas")
+
+        scored: list[dict[str, Any]] = []
+        for row in mc_rows:
+            text = (row["clean_text"] or "").strip()
+            score, relevant_skills = _compute_tfidf_relevance(text, brechas)
+            if score >= 0.10 and relevant_skills:
+                scored.append({
+                    "mc_id":             row["id"],
+                    "asignatura":        row["nombre"] or f"Asignatura {row['id']}",
+                    "clean_text":        text,
+                    "relevancia_score":  round(score, 3),
+                    "brechas_relevantes": relevant_skills,
+                })
+
+        scored.sort(key=lambda x: x["relevancia_score"], reverse=True)
+        top = scored[:5]
+
+        if not top:
+            _update("done", result={
+                "program_id": program_id,
+                "asignaturas_analizadas": len(mc_rows),
+                "advertencia": "Ninguna asignatura superó el umbral de relevancia. Los microcurrículos pueden tener texto insuficiente.",
+                "propuestas": [],
+            })
+            _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
+            return
+
+        # 4. Call OpenAI for each top asignatura
+        propuestas: list[dict[str, Any]] = []
+        for i, item in enumerate(top):
+            _update("running", current_step=f"Generando RAs con IA ({i+1}/{len(top)}): {item['asignatura'][:40]}")
+            ai_result = _call_openai_for_ras(
+                asignatura=item["asignatura"],
+                clean_text=item["clean_text"],
+                brechas_relevantes=item["brechas_relevantes"],
+            )
+            # Collect all skills_incorporadas from the proposed RAs
+            all_skills: list[str] = []
+            for ra in ai_result.get("ras_propuestos", []):
+                all_skills.extend(ra.get("skills_incorporadas", []))
+
+            propuestas.append({
+                "asignatura":          item["asignatura"],
+                "relevancia_score":    item["relevancia_score"],
+                "brechas_relevantes":  item["brechas_relevantes"],
+                "ras_actuales_texto":  item["clean_text"][:600],
+                "ras_propuestos":      ai_result.get("ras_propuestos", []),
+                "skills_incorporadas": list(set(all_skills)),
+                "justificacion":       ai_result.get("justificacion", ""),
+            })
+
+        result = {
+            "program_id":             program_id,
+            "asignaturas_analizadas": len(mc_rows),
+            "brechas_totales":        len(brechas),
+            "propuestas":             propuestas,
+        }
+        _REDESIGN_CACHE[program_id] = result
+        _update("done", result=result)
+        logger.info("redesign/%s done: %d proposals", program_id, len(propuestas))
+
+    except Exception as exc:
+        logger.error("redesign_error program_id=%s: %s", program_id, exc, exc_info=True)
+        _update("error", error=str(exc))
+
+
+@app.post("/api/curriculum/redesign/{program_id}", tags=["curriculum"])
+def curriculum_redesign_start(
+    program_id: int,
+    background_tasks: BackgroundTasks,
+) -> _UnicodeJSONResponse:
+    """Start async curriculum redesign analysis. Poll /status/{job_id} for progress."""
+    job_id = str(uuid.uuid4())[:8]
+    _REDESIGN_JOBS[job_id] = {
+        "job_id":       job_id,
+        "program_id":   program_id,
+        "status":       "queued",
+        "current_step": None,
+        "error":        None,
+        "result":       None,
+    }
+    background_tasks.add_task(_run_redesign, job_id, program_id)
+    return _UnicodeJSONResponse({"job_id": job_id, "status": "queued"})
+
+
+@app.get("/api/curriculum/redesign/status/{job_id}", tags=["curriculum"])
+def curriculum_redesign_status(job_id: str) -> _UnicodeJSONResponse:
+    """Poll redesign job status."""
+    job = _REDESIGN_JOBS.get(job_id)
+    if not job:
+        return _UnicodeJSONResponse({"error": "job not found"}, status_code=404)  # type: ignore[name-defined]
+    return _UnicodeJSONResponse(job)
+
+
+@app.get("/api/curriculum/redesign/{program_id}/download", tags=["curriculum"])
+def curriculum_redesign_download(program_id: int):
+    """Generate and download a .docx report with the redesign proposals."""
+    from fastapi.responses import StreamingResponse
+    import io
+
+    result = _REDESIGN_CACHE.get(program_id)
+    if not result:
+        return _UnicodeJSONResponse(
+            {"error": "No hay análisis disponible. Ejecuta primero POST /api/curriculum/redesign/{program_id}"},
+            status_code=404,  # type: ignore[name-defined]
+        )
+
+    propuestas = result.get("propuestas", [])
+    if not propuestas:
+        return _UnicodeJSONResponse(
+            {"error": "El análisis no generó propuestas para este programa.", "advertencia": result.get("advertencia", "")},
+            status_code=422,  # type: ignore[name-defined]
+        )
+
+    try:
+        from docx import Document
+        from docx.shared import Pt, RGBColor
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+        doc = Document()
+
+        # Title
+        from api.database import fetch_one
+        prog_row = fetch_one("SELECT nombre FROM especializaciones WHERE id = %s", (program_id,))
+        prog_nombre = prog_row["nombre"] if prog_row else f"Programa {program_id}"
+
+        title = doc.add_heading(f"Propuesta de Actualización Curricular", level=1)
+        title.runs[0].font.color.rgb = RGBColor(0x0D, 0x21, 0x58)
+
+        subtitle = doc.add_paragraph(prog_nombre)
+        subtitle.runs[0].bold = True
+        subtitle.runs[0].font.size = Pt(13)
+
+        from datetime import date
+        doc.add_paragraph(f"Generado: {date.today().isoformat()} · Observatorio UNIR Colombia")
+        doc.add_paragraph(
+            f"Resumen: {len(propuestas)} asignaturas con propuestas de actualización · "
+            f"{result.get('brechas_totales', 0)} brechas identificadas en el mercado."
+        )
+        doc.add_paragraph("")
+
+        # Per-subject section
+        for prop in propuestas:
+            doc.add_heading(prop["asignatura"], level=2)
+            p = doc.add_paragraph()
+            p.add_run("Relevancia con brechas: ").bold = True
+            p.add_run(f"{prop['relevancia_score']:.2f} · Brechas relevantes: {', '.join(prop['brechas_relevantes'][:5])}")
+
+            # Comparison table
+            table = doc.add_table(rows=1, cols=2)
+            table.style = "Table Grid"
+            hdr = table.rows[0].cells
+            hdr[0].text = "RAs / Contenido Actual"
+            hdr[1].text = "RAs Propuestos (IA)"
+            for cell in hdr:
+                for para in cell.paragraphs:
+                    for run in para.runs:
+                        run.bold = True
+                        run.font.color.rgb = RGBColor(0x0D, 0x21, 0x58)
+
+            row_cells = table.add_row().cells
+            row_cells[0].text = (prop.get("ras_actuales_texto") or "Sin texto disponible")[:500]
+
+            right = row_cells[1]
+            for ra in prop.get("ras_propuestos", []):
+                p_ra = right.add_paragraph()
+                run_code = p_ra.add_run(f"[{ra.get('codigo','RA')}] ")
+                run_code.bold = True
+                if ra.get("tipo") == "nuevo":
+                    run_code.font.color.rgb = RGBColor(0x05, 0x96, 0x69)  # green
+                else:
+                    run_code.font.color.rgb = RGBColor(0xD9, 0x77, 0x06)  # amber
+                p_ra.add_run(ra.get("texto", ""))
+
+            if prop.get("justificacion"):
+                jus = doc.add_paragraph()
+                jus.add_run("Justificación: ").italic = True
+                jus.add_run(prop["justificacion"])
+
+            doc.add_paragraph("")
+
+        # Footer
+        doc.add_paragraph(
+            "Motor de Pertinencia Académica v2 · UNIR Colombia · Datos: mercado laboral activo Colombia 2024"
+        ).runs[0].font.color.rgb = RGBColor(0x9C, 0xA3, 0xAF)
+
+        buf = io.BytesIO()
+        doc.save(buf)
+        buf.seek(0)
+
+        filename = f"redesign_curricular_programa_{program_id}.docx"
+        return StreamingResponse(
+            buf,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception as exc:
+        logger.error("redesign_download_error program_id=%s: %s", program_id, exc, exc_info=True)
+        return _UnicodeJSONResponse({"error": f"Error generando documento: {exc}"}, status_code=500)  # type: ignore[name-defined]
+
+
 @app.get("/api/pipeline/status/{job_id}", tags=["pipeline"])
 def pipeline_status(job_id: str) -> _UnicodeJSONResponse:
     job = _PIPELINE_JOBS.get(job_id)
