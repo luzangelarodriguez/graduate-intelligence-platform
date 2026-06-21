@@ -877,9 +877,9 @@ _REDESIGN_CACHE: dict[int, dict[str, Any]] = {}
 _REDESIGN_JOBS: dict[str, dict[str, Any]] = {}
 
 
-def _compute_tfidf_relevance(text: str, skills: list[str]) -> tuple[float, list[str]]:
+def _compute_tfidf_relevance(text: str, skills: list[str]) -> tuple[float, list[tuple[str, float]]]:
     """
-    Return (max_similarity, relevant_skills) using TF-IDF cosine similarity.
+    Return (max_similarity, [(skill, score), ...]) sorted by per-skill cosine score DESC.
     Avoids loading SBERT to prevent OOM on Railway.
     """
     try:
@@ -893,14 +893,17 @@ def _compute_tfidf_relevance(text: str, skills: list[str]) -> tuple[float, list[
         text_vec = mat[0]
         skill_vecs = mat[1:]
         sims = sk_cosine(text_vec, skill_vecs).flatten()
-        threshold = 0.10
-        relevant = [skills[i] for i, s in enumerate(sims) if s >= threshold]
-        return float(np.max(sims)) if len(sims) else 0.0, relevant
+        # Return all (skill, score) pairs sorted by relevance so callers can slice
+        ranked = sorted(zip(skills, sims.tolist()), key=lambda x: x[1], reverse=True)
+        return float(np.max(sims)) if len(sims) else 0.0, ranked
     except Exception:
         # Last-resort: simple keyword overlap
         text_lower = text.lower()
-        relevant = [s for s in skills if s.lower() in text_lower or any(w in text_lower for w in s.lower().split())]
-        return (1.0 if relevant else 0.0), relevant
+        ranked = [
+            (s, 1.0) for s in skills
+            if s.lower() in text_lower or any(w in text_lower for w in s.lower().split())
+        ]
+        return (1.0 if ranked else 0.0), ranked
 
 
 def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: list[str]) -> dict[str, Any]:
@@ -922,13 +925,18 @@ def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: l
         brechas_str = ", ".join(brechas_relevantes[:8])
 
         prompt = (
-            f"Eres un diseñador curricular universitario colombiano. "
+            f"Eres un diseñador curricular universitario colombiano experto en pertinencia académica. "
             f"Aquí están los contenidos/resultados de aprendizaje (RA) actuales "
             f"de la asignatura '{asignatura}':\n\n{texto_resumido}\n\n"
             f"El mercado laboral demanda estas competencias que el programa NO cubre actualmente: "
             f"{brechas_str}\n\n"
-            f"Propón 1 o 2 RAs NUEVOS o MODIFICADOS que incorporen estas competencias, "
-            f"manteniendo formato académico universitario (código RA-XXX, verbo de Bloom, contenido medible). "
+            f"INSTRUCCIONES IMPORTANTES:\n"
+            f"1. Solo propón RAs si la competencia es académicamente coherente con el campo de '{asignatura}'.\n"
+            f"2. Si ninguna de las brechas dadas es coherente con el contenido de la asignatura "
+            f"(ej: pedir Excel o habilidades financieras a una asignatura de neuropsicología clínica), "
+            f"responde con ras_propuestos: [] y explica en justificacion por qué ninguna aplica.\n"
+            f"3. Para las brechas coherentes, propón 1 o 2 RAs NUEVOS o MODIFICADOS en formato académico "
+            f"universitario (código RA-XXX, verbo de Bloom, contenido medible y específico).\n\n"
             f"Responde ÚNICAMENTE en JSON con esta estructura exacta:\n"
             f'{{"ras_propuestos": [{{"codigo": "RA-001", "texto": "...", '
             f'"skills_incorporadas": ["..."], "tipo": "nuevo", "ra_original_codigo": null}}], '
@@ -1053,28 +1061,44 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
             return
 
+        # FIX 1: Filter generic/noise skills before sending to OpenAI
+        _RUIDO_EXCLUIDO = {
+            'financiero', 'sas', 'excel', 'trabajo en equipo', 'estrategia',
+            'gestion', 'comunicacion', 'liderazgo', 'innovacion', 'negociacion',
+            'planeacion', 'ventas', 'comercial', 'servicio al cliente', 'contabilidad',
+            'presupuesto', 'facturacion', 'logistica', 'power bi', 'tableau',
+        }
+        brechas_filtradas = [b for b in brechas if b.lower() not in _RUIDO_EXCLUIDO]
+        if not brechas_filtradas:
+            brechas_filtradas = brechas  # fallback: use all if filter removes everything
+
         # 3. Score each asignatura by TF-IDF relevance to brechas
         _update("running", current_step="Calculando relevancia de asignaturas")
 
-        logger.info("[REDESIGN-DEBUG] program_id=%s brechas_count=%d brechas=%s",
-                    program_id, len(brechas), brechas)
+        logger.info(
+            "[REDESIGN-DEBUG] program_id=%s brechas=%d filtradas=%d brechas_filtradas=%s",
+            program_id, len(brechas), len(brechas_filtradas), brechas_filtradas,
+        )
 
         scored: list[dict[str, Any]] = []
         all_scores: list[dict[str, Any]] = []   # kept for debug regardless of threshold
         for row in mc_rows:
             text = (row["clean_text"] or "").strip()
-            score, relevant_skills = _compute_tfidf_relevance(text, brechas)
+            # FIX 2: get per-skill scores so each subject gets its own ranked brechas
+            score, ranked_skills = _compute_tfidf_relevance(text, brechas_filtradas)
             asig_nombre = row["nombre"] or f"Asignatura {row['id']}"
             logger.info(
-                "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f relevant_skills=%s",
-                asig_nombre, len(text), score, relevant_skills,
+                "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f top_skills=%s",
+                asig_nombre, len(text), score, ranked_skills[:3],
             )
             confianza = "alta" if score > 0.08 else "media" if score > 0.03 else "baja"
+            # Top brechas specifically relevant to THIS asignatura
+            top_brechas_asig = [skill for skill, _ in ranked_skills[:6]] if ranked_skills else brechas_filtradas[:5]
             all_scores.append({
-                "nombre":         asig_nombre[:60],
-                "clean_text_len": len(text),
-                "max_score":      round(score, 4),
-                "relevant_skills": relevant_skills,
+                "nombre":          asig_nombre[:60],
+                "clean_text_len":  len(text),
+                "max_score":       round(score, 4),
+                "top_brechas":     top_brechas_asig[:4],
             })
             # Always include — no absolute threshold; ranking decides top 5
             scored.append({
@@ -1082,7 +1106,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
                 "asignatura":         asig_nombre,
                 "clean_text":         text,
                 "relevancia_score":   round(score, 4),
-                "brechas_relevantes": relevant_skills if relevant_skills else brechas[:5],
+                "brechas_relevantes": top_brechas_asig,
                 "confianza":          confianza,
             })
 
