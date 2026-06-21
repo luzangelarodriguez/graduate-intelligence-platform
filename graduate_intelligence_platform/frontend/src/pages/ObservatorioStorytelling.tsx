@@ -79,6 +79,36 @@ interface UniversityData {
   competitors: Competitor[];
   total: number;
 }
+interface RAPropuesto {
+  codigo: string;
+  texto: string;
+  tipo: 'nuevo' | 'modificado';
+  skills_incorporadas: string[];
+}
+interface RedisenioPropuesta {
+  asignatura: string;
+  relevancia_score: number;
+  confianza: 'alta' | 'media' | 'baja';
+  brechas_relevantes: string[];
+  ras_actuales_texto: string;
+  ras_propuestos: RAPropuesto[];
+  skills_incorporadas: string[];
+  justificacion?: string;
+}
+interface RediseniResult {
+  program_id: number;
+  asignaturas_analizadas: number;
+  propuestas: RedisenioPropuesta[];
+  advertencia?: string;
+  debug?: Record<string, unknown>;
+}
+interface RediseniJob {
+  job_id: string;
+  status: 'queued' | 'running' | 'done' | 'error';
+  current_step?: string | null;
+  result?: RediseniResult;
+  error?: string;
+}
 
 // ─── Static program metadata ──────────────────────────────────────────────────
 const PROGRAMS = [
@@ -98,6 +128,7 @@ const NAV_SECTIONS = [
   { id: 's6', n: '06', label: 'Empleos Compatibles' },
   { id: 's7', n: '07', label: 'Simulación Curricular' },
   { id: 's8', n: '08', label: 'Recomendaciones' },
+  { id: 's9', n: '09', label: 'Rediseño Curricular' },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -366,6 +397,111 @@ function Spinner() {
 }
 
 // ─── Section wrapper ──────────────────────────────────────────────────────────
+// ─── ProposalCard ─────────────────────────────────────────────────────────────
+function ProposalCard({ prop }: { prop: RedisenioPropuesta }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const confianzaStyle: Record<string, { bg: string; color: string; label: string }> = {
+    alta:  { bg: '#D1FAE5', color: '#065F46', label: 'Confianza alta' },
+    media: { bg: '#FEF3C7', color: '#92400E', label: 'Confianza media' },
+    baja:  { bg: '#F3F4F6', color: '#374151', label: 'Confianza baja' },
+  };
+  const conf = confianzaStyle[prop.confianza] ?? confianzaStyle.baja;
+
+  const TRUNCATE = 300;
+  const truncated = prop.ras_actuales_texto.length > TRUNCATE && !expanded;
+  const displayText = truncated ? prop.ras_actuales_texto.slice(0, TRUNCATE) + '…' : prop.ras_actuales_texto;
+
+  return (
+    <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 20, background: C.white }}>
+      {/* Card header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: `1px solid ${C.border}`, background: C.navyBg }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: 0 }}>{prop.asignatura}</p>
+        <span style={{ fontSize: 11, fontWeight: 700, background: conf.bg, color: conf.color, borderRadius: 20, padding: '3px 10px' }}>
+          {conf.label}
+        </span>
+      </div>
+
+      {/* 2-column body */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 160 }}>
+        {/* Left — RAs actuales */}
+        <div style={{ padding: '16px 20px', borderRight: `1px solid ${C.border}`, background: '#F9FAFB' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6B7280', marginBottom: 10 }}>
+            RAs Actuales
+          </p>
+          <p style={{ fontSize: 12, color: '#374151', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{displayText}</p>
+          {prop.ras_actuales_texto.length > TRUNCATE && (
+            <button
+              onClick={() => setExpanded(e => !e)}
+              style={{ marginTop: 8, fontSize: 11, color: C.navy, fontWeight: 700, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
+              {expanded ? 'Ver menos ▲' : 'Ver más ▼'}
+            </button>
+          )}
+        </div>
+
+        {/* Right — RAs propuestos */}
+        <div style={{ padding: '16px 20px', background: '#F0FDF4' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#065F46', marginBottom: 10 }}>
+            RAs Propuestos
+          </p>
+          {prop.ras_propuestos.length === 0 ? (
+            <p style={{ fontSize: 12, color: '#6B7280', fontStyle: 'italic', margin: 0 }}>
+              Ninguna brecha disponible es coherente con esta asignatura.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {prop.ras_propuestos.map((ra, i) => (
+                <div key={i} style={{ paddingBottom: 14, borderBottom: i < prop.ras_propuestos.length - 1 ? `1px solid #BBF7D0` : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#065F46' }}>{ra.codigo}</span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700,
+                      background: ra.tipo === 'nuevo' ? '#DCFCE7' : '#E0F2FE',
+                      color: ra.tipo === 'nuevo' ? '#166534' : '#075985',
+                      borderRadius: 20, padding: '1px 8px',
+                    }}>
+                      {ra.tipo === 'nuevo' ? 'nuevo' : 'modificado'}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 12, color: '#166534', lineHeight: 1.6, margin: '0 0 8px' }}>{ra.texto}</p>
+                  {ra.skills_incorporadas.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                      {ra.skills_incorporadas.map((s, si) => (
+                        <span key={si} style={{ fontSize: 10, background: '#D1FAE5', color: '#065F46', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Card footer */}
+      <div style={{ padding: '12px 20px', borderTop: `1px solid ${C.border}`, background: C.white }}>
+        {prop.justificacion && (
+          <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', margin: '0 0 8px' }}>
+            {prop.justificacion}
+          </p>
+        )}
+        {prop.brechas_relevantes.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', alignSelf: 'center', marginRight: 4 }}>Brechas:</span>
+            {prop.brechas_relevantes.slice(0, 6).map((b, bi) => (
+              <span key={bi} style={{ fontSize: 10, background: C.navyBg, color: C.navy, borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
+                {b}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SectionBlock({ id, n, title, dark = false, children }: {
   id: string; n: string; title: string; dark?: boolean; children: React.ReactNode;
 }) {
@@ -401,8 +537,11 @@ export default function ObservatorioStorytelling() {
   const [pipelineStatus, setPipelineStatus]   = useState<string>('idle');
   const [pipelineStep, setPipelineStep]       = useState<string | null>(null);
   const [pipelineLog, setPipelineLog]         = useState<string[]>([]);
-  const mainRef = useRef<HTMLDivElement>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
+  const [redesignDlError, setRedesignDlError] = useState(false);
+  const mainRef        = useRef<HTMLDivElement>(null);
+  const pollRef        = useRef<ReturnType<typeof setInterval> | null>(null);
+  const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // fetch summary
   useEffect(() => {
@@ -438,6 +577,62 @@ export default function ObservatorioStorytelling() {
       .then((d: UniversityData) => setUniv(d))
       .catch(() => setUniv(null));
   }, [programaId]);
+
+  // Reset redesign when program changes
+  useEffect(() => {
+    setRedesignJob(null);
+    setRedesignDlError(false);
+    if (redesignPollRef.current) {
+      clearInterval(redesignPollRef.current);
+      redesignPollRef.current = null;
+    }
+  }, [programaId]);
+
+  // Cleanup redesign poll on unmount
+  useEffect(() => () => { if (redesignPollRef.current) clearInterval(redesignPollRef.current); }, []);
+
+  function startRedesign() {
+    setRedesignDlError(false);
+    setRedesignJob({ job_id: '', status: 'queued', current_step: 'Iniciando análisis…' });
+    fetch(`${API}/api/curriculum/redesign/${programaId}`, { method: 'POST' })
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: { job_id: string }) => {
+        const initial: RediseniJob = { job_id: d.job_id, status: 'queued', current_step: 'En cola…' };
+        setRedesignJob(initial);
+        redesignPollRef.current = setInterval(() => pollRedesign(d.job_id), 3000);
+      })
+      .catch(() => setRedesignJob({ job_id: '', status: 'error', error: 'No se pudo iniciar el análisis. Verifica que el servidor esté activo.' }));
+  }
+
+  function pollRedesign(jobId: string) {
+    fetch(`${API}/api/curriculum/redesign/status/${jobId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: RediseniJob) => {
+        setRedesignJob(d);
+        if (d.status === 'done' || d.status === 'error') {
+          if (redesignPollRef.current) { clearInterval(redesignPollRef.current); redesignPollRef.current = null; }
+        }
+      })
+      .catch(() => {});
+  }
+
+  async function downloadRedesign() {
+    setRedesignDlError(false);
+    try {
+      const res = await fetch(`${API}/api/curriculum/redesign/${programaId}/download`);
+      if (res.status === 404) { setRedesignDlError(true); return; }
+      if (!res.ok) { setRedesignDlError(true); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rediseno_curricular_${programaId}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setRedesignDlError(true);
+    }
+  }
 
   // pipeline
   function startPipeline() {
@@ -1076,6 +1271,180 @@ export default function ObservatorioStorytelling() {
                 })()}
               </>
             )}
+          </SectionBlock>
+
+          {/* ── S9: Rediseño Curricular Asistido ── */}
+          <SectionBlock id="s9" n="09" title="Rediseño Curricular Asistido">
+            {(() => {
+              // ── Estado inicial ──────────────────────────────────────────────
+              if (!redesignJob || redesignJob.job_id === '') {
+                const isLaunching = redesignJob?.status === 'queued' && redesignJob.job_id === '';
+                return (
+                  <div style={{ maxWidth: 640 }}>
+                    <p style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.7, marginBottom: 24 }}>
+                      El motor de IA analiza los microcurrículos del programa contra las brechas detectadas en el mercado
+                      y genera propuestas concretas de nuevos o modificados Resultados de Aprendizaje (RAs) por asignatura.
+                    </p>
+                    <div style={{ background: C.navyBg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '20px 24px', marginBottom: 24 }}>
+                      <p style={{ fontSize: 12, color: C.navy, fontWeight: 600, marginBottom: 6 }}>¿Qué incluye el análisis?</p>
+                      <ul style={{ fontSize: 12, color: '#374151', lineHeight: 1.8, paddingLeft: 18, margin: 0 }}>
+                        <li>Identificación de brechas más relevantes por asignatura (TF-IDF)</li>
+                        <li>Propuestas de RAs generadas con GPT-4o-mini</li>
+                        <li>Filtrado de ruido genérico (Excel, liderazgo, etc.)</li>
+                        <li>Descarga en formato .docx con comparación antes/después</li>
+                      </ul>
+                    </div>
+                    <button
+                      onClick={startRedesign}
+                      disabled={isLaunching}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        background: isLaunching ? '#9CA3AF' : C.navy,
+                        color: C.white,
+                        border: 'none', borderRadius: 8,
+                        padding: '12px 24px',
+                        fontSize: 14, fontWeight: 700,
+                        cursor: isLaunching ? 'not-allowed' : 'pointer',
+                        transition: 'background 0.15s',
+                      }}>
+                      {isLaunching ? '⏳ Iniciando…' : '🔬 Analizar y proponer mejoras curriculares'}
+                    </button>
+                  </div>
+                );
+              }
+
+              // ── Running / queued ────────────────────────────────────────────
+              if (redesignJob.status === 'queued' || redesignJob.status === 'running') {
+                return (
+                  <div style={{ maxWidth: 520 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: '50%',
+                        border: `3px solid ${C.border}`,
+                        borderTopColor: C.navy,
+                        animation: 'spin 0.8s linear infinite',
+                        flexShrink: 0,
+                      }} />
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: C.navy, margin: 0 }}>
+                          {redesignJob.status === 'queued' ? 'En cola…' : 'Analizando con IA…'}
+                        </p>
+                        {redesignJob.current_step && (
+                          <p style={{ fontSize: 12, color: '#6B7280', margin: '4px 0 0', fontStyle: 'italic' }}>
+                            {redesignJob.current_step}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {/* Animated progress bar */}
+                    <div style={{ height: 4, background: C.border, borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', width: '40%',
+                        background: `linear-gradient(90deg, ${C.navy}, ${C.mid})`,
+                        borderRadius: 4,
+                        animation: 'progressSlide 1.8s ease-in-out infinite',
+                      }} />
+                    </div>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 10 }}>
+                      Esto puede tomar 1–2 minutos. No cierres esta pestaña.
+                    </p>
+                    <style>{`
+                      @keyframes spin { to { transform: rotate(360deg); } }
+                      @keyframes progressSlide {
+                        0%   { transform: translateX(-100%); }
+                        50%  { transform: translateX(150%); }
+                        100% { transform: translateX(150%); }
+                      }
+                    `}</style>
+                  </div>
+                );
+              }
+
+              // ── Error ───────────────────────────────────────────────────────
+              if (redesignJob.status === 'error') {
+                return (
+                  <div style={{ maxWidth: 520 }}>
+                    <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '20px 24px', marginBottom: 20 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#B91C1C', marginBottom: 6 }}>Error en el análisis</p>
+                      <p style={{ fontSize: 13, color: '#7F1D1D', margin: 0 }}>
+                        {redesignJob.error ?? 'Ocurrió un error inesperado. Intenta de nuevo.'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => { setRedesignJob(null); setRedesignDlError(false); }}
+                      style={{ background: C.navy, color: C.white, border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      Reintentar
+                    </button>
+                  </div>
+                );
+              }
+
+              // ── Done ────────────────────────────────────────────────────────
+              const result = redesignJob.result;
+              if (!result) return null;
+              const propuestas = result.propuestas ?? [];
+
+              return (
+                <div>
+                  {/* Header resumen */}
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: C.navy, margin: 0 }}>
+                      {result.asignaturas_analizadas} asignaturas analizadas · {propuestas.length} con propuestas de mejora
+                    </p>
+                    {result.advertencia && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#92400E', background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 20, padding: '3px 10px' }}>
+                        ⚠ {result.advertencia}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Vacío */}
+                  {propuestas.length === 0 && (
+                    <div style={{ background: C.navyBg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '32px 24px', textAlign: 'center', marginBottom: 24 }}>
+                      <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>
+                        No se identificaron asignaturas con potencial de mejora clara para este programa.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Cards por propuesta */}
+                  {propuestas.map((prop, idx) => (
+                    <ProposalCard key={idx} prop={prop} />
+                  ))}
+
+                  {/* Botón descarga */}
+                  <div style={{ marginTop: 32, paddingTop: 24, borderTop: `1px solid ${C.border}` }}>
+                    <button
+                      onClick={downloadRedesign}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        background: C.navy, color: C.white,
+                        border: 'none', borderRadius: 8,
+                        padding: '12px 24px', fontSize: 14, fontWeight: 700,
+                        cursor: 'pointer',
+                      }}>
+                      📥 Descargar propuesta completa (.docx)
+                    </button>
+                    {redesignDlError && (
+                      <p style={{ fontSize: 12, color: '#B91C1C', marginTop: 10, fontStyle: 'italic' }}>
+                        El archivo ya no está disponible en el servidor. Vuelve a analizar para descargar.
+                      </p>
+                    )}
+                    <button
+                      onClick={() => { setRedesignJob(null); setRedesignDlError(false); }}
+                      style={{
+                        marginLeft: 12,
+                        background: 'transparent', color: C.navy,
+                        border: `1px solid ${C.border}`, borderRadius: 8,
+                        padding: '12px 20px', fontSize: 13, fontWeight: 600,
+                        cursor: 'pointer',
+                      }}>
+                      ↺ Nuevo análisis
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
           </SectionBlock>
 
           {/* Footer */}
