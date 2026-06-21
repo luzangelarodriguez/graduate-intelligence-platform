@@ -327,6 +327,9 @@ def run_acquisition(
         if source_name == "elempleo":
             from scrapers.sources.elempleo_scraper import scrape_jobs
             scrape_fn = scrape_jobs
+        elif source_name == "bebee":
+            from scrapers.sources.bebee_scraper import scrape_jobs
+            scrape_fn = scrape_jobs
         else:
             # Generic lazy import
             import importlib
@@ -509,7 +512,7 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Scraper to use (default: elempleo). "
             "Available: elempleo, magneto, magneto_api, computrabajo, indeed_co, "
-            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship"
+            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship, bebee"
         ),
     )
     parser.add_argument(
