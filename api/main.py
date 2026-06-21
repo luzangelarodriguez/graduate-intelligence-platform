@@ -1060,6 +1060,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
                     program_id, len(brechas), brechas)
 
         scored: list[dict[str, Any]] = []
+        all_scores: list[dict[str, Any]] = []   # kept for debug regardless of threshold
         for row in mc_rows:
             text = (row["clean_text"] or "").strip()
             score, relevant_skills = _compute_tfidf_relevance(text, brechas)
@@ -1068,6 +1069,12 @@ def _run_redesign(job_id: str, program_id: int) -> None:
                 "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f relevant_skills=%s",
                 asig_nombre, len(text), score, relevant_skills,
             )
+            all_scores.append({
+                "nombre":        asig_nombre[:60],
+                "clean_text_len": len(text),
+                "max_score":     round(score, 4),
+                "relevant_skills": relevant_skills,
+            })
             if score >= 0.10 and relevant_skills:
                 scored.append({
                     "mc_id":             row["id"],
@@ -1080,14 +1087,24 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         scored.sort(key=lambda x: x["relevancia_score"], reverse=True)
         top = scored[:5]
 
+        # Debug block included in every response
+        debug_info = {
+            "brechas_count":       len(brechas),
+            "brechas_sample":      brechas[:10],
+            "umbral":              0.10,
+            "asignaturas_scores":  sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
+        }
+
         if not top:
-            _update("done", result={
-                "program_id": program_id,
+            result = {
+                "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
                 "advertencia": "Ninguna asignatura superó el umbral de relevancia. Los microcurrículos pueden tener texto insuficiente.",
-                "propuestas": [],
-            })
-            _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
+                "propuestas":             [],
+                "debug":                  debug_info,
+            }
+            _REDESIGN_CACHE[program_id] = result
+            _update("done", result=result)
             return
 
         # 4. Call OpenAI for each top asignatura
@@ -1119,6 +1136,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             "asignaturas_analizadas": len(mc_rows),
             "brechas_totales":        len(brechas),
             "propuestas":             propuestas,
+            "debug":                  debug_info,
         }
         _REDESIGN_CACHE[program_id] = result
         _update("done", result=result)
