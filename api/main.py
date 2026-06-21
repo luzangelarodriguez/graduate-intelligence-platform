@@ -1060,6 +1060,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
                     program_id, len(brechas), brechas)
 
         scored: list[dict[str, Any]] = []
+        all_scores: list[dict[str, Any]] = []   # kept for debug regardless of threshold
         for row in mc_rows:
             text = (row["clean_text"] or "").strip()
             score, relevant_skills = _compute_tfidf_relevance(text, brechas)
@@ -1068,26 +1069,44 @@ def _run_redesign(job_id: str, program_id: int) -> None:
                 "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f relevant_skills=%s",
                 asig_nombre, len(text), score, relevant_skills,
             )
-            if score >= 0.10 and relevant_skills:
-                scored.append({
-                    "mc_id":             row["id"],
-                    "asignatura":        asig_nombre,
-                    "clean_text":        text,
-                    "relevancia_score":  round(score, 3),
-                    "brechas_relevantes": relevant_skills,
-                })
+            confianza = "alta" if score > 0.08 else "media" if score > 0.03 else "baja"
+            all_scores.append({
+                "nombre":         asig_nombre[:60],
+                "clean_text_len": len(text),
+                "max_score":      round(score, 4),
+                "relevant_skills": relevant_skills,
+            })
+            # Always include — no absolute threshold; ranking decides top 5
+            scored.append({
+                "mc_id":              row["id"],
+                "asignatura":         asig_nombre,
+                "clean_text":         text,
+                "relevancia_score":   round(score, 4),
+                "brechas_relevantes": relevant_skills if relevant_skills else brechas[:5],
+                "confianza":          confianza,
+            })
 
         scored.sort(key=lambda x: x["relevancia_score"], reverse=True)
         top = scored[:5]
 
+        # Debug block included in every response
+        debug_info = {
+            "brechas_count":      len(brechas),
+            "brechas_sample":     brechas[:10],
+            "umbral":             "ninguno (top-5 por ranking)",
+            "asignaturas_scores": sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
+        }
+
         if not top:
-            _update("done", result={
-                "program_id": program_id,
+            result = {
+                "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
                 "advertencia": "Ninguna asignatura superó el umbral de relevancia. Los microcurrículos pueden tener texto insuficiente.",
-                "propuestas": [],
-            })
-            _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
+                "propuestas":             [],
+                "debug":                  debug_info,
+            }
+            _REDESIGN_CACHE[program_id] = result
+            _update("done", result=result)
             return
 
         # 4. Call OpenAI for each top asignatura
@@ -1107,6 +1126,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             propuestas.append({
                 "asignatura":          item["asignatura"],
                 "relevancia_score":    item["relevancia_score"],
+                "confianza":           item["confianza"],
                 "brechas_relevantes":  item["brechas_relevantes"],
                 "ras_actuales_texto":  item["clean_text"][:600],
                 "ras_propuestos":      ai_result.get("ras_propuestos", []),
@@ -1119,6 +1139,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             "asignaturas_analizadas": len(mc_rows),
             "brechas_totales":        len(brechas),
             "propuestas":             propuestas,
+            "debug":                  debug_info,
         }
         _REDESIGN_CACHE[program_id] = result
         _update("done", result=result)
