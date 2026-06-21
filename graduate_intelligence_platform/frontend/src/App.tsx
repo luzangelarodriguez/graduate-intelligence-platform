@@ -17,14 +17,15 @@ import { ProgramIntelligenceDetailPage } from './pages/ProgramIntelligenceDetail
 import { ProgramMicrocurriculumPage } from './pages/ProgramMicrocurriculumPage';
 import { ProgramSimulationPage } from './pages/ProgramSimulationPage';
 import { ProgramsPage } from './pages/ProgramsPage';
+import { ObservatorioMinimalista } from './pages/ObservatorioMinimalista';
 
 export default function App() {
   return (
     <AppProvider>
       <AuthProvider>
         <Routes>
-          <Route index element={<ObservatorioStorytelling />} />
-          <Route path="/observatorio" element={<ObservatorioStorytelling />} />
+          <Route index element={<ObservatorioMinimalista />} />
+          <Route path="/observatorio" element={<ObservatorioMinimalista />} />
           <Route path="/observatorio-institucional" element={<ExecutiveSummaryPage />} />
           <Route path="/pertinencia-demo" element={<PertinenciaStorytelling />} />
           <Route path="/login" element={<LoginPage />} />
