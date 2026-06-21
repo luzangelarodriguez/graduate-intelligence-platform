@@ -370,7 +370,6 @@ function SectionBlock({ id, n, title, dark = false, children }: {
 }) {
   return (
     <section id={id} style={{
-      padding: '48px 0',
       borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.08)' : C.border}`,
       background: dark ? C.navy : 'transparent',
       margin: dark ? '0 -48px' : '0',
