@@ -1,4 +1,11 @@
-import { CheckCircle2, BarChart3 } from 'lucide-react';
+import { CheckCircle2, BarChart3, AlertCircle } from 'lucide-react';
+import { SkillsAnalysis } from '../../services/observatoryApi';
+
+interface CoberturaSectionProps {
+  data: SkillsAnalysis | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface CoverageTopic {
   name: string;
@@ -8,7 +15,7 @@ interface CoverageTopic {
   remarks: string;
 }
 
-const coverageTopics: CoverageTopic[] = [
+const defaultCoverageTopics: CoverageTopic[] = [
   { name: 'Python & Scripting', coverage: 100, status: 'covered', importance: 95, remarks: 'Completamente integrado' },
   { name: 'Web Development (React)', coverage: 90, status: 'covered', importance: 92, remarks: 'Requiere modernización' },
   { name: 'Backend Systems (Node.js)', coverage: 85, status: 'partial', importance: 88, remarks: 'Bases sólidas' },
@@ -19,7 +26,47 @@ const coverageTopics: CoverageTopic[] = [
   { name: 'Security & Encryption', coverage: 55, status: 'partial', importance: 82, remarks: 'Ampliar cobertura' },
 ];
 
-export function CoberturaSection() {
+export function CoberturaSection({ data, loading, error }: CoberturaSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-cobertura" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <CheckCircle2 size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Cobertura Curricular
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <section id="section-cobertura" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <CheckCircle2 size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Cobertura Curricular
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertCircle size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const coverageTopics = defaultCoverageTopics;
   const totalCoverage = Math.round(coverageTopics.reduce((sum, t) => sum + t.coverage, 0) / coverageTopics.length);
   const criticalGaps = coverageTopics.filter(t => t.coverage < 50 && t.importance > 80).length;
 

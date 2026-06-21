@@ -1,4 +1,11 @@
-import { Zap, TrendingUp, BarChart3 } from 'lucide-react';
+import { Zap, TrendingUp, BarChart3, AlertCircle } from 'lucide-react';
+import { DashboardSummary } from '../../services/observatoryApi';
+
+interface SimulacionSectionProps {
+  data: DashboardSummary | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface Scenario {
   name: string;
@@ -57,9 +64,48 @@ const scenarios: Scenario[] = [
   },
 ];
 
-export function SimulacionSection() {
-  const basePerti = 76;
-  const baseEmpl = 82;
+export function SimulacionSection({ data, loading, error }: SimulacionSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-simulacion" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Zap size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Simulación de Mejora
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <section id="section-simulacion" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Zap size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Simulación de Mejora
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertCircle size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const basePerti = data?.pertinencia_general || 76;
+  const baseEmpl = data?.empleabilidad_egresados || 82;
 
   return (
     <section id="section-simulacion" className="scroll-mt-24 mb-16">

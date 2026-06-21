@@ -1,4 +1,11 @@
-import { AlertCircle, TrendingUp, Clock } from 'lucide-react';
+import { AlertCircle, TrendingUp, Clock, AlertCircle as AlertIcon } from 'lucide-react';
+import { SkillsAnalysis } from '../../services/observatoryApi';
+
+interface BrechasSectionProps {
+  data: SkillsAnalysis | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface Gap {
   skill: string;
@@ -9,7 +16,7 @@ interface Gap {
   recommendedAction: string;
 }
 
-const gaps: Gap[] = [
+const defaultGaps: Gap[] = [
   {
     skill: 'Artificial Intelligence & Machine Learning',
     gap: 70,
@@ -72,9 +79,49 @@ function getUrgencyLabel(urgency: string) {
   return 'MEDIA';
 }
 
-export function BrechasSection() {
-  const criticalCount = gaps.filter(g => g.urgency === 'critical').length;
-  const totalGap = Math.round(gaps.reduce((sum, g) => sum + g.gap, 0) / gaps.length);
+export function BrechasSection({ data, loading, error }: BrechasSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-brechas" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <AlertCircle size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Brechas Identificadas
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data || !data.skill_gaps || data.skill_gaps.length === 0) {
+    return (
+      <section id="section-brechas" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <AlertCircle size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Brechas Identificadas
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertIcon size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const gaps = defaultGaps;
+  const totalGap = gaps.reduce((sum: number, gap: any) => sum + (gap.gap || 0), 0) / gaps.length;
+  const criticalCount = gaps.filter((gap: any) => gap.urgency === 'critical').length;
 
   return (
     <section id="section-brechas" className="scroll-mt-24 mb-16">

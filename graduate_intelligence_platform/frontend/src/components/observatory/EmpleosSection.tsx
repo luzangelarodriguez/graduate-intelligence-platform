@@ -1,4 +1,11 @@
-import { Users, TrendingUp, Briefcase } from 'lucide-react';
+import { Users, TrendingUp, Briefcase, AlertCircle } from 'lucide-react';
+import { SkillsAnalysis } from '../../services/observatoryApi';
+
+interface EmpleosSectionProps {
+  data: SkillsAnalysis | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface JobRole {
   role: string;
@@ -10,7 +17,7 @@ interface JobRole {
   matchLevel: 'excellent' | 'good' | 'fair';
 }
 
-const jobRoles: JobRole[] = [
+const defaultJobRoles: JobRole[] = [
   {
     role: 'Software Developer / Engineer',
     alignment: 94,
@@ -97,9 +104,48 @@ function getMatchLabel(match: string) {
   return 'REGULAR';
 }
 
-export function EmpleosSection() {
-  const topJobs = jobRoles.filter(j => j.alignment > 85);
-  const totalVacancies = jobRoles.reduce((sum, j) => sum + j.vacanciesPerYear, 0);
+export function EmpleosSection({ data, loading, error }: EmpleosSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-empleos" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Users size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Empleos Compatibles
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data || !data.compatible_jobs || data.compatible_jobs.length === 0) {
+    return (
+      <section id="section-empleos" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Users size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Empleos Compatibles
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertCircle size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const topJobs = defaultJobRoles;
+  const totalVacancies = defaultJobRoles.reduce((sum: number, job: any) => sum + (job.vacanciesPerYear || 0), 0);
 
   return (
     <section id="section-empleos" className="scroll-mt-24 mb-16">
@@ -140,7 +186,7 @@ export function EmpleosSection() {
             Salario Promedio
           </p>
           <p className="text-3xl font-black text-[var(--color-text-primary)] mb-2">
-            ${Math.round(jobRoles.reduce((sum, j) => sum + j.avgSalary, 0) / jobRoles.length)}K
+            ${Math.round(defaultJobRoles.reduce((sum: number, j: any) => sum + (j.avgSalary || 0), 0) / defaultJobRoles.length)}K
           </p>
           <p className="text-xs text-[var(--color-text-secondary)]">salario mensual COP (miles)</p>
         </div>
@@ -148,7 +194,7 @@ export function EmpleosSection() {
 
       {/* Job Roles Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {jobRoles.map((job, idx) => (
+            {defaultJobRoles.map((job: any, idx: number) => (
           <div
             key={idx}
             className={`rounded-xl border-2 bg-[var(--color-surface)] p-6 transition-all hover:shadow-md ${
@@ -208,7 +254,7 @@ export function EmpleosSection() {
                 Skills Requeridas
               </p>
               <div className="flex flex-wrap gap-2">
-                {job.requiredSkills.map((skill, sidx) => (
+                    {job.requiredSkills.map((skill: any, sidx: number) => (
                   <span
                     key={sidx}
                     className="text-xs bg-[var(--color-background)] text-[var(--color-text-primary)] rounded-full px-3 py-1.5 font-600"

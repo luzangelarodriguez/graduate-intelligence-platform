@@ -19,6 +19,7 @@ import { BrechasSection } from '../components/observatory/BrechasSection';
 import { EmpleosSection } from '../components/observatory/EmpleosSection';
 import { SimulacionSection } from '../components/observatory/SimulacionSection';
 import { RecomendacionesSection } from '../components/observatory/RecomendacionesSection';
+import { observatoryApi, DashboardSummary, SkillsAnalysis, RelatedUniversities } from '../services/observatoryApi';
 
 interface NavigationItem {
   id: string;
@@ -38,10 +39,44 @@ const navigationItems: NavigationItem[] = [
   { id: 'recomendaciones', label: 'Recomendaciones', icon: Lightbulb, section: 'recomendaciones' },
 ];
 
+const PROGRAM_IDS = [
+  { id: 94, name: 'Ingeniería de Sistemas' },
+  { id: 92, name: 'Ingeniería de Software' },
+  { id: 108, name: 'Ingeniería Informática' },
+  { id: 20, name: 'Desarrollo de Software' },
+];
+
 export function ObservatorioMinimalista() {
   const [activeSection, setActiveSection] = useState('estado');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState('Ingeniería de Sistemas');
+  const [selectedProgramId, setSelectedProgramId] = useState(94);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [skills, setSkills] = useState<SkillsAnalysis | null>(null);
+  const [universities, setUniversities] = useState<RelatedUniversities | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data when program changes
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      console.log('[v0] Loading data for program:', selectedProgramId);
+      try {
+        const data = await observatoryApi.getAllData(selectedProgramId);
+        setSummary(data.summary);
+        setSkills(data.skills);
+        setUniversities(data.universities);
+      } catch (err) {
+        console.error('[v0] Error loading data:', err);
+        setError('Error cargando datos. Por favor intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedProgramId]);
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -76,13 +111,15 @@ export function ObservatorioMinimalista() {
               Programa
             </label>
             <select
-              value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
+              value={selectedProgramId}
+              onChange={(e) => setSelectedProgramId(parseInt(e.target.value))}
               className="mt-2 w-full rounded border border-[var(--color-navy-light)] bg-[var(--color-navy-light)] px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-red)]"
             >
-              <option>Ingeniería de Sistemas</option>
-              <option>Administración de Empresas</option>
-              <option>Contabilidad</option>
+              {PROGRAM_IDS.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -189,33 +226,33 @@ export function ObservatorioMinimalista() {
               Observatorio de Pertinencia Educativa
             </h1>
             <p className="text-lg text-[var(--color-text-secondary)]">
-              Análisis integral del programa {selectedProgram}
+              Análisis integral del programa {PROGRAM_IDS.find(p => p.id === selectedProgramId)?.name || 'cargando...'}
             </p>
           </header>
 
           {/* Section: Estado de Pertinencia */}
-          <EstadoSection />
+          <EstadoSection data={summary} loading={loading} error={error} />
 
           {/* Section: Qué Demanda Mercado */}
-          <MercadoSection />
+          <MercadoSection data={skills} loading={loading} error={error} />
 
           {/* Section: Qué Enseña Programa */}
-          <ProgramaSection />
+          <ProgramaSection data={skills} loading={loading} error={error} />
 
           {/* Section: Cobertura Curricular */}
-          <CoberturaSection />
+          <CoberturaSection data={skills} loading={loading} error={error} />
 
           {/* Section: Brechas Identificadas */}
-          <BrechasSection />
+          <BrechasSection data={skills} loading={loading} error={error} />
 
           {/* Section: Empleos Compatibles */}
-          <EmpleosSection />
+          <EmpleosSection data={skills} loading={loading} error={error} />
 
           {/* Section: Simulación de Mejora */}
-          <SimulacionSection />
+          <SimulacionSection data={summary} loading={loading} error={error} />
 
           {/* Section: Recomendaciones */}
-          <RecomendacionesSection />
+          <RecomendacionesSection data={skills} loading={loading} error={error} />
 
 
 

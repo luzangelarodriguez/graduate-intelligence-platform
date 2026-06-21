@@ -1,4 +1,11 @@
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, AlertCircle } from 'lucide-react';
+import { DashboardSummary } from '../../services/observatoryApi';
+
+interface EstadoSectionProps {
+  data: DashboardSummary | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface KPICard {
   label: string;
@@ -9,34 +16,72 @@ interface KPICard {
   color: string;
 }
 
-const kpis: KPICard[] = [
-  {
-    label: 'Pertinencia General',
-    value: '76%',
-    percentage: 76,
-    trend: 'up',
-    change: '+5% vs último año',
-    color: 'bg-[var(--color-success)]',
-  },
-  {
-    label: 'Cobertura Curricular',
-    value: '68%',
-    percentage: 68,
-    trend: 'down',
-    change: '-2% vs último año',
-    color: 'bg-[var(--color-warning)]',
-  },
-  {
-    label: 'Empleabilidad Egresados',
-    value: '82%',
-    percentage: 82,
-    trend: 'up',
-    change: '+8% vs último año',
-    color: 'bg-[var(--color-success)]',
-  },
-];
+export function EstadoSection({ data, loading, error }: EstadoSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-estado" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <TrendingUp size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Estado de Pertinencia
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
 
-export function EstadoSection() {
+  if (error || !data) {
+    return (
+      <section id="section-estado" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <TrendingUp size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Estado de Pertinencia
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertCircle size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const kpis: KPICard[] = [
+    {
+      label: 'Pertinencia General',
+      value: `${data.pertinencia_general}%`,
+      percentage: data.pertinencia_general,
+      trend: 'up',
+      change: '+5% vs último año',
+      color: 'bg-[var(--color-success)]',
+    },
+    {
+      label: 'Cobertura Curricular',
+      value: `${data.cobertura_curricular}%`,
+      percentage: data.cobertura_curricular,
+      trend: 'down',
+      change: '-2% vs último año',
+      color: 'bg-[var(--color-warning)]',
+    },
+    {
+      label: 'Empleabilidad Egresados',
+      value: `${data.empleabilidad_egresados}%`,
+      percentage: data.empleabilidad_egresados,
+      trend: 'up',
+      change: '+8% vs último año',
+      color: 'bg-[var(--color-success)]',
+    },
+  ];
   return (
     <section id="section-estado" className="scroll-mt-24 mb-16">
       <div className="mb-8">

@@ -1,4 +1,11 @@
-import { Lightbulb, CheckCircle2, Clock, Zap } from 'lucide-react';
+import { Lightbulb, CheckCircle2, Clock, Zap, AlertCircle } from 'lucide-react';
+import { SkillsAnalysis } from '../../services/observatoryApi';
+
+interface RecomendacionesSectionProps {
+  data: SkillsAnalysis | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface Recommendation {
   title: string;
@@ -116,9 +123,48 @@ function getPriorityLabel(priority: string) {
   return 'MEDIA';
 }
 
-export function RecomendacionesSection() {
-  const urgentCount = recommendations.filter(r => r.priority === 'urgent').length;
-  const highImpact = recommendations.filter(r => r.impact === 'alto').length;
+export function RecomendacionesSection({ data, loading, error }: RecomendacionesSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-recomendaciones" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Lightbulb size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Recomendaciones
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <section id="section-recomendaciones" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <Lightbulb size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Recomendaciones
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertCircle size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const urgentCount = recommendations.filter((r: any) => r.priority === 'urgent').length;
+  const highImpact = recommendations.filter((r: any) => r.impact === 'alto').length;
 
   return (
     <section id="section-recomendaciones" className="scroll-mt-24 mb-16">

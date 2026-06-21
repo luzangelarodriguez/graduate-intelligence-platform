@@ -1,4 +1,11 @@
-import { BookOpen, CheckCircle2, AlertCircle } from 'lucide-react';
+import { BookOpen, CheckCircle2, AlertCircle, AlertCircle as AlertIcon } from 'lucide-react';
+import { SkillsAnalysis } from '../../services/observatoryApi';
+
+interface ProgramaSectionProps {
+  data: SkillsAnalysis | null;
+  loading: boolean;
+  error: string | null;
+}
 
 interface CurriculumArea {
   name: string;
@@ -9,7 +16,7 @@ interface CurriculumArea {
   status: 'strong' | 'adequate' | 'weak';
 }
 
-const curriculumAreas: CurriculumArea[] = [
+const defaultCurriculumAreas: CurriculumArea[] = [
   {
     name: 'Fundamentos de Programación',
     description: 'Algoritmos, estructuras de datos y paradigmas',
@@ -70,8 +77,48 @@ function getStatusLabel(status: string) {
   return 'Débil';
 }
 
-export function ProgramaSection() {
-  const totalCredits = curriculumAreas.reduce((sum, area) => sum + area.credits, 0);
+export function ProgramaSection({ data, loading, error }: ProgramaSectionProps) {
+  if (loading) {
+    return (
+      <section id="section-programa" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <BookOpen size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Qué Enseña el Programa
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-12 text-center">
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Cargando datos...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !data || !data.program_taught_skills || data.program_taught_skills.length === 0) {
+    return (
+      <section id="section-programa" className="scroll-mt-24 mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-black text-[var(--color-text-primary)] flex items-center gap-3 mb-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--color-accent-red)] bg-opacity-10">
+              <BookOpen size={24} className="text-[var(--color-accent-red)]" />
+            </div>
+            Qué Enseña el Programa
+          </h2>
+        </div>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 flex items-center gap-3">
+          <AlertIcon size={20} className="text-[var(--color-accent-red)]" />
+          <span className="text-[var(--color-text-secondary)]">
+            {error || 'Datos en construcción'}
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const curriculumAreas = defaultCurriculumAreas;
+  const totalCredits = curriculumAreas.reduce((sum: number, area: any) => sum + (area.credits || 0), 0);
 
   return (
     <section id="section-programa" className="scroll-mt-24 mb-16">
@@ -111,7 +158,7 @@ export function ProgramaSection() {
 
       {/* Curriculum Areas */}
       <div className="space-y-4">
-        {curriculumAreas.map((area, idx) => (
+        {curriculumAreas.map((area: any, idx: number) => (
           <div
             key={idx}
             className={`rounded-xl border-2 ${getStatusColor(area.status)} bg-[var(--color-surface)] p-6 transition-all hover:shadow-md`}
@@ -158,7 +205,7 @@ export function ProgramaSection() {
                 Asignaturas Ofertadas
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                {area.subjects.map((subject, sidx) => (
+                  {area.subjects.map((subject: any, sidx: number) => (
                   <div
                     key={sidx}
                     className="text-sm text-[var(--color-text-primary)] bg-[var(--color-background)] rounded-lg px-3 py-2 flex items-center gap-2"
