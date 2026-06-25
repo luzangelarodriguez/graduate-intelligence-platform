@@ -730,7 +730,6 @@ export default function ObservatorioStorytelling() {
   const coberturaPct   = skills?.cobertura_pct ?? 0;
   const brechaPct      = skills ? 100 - coberturaPct : 0;
   const empCompatibles = top_matches.filter(m => m.skills_en_comun.length > 0).length;
-  const maxFrecuencia  = skillsMercadoDeduped.length ? Math.max(...skillsMercadoDeduped.map(s => s.frecuencia), 1) : 1;
   const maxCobertura   = skills ? Math.max(...skills.skills_programa.map(s => s.cobertura), 1) : 1;
   const qualityMatches = top_matches.filter(m => (m.skills_en_comun?.length ?? 0) > 0).length;
   const dataPobre      = totales.matches < 10 || qualityMatches < 3;
@@ -770,6 +769,7 @@ export default function ObservatorioStorytelling() {
     }
     return Array.from(seen.values()).sort((a, b) => b.frecuencia - a.frecuencia);
   })();
+  const maxFrecuencia = skillsMercadoDeduped.length ? Math.max(...skillsMercadoDeduped.map(s => s.frecuencia), 1) : 1;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', background: '#F7F8FC' }}>
