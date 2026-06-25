@@ -53,15 +53,15 @@ export default function WordCloudCanvas({ words, height = 340, scheme }: Props) 
       backgroundColor: 'transparent',
       gridSize:        Math.round(W / 60),
       weightFactor:    (size: number) => Math.pow(size / maxW, 0.45) * (W / 14),
-      color:           (_word: string, weight: number) => {
+      color:           (_word: string, weight: string | number) => {
         const norm = (weight as number) / maxW;
         return tierColor(norm, scheme);
       },
       fontFamily:      'system-ui, -apple-system, sans-serif',
-      fontWeight:      (_word: string, weight: number) => {
+      fontWeight:      ((_word: string, weight: string | number) => {
         const norm = (weight as number) / maxW;
         return norm >= 0.5 ? '800' : norm >= 0.3 ? '700' : '500';
-      },
+      }) as unknown as string,
       rotateRatio:     0.3,
       minRotation:     -Math.PI / 12,   // -15°
       maxRotation:      Math.PI / 12,   //  15°
@@ -69,7 +69,7 @@ export default function WordCloudCanvas({ words, height = 340, scheme }: Props) 
       drawOutOfBound:  false,
       shrinkToFit:     true,
 
-      hover: (item: [string, number] | null, _dim: unknown, event: MouseEvent) => {
+      hover: ((item: WordCloud.ListEntry | null, _dim: unknown, event: MouseEvent) => {
         if (!item || !wrap) { setTooltip(null); return; }
         const word = words.find(w => w.text === item[0]);
         if (!word?.tooltip) { setTooltip(null); return; }
@@ -79,13 +79,13 @@ export default function WordCloudCanvas({ words, height = 340, scheme }: Props) 
           x: event.clientX - rect.left + 12,
           y: event.clientY - rect.top  - 8,
         });
-      },
+      }) as WordCloud.Options['hover'],
 
-      click: (item: [string, number] | null) => {
+      click: ((item: WordCloud.ListEntry | null) => {
         if (!item) return;
         const word = words.find(w => w.text === item[0]);
         if (word?.tooltip) alert(word.tooltip);
-      },
+      }) as WordCloud.Options['click'],
     });
 
     // Cleanup on unmount / re-render
