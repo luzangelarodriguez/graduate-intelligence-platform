@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import WordCloudCanvas, { CloudWord } from '../components/WordCloudCanvas';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -1034,9 +1035,13 @@ export default function ObservatorioStorytelling() {
               // One flat list sorted by cobertura DESC — all categories merged
               const allSkills = Object.values(skillsByCategory).flat()
                 .sort((a, b) => b.cobertura - a.cobertura);
-              const maxCob = Math.max(...allSkills.map(s => s.cobertura), 1);
-              // Deterministic rotation pattern (no Math.random — reproducible)
-              const ROTS = [0, 0, 0, 0, 0, 0, 0, -2, -3, 2, 3, -1, 1];
+              const s3CloudWords: CloudWord[] = allSkills.map(s => {
+                const esFortale = fortalezasSet.has(normalizeSkill(s.skill));
+                const tooltipText = s.asignaturas && s.asignaturas.length > 0
+                  ? `Enseñado en: ${s.asignaturas.join(', ')}${esFortale ? ' · ✓ también demandado por el mercado' : ''}`
+                  : esFortale ? '✓ También demandado por el mercado' : undefined;
+                return { text: s.skill, weight: s.cobertura, color: '', bold: esFortale, tooltip: tooltipText };
+              });
               return (
                 <>
                   {/* Leyenda */}
@@ -1049,39 +1054,7 @@ export default function ObservatorioStorytelling() {
                   {allSkills.length === 0 ? (
                     <p className="text-sm text-gray-400 py-6 text-center">Cargando competencias del programa… (ejecuta el pipeline para poblar los datos)</p>
                   ) : (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '6px 10px', lineHeight: 0.95, padding: '12px 0' }}>
-                      {allSkills.map((s, i) => {
-                        const esFortale = fortalezasSet.has(normalizeSkill(s.skill));
-                        const fs = Math.round(12 + Math.pow(s.cobertura / maxCob, 0.4) * 48);
-                        const rot = ROTS[i % ROTS.length];
-                        // Color tiers: darker = bigger
-                        let color: string, weight: number;
-                        if (fs >= 45)      { color = '#0D2158'; weight = 800; }
-                        else if (fs >= 32) { color = '#2563EB'; weight = 700; }
-                        else if (fs >= 22) { color = '#5B83D1'; weight = 600; }
-                        else               { color = '#93A5C9'; weight = 500; }
-                        const tooltipText = s.asignaturas && s.asignaturas.length > 0
-                          ? `Enseñado en: ${s.asignaturas.join(', ')}${esFortale ? ' · ✓ también demandado por el mercado' : ''}`
-                          : esFortale ? '✓ También demandado por el mercado' : undefined;
-                        return (
-                          <span
-                            key={s.skill}
-                            title={tooltipText}
-                            style={{
-                              display: 'inline-block',
-                              fontSize: fs,
-                              fontWeight: esFortale ? Math.max(weight, 700) : weight,
-                              color,
-                              opacity: esFortale ? 1 : 0.70,
-                              transform: rot !== 0 ? `rotate(${rot}deg)` : undefined,
-                              cursor: tooltipText ? 'help' : 'default',
-                              transition: 'opacity 0.15s',
-                            }}>
-                            {s.skill}
-                          </span>
-                        );
-                      })}
-                    </div>
+                    <WordCloudCanvas key={`s3-${programaId}`} words={s3CloudWords} height={340} scheme="navy" />
                   )}
                   {skills.skills_programa.length > 0 && (
                     <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ') || 'por determinar'}.`} />
@@ -1181,43 +1154,19 @@ export default function ObservatorioStorytelling() {
                 ) : (
                   <>
                     {(() => {
-                      // One merged cloud sorted by frecuencia DESC
                       const sorted = [...skills.brechas].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
-                      const maxFreq = Math.max(...sorted.map(b => b.frecuencia_mercado ?? 1), 1);
-                      const ROTS = [0, 0, 0, 0, 0, 0, 0, -2, -3, 2, 3, -1, 1];
-                      return (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '6px 10px', lineHeight: 0.95, padding: '12px 0' }}>
-                          {sorted.map((b, i) => {
-                            const esRuido = classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
-                            const freq = b.frecuencia_mercado ?? 1;
-                            const fs = Math.round(12 + Math.pow(freq / maxFreq, 0.4) * 48);
-                            const rot = ROTS[i % ROTS.length];
-                            let color: string, weight: number;
-                            if (esRuido)       { color = '#B45309'; weight = 500; }
-                            else if (fs >= 45) { color = '#7F1D1D'; weight = 800; }
-                            else if (fs >= 32) { color = '#B91C1C'; weight = 700; }
-                            else if (fs >= 22) { color = '#DC2626'; weight = 600; }
-                            else               { color = '#F87171'; weight = 500; }
-                            return (
-                              <span
-                                key={b.skill}
-                                title={esRuido ? 'Skill genérica — verificar relevancia' : `${freq} vacante${freq !== 1 ? 's' : ''} en el mercado`}
-                                style={{
-                                  display: 'inline-block',
-                                  fontSize: fs,
-                                  fontWeight: weight,
-                                  color,
-                                  opacity: esRuido ? 0.55 : 1,
-                                  transform: rot !== 0 ? `rotate(${rot}deg)` : undefined,
-                                  cursor: 'help',
-                                  transition: 'opacity 0.15s',
-                                }}>
-                                {b.skill}{esRuido ? ' ⚠' : ''}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      );
+                      const s5CloudWords: CloudWord[] = sorted.map(b => {
+                        const freq = b.frecuencia_mercado ?? 1;
+                        const esRuido = classifySkill(b.skill) === 'otro' && freq < 3;
+                        return {
+                          text: esRuido ? `${b.skill} ⚠` : b.skill,
+                          weight: freq,
+                          color: '',
+                          bold: false,
+                          tooltip: esRuido ? 'Skill genérica — verificar relevancia' : `${freq} vacante${freq !== 1 ? 's' : ''} en el mercado`,
+                        };
+                      });
+                      return <WordCloudCanvas key={`s5-${programaId}`} words={s5CloudWords} height={300} scheme="red" />;
                     })()}
                     {skills.exclusivas_programa.length > 0 && (
                       <div className="rounded-xl p-4 mb-4" style={{ background: C.navyBg, border: `1px solid ${C.border}` }}>
