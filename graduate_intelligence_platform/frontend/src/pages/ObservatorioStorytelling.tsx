@@ -1034,54 +1034,52 @@ export default function ObservatorioStorytelling() {
               return (
                 <>
                   {/* Leyenda */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: '8px 14px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8 }}>
-                    <span style={{ fontSize: 11, color: '#166534' }}>
-                      <span style={{ fontWeight: 800, color: '#16a34a' }}>✓</span> = También demandado por el mercado laboral
-                    </span>
-                    <span style={{ color: '#D1D5DB' }}>·</span>
-                    <span style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>
-                      Hover para ver en qué asignatura se enseña
-                    </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14, marginBottom: 20, padding: '8px 14px', background: '#F8FAFC', border: `1px solid ${C.border}`, borderRadius: 8 }}>
+                    {(['herramienta','competencia','habilidad','otro'] as SkillCat[]).map(k => (
+                      <span key={k} style={{ fontSize: 11, color: CAT_STYLE[k].color, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 8 }}>●</span> {CAT_STYLE[k].label}
+                      </span>
+                    ))}
+                    <span style={{ color: C.border }}>·</span>
+                    <span style={{ fontSize: 11, color: '#374151' }}><strong>Negrita</strong> = también demandado por el mercado</span>
+                    <span style={{ color: C.border }}>·</span>
+                    <span style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>Hover → asignatura que lo enseña</span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
                     {Object.entries(skillsByCategory).map(([cat, skList]) => {
                       const catKey = (Object.entries(CAT_STYLE).find(([, v]) => v.label === cat)?.[0] ?? 'otro') as SkillCat;
                       const st = CAT_STYLE[catKey];
+                      const maxCob = Math.max(...skList.map(s => s.cobertura), 1);
                       return (
                         <div key={cat}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                             <span style={{ fontSize: 13 }}>{st.icon}</span>
                             <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: st.color }}>{cat}s</span>
                             <span style={{ fontSize: 10, fontWeight: 700, background: st.bg, color: st.color, borderRadius: 20, padding: '1px 8px' }}>{skList.length}</span>
                           </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', gap: '8px 14px' }}>
                             {skList.map(s => {
                               const esFortale = fortalezasSet.has(normalizeSkill(s.skill));
+                              const fs = Math.round(13 + Math.min(20, (s.cobertura / maxCob) * 20));
                               const tooltipText = s.asignaturas && s.asignaturas.length > 0
                                 ? `Enseñado en: ${s.asignaturas.join(', ')}`
                                 : undefined;
                               return (
-                                <div
+                                <span
                                   key={s.skill}
                                   title={tooltipText}
                                   style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                                    background: esFortale ? st.bg : '#F9FAFB',
-                                    border: `1.5px solid ${esFortale ? st.color : '#E5E7EB'}`,
-                                    borderRadius: 20,
-                                    padding: '4px 12px',
-                                    fontSize: 12, fontWeight: esFortale ? 700 : 500,
-                                    color: esFortale ? st.color : '#374151',
+                                    fontSize: fs,
+                                    fontWeight: esFortale ? 800 : 500,
+                                    color: st.color,
+                                    opacity: esFortale ? 1 : 0.65,
                                     cursor: tooltipText ? 'help' : 'default',
-                                    transition: 'box-shadow 0.15s',
+                                    lineHeight: 1.3,
+                                    transition: 'opacity 0.15s',
                                   }}>
-                                  {esFortale && <span style={{ color: '#16a34a', fontWeight: 800 }}>✓</span>}
                                   {s.skill}
-                                  {s.asignaturas && s.asignaturas.length > 0 && (
-                                    <span className="chip-sub">{s.asignaturas.length} asig.</span>
-                                  )}
-                                </div>
+                                </span>
                               );
                             })}
                           </div>
@@ -1193,33 +1191,33 @@ export default function ObservatorioStorytelling() {
                       const st      = CAT_STYLE[cat];
                       const catList = skills.brechas.filter(b => classifySkill(b.skill) === cat);
                       if (catList.length === 0) return null;
+                      const maxFreqCat = Math.max(...catList.map(b => b.frecuencia_mercado ?? 1), 1);
                       return (
-                        <div key={cat} className="mb-6">
-                          <p className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: '#dc2626' }}>
+                        <div key={cat} style={{ marginBottom: 24 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                             <span>{st.icon}</span>
-                            {st.label}s faltantes
-                            <span className="ml-1 rounded-full px-2 py-0.5 text-[10px]" style={{ background: '#fee2e2', color: '#dc2626' }}>{catList.length}</span>
-                          </p>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DC2626' }}>{st.label}s faltantes</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, background: '#FEE2E2', color: '#DC2626', borderRadius: 20, padding: '1px 8px' }}>{catList.length}</span>
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', gap: '8px 14px' }}>
                             {catList.map(b => {
-                              const esRuido = classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
+                              const esRuido = cat === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
+                              const freq = b.frecuencia_mercado ?? 1;
+                              const fs = Math.round(13 + Math.min(20, (freq / maxFreqCat) * 20));
                               return (
-                                <div
+                                <span
                                   key={b.skill}
-                                  title={esRuido ? 'Skill genérica — verificar si aplica al programa' : undefined}
+                                  title={esRuido ? 'Skill genérica — verificar si aplica al programa' : `${freq} vacante${freq !== 1 ? 's' : ''} en el mercado`}
                                   style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                                    background: esRuido ? '#FFFBEB' : '#FEF2F2',
-                                    border: `1.5px solid ${esRuido ? '#FDE68A' : '#FECACA'}`,
-                                    borderRadius: 20,
-                                    padding: '4px 12px',
+                                    fontSize: fs,
+                                    fontWeight: 600,
+                                    color: esRuido ? '#B45309' : '#DC2626',
+                                    opacity: esRuido ? 0.6 : 1,
+                                    cursor: 'help',
+                                    lineHeight: 1.3,
                                   }}>
-                                  <span style={{ fontSize: 12, fontWeight: 600, color: esRuido ? '#92400E' : '#991B1B' }}>{b.skill}</span>
-                                  {b.frecuencia_mercado != null && b.frecuencia_mercado > 0 && (
-                                    <span style={{ fontSize: 9, fontWeight: 800, color: esRuido ? '#B45309' : '#DC2626' }}>{b.frecuencia_mercado}×</span>
-                                  )}
-                                  {esRuido && <span style={{ fontSize: 10 }} title="Verificar relevancia">⚠</span>}
-                                </div>
+                                  {b.skill}{esRuido ? ' ⚠' : ''}
+                                </span>
                               );
                             })}
                           </div>
