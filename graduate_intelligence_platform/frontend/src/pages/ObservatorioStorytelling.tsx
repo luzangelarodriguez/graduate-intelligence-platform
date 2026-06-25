@@ -118,16 +118,16 @@ const PROGRAMS = [
 ];
 
 const NAV_SECTIONS = [
-  { id: 's1', n: '01', label: 'Estado de Pertinencia' },
-  { id: 's2', n: '02', label: 'Qué Demanda el Mercado' },
-  { id: 's3', n: '03', label: 'Qué Enseña el Programa' },
-  { id: 's4',  n: '04',  label: 'Cobertura Curricular' },
-  { id: 's4b', n: '04b', label: 'Benchmarking SNIES' },
-  { id: 's5',  n: '05',  label: 'Brechas Curriculares' },
-  { id: 's6', n: '06', label: 'Empleos Compatibles' },
-  { id: 's7', n: '07', label: 'Simulación Curricular' },
-  { id: 's8', n: '08', label: 'Recomendaciones' },
-  { id: 's9', n: '09', label: 'Rediseño Curricular' },
+  { id: 's1',  n: '01',  label: 'Estado de Pertinencia',    sub: 'Score general de alineación con el mercado' },
+  { id: 's2',  n: '02',  label: 'Qué Demanda el Mercado',   sub: 'Skills y roles más solicitados en vacantes' },
+  { id: 's3',  n: '03',  label: 'Qué Enseña el Programa',   sub: 'Competencias actuales del microcurrículo' },
+  { id: 's4',  n: '04',  label: 'Cobertura Curricular',     sub: '% del mercado que el programa cubre' },
+  { id: 's4b', n: '04b', label: 'Benchmarking SNIES',       sub: 'Comparativa con universidades similares' },
+  { id: 's5',  n: '05',  label: 'Brechas Curriculares',     sub: 'Skills demandadas que el programa no enseña' },
+  { id: 's6',  n: '06',  label: 'Empleos Compatibles',      sub: 'Vacantes reales alineadas con el programa' },
+  { id: 's7',  n: '07',  label: 'Simulación Curricular',    sub: 'Impacto de incorporar nuevas competencias' },
+  { id: 's8',  n: '08',  label: 'Recomendaciones',          sub: 'Acciones sugeridas para el comité curricular' },
+  { id: 's9',  n: '09',  label: 'Rediseño Curricular',      sub: 'Propuestas de mejora asistidas por IA' },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -851,7 +851,7 @@ export default function ObservatorioStorytelling() {
           paddingLeft: 24,
         }}>
         <style>{`.subnav-tabs::-webkit-scrollbar { display: none; }`}</style>
-        {NAV_SECTIONS.map(({ id, n, label }) => {
+        {NAV_SECTIONS.map(({ id, n, label, sub }) => {
           const isActive = activeSection === id;
           return (
             <button
@@ -862,11 +862,9 @@ export default function ObservatorioStorytelling() {
                 el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6,
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center',
                 padding: '0 16px',
-                height: 44,
-                fontSize: 12, fontWeight: isActive ? 700 : 500,
-                color: isActive ? '#0a3d8f' : '#6B7280',
+                height: 52,
                 background: 'transparent',
                 border: 'none',
                 borderBottom: `2px solid ${isActive ? '#0a3d8f' : 'transparent'}`,
@@ -875,8 +873,11 @@ export default function ObservatorioStorytelling() {
                 transition: 'color 0.15s, border-color 0.15s',
                 flexShrink: 0,
               }}>
-              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.05em', color: isActive ? '#1265b8' : '#D1D5DB' }}>{n}</span>
-              {label}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.05em', color: isActive ? '#1265b8' : '#D1D5DB' }}>{n}</span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? '#0a3d8f' : '#374151' }}>{label}</span>
+              </div>
+              <span style={{ fontSize: 10, color: isActive ? '#1265b8' : '#9CA3AF', marginTop: 2, fontWeight: 400 }}>{sub}</span>
             </button>
           );
         })}
