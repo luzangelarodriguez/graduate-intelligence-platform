@@ -662,7 +662,8 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         prog_rows = fetch_all(
             """
             SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
-                   COUNT(*) AS cobertura
+                   COUNT(*) AS cobertura,
+                   ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
             FROM microcurriculo_skills ms
             JOIN microcurriculos m ON m.id = ms.microcurriculo_id
             WHERE m.specialization_id = %s
@@ -673,7 +674,11 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             (program_id,),
         )
         skills_programa = [
-            {"skill": r["skill_name"], "cobertura": int(r["cobertura"])}
+            {
+                "skill":       r["skill_name"],
+                "cobertura":   int(r["cobertura"]),
+                "asignaturas": list(r["asignaturas"]) if r["asignaturas"] else [],
+            }
             for r in prog_rows
             if r["skill_name"]
         ]
