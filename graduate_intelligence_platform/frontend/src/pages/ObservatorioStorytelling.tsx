@@ -922,36 +922,59 @@ export default function ObservatorioStorytelling() {
 
           {/* S2 */}
           <SectionBlock id="s2" n="02" title="Qué Demanda el Mercado" dark>
-            {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (
-              <>
-                <p className="text-sm text-blue-200 mb-5">Skills más frecuentes en las {totales.matches} vacantes analizadas para este perfil de programa.</p>
-                <div className="space-y-2 mb-6">
-                  {skills.skills_mercado.slice(0, 10).map(s => (
-                    <div key={s.skill} className="flex items-center gap-3">
-                      <span className="text-xs text-blue-200 w-32 flex-shrink-0 truncate">{s.skill}</span>
-                      <div className="flex-1 h-3 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(s.frecuencia / maxFrecuencia) * 100}%`, background: C.mid }} />
-                      </div>
-                      <span className="text-xs font-semibold w-6 text-right" style={{ color: C.mid }}>{s.frecuencia}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  {(['herramienta','competencia','habilidad'] as SkillCat[]).map(cat => {
-                    const st = CAT_STYLE[cat];
-                    const count = skills.skills_mercado.filter(s => classifySkill(s.skill) === cat).length;
-                    return (
-                      <div key={cat} className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <p className="text-2xl mb-1">{st.icon}</p>
-                        <p className="text-lg font-extrabold text-white">{count}</p>
-                        <p className="text-xs text-blue-300">{st.label}s</p>
-                      </div>
-                    );
-                  })}
-                </div>
-                <Insight dark text={`El mercado demanda ${skills.skills_mercado.length} skills distintas. Las 3 más frecuentes son: ${skills.skills_mercado.slice(0,3).map(s=>s.skill).join(', ')}.`} />
-              </>
-            )}
+            {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (() => {
+              // Group skills_mercado by category, sorted by frecuencia DESC
+              const bycat: Record<'herramienta'|'competencia'|'habilidad', SkillMercado[]> = { herramienta: [], competencia: [], habilidad: [] };
+              for (const s of skills.skills_mercado) {
+                const cat = classifySkill(s.skill);
+                if (cat !== 'otro') bycat[cat].push(s);
+              }
+              const cols: { cat: 'herramienta'|'competencia'|'habilidad'; items: SkillMercado[] }[] = [
+                { cat: 'herramienta', items: bycat.herramienta.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
+                { cat: 'competencia', items: bycat.competencia.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
+                { cat: 'habilidad',   items: bycat.habilidad.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
+              ];
+              return (
+                <>
+                  <p className="text-sm text-blue-200 mb-6">Skills clasificadas por tipo en las {totales.matches} vacantes analizadas.</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
+                    {cols.map(({ cat, items }) => {
+                      const st = CAT_STYLE[cat];
+                      const maxFreq = items.length ? Math.max(...items.map(s => s.frecuencia), 1) : 1;
+                      return (
+                        <div key={cat} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 12, padding: '16px 18px' }}>
+                          {/* Column header */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                            <span style={{ fontSize: 16 }}>{st.icon}</span>
+                            <div>
+                              <p style={{ fontSize: 11, fontWeight: 800, color: st.color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>{st.label}s</p>
+                              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', margin: 0 }}>{bycat[cat].length} identificadas</p>
+                            </div>
+                          </div>
+                          {/* Mini bar chart */}
+                          {items.length === 0 ? (
+                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Sin datos suficientes</p>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                              {items.map(s => (
+                                <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', width: 100, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.skill}</span>
+                                  <div style={{ flex: 1, height: 6, borderRadius: 4, background: 'rgba(255,255,255,0.10)' }}>
+                                    <div style={{ height: '100%', borderRadius: 4, background: st.color, width: `${(s.frecuencia / maxFreq) * 100}%`, transition: 'width 0.6s ease' }} />
+                                  </div>
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: st.color, width: 20, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Insight dark text={`El mercado demanda ${skills.skills_mercado.length} skills distintas. Las 3 más frecuentes son: ${skills.skills_mercado.slice(0,3).map(s=>s.skill).join(', ')}.`} />
+                </>
+              );
+            })()}
           </SectionBlock>
 
           {/* S3 */}
