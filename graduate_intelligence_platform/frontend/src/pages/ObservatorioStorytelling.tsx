@@ -259,6 +259,18 @@ function pertinenciaLevel(score: number): { label: string; color: string; bg: st
   return              { label: 'Crítica',   color: '#dc2626', bg: '#fee2e2', desc: 'Brecha significativa entre el currículo y las competencias demandadas por el mercado.' };
 }
 
+// ─── Skill normalization ──────────────────────────────────────────────────────
+const SKILL_ALIASES: Record<string, string> = {
+  'powerbi':    'power bi',
+  'power-bi':   'power bi',
+  'rstudio':    'r',
+  'r studio':   'r',
+};
+function normalizeSkill(s: string): string {
+  const lower = s.toLowerCase().replace(/\s+/g, ' ').trim();
+  return SKILL_ALIASES[lower] ?? lower;
+}
+
 // ─── Skill classification ─────────────────────────────────────────────────────
 const SKILL_CATS = {
   herramienta: new Set([
@@ -266,7 +278,7 @@ const SKILL_CATS = {
     'spark','databricks','tensorflow','r','hadoop','kafka','looker','salesforce',
     'pytorch','kubernetes','git','postgresql','mysql','mongodb','redis',
     'numpy','pandas','sklearn','scikit-learn','jupyter','colab','sap','crm',
-    'spss','wais','wisc','rorschach','bender',
+    'spss','wais','wisc','rorschach','bender','rstudio','powerbi',
   ]),
   competencia: new Set([
     'machine learning','deep learning','nlp','data visualization','big data','etl',
@@ -278,18 +290,21 @@ const SKILL_CATS = {
     'aprendizaje','memoria','atencion','percepcion','lenguaje',
     'trastorno','discapacidad','neuroling','rehabilitacion',
     'psicologia','diagnostico','evaluacion neuropsicologica',
+    'visualizacion de datos','pmbok','lean','scrum','agile','six sigma',
+    'metodologia','analisis de datos',
   ]),
   habilidad: new Set([
     'gestion','liderazgo','comunicacion','trabajo en equipo','pensamiento critico',
-    'innovacion','negociacion','planeacion','scrum','agile','kanban',
+    'innovacion','negociacion','planeacion','kanban',
     'gestion de proyectos','orientacion a resultados','toma de decisiones',
     'educacion','orientacion','diversidad','inclusion','desarrollo','inteligencia',
     'pedagogia','docencia','didactica','ensenanza','formacion',
+    'resolucion de problemas',
   ]),
 };
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
 function classifySkill(s: string): SkillCat {
-  const key = s.toLowerCase();
+  const key = normalizeSkill(s);
   if (SKILL_CATS.herramienta.has(key)) return 'herramienta';
   if (SKILL_CATS.competencia.has(key)) return 'competencia';
   if (SKILL_CATS.habilidad.has(key))   return 'habilidad';
@@ -715,7 +730,7 @@ export default function ObservatorioStorytelling() {
   const coberturaPct   = skills?.cobertura_pct ?? 0;
   const brechaPct      = skills ? 100 - coberturaPct : 0;
   const empCompatibles = top_matches.filter(m => m.skills_en_comun.length > 0).length;
-  const maxFrecuencia  = skills ? Math.max(...skills.skills_mercado.map(s => s.frecuencia), 1) : 1;
+  const maxFrecuencia  = skillsMercadoDeduped.length ? Math.max(...skillsMercadoDeduped.map(s => s.frecuencia), 1) : 1;
   const maxCobertura   = skills ? Math.max(...skills.skills_programa.map(s => s.cobertura), 1) : 1;
   const qualityMatches = top_matches.filter(m => (m.skills_en_comun?.length ?? 0) > 0).length;
   const dataPobre      = totales.matches < 10 || qualityMatches < 3;
@@ -724,12 +739,37 @@ export default function ObservatorioStorytelling() {
 
   const skillsByCategory: Record<string, SkillPrograma[]> = {};
   if (skills) {
+    // Deduplicate by normalized skill name, summing cobertura across variants
+    const seen = new Map<string, SkillPrograma>();
     for (const s of skills.skills_programa) {
+      const norm = normalizeSkill(s.skill);
+      if (seen.has(norm)) {
+        seen.get(norm)!.cobertura += s.cobertura;
+      } else {
+        seen.set(norm, { ...s, skill: norm });
+      }
+    }
+    for (const s of seen.values()) {
       const cat = CAT_STYLE[classifySkill(s.skill)].label;
       if (!skillsByCategory[cat]) skillsByCategory[cat] = [];
       skillsByCategory[cat].push(s);
     }
   }
+
+  // Same dedup for skills_mercado used in S2
+  const skillsMercadoDeduped: SkillMercado[] = (() => {
+    if (!skills) return [];
+    const seen = new Map<string, SkillMercado>();
+    for (const s of skills.skills_mercado) {
+      const norm = normalizeSkill(s.skill);
+      if (seen.has(norm)) {
+        seen.get(norm)!.frecuencia += s.frecuencia;
+      } else {
+        seen.set(norm, { ...s, skill: norm });
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) => b.frecuencia - a.frecuencia);
+  })();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', background: '#F7F8FC' }}>
@@ -923,16 +963,16 @@ export default function ObservatorioStorytelling() {
           {/* S2 */}
           <SectionBlock id="s2" n="02" title="Qué Demanda el Mercado" dark>
             {dataPobre ? <ExplorandoMsg /> : !skills ? <Spinner /> : (() => {
-              // Group skills_mercado by category, sorted by frecuencia DESC
+              // Group deduplicated skills by category, sorted by frecuencia DESC
               const bycat: Record<'herramienta'|'competencia'|'habilidad', SkillMercado[]> = { herramienta: [], competencia: [], habilidad: [] };
-              for (const s of skills.skills_mercado) {
+              for (const s of skillsMercadoDeduped) {
                 const cat = classifySkill(s.skill);
                 if (cat !== 'otro') bycat[cat].push(s);
               }
               const cols: { cat: 'herramienta'|'competencia'|'habilidad'; items: SkillMercado[] }[] = [
-                { cat: 'herramienta', items: bycat.herramienta.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
-                { cat: 'competencia', items: bycat.competencia.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
-                { cat: 'habilidad',   items: bycat.habilidad.sort((a,b) => b.frecuencia - a.frecuencia).slice(0, 8) },
+                { cat: 'herramienta', items: bycat.herramienta.slice(0, 8) },
+                { cat: 'competencia', items: bycat.competencia.slice(0, 8) },
+                { cat: 'habilidad',   items: bycat.habilidad.slice(0, 8) },
               ];
               return (
                 <>
@@ -943,7 +983,6 @@ export default function ObservatorioStorytelling() {
                       const maxFreq = items.length ? Math.max(...items.map(s => s.frecuencia), 1) : 1;
                       return (
                         <div key={cat} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 12, padding: '16px 18px' }}>
-                          {/* Column header */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                             <span style={{ fontSize: 16 }}>{st.icon}</span>
                             <div>
@@ -951,7 +990,6 @@ export default function ObservatorioStorytelling() {
                               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', margin: 0 }}>{bycat[cat].length} identificadas</p>
                             </div>
                           </div>
-                          {/* Mini bar chart */}
                           {items.length === 0 ? (
                             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Sin datos suficientes</p>
                           ) : (
@@ -971,7 +1009,7 @@ export default function ObservatorioStorytelling() {
                       );
                     })}
                   </div>
-                  <Insight dark text={`El mercado demanda ${skills.skills_mercado.length} skills distintas. Las 3 más frecuentes son: ${skills.skills_mercado.slice(0,3).map(s=>s.skill).join(', ')}.`} />
+                  <Insight dark text={`El mercado demanda ${skillsMercadoDeduped.length} skills distintas. Las 3 más frecuentes son: ${skillsMercadoDeduped.slice(0,3).map(s=>s.skill).join(', ')}.`} />
                 </>
               );
             })()}
