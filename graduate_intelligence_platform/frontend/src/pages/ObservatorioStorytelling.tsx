@@ -890,7 +890,17 @@ export default function ObservatorioStorytelling() {
           flexShrink: 0,
           paddingLeft: 24,
         }}>
-        <style>{`.subnav-tabs::-webkit-scrollbar { display: none; }`}</style>
+        <style>{`
+          .subnav-tabs::-webkit-scrollbar { display: none; }
+          .skill-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+          }
+          @media (max-width: 640px) {
+            .skill-grid { grid-template-columns: 1fr; }
+          }
+        `}</style>
         {NAV_SECTIONS.map(({ id, n, label, sub }) => {
           const isActive = activeSection === id;
           return (
@@ -993,14 +1003,14 @@ export default function ObservatorioStorytelling() {
                           {items.length === 0 ? (
                             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Sin datos suficientes</p>
                           ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                            <div className="skill-grid">
                               {items.map(s => (
-                                <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', width: 100, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.skill}</span>
-                                  <div style={{ flex: 1, height: 6, borderRadius: 4, background: 'rgba(255,255,255,0.10)' }}>
+                                <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', width: 72, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.skill}</span>
+                                  <div style={{ flex: 1, height: 5, borderRadius: 4, background: 'rgba(255,255,255,0.10)', minWidth: 20 }}>
                                     <div style={{ height: '100%', borderRadius: 4, background: st.color, width: `${(s.frecuencia / maxFreq) * 100}%`, transition: 'width 0.6s ease' }} />
                                   </div>
-                                  <span style={{ fontSize: 10, fontWeight: 700, color: st.color, width: 20, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
+                                  <span style={{ fontSize: 9, fontWeight: 700, color: st.color, width: 16, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
                                 </div>
                               ))}
                             </div>
@@ -1029,7 +1039,7 @@ export default function ObservatorioStorytelling() {
                         <p className="text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2" style={{ color: st.color }}>
                           <span>{st.icon}</span> {cat}s
                         </p>
-                        <div className="space-y-1.5">
+                        <div className="skill-grid">
                           {skList.map(s => <HBar key={s.skill} label={s.skill} val={s.cobertura} max={maxCobertura} color={st.color} />)}
                         </div>
                       </div>
@@ -1146,7 +1156,7 @@ export default function ObservatorioStorytelling() {
                             {st.label}s faltantes
                             <span className="ml-1 rounded-full px-2 py-0.5 text-[10px]" style={{ background: '#fee2e2', color: '#dc2626' }}>{catList.length}</span>
                           </p>
-                          <div className="space-y-1.5">
+                          <div className="skill-grid">
                             {catList.map(b => {
                               const esRuido = classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
                               return (
