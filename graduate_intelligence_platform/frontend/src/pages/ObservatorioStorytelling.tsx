@@ -44,7 +44,7 @@ interface Summary {
   totales: { matches: number; alta: number; media: number; baja: number };
 }
 interface SkillMercado  { skill: string; frecuencia: number }
-interface SkillPrograma { skill: string; cobertura: number }
+interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string[] }
 interface Brecha        { skill: string; frecuencia_mercado: number }
 interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number }
 interface Exclusiva     { skill: string; cobertura: number }
@@ -900,6 +900,8 @@ export default function ObservatorioStorytelling() {
           @media (max-width: 640px) {
             .skill-grid { grid-template-columns: 1fr; }
           }
+          .chip-sub { display: none; font-size: 9px; color: #9CA3AF; margin-left: 4px; }
+          @media (max-width: 640px) { .chip-sub { display: inline; } }
         `}</style>
         {NAV_SECTIONS.map(({ id, n, label, sub }) => {
           const isActive = activeSection === id;
@@ -1027,33 +1029,75 @@ export default function ObservatorioStorytelling() {
 
           {/* S3 */}
           <SectionBlock id="s3" n="03" title="Qué Enseña el Programa">
-            {!skills ? <Spinner /> : (
-              <>
-                <p className="text-sm text-gray-600 mb-5">Skills identificadas en el plan de estudios, agrupadas por tipo.</p>
-                <div className="space-y-6">
-                  {Object.entries(skillsByCategory).map(([cat, skList]) => {
-                    const catKey = (Object.entries(CAT_STYLE).find(([, v]) => v.label === cat)?.[0] ?? 'otro') as SkillCat;
-                    const st = CAT_STYLE[catKey];
-                    return (
-                      <div key={cat}>
-                        <p className="text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2" style={{ color: st.color }}>
-                          <span>{st.icon}</span> {cat}s
-                        </p>
-                        <div className="skill-grid">
-                          {skList.map(s => <HBar key={s.skill} label={s.skill} val={s.cobertura} max={maxCobertura} color={st.color} />)}
+            {!skills ? <Spinner /> : (() => {
+              const fortalezasSet = new Set(skills.fortalezas.map(f => normalizeSkill(f.skill)));
+              return (
+                <>
+                  {/* Leyenda */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: '8px 14px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8 }}>
+                    <span style={{ fontSize: 11, color: '#166534' }}>
+                      <span style={{ fontWeight: 800, color: '#16a34a' }}>✓</span> = También demandado por el mercado laboral
+                    </span>
+                    <span style={{ color: '#D1D5DB' }}>·</span>
+                    <span style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic' }}>
+                      Hover para ver en qué asignatura se enseña
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    {Object.entries(skillsByCategory).map(([cat, skList]) => {
+                      const catKey = (Object.entries(CAT_STYLE).find(([, v]) => v.label === cat)?.[0] ?? 'otro') as SkillCat;
+                      const st = CAT_STYLE[catKey];
+                      return (
+                        <div key={cat}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                            <span style={{ fontSize: 13 }}>{st.icon}</span>
+                            <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: st.color }}>{cat}s</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, background: st.bg, color: st.color, borderRadius: 20, padding: '1px 8px' }}>{skList.length}</span>
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {skList.map(s => {
+                              const esFortale = fortalezasSet.has(normalizeSkill(s.skill));
+                              const tooltipText = s.asignaturas && s.asignaturas.length > 0
+                                ? `Enseñado en: ${s.asignaturas.join(', ')}`
+                                : undefined;
+                              return (
+                                <div
+                                  key={s.skill}
+                                  title={tooltipText}
+                                  style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                                    background: esFortale ? st.bg : '#F9FAFB',
+                                    border: `1.5px solid ${esFortale ? st.color : '#E5E7EB'}`,
+                                    borderRadius: 20,
+                                    padding: '4px 12px',
+                                    fontSize: 12, fontWeight: esFortale ? 700 : 500,
+                                    color: esFortale ? st.color : '#374151',
+                                    cursor: tooltipText ? 'help' : 'default',
+                                    transition: 'box-shadow 0.15s',
+                                  }}>
+                                  {esFortale && <span style={{ color: '#16a34a', fontWeight: 800 }}>✓</span>}
+                                  {s.skill}
+                                  {s.asignaturas && s.asignaturas.length > 0 && (
+                                    <span className="chip-sub">{s.asignaturas.length} asig.</span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                  {skills.skills_programa.length === 0 && (
-                    <p className="text-sm text-gray-400 py-6 text-center">Cargando competencias del programa... (ejecuta el pipeline para poblar los datos)</p>
+                      );
+                    })}
+                    {skills.skills_programa.length === 0 && (
+                      <p className="text-sm text-gray-400 py-6 text-center">Cargando competencias del programa… (ejecuta el pipeline para poblar los datos)</p>
+                    )}
+                  </div>
+                  {skills.skills_programa.length > 0 && (
+                    <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ') || 'por determinar'}.`} />
                   )}
-                </div>
-                {skills.skills_programa.length > 0 && (
-                  <Insight text={`El programa cubre ${skills.skills_programa.length} skills. Sus fortalezas son: ${skills.fortalezas.slice(0,3).map(f=>f.skill).join(', ') || 'por determinar'}.`} />
-                )}
-              </>
-            )}
+                </>
+              );
+            })()}
           </SectionBlock>
 
           {/* S4 */}
@@ -1156,27 +1200,25 @@ export default function ObservatorioStorytelling() {
                             {st.label}s faltantes
                             <span className="ml-1 rounded-full px-2 py-0.5 text-[10px]" style={{ background: '#fee2e2', color: '#dc2626' }}>{catList.length}</span>
                           </p>
-                          <div className="skill-grid">
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                             {catList.map(b => {
                               const esRuido = classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3;
                               return (
-                                <div key={b.skill} className="flex items-center gap-3 rounded-xl px-4 py-2" style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
-                                  <span className="text-sm font-semibold flex-1 text-red-800">{b.skill}</span>
-                                  {esRuido && (
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-                                      style={{ background: '#fef9c3', color: '#92400e', border: '1px solid #fde68a' }}
-                                      title="Skill genérica o de bajo contexto — verificar si aplica al programa">
-                                      ⚠ Verificar relevancia
-                                    </span>
-                                  )}
+                                <div
+                                  key={b.skill}
+                                  title={esRuido ? 'Skill genérica — verificar si aplica al programa' : undefined}
+                                  style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                                    background: esRuido ? '#FFFBEB' : '#FEF2F2',
+                                    border: `1.5px solid ${esRuido ? '#FDE68A' : '#FECACA'}`,
+                                    borderRadius: 20,
+                                    padding: '4px 12px',
+                                  }}>
+                                  <span style={{ fontSize: 12, fontWeight: 600, color: esRuido ? '#92400E' : '#991B1B' }}>{b.skill}</span>
                                   {b.frecuencia_mercado != null && b.frecuencia_mercado > 0 && (
-                                    <>
-                                      <div className="h-1.5 rounded-full w-20 flex-shrink-0" style={{ background: '#fecaca' }}>
-                                        <div className="h-full rounded-full" style={{ width: `${Math.min((b.frecuencia_mercado / maxFrecuencia) * 100, 100)}%`, background: '#dc2626' }} />
-                                      </div>
-                                      <span className="text-xs font-bold text-red-500 flex-shrink-0">{b.frecuencia_mercado} vacante{b.frecuencia_mercado !== 1 ? 's' : ''}</span>
-                                    </>
+                                    <span style={{ fontSize: 9, fontWeight: 800, color: esRuido ? '#B45309' : '#DC2626' }}>{b.frecuencia_mercado}×</span>
                                   )}
+                                  {esRuido && <span style={{ fontSize: 10 }} title="Verificar relevancia">⚠</span>}
                                 </div>
                               );
                             })}
