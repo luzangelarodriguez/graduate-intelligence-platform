@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import unirLogo from '../assets/logos/unir-logo.svg';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -539,8 +538,9 @@ export default function ObservatorioStorytelling() {
   const [pipelineLog, setPipelineLog]         = useState<string[]>([]);
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
-  const mainRef        = useRef<HTMLDivElement>(null);
-  const pollRef        = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mainRef         = useRef<HTMLDivElement>(null);
+  const tabsRef         = useRef<HTMLDivElement>(null);
+  const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // fetch summary
@@ -670,7 +670,7 @@ export default function ObservatorioStorytelling() {
 
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
-  // Scroll-spy via IntersectionObserver on main scroll container
+  // Scroll-spy via IntersectionObserver (root = main scroll container)
   useEffect(() => {
     const container = mainRef.current;
     if (!container) return;
@@ -680,7 +680,7 @@ export default function ObservatorioStorytelling() {
           if (entry.isIntersecting) setActiveSection(entry.target.id);
         });
       },
-      { root: container, rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+      { root: container, rootMargin: '-20% 0px -70% 0px', threshold: 0 }
     );
     NAV_SECTIONS.forEach(({ id }) => {
       const el = container.querySelector(`#${id}`);
@@ -688,6 +688,14 @@ export default function ObservatorioStorytelling() {
     });
     return () => observer.disconnect();
   }, [loading]);
+
+  // Auto-scroll active tab into view in the horizontal subnav
+  useEffect(() => {
+    const nav = tabsRef.current;
+    if (!nav) return;
+    const activeTab = nav.querySelector<HTMLButtonElement>(`[data-section="${activeSection}"]`);
+    if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [activeSection]);
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.bg }}>
@@ -724,154 +732,161 @@ export default function ObservatorioStorytelling() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif', background: C.bg }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', background: '#F7F8FC' }}>
 
-      {/* ── SIDEBAR ── */}
-      <aside style={{
-        width: 240, flexShrink: 0,
-        background: C.navy,
-        display: 'flex', flexDirection: 'column',
-        overflowY: 'auto',
-        borderRight: '1px solid rgba(255,255,255,0.07)',
+      {/* ── HEADER PRINCIPAL ── */}
+      <header style={{
+        background: 'linear-gradient(90deg, #0a3d8f 0%, #1265b8 55%, #1f7bc4 100%)',
+        padding: '0 40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 68,
+        flexShrink: 0,
+        boxShadow: '0 2px 12px rgba(10,61,143,0.30)',
+        position: 'relative',
+        zIndex: 20,
       }}>
-        {/* Logo */}
-        <div style={{ padding: '24px 20px 16px' }}>
-          <img src={unirLogo} alt="UNIR Colombia" style={{ height: 32, maxWidth: '100%', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 20px' }} />
-
-        {/* Program selector */}
-        <div style={{ padding: '16px 20px' }}>
-          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.mid, marginBottom: 8 }}>Programa</p>
-          <select
-            value={programaId}
-            onChange={e => setProgramaId(Number(e.target.value))}
-            style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.08)',
-              color: C.white,
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 6,
-              padding: '8px 10px',
-              fontSize: 11,
-              fontWeight: 600,
-              cursor: 'pointer',
-              outline: 'none',
-            }}>
-            {PROGRAMS.map(p => (
-              <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 20px' }} />
-
-        {/* Nav */}
-        <nav style={{ padding: '12px 0', flex: 1 }}>
-          {NAV_SECTIONS.map(({ id, n, label }) => {
-            const isActive = activeSection === id;
-            return (
-              <button
-                key={id}
-                onClick={() => {
-                  const el = mainRef.current?.querySelector(`#${id}`);
-                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  width: '100%',
-                  padding: '10px 20px',
-                  background: isActive ? 'rgba(255,255,255,0.07)' : 'transparent',
-                  border: 'none',
-                  borderLeft: `3px solid ${isActive ? C.red : 'transparent'}`,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.15s',
-                }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', color: isActive ? C.red : 'rgba(255,255,255,0.3)', minWidth: 18 }}>{n}</span>
-                <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 400, color: isActive ? C.white : 'rgba(255,255,255,0.55)', lineHeight: 1.3 }}>{label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Footer: run info + update button */}
-        <div style={{ padding: '12px 20px 20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          {isFallback && (
-            <p style={{ fontSize: 9, color: C.gold, marginBottom: 8, fontWeight: 600 }}>⚠ Datos de referencia (API no disponible)</p>
-          )}
-          <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginBottom: 10, lineHeight: 1.4 }}>
-            Run #{d.run_id}<br />{d.fecha}
-          </p>
-          <button
-            onClick={() => setPipelineLogOpen(o => !o)}
-            style={{
-              width: '100%',
-              padding: '7px 0',
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 6,
-              color: C.light,
-              fontSize: 10,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}>
-            ↻ Ver última actualización
-          </button>
-          {pipelineLogOpen && (
-            <div style={{ marginTop: 8, padding: '10px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: 6, fontSize: 9, lineHeight: 1.5 }}>
-              <p style={{ color: '#86efac', marginBottom: 4 }}>Último análisis: {d.fecha ?? '—'}</p>
-              <p style={{ color: 'rgba(255,255,255,0.45)' }}>
-                Adquisición y matching corren cada noche vía GitHub Actions. El matching SBERT se ejecuta en el runner de GitHub.
-              </p>
-            </div>
-          )}
-          {pipelineStatus !== 'idle' && (
-            <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.06)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.1)', fontSize: 9 }}>
-              {(pipelineStatus === 'running' || pipelineStatus === 'queued') && (
-                <div className="w-3 h-3 rounded-full border-2 border-blue-300 border-t-transparent animate-spin" style={{ display: 'inline-block', marginRight: 6 }} />
-              )}
-              <span style={{ color: C.light }}>
-                {pipelineStatus === 'queued'  && 'Iniciando…'}
-                {pipelineStatus === 'running' && (pipelineStep ?? '…')}
-                {pipelineStatus === 'done'    && '✓ Listo'}
-                {pipelineStatus === 'error'   && '⚠ Error'}
+        {/* Logo izquierda */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div>
+            {/* Logo "uniR" serif con punto celeste sobre la i */}
+            <div style={{ display: 'flex', alignItems: 'baseline', lineHeight: 1 }}>
+              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 30, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>un</span>
+              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 30, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', position: 'relative', display: 'inline-block' }}>
+                i
+                <span style={{ position: 'absolute', top: -5, left: '50%', transform: 'translateX(-50%)', width: 5, height: 5, background: '#5BC4F5', borderRadius: '50%', display: 'block' }} />
               </span>
+              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>R</span>
             </div>
-          )}
+            <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
+              La Universidad en Internet
+            </div>
+          </div>
+
+          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.22)', margin: '0 4px' }} />
+
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: '0.01em' }}>Observatorio de Pertinencia</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.60)', letterSpacing: '0.04em', marginTop: 2 }}>Colombia · Inteligencia Curricular</div>
+          </div>
         </div>
-      </aside>
+
+        {/* Derecha: badge + selector + KPIs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* KPIs pequeños */}
+          {[
+            { v: `${score.toFixed(0)}/100`, l: 'Pertinencia', c: nivel.color },
+            { v: `${coberturaPct}%`,         l: 'Cobertura',  c: '#38BDF8' },
+            { v: String(empCompatibles),      l: 'Empleos',   c: '#34D399' },
+          ].map(({ v, l, c }) => (
+            <div key={l} style={{ textAlign: 'center', padding: '5px 12px', background: 'rgba(255,255,255,0.10)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.18)' }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: c, lineHeight: 1 }}>{v}</div>
+              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', marginTop: 2, letterSpacing: '0.05em' }}>{l}</div>
+            </div>
+          ))}
+
+          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.18)' }} />
+
+          {/* Beta badge */}
+          <span style={{ border: '1.5px solid rgba(255,255,255,0.55)', color: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', borderRadius: 20, padding: '4px 10px' }}>
+            Beta
+          </span>
+
+          {/* Selector de programa */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '7px 12px' }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap' }}>Programa</span>
+            <select
+              value={programaId}
+              onChange={e => setProgramaId(Number(e.target.value))}
+              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', outline: 'none', maxWidth: 190 }}>
+              {PROGRAMS.map(p => (
+                <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Run info + pipeline button */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setPipelineLogOpen(o => !o)}
+              title={`Run #${d.run_id} · ${d.fecha}`}
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 8, color: 'rgba(255,255,255,0.70)', fontSize: 11, fontWeight: 600, cursor: 'pointer', padding: '7px 10px', lineHeight: 1 }}>
+              ↻
+            </button>
+            {pipelineLogOpen && (
+              <div style={{ position: 'absolute', right: 0, top: 40, width: 280, background: '#0a3d8f', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', zIndex: 50 }}>
+                <p style={{ fontSize: 11, color: '#86efac', marginBottom: 6, fontWeight: 700 }}>Último análisis: {d.fecha ?? '—'}</p>
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5, margin: 0 }}>
+                  Adquisición y matching corren cada noche vía GitHub Actions.
+                </p>
+                {isFallback && <p style={{ fontSize: 10, color: C.gold, marginTop: 8, fontWeight: 600 }}>⚠ Datos de referencia (API no disponible)</p>}
+                {pipelineStatus !== 'idle' && (
+                  <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: 6, fontSize: 10 }}>
+                    <span style={{ color: '#fff' }}>
+                      {pipelineStatus === 'queued'  && '⏳ Iniciando…'}
+                      {pipelineStatus === 'running' && `⚙ ${pipelineStep ?? '…'}`}
+                      {pipelineStatus === 'done'    && '✓ Listo'}
+                      {pipelineStatus === 'error'   && '⚠ Error'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ── SUBNAV HORIZONTAL (tabs) ── */}
+      <div
+        ref={tabsRef}
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #E5E7EB',
+          display: 'flex',
+          alignItems: 'center',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          flexShrink: 0,
+          paddingLeft: 24,
+        }}>
+        <style>{`.subnav-tabs::-webkit-scrollbar { display: none; }`}</style>
+        {NAV_SECTIONS.map(({ id, n, label }) => {
+          const isActive = activeSection === id;
+          return (
+            <button
+              key={id}
+              data-section={id}
+              onClick={() => {
+                const el = mainRef.current?.querySelector(`#${id}`);
+                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '0 16px',
+                height: 44,
+                fontSize: 12, fontWeight: isActive ? 700 : 500,
+                color: isActive ? '#0a3d8f' : '#6B7280',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: `2px solid ${isActive ? '#0a3d8f' : 'transparent'}`,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.15s, border-color 0.15s',
+                flexShrink: 0,
+              }}>
+              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.05em', color: isActive ? '#1265b8' : '#D1D5DB' }}>{n}</span>
+              {label}
+            </button>
+          );
+        })}
+      </div>
 
       {/* ── MAIN CONTENT ── */}
-      <main ref={mainRef} style={{ flex: 1, overflowY: 'auto', background: C.bg }}>
-
-        {/* Header strip */}
-        <div style={{ padding: '20px 48px', borderBottom: `1px solid ${C.border}`, background: C.white, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, position: 'sticky', top: 0, zIndex: 10 }}>
-          <div>
-            <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.mid, marginBottom: 2 }}>Observatorio Institucional · UNIR Colombia</p>
-            <h1 style={{ fontSize: 16, fontWeight: 800, color: C.navy, margin: 0, letterSpacing: '-0.01em' }}>{meta.nombre}</h1>
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-            {[
-              { v: `${score.toFixed(0)}/100`, l: 'Pertinencia', c: nivel.color },
-              { v: `${coberturaPct}%`,         l: 'Cobertura',  c: '#2563eb' },
-              { v: String(empCompatibles),      l: 'Empleos',   c: '#059669' },
-            ].map(({ v, l, c }) => (
-              <div key={l} style={{ textAlign: 'center', padding: '6px 14px', background: C.navyBg, borderRadius: 8, border: `1px solid ${C.border}` }}>
-                <p style={{ fontSize: 15, fontWeight: 800, color: c, margin: 0, lineHeight: 1 }}>{v}</p>
-                <p style={{ fontSize: 9, color: C.mid, margin: 0, marginTop: 2, letterSpacing: '0.05em' }}>{l}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      <main ref={mainRef} style={{ flex: 1, overflowY: 'auto', background: '#F7F8FC' }}>
 
         {/* Sections */}
-        <div style={{ padding: '0 48px', maxWidth: 900 }}>
+        <div style={{ padding: '0 48px', maxWidth: 960, margin: '0 auto' }}>
 
           {/* S1 */}
           <SectionBlock id="s1" n="01" title="Estado de Pertinencia">
