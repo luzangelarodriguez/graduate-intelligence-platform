@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { ProgressCircle, Card, Text, Metric, BarList } from '@tremor/react';
 import WordCloudCanvas, { CloudWord } from '../components/WordCloudCanvas';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -944,13 +945,44 @@ export default function ObservatorioStorytelling() {
 
           {/* S1 */}
           <SectionBlock id="s1" n="01" title="Estado de Pertinencia">
-            <div className="flex flex-col sm:flex-row gap-8 items-center">
+            <div className="flex flex-col sm:flex-row gap-8 items-start">
+
+              {/* ProgressCircle (Tremor) */}
               <div className="flex flex-col items-center gap-3 flex-shrink-0">
-                <SemiGauge pct={score} color={nivel.color} size={240} />
-                <span className="rounded-full px-5 py-1.5 text-sm font-extrabold" style={{ background: nivel.bg, color: nivel.color }}>{nivel.label}</span>
+                <ProgressCircle
+                  value={score}
+                  size="xl"
+                  color={score >= 75 ? 'emerald' : score >= 60 ? 'blue' : score >= 40 ? 'amber' : 'red'}
+                >
+                  <span className="text-2xl font-extrabold" style={{ color: nivel.color }}>
+                    {Math.round(score)}%
+                  </span>
+                </ProgressCircle>
+                <span className="rounded-full px-5 py-1.5 text-sm font-extrabold"
+                  style={{ background: nivel.bg, color: nivel.color }}>
+                  {nivel.label}
+                </span>
               </div>
+
+              {/* KPI cards + description */}
               <div className="flex-1 space-y-4">
+                {/* KPI row — Card + Text + Metric (Tremor) */}
+                <div className="grid grid-cols-3 gap-3">
+                  {([
+                    { label: 'Pertinencia',  value: `${score.toFixed(0)}/100`, color: nivel.color },
+                    { label: 'Cobertura',    value: `${coberturaPct}%`,        color: '#2563EB'   },
+                    { label: 'Empleos comp.', value: String(empCompatibles),   color: '#059669'   },
+                  ] as { label: string; value: string; color: string }[]).map(({ label, value, color }) => (
+                    <Card key={label} className="p-3 text-center">
+                      <Text className="text-xs text-gray-500">{label}</Text>
+                      <Metric className="text-xl" style={{ color }}>{value}</Metric>
+                    </Card>
+                  ))}
+                </div>
+
                 <p className="text-sm leading-relaxed text-gray-700">{nivel.desc}</p>
+
+                {/* Scale legend */}
                 <div className="space-y-2">
                   {[
                     { range: '75 – 100', label: 'Excelente', color: '#059669', bg: '#d1fae5' },
@@ -968,6 +1000,7 @@ export default function ObservatorioStorytelling() {
                     </div>
                   ))}
                 </div>
+
                 <Insight text={`Con un score promedio de ${score.toFixed(0)}/100, el programa se ubica en nivel ${nivel.label.toLowerCase()}. ${nivel.desc}`} />
               </div>
             </div>
@@ -982,46 +1015,48 @@ export default function ObservatorioStorytelling() {
                 const cat = classifySkill(s.skill);
                 if (cat !== 'otro') bycat[cat].push(s);
               }
-              const cols: { cat: 'herramienta'|'competencia'|'habilidad'; items: SkillMercado[] }[] = [
-                { cat: 'herramienta', items: bycat.herramienta.slice(0, 8) },
-                { cat: 'competencia', items: bycat.competencia.slice(0, 8) },
-                { cat: 'habilidad',   items: bycat.habilidad.slice(0, 8) },
+              const cols: { cat: 'herramienta'|'competencia'|'habilidad'; items: SkillMercado[]; tremorColor: string }[] = [
+                { cat: 'herramienta', items: bycat.herramienta.slice(0, 8), tremorColor: 'blue'    },
+                { cat: 'competencia', items: bycat.competencia.slice(0, 8), tremorColor: 'emerald' },
+                { cat: 'habilidad',   items: bycat.habilidad.slice(0, 8),   tremorColor: 'amber'   },
               ];
               return (
                 <>
-                  <p className="text-sm text-blue-200 mb-6">Skills clasificadas por tipo en las {totales.matches} vacantes analizadas.</p>
+                  <p className="text-sm text-blue-200 mb-6">
+                    Skills clasificadas por tipo en las {totales.matches} vacantes analizadas.
+                  </p>
+
+                  {/* BarList por categoría — Tremor Cards sobre fondo navy */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
-                    {cols.map(({ cat, items }) => {
+                    {cols.map(({ cat, items, tremorColor }) => {
                       const st = CAT_STYLE[cat];
-                      const maxFreq = items.length ? Math.max(...items.map(s => s.frecuencia), 1) : 1;
                       return (
-                        <div key={cat} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 12, padding: '16px 18px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                        <Card key={cat} className="p-4">
+                          {/* Header de la tarjeta */}
+                          <div className="flex items-center gap-2 mb-3">
                             <span style={{ fontSize: 16 }}>{st.icon}</span>
                             <div>
-                              <p style={{ fontSize: 11, fontWeight: 800, color: st.color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>{st.label}s</p>
-                              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', margin: 0 }}>{bycat[cat].length} identificadas</p>
+                              <Text className="text-xs font-extrabold uppercase tracking-wide" style={{ color: st.color }}>
+                                {st.label}s
+                              </Text>
+                              <Text className="text-xs text-gray-400">{bycat[cat].length} identificadas</Text>
                             </div>
                           </div>
+
                           {items.length === 0 ? (
-                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Sin datos suficientes</p>
+                            <Text className="text-xs text-gray-400 italic">Sin datos suficientes</Text>
                           ) : (
-                            <div className="skill-grid">
-                              {items.map(s => (
-                                <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', width: 72, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.skill}</span>
-                                  <div style={{ flex: 1, height: 5, borderRadius: 4, background: 'rgba(255,255,255,0.10)', minWidth: 20 }}>
-                                    <div style={{ height: '100%', borderRadius: 4, background: st.color, width: `${(s.frecuencia / maxFreq) * 100}%`, transition: 'width 0.6s ease' }} />
-                                  </div>
-                                  <span style={{ fontSize: 9, fontWeight: 700, color: st.color, width: 16, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
-                                </div>
-                              ))}
-                            </div>
+                            <BarList
+                              data={items.map(s => ({ name: s.skill, value: s.frecuencia }))}
+                              color={tremorColor as Parameters<typeof BarList>[0]['color']}
+                              className="text-xs"
+                            />
                           )}
-                        </div>
+                        </Card>
                       );
                     })}
                   </div>
+
                   <Insight dark text={`El mercado demanda ${skillsMercadoDeduped.length} skills distintas. Las 3 más frecuentes son: ${skillsMercadoDeduped.slice(0,3).map(s=>s.skill).join(', ')}.`} />
                 </>
               );
