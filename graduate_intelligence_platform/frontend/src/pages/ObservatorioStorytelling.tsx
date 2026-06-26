@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ProgressCircle, Card, Text, Metric, BarList } from '@tremor/react';
+import {
+  TrendingUp, BarChart3, BookOpen, Target, Building2,
+  AlertTriangle, Briefcase, FlaskConical, CheckSquare, Sparkles, RefreshCw,
+} from 'lucide-react';
 import WordCloudCanvas, { CloudWord } from '../components/WordCloudCanvas';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -120,17 +124,31 @@ const PROGRAMS = [
 ];
 
 const NAV_SECTIONS = [
-  { id: 's1',  n: '01',  label: 'Estado de Pertinencia',    sub: 'Score general de alineación con el mercado' },
-  { id: 's2',  n: '02',  label: 'Qué Demanda el Mercado',   sub: 'Skills y roles más solicitados en vacantes' },
-  { id: 's3',  n: '03',  label: 'Qué Enseña el Programa',   sub: 'Competencias actuales del microcurrículo' },
-  { id: 's4',  n: '04',  label: 'Cobertura Curricular',     sub: '% del mercado que el programa cubre' },
-  { id: 's4b', n: '04b', label: 'Benchmarking SNIES',       sub: 'Comparativa con universidades similares' },
-  { id: 's5',  n: '05',  label: 'Brechas Curriculares',     sub: 'Skills demandadas que el programa no enseña' },
-  { id: 's6',  n: '06',  label: 'Empleos Compatibles',      sub: 'Vacantes reales alineadas con el programa' },
-  { id: 's7',  n: '07',  label: 'Simulación Curricular',    sub: 'Impacto de incorporar nuevas competencias' },
-  { id: 's8',  n: '08',  label: 'Recomendaciones',          sub: 'Acciones sugeridas para el comité curricular' },
-  { id: 's9',  n: '09',  label: 'Rediseño Curricular',      sub: 'Propuestas de mejora asistidas por IA' },
+  { id: 's1',  n: '01',  label: 'Estado de Pertinencia',    sub: 'Score de alineación',              icon: TrendingUp    },
+  { id: 's2',  n: '02',  label: 'Qué Demanda el Mercado',   sub: 'Skills en vacantes',               icon: BarChart3     },
+  { id: 's3',  n: '03',  label: 'Qué Enseña el Programa',   sub: 'Competencias del microcurrículo',  icon: BookOpen      },
+  { id: 's4',  n: '04',  label: 'Cobertura Curricular',     sub: '% del mercado cubierto',           icon: Target        },
+  { id: 's4b', n: '04b', label: 'Benchmarking SNIES',       sub: 'Comparativa SNIES',                icon: Building2     },
+  { id: 's5',  n: '05',  label: 'Brechas Curriculares',     sub: 'Skills no cubiertas',              icon: AlertTriangle },
+  { id: 's6',  n: '06',  label: 'Empleos Compatibles',      sub: 'Vacantes alineadas',               icon: Briefcase     },
+  { id: 's7',  n: '07',  label: 'Simulación Curricular',    sub: 'Impacto de mejoras',               icon: FlaskConical  },
+  { id: 's8',  n: '08',  label: 'Recomendaciones',          sub: 'Acciones para el comité',          icon: CheckSquare   },
+  { id: 's9',  n: '09',  label: 'Rediseño Curricular',      sub: 'Propuestas IA',                    icon: Sparkles      },
 ];
+
+// ─── Section background tints ──────────────────────────────────────────────────
+const SECTION_BG: Record<string, string> = {
+  s1:  '#EEF2FF',
+  s2:  '#ECFDF5',
+  s3:  '#EEF2FF',
+  s4:  '#ECFEFF',
+  s4b: '#F8FAFC',
+  s5:  '#FEF2F2',
+  s6:  '#FFFBEB',
+  s7:  '#FAF5FF',
+  s8:  '#F0FDF4',
+  s9:  '#F8FAFC',
+};
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
 const FALLBACK: Summary = {
@@ -556,7 +574,6 @@ export default function ObservatorioStorytelling() {
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
   const mainRef         = useRef<HTMLDivElement>(null);
-  const tabsRef         = useRef<HTMLDivElement>(null);
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -706,14 +723,6 @@ export default function ObservatorioStorytelling() {
     return () => observer.disconnect();
   }, [loading]);
 
-  // Auto-scroll active tab into view in the horizontal subnav
-  useEffect(() => {
-    const nav = tabsRef.current;
-    if (!nav) return;
-    const activeTab = nav.querySelector<HTMLButtonElement>(`[data-section="${activeSection}"]`);
-    if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }, [activeSection]);
-
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.bg }}>
       <div style={{ textAlign: 'center' }}>
@@ -774,95 +783,123 @@ export default function ObservatorioStorytelling() {
   const maxFrecuencia = skillsMercadoDeduped.length ? Math.max(...skillsMercadoDeduped.map(s => s.frecuencia), 1) : 1;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', background: '#F7F8FC' }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', overflow: 'hidden' }}>
 
-      {/* ── HEADER PRINCIPAL ── */}
-      <header style={{
-        background: 'linear-gradient(90deg, #0a3d8f 0%, #1265b8 55%, #1f7bc4 100%)',
-        padding: '0 40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: 68,
-        flexShrink: 0,
-        boxShadow: '0 2px 12px rgba(10,61,143,0.30)',
-        position: 'relative',
-        zIndex: 20,
+      {/* ── SIDEBAR ── */}
+      <aside style={{
+        width: 252, flexShrink: 0,
+        background: 'linear-gradient(170deg, #061848 0%, #0D2158 55%, #091540 100%)',
+        display: 'flex', flexDirection: 'column',
+        overflowY: 'auto', scrollbarWidth: 'none' as const,
+        boxShadow: '4px 0 24px rgba(0,0,0,0.22)',
+        zIndex: 10,
       }}>
-        {/* Logo izquierda */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div>
-            {/* Logo "uniR" serif con punto celeste sobre la i */}
-            <div style={{ display: 'flex', alignItems: 'baseline', lineHeight: 1 }}>
-              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 30, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>un</span>
-              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 30, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', position: 'relative', display: 'inline-block' }}>
-                i
-                <span style={{ position: 'absolute', top: -5, left: '50%', transform: 'translateX(-50%)', width: 5, height: 5, background: '#5BC4F5', borderRadius: '50%', display: 'block' }} />
-              </span>
-              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>R</span>
-            </div>
-            <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>
-              La Universidad en Internet
-            </div>
+        {/* Logo + selector */}
+        <div style={{ padding: '22px 18px 14px', flexShrink: 0 }}>
+          {/* uniR logo */}
+          <div style={{ display: 'flex', alignItems: 'baseline', lineHeight: 1, marginBottom: 3 }}>
+            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>un</span>
+            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', position: 'relative', display: 'inline-block' }}>
+              i
+              <span style={{ position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, background: '#5BC4F5', borderRadius: '50%' }} />
+            </span>
+            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>R</span>
+          </div>
+          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.42)', marginBottom: 14 }}>
+            La Universidad en Internet
           </div>
 
-          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.22)', margin: '0 4px' }} />
-
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: '0.01em' }}>Observatorio de Pertinencia</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.60)', letterSpacing: '0.04em', marginTop: 2 }}>Colombia · Inteligencia Curricular</div>
-          </div>
-        </div>
-
-        {/* Derecha: badge + selector + KPIs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* KPIs pequeños */}
-          {[
-            { v: `${score.toFixed(0)}/100`, l: 'Pertinencia', c: nivel.color },
-            { v: `${coberturaPct}%`,         l: 'Cobertura',  c: '#38BDF8' },
-            { v: String(empCompatibles),      l: 'Empleos',   c: '#34D399' },
-          ].map(({ v, l, c }) => (
-            <div key={l} style={{ textAlign: 'center', padding: '5px 12px', background: 'rgba(255,255,255,0.10)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.18)' }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: c, lineHeight: 1 }}>{v}</div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', marginTop: 2, letterSpacing: '0.05em' }}>{l}</div>
-            </div>
-          ))}
-
-          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.18)' }} />
-
-          {/* Beta badge */}
-          <span style={{ border: '1.5px solid rgba(255,255,255,0.55)', color: 'rgba(255,255,255,0.85)', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', borderRadius: 20, padding: '4px 10px' }}>
-            Beta
-          </span>
-
-          {/* Selector de programa */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 8, padding: '7px 12px' }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap' }}>Programa</span>
+          {/* Program selector */}
+          <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: '8px 10px' }}>
+            <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.42)', marginBottom: 5 }}>Programa</div>
             <select
               value={programaId}
               onChange={e => setProgramaId(Number(e.target.value))}
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', outline: 'none', maxWidth: 190 }}>
+              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', outline: 'none', width: '100%' }}>
               {PROGRAMS.map(p => (
                 <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
               ))}
             </select>
           </div>
+        </div>
 
-          {/* Run info + pipeline button */}
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 16px 10px' }} />
+
+        {/* KPI row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5, padding: '0 14px 12px' }}>
+          {([
+            { v: score.toFixed(0), l: 'Score',  c: nivel.color  },
+            { v: `${coberturaPct}%`, l: 'Cob.',  c: '#38BDF8'   },
+            { v: String(empCompatibles), l: 'Emp.', c: '#34D399' },
+          ] as { v: string; l: string; c: string }[]).map(({ v, l, c }) => (
+            <div key={l} style={{ textAlign: 'center', padding: '6px 4px', background: 'rgba(255,255,255,0.06)', borderRadius: 6 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: c, lineHeight: 1 }}>{v}</div>
+              <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.42)', marginTop: 2 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 16px 6px' }} />
+
+        {/* Nav */}
+        <nav style={{ flex: 1, padding: '4px 10px 10px' }}>
+          {NAV_SECTIONS.map(({ id, n, label, sub, icon: Icon }) => {
+            const isActive = activeSection === id;
+            return (
+              <button
+                key={id}
+                onClick={() => {
+                  const el = mainRef.current?.querySelector(`#${id}`);
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  width: '100%', padding: '9px 10px', marginBottom: 1,
+                  background: isActive ? 'rgba(255,255,255,0.11)' : 'transparent',
+                  border: 'none',
+                  borderLeft: `3px solid ${isActive ? '#60A5FA' : 'transparent'}`,
+                  borderRadius: '0 8px 8px 0',
+                  cursor: 'pointer',
+                  textAlign: 'left' as const,
+                  transition: 'background 0.15s, border-color 0.15s',
+                }}>
+                <Icon size={14} color={isActive ? '#93C5FD' : 'rgba(255,255,255,0.36)'} style={{ flexShrink: 0 }} />
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ fontSize: 8, fontWeight: 700, color: isActive ? '#60A5FA' : 'rgba(255,255,255,0.28)', letterSpacing: '0.05em', flexShrink: 0 }}>{n}</span>
+                    <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.62)', lineHeight: 1.2, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+                  </div>
+                  {isActive && (
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.36)', marginTop: 2 }}>{sub}</div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Bottom: run info + pipeline */}
+        <div style={{ padding: '10px 14px 18px', borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.32)' }}>Run #{d.run_id} · {d.fecha}</span>
+            <span style={{ border: '1px solid rgba(255,255,255,0.32)', color: 'rgba(255,255,255,0.60)', fontSize: 8, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' as const, borderRadius: 20, padding: '2px 7px' }}>Beta</span>
+          </div>
+          {isFallback && <p style={{ fontSize: 9, color: C.gold, marginBottom: 8, fontWeight: 600 }}>⚠ Datos de referencia</p>}
           <div style={{ position: 'relative' }}>
             <button
               onClick={() => setPipelineLogOpen(o => !o)}
-              title={`Run #${d.run_id} · ${d.fecha}`}
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 8, color: 'rgba(255,255,255,0.70)', fontSize: 11, fontWeight: 600, cursor: 'pointer', padding: '7px 10px', lineHeight: 1 }}>
-              ↻
+              style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 7, color: 'rgba(255,255,255,0.58)', fontSize: 10, fontWeight: 600, cursor: 'pointer', padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <RefreshCw size={11} />
+              Actualizar datos
             </button>
             {pipelineLogOpen && (
-              <div style={{ position: 'absolute', right: 0, top: 40, width: 280, background: '#0a3d8f', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', zIndex: 50 }}>
+              <div style={{ position: 'absolute', bottom: 44, left: 0, right: 0, background: '#0a3d8f', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 16px', boxShadow: '0 -8px 24px rgba(0,0,0,0.35)', zIndex: 50 }}>
                 <p style={{ fontSize: 11, color: '#86efac', marginBottom: 6, fontWeight: 700 }}>Último análisis: {d.fecha ?? '—'}</p>
                 <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5, margin: 0 }}>
                   Adquisición y matching corren cada noche vía GitHub Actions.
                 </p>
-                {isFallback && <p style={{ fontSize: 10, color: C.gold, marginTop: 8, fontWeight: 600 }}>⚠ Datos de referencia (API no disponible)</p>}
                 {pipelineStatus !== 'idle' && (
                   <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(255,255,255,0.08)', borderRadius: 6, fontSize: 10 }}>
                     <span style={{ color: '#fff' }}>
@@ -877,68 +914,10 @@ export default function ObservatorioStorytelling() {
             )}
           </div>
         </div>
-      </header>
-
-      {/* ── SUBNAV HORIZONTAL (tabs) ── */}
-      <div
-        ref={tabsRef}
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #E5E7EB',
-          display: 'flex',
-          alignItems: 'center',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          flexShrink: 0,
-          paddingLeft: 24,
-        }}>
-        <style>{`
-          .subnav-tabs::-webkit-scrollbar { display: none; }
-          .skill-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 20px;
-          }
-          @media (max-width: 640px) {
-            .skill-grid { grid-template-columns: 1fr; }
-          }
-          .chip-sub { display: none; font-size: 9px; color: #9CA3AF; margin-left: 4px; }
-          @media (max-width: 640px) { .chip-sub { display: inline; } }
-        `}</style>
-        {NAV_SECTIONS.map(({ id, n, label, sub }) => {
-          const isActive = activeSection === id;
-          return (
-            <button
-              key={id}
-              data-section={id}
-              onClick={() => {
-                const el = mainRef.current?.querySelector(`#${id}`);
-                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center',
-                padding: '0 16px',
-                height: 52,
-                background: 'transparent',
-                border: 'none',
-                borderBottom: `2px solid ${isActive ? '#0a3d8f' : 'transparent'}`,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'color 0.15s, border-color 0.15s',
-                flexShrink: 0,
-              }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.05em', color: isActive ? '#1265b8' : '#D1D5DB' }}>{n}</span>
-                <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? '#0a3d8f' : '#374151' }}>{label}</span>
-              </div>
-              <span style={{ fontSize: 10, color: isActive ? '#1265b8' : '#9CA3AF', marginTop: 2, fontWeight: 400 }}>{sub}</span>
-            </button>
-          );
-        })}
-      </div>
+      </aside>
 
       {/* ── MAIN CONTENT ── */}
-      <main ref={mainRef} style={{ flex: 1, overflowY: 'auto', background: '#F7F8FC' }}>
+      <main ref={mainRef} style={{ flex: 1, overflowY: 'auto', backgroundColor: SECTION_BG[activeSection] ?? '#F7F8FC', transition: 'background-color 0.5s ease' }}>
 
         {/* Sections */}
         <div style={{ padding: '0 48px', maxWidth: 960, margin: '0 auto' }}>
