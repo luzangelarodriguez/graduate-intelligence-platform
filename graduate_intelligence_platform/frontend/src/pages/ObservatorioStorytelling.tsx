@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { blueGradient } from '../utils/chartColors';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement,
@@ -323,12 +324,13 @@ function ProposalCard({ prop }: { prop: RedisenioPropuesta }) {
 
 // ─── Chart.js wrappers ─────────────────────────────────────────────────────────
 
-function HorizBarChart({ labels, values, color = '#3B82F6', valueLabel = 'vacantes' }: {
-  labels: string[]; values: number[]; color?: string; valueLabel?: string;
+function HorizBarChart({ labels, values, color, valueLabel = 'vacantes' }: {
+  labels: string[]; values: number[]; color?: string | string[]; valueLabel?: string;
 }) {
+  const bg = color ?? blueGradient(values.length);
   const data = {
     labels,
-    datasets: [{ data: values, backgroundColor: color, borderRadius: 4, barThickness: 14 }],
+    datasets: [{ data: values, backgroundColor: bg, borderRadius: 4, barThickness: 14 }],
   };
   const options = {
     indexAxis: 'y' as const,
@@ -457,7 +459,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             <DashPanel title="Top Skills del Mercado">
               <div style={{ height: 190 }}>
                 {topMarket.length > 0
-                  ? <HorizBarChart labels={topMarket.map(s => s.skill)} values={topMarket.map(s => s.frecuencia)} color="#3B82F6" />
+                  ? <HorizBarChart labels={topMarket.map(s => s.skill)} values={topMarket.map(s => s.frecuencia)} />
                   : <Spinner />}
               </div>
             </DashPanel>
@@ -467,7 +469,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
                   ? <DonutChart
                       labels={['Herramientas', 'Competencias', 'Habilidades', 'Otros']}
                       values={[compCount.Herramientas, compCount.Competencias, compCount.Habilidades, compCount.Otros]}
-                      colors={['#3B82F6', '#10B981', '#F59E0B', '#94A3B8']}
+                      colors={blueGradient(4)}
                     />
                   : <Spinner />}
               </div>
@@ -545,7 +547,7 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
                 <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.frecuencia)} color={m.bar} />
+                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.frecuencia)} />
                 </div>
               )}
             </DashPanel>
@@ -583,7 +585,7 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
                 <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.cobertura)} color={m.bar} valueLabel="materias" />
+                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.cobertura)} valueLabel="materias" />
                 </div>
               )}
             </DashPanel>
