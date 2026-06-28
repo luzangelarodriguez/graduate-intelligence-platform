@@ -53,6 +53,7 @@ interface ProgramSelectorStripProps {
   programs: Program[];
   selectedProgramId: number | null;
   onChange: (programId: number) => void;
+  hasEvidence?: boolean;
   domainLabel?: string;
   subdomainLabel?: string;
   benchmarkLabel?: string;
@@ -185,6 +186,7 @@ export function ProgramSelectorStrip({
   programs,
   selectedProgramId,
   onChange,
+  hasEvidence,
   domainLabel,
   subdomainLabel,
   benchmarkLabel,
@@ -197,9 +199,11 @@ export function ProgramSelectorStrip({
   secondaryActionHref,
 }: ProgramSelectorStripProps) {
   const selectedProgram = programs.find((program) => program.especializacion_id === selectedProgramId) || programs[0] || null;
-  const detailedMicrocurriculum = Boolean(
-    selectedProgram?.microcurriculum_context || /visual analytics.*big data/i.test(selectedProgram?.nombre_especializacion || ''),
-  );
+  const detailedMicrocurriculum =
+    hasEvidence ??
+    Boolean(
+      selectedProgram?.microcurriculum_context || /visual analytics.*big data/i.test(selectedProgram?.nombre_especializacion || ''),
+    );
 
   return (
     <article className="rounded-2xl border border-line bg-white p-5 shadow-sm">

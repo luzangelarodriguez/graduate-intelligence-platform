@@ -1,4 +1,4 @@
-﻿import {
+import {
   getCriticalPrograms,
   getExecutiveObservatory,
   getProgramAlignment,
@@ -8,7 +8,17 @@
   getProgramas,
 } from './api';
 import { requestResource } from './serviceState';
-import { hasProgramCurricularEvidence } from '../hooks/useProgramIntelligenceData';
+import type { ProgramIntelligenceItem } from '../types/api';
+
+function hasProgramCurricularEvidence(item: ProgramIntelligenceItem): boolean {
+  const evidence = (item.supporting_evidence || {}) as Record<string, unknown>;
+  return (
+    Boolean(evidence.microcurriculum_context) ||
+    Boolean(evidence.domain_taxonomy) ||
+    (Array.isArray(item.top_gaps) && item.top_gaps.length > 0) ||
+    (Array.isArray(item.top_recommendations) && item.top_recommendations.length > 0)
+  );
+}
 
 export const programService = {
   listPrograms: () =>
@@ -83,7 +93,3 @@ export const programService = {
       'Valide la tabla de métricas del observatorio ejecutivo.',
     ),
 };
-
-
-
-
