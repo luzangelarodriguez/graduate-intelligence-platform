@@ -948,6 +948,133 @@ def pipeline_run(
     })
 
 
+# ─── Market Context ───────────────────────────────────────────────────────────
+
+_MARKET_STUDIES = [
+    {
+        "title": "World Economic Forum — Future of Jobs Report 2025",
+        "summary": (
+            "La IA y el análisis de grandes datos encabezan la lista de habilidades de más rápido "
+            "crecimiento a nivel global, seguidas de ciberseguridad y alfabetización tecnológica. "
+            "Se proyecta que el 40% de las habilidades requeridas en el trabajo cambiarán para 2030, "
+            "y el 63% de los empleadores ya identifican la brecha de habilidades como su principal "
+            "barrera de transformación."
+        ),
+        "url": "https://www.weforum.org/publications/the-future-of-jobs-report-2025",
+    },
+    {
+        "title": "OLE Colombia — Observatorio Laboral para la Educación",
+        "summary": (
+            "Sistema oficial del gobierno colombiano que hace seguimiento a la inserción laboral de "
+            "graduados de educación superior, midiendo la pertinencia entre la oferta educativa y la "
+            "demanda real del mercado laboral nacional."
+        ),
+        "url": "https://ole.mineducacion.gov.co",
+    },
+    {
+        "title": "Adecco Colombia — Tendencias del Mercado Laboral 2026",
+        "summary": (
+            "El mercado laboral colombiano en 2026 prioriza la productividad sobre el volumen de "
+            "contratación, impulsado por la aceleración de la IA y automatización. Las empresas están "
+            "invirtiendo en upskilling y migrando hacia modelos de selección basados en competencias medibles."
+        ),
+        "url": "https://www.eltiempo.com",
+    },
+]
+
+# In-memory cache: program_id → {analisis, generado_en}
+_MARKET_CONTEXT_CACHE: dict[int, dict[str, Any]] = {}
+
+
+@app.post("/api/dashboard/market-context/{program_id}", tags=["dashboard"])
+def market_context(program_id: int) -> dict[str, Any]:
+    """Generate AI-personalized market context analysis for a program, cached per program_id."""
+    import datetime
+
+    # Return cached result if available
+    if program_id in _MARKET_CONTEXT_CACHE:
+        return _MARKET_CONTEXT_CACHE[program_id]
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return {
+            "analisis": "Análisis no disponible: OPENAI_API_KEY no configurada.",
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": True,
+        }
+
+    try:
+        # Get program skills data
+        sa = dashboard_skills_analysis(program_id)
+        brechas    = [b["skill"] for b in sa.get("brechas", [])[:8]]
+        fortalezas = [f["skill"] for f in sa.get("fortalezas", [])[:6]]
+
+        # Get program name
+        from api.database import fetch_one
+        row = fetch_one(
+            "SELECT nombre FROM especializaciones WHERE id = %s",
+            (program_id,),
+        )
+        nombre_programa = row["nombre"] if row else f"Programa {program_id}"
+
+        # Get pertinencia score from latest run
+        score_row = fetch_one(
+            """
+            SELECT ROUND(AVG(score_match)::numeric, 1) AS score
+            FROM ml_program_job_matches
+            WHERE especializacion_id = %s
+              AND run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')
+            """,
+            (program_id,),
+        )
+        score = float(score_row["score"] or 0) if score_row else 0.0
+
+        studies_text = "\n\n".join(
+            f"[{s['title']}]\n{s['summary']}" for s in _MARKET_STUDIES
+        )
+        brechas_str    = ", ".join(brechas) if brechas else "ninguna identificada"
+        fortalezas_str = ", ".join(fortalezas) if fortalezas else "ninguna identificada"
+
+        prompt = (
+            f"Eres un asesor de pertinencia curricular. Basándote en estos 3 estudios de mercado:\n\n"
+            f"{studies_text}\n\n"
+            f"Y estos datos específicos del programa '{nombre_programa}':\n"
+            f"- Brechas detectadas: {brechas_str}\n"
+            f"- Fortalezas actuales: {fortalezas_str}\n"
+            f"- Score de pertinencia: {score}/100\n\n"
+            f"Escribe un párrafo de 3-4 oraciones en español, dirigido a un comité curricular, "
+            f"que conecte los hallazgos de estos estudios con la situación específica de este programa. "
+            f"Cita explícitamente qué estudio respalda cada punto que menciones. "
+            f"Sé concreto y evita generalidades vacías."
+        )
+
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=400,
+        )
+        analisis = response.choices[0].message.content.strip()
+
+        result = {
+            "analisis": analisis,
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": False,
+        }
+        _MARKET_CONTEXT_CACHE[program_id] = result
+        return result
+
+    except Exception as exc:
+        logger.error("market_context error program_id=%s: %s", program_id, exc, exc_info=True)
+        return {
+            "analisis": f"Error al generar el análisis: {exc}",
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": True,
+        }
+
+
 # ─── Curriculum Redesign ──────────────────────────────────────────────────────
 
 # In-memory cache: program_id → redesign result (cleared on new POST)

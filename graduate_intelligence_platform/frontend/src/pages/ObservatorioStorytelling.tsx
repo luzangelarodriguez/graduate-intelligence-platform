@@ -10,6 +10,7 @@ import { Bar, Doughnut, Scatter } from 'react-chartjs-2';
 import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconAlertTriangle, IconBriefcase, IconListCheck,
+  IconWorld,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -91,7 +92,7 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones' | 'contexto';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
@@ -101,6 +102,7 @@ const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<Ic
   { id: 'brechas',         label: 'Brechas',          Icon: IconAlertTriangle },
   { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
+  { id: 'contexto',        label: 'Contexto',         Icon: IconWorld         },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -1058,6 +1060,143 @@ function ViewRecomendaciones({
   );
 }
 
+// ─── Market context static studies ───────────────────────────────────────────
+const MARKET_STUDIES = [
+  {
+    icon: '🌐',
+    title: 'World Economic Forum — Future of Jobs Report 2025',
+    summary: 'La IA y el análisis de grandes datos encabezan la lista de habilidades de más rápido crecimiento a nivel global, seguidas de ciberseguridad y alfabetización tecnológica. Se proyecta que el 40% de las habilidades requeridas en el trabajo cambiarán para 2030, y el 63% de los empleadores ya identifican la brecha de habilidades como su principal barrera de transformación.',
+    url: 'https://www.weforum.org/publications/the-future-of-jobs-report-2025',
+    source: 'weforum.org · 2025',
+  },
+  {
+    icon: '🇨🇴',
+    title: 'OLE Colombia — Observatorio Laboral para la Educación',
+    summary: 'Sistema oficial del gobierno colombiano que hace seguimiento a la inserción laboral de graduados de educación superior, midiendo la pertinencia entre la oferta educativa y la demanda real del mercado laboral nacional.',
+    url: 'https://ole.mineducacion.gov.co',
+    source: 'ole.mineducacion.gov.co · MEN',
+  },
+  {
+    icon: '📊',
+    title: 'Adecco Colombia — Tendencias del Mercado Laboral 2026',
+    summary: 'El mercado laboral colombiano en 2026 prioriza la productividad sobre el volumen de contratación, impulsado por la aceleración de la IA y automatización. Las empresas están invirtiendo en upskilling y migrando hacia modelos de selección basados en competencias medibles.',
+    url: 'https://www.eltiempo.com',
+    source: 'El Tiempo · feb 2026',
+  },
+];
+
+function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
+  const [analisis, setAnalisis]   = useState<string | null>(null);
+  const [loading, setLoading]     = useState(false);
+  const [generated, setGenerated] = useState<string | null>(null);
+  const [aiError, setAiError]     = useState(false);
+
+  const hasBrechas = (skills?.brechas?.length ?? 0) > 0;
+
+  function generate() {
+    setLoading(true); setAiError(false);
+    fetch(`${API}/api/dashboard/market-context/${programaId}`, { method: 'POST' })
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: { analisis: string; generado_en: string; error?: boolean }) => {
+        setAnalisis(d.analisis);
+        setGenerated(d.generado_en ? new Date(d.generado_en).toLocaleString('es-CO') : null);
+        setAiError(!!d.error);
+        setLoading(false);
+      })
+      .catch(() => { setAiError(true); setLoading(false); });
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+      <div style={{ flexShrink: 0 }}>
+        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Contexto de Mercado — Estudios de Referencia</h1>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hallazgos de informes externos + análisis personalizado por IA para {meta.label}</p>
+      </div>
+
+      {/* Parte A — 3 static study cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, flexShrink: 0 }}>
+        {MARKET_STUDIES.map(s => (
+          <div key={s.title} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>{s.icon}</span>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
+            </div>
+            <p style={{ fontSize: 11, color: '#374151', fontStyle: 'italic', lineHeight: 1.7, margin: 0, flex: 1 }}>"{s.summary}"</p>
+            <a href={s.url} target="_blank" rel="noopener noreferrer"
+               style={{ fontSize: 9, fontWeight: 700, color: '#6B7280', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', borderTop: `1px solid ${C.border}`, paddingTop: 8, marginTop: 4 }}>
+              📎 {s.source}
+            </a>
+          </div>
+        ))}
+      </div>
+
+      {/* Parte B — AI personalized analysis */}
+      <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 20px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
+              Análisis personalizado IA — {meta.nombre}
+            </p>
+            <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
+              Conecta los estudios anteriores con la situación específica de este programa (score: {score.toFixed(0)}/100)
+            </p>
+          </div>
+          {!loading && (
+            <button
+              onClick={generate}
+              style={{ background: C.navy, color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+              {analisis ? '↺ Regenerar' : '✨ Generar análisis'}
+            </button>
+          )}
+        </div>
+
+        {loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0' }}>
+            <div className="w-6 h-6 rounded-full border-4 border-blue-200 border-t-blue-800 animate-spin flex-shrink-0" />
+            <p style={{ fontSize: 12, color: '#6B7280', margin: 0, fontStyle: 'italic' }}>Consultando estudios y generando análisis…</p>
+          </div>
+        ) : analisis ? (
+          <div>
+            {aiError ? (
+              <p style={{ fontSize: 12, color: '#B91C1C', margin: 0 }}>{analisis}</p>
+            ) : (
+              <div style={{ background: '#F8FAFC', borderRadius: 8, borderLeft: `4px solid ${C.navy}`, padding: '14px 16px' }}>
+                <p style={{ fontSize: 13, color: '#1E293B', lineHeight: 1.8, margin: 0 }}>{analisis}</p>
+              </div>
+            )}
+            {generated && <p style={{ fontSize: 9, color: '#9CA3AF', margin: '8px 0 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Generado: {generated}</p>}
+          </div>
+        ) : (
+          <div style={{ background: '#F8FAFC', borderRadius: 8, border: `1px dashed ${C.border}`, padding: '24px', textAlign: 'center' }}>
+            <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>
+              {hasBrechas
+                ? `Haz clic en "Generar análisis" para obtener un diagnóstico personalizado basado en las ${skills!.brechas.length} brechas y ${skills!.fortalezas.length} fortalezas de este programa.`
+                : 'Carga los datos del programa primero para habilitar el análisis personalizado.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Quick reference bullets */}
+      <DashPanel title="Indicadores clave de los estudios">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {[
+            { label: '40%',   desc: 'de las habilidades laborales cambiarán para 2030', color: '#2563EB', source: 'WEF 2025' },
+            { label: '63%',   desc: 'de empleadores ven la brecha de skills como barrera principal', color: '#DC2626', source: 'WEF 2025' },
+            { label: '2026',  desc: 'Colombia prioriza productividad + upskilling sobre volumen', color: '#059669', source: 'Adecco CO' },
+          ].map(kpi => (
+            <div key={kpi.label} style={{ textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: `${kpi.color}08`, border: `1px solid ${kpi.color}22` }}>
+              <p style={{ fontSize: 28, fontWeight: 900, color: kpi.color, margin: '0 0 6px', lineHeight: 1 }}>{kpi.label}</p>
+              <p style={{ fontSize: 11, color: '#374151', margin: '0 0 4px', lineHeight: 1.4 }}>{kpi.desc}</p>
+              <span style={{ fontSize: 9, fontWeight: 700, color: kpi.color, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{kpi.source}</span>
+            </div>
+          ))}
+        </div>
+      </DashPanel>
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
   const [summary, setSummary]               = useState<Summary | null>(null);
@@ -1226,6 +1365,7 @@ export default function ObservatorioStorytelling() {
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
+    contexto:        <ViewContexto        {...viewProps} />,
   };
 
   return (
