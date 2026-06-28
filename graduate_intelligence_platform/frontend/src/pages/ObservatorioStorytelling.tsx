@@ -1085,6 +1085,326 @@ const MARKET_STUDIES = [
   },
 ];
 
+// ─── WEF domain detection (mirrors backend logic) ────────────────────────────
+function detectDominio(nombre: string): 'datos_ia' | 'juridico_social' | 'salud_educacion' | 'otro' {
+  const n = nombre.toLowerCase();
+  if (/dato|analítica|analytics|inteligencia artificial|\bia\b|machine|big data/.test(n)) return 'datos_ia';
+  if (/crimin|victimol|derecho|juridic|penal/.test(n)) return 'juridico_social';
+  if (/neuropsicol|psicol|educaci|pedagog|clíni/.test(n)) return 'salud_educacion';
+  return 'otro';
+}
+
+// ─── WEF Chart components ─────────────────────────────────────────────────────
+
+const SRC_WEF = 'Fuente: WEF Future of Jobs Report 2025';
+
+function WefSourceNote({ fig }: { fig: string }) {
+  return (
+    <p style={{ fontSize: 9, color: '#9CA3AF', margin: '8px 0 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      {SRC_WEF} — {fig}
+    </p>
+  );
+}
+
+// G1: Disruption KPI cards (Colombia vs global)
+function WefG1Disruption() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
+        Disrupción de habilidades: Colombia vs. mundo
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        {[
+          { val: '41%', label: 'de las competencias laborales cambiarán', sub: 'Colombia 2025-2030', color: '#2563EB' },
+          { val: '39%', label: 'de las competencias laborales cambiarán', sub: 'Promedio global',     color: '#7C3AED' },
+          { val: '+2 pts', label: 'Colombia por encima del promedio mundial', sub: 'Diferencia',      color: '#DC2626' },
+        ].map(k => (
+          <div key={k.sub} style={{ textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: `${k.color}08`, border: `1px solid ${k.color}22` }}>
+            <p style={{ fontSize: 26, fontWeight: 900, color: k.color, margin: '0 0 4px', lineHeight: 1 }}>{k.val}</p>
+            <p style={{ fontSize: 10, color: '#374151', margin: '0 0 4px', lineHeight: 1.4 }}>{k.label}</p>
+            <span style={{ fontSize: 9, fontWeight: 700, color: k.color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{k.sub}</span>
+          </div>
+        ))}
+      </div>
+      <WefSourceNote fig="Figura 3.2" />
+    </div>
+  );
+}
+
+// G2: Skills en auge vs. en declive (barras horizontales)
+function WefG2SkillsTrends() {
+  const items = [
+    { label: 'IA y big data',                            val: 87  },
+    { label: 'Redes y ciberseguridad',                   val: 70  },
+    { label: 'Alfabetización tecnológica',               val: 68  },
+    { label: 'Pensamiento creativo',                     val: 66  },
+    { label: 'Resiliencia, flexibilidad y agilidad',     val: 66  },
+    { label: 'Gestión del talento',                      val: 58  },
+    { label: 'Pensamiento analítico',                    val: 55  },
+    { label: 'Gestión ambiental',                        val: 53  },
+    { label: 'Lectoescritura y matemáticas',             val:  -4 },
+    { label: 'Destreza manual / resistencia / precisión',val: -24 },
+  ];
+  const data = {
+    labels: items.map(i => i.label),
+    datasets: [{
+      data: items.map(i => i.val),
+      backgroundColor: items.map(i => i.val >= 0 ? '#1D9E75' : '#D85A30'),
+      borderRadius: 4,
+    }],
+  };
+  const opts = {
+    indexAxis: 'y' as const,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: {
+      label: (ctx: { raw: unknown }) => ` ${ctx.raw}% aumento neto`,
+    }}},
+    scales: {
+      x: { min: -30, max: 100, ticks: { font: { size: 10 }, callback: (v: unknown) => `${v}%` }, grid: { color: '#F1F5F9' } },
+      y: { ticks: { font: { size: 10 }, color: '#374151' }, grid: { display: false } },
+    },
+  };
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
+        Qué habilidades están creciendo y cuáles están cayendo a nivel global
+      </p>
+      <div style={{ display: 'flex', gap: 12, fontSize: 9, fontWeight: 700, marginBottom: 8 }}>
+        <span style={{ color: '#1D9E75' }}>▮ En auge</span>
+        <span style={{ color: '#D85A30' }}>▮ En declive</span>
+      </div>
+      <div style={{ height: 270 }}>
+        <Bar data={data} options={opts} />
+      </div>
+      <WefSourceNote fig="Figura 3.4" />
+    </div>
+  );
+}
+
+// G3: Balance global de empleos
+function WefG3JobBalance() {
+  const created = 170, displaced = 92, total = created + displaced;
+  const pctCreated = (created / total * 100).toFixed(1);
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
+        Empleos creados vs. desplazados a nivel global, 2025-2030
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
+        {[
+          { val: '170M', label: '14% del empleo formal actual', sub: 'Empleos creados',    color: '#1D9E75' },
+          { val: '92M',  label: '8% del empleo formal actual',  sub: 'Empleos desplazados', color: '#D85A30' },
+          { val: '+78M', label: '7% de crecimiento neto a 2030', sub: 'Crecimiento neto',  color: '#2563EB' },
+        ].map(k => (
+          <div key={k.sub} style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 10, background: `${k.color}08`, border: `1px solid ${k.color}22` }}>
+            <p style={{ fontSize: 22, fontWeight: 900, color: k.color, margin: '0 0 4px', lineHeight: 1 }}>{k.val}</p>
+            <p style={{ fontSize: 10, color: '#374151', margin: '0 0 4px', lineHeight: 1.3 }}>{k.label}</p>
+            <span style={{ fontSize: 9, fontWeight: 700, color: k.color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{k.sub}</span>
+          </div>
+        ))}
+      </div>
+      {/* Proportional bar */}
+      <div style={{ height: 14, borderRadius: 7, overflow: 'hidden', display: 'flex', background: '#F1F5F9' }}>
+        <div style={{ width: `${pctCreated}%`, background: '#1D9E75', transition: 'width 0.6s ease' }} />
+        <div style={{ flex: 1, background: '#D85A30' }} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+        <span style={{ fontSize: 9, color: '#1D9E75', fontWeight: 700 }}>Creados {pctCreated}%</span>
+        <span style={{ fontSize: 9, color: '#D85A30', fontWeight: 700 }}>Desplazados {(100 - parseFloat(pctCreated)).toFixed(1)}%</span>
+      </div>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.5, fontStyle: 'italic' }}>
+        El 22% del empleo formal global (1,2 mil millones de puestos analizados) estará en movimiento hacia 2030.
+      </p>
+      <WefSourceNote fig="Figura 2.1 · OIT" />
+    </div>
+  );
+}
+
+// G4: Top skills crecimiento (dominio datos/IA) — resalta las tech en azul
+function WefG4DatosIA() {
+  const items = [
+    { label: 'IA y big data',                        val: 87, tech: true  },
+    { label: 'Redes y ciberseguridad',               val: 70, tech: true  },
+    { label: 'Alfabetización tecnológica',           val: 68, tech: true  },
+    { label: 'Pensamiento creativo',                 val: 66, tech: false },
+    { label: 'Resiliencia y agilidad',               val: 66, tech: false },
+    { label: 'Curiosidad y aprendizaje continuo',    val: 61, tech: false },
+    { label: 'Liderazgo e influencia social',        val: 58, tech: false },
+    { label: 'Gestión del talento',                  val: 58, tech: false },
+    { label: 'Pensamiento analítico',                val: 55, tech: false },
+    { label: 'Gestión ambiental',                    val: 53, tech: false },
+  ];
+  const data = {
+    labels: items.map(i => i.label),
+    datasets: [{
+      data: items.map(i => i.val),
+      backgroundColor: items.map(i => i.tech ? '#378ADD' : '#888780'),
+      borderRadius: 4,
+    }],
+  };
+  const opts = {
+    indexAxis: 'y' as const,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: {
+      label: (ctx: { raw: unknown }) => ` ${ctx.raw}% aumento neto`,
+    }}},
+    scales: {
+      x: { min: 0, max: 100, ticks: { font: { size: 10 }, callback: (v: unknown) => `${v}%` }, grid: { color: '#F1F5F9' } },
+      y: { ticks: { font: { size: 10 }, color: '#374151' }, grid: { display: false } },
+    },
+  };
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 4px' }}>
+        Habilidades de más rápido crecimiento global
+      </p>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '0 0 10px' }}>Relevante para este programa — habilidades tecnológicas destacadas en azul</p>
+      <div style={{ display: 'flex', gap: 12, fontSize: 9, fontWeight: 700, marginBottom: 8 }}>
+        <span style={{ color: '#378ADD' }}>▮ Tecnológicas (relevantes para este programa)</span>
+        <span style={{ color: '#888780' }}>▮ Transversales</span>
+      </div>
+      <div style={{ height: 260 }}>
+        <Bar data={data} options={opts} />
+      </div>
+      <WefSourceNote fig="Figura 3.4" />
+    </div>
+  );
+}
+
+// G5: Empleos de cuidado y educación (dominio salud/educación) — barras cualitativas
+function WefG5SaludEducacion() {
+  const items = [
+    { label: 'Profesionales de enfermería',                    color: '#5DCAA5' },
+    { label: 'Trabajo social y consejería',                    color: '#5DCAA5' },
+    { label: 'Docentes universitarios / educación superior',   color: '#7F77DD' },
+    { label: 'Docentes de educación secundaria',               color: '#7F77DD' },
+  ];
+  const data = {
+    labels: items.map(i => i.label),
+    datasets: [{
+      data: [100, 100, 100, 100],
+      backgroundColor: items.map(i => i.color),
+      borderRadius: 4,
+    }],
+  };
+  const opts = {
+    indexAxis: 'y' as const,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: () => ' Top 15 empleos de mayor crecimiento absoluto a 2030' } },
+    },
+    scales: {
+      x: { display: false },
+      y: { ticks: { font: { size: 11 }, color: '#374151' }, grid: { display: false } },
+    },
+  };
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 4px' }}>
+        Empleos de cuidado y educación entre los de mayor crecimiento
+      </p>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '0 0 10px' }}>Relevante para este programa</p>
+      <div style={{ display: 'flex', gap: 12, fontSize: 9, fontWeight: 700, marginBottom: 8 }}>
+        <span style={{ color: '#5DCAA5' }}>▮ Cuidado / salud</span>
+        <span style={{ color: '#7F77DD' }}>▮ Educación</span>
+      </div>
+      <div style={{ height: 150 }}>
+        <Bar data={data} options={opts} />
+      </div>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.5, fontStyle: 'italic' }}>
+        Las cuatro ocupaciones figuran dentro de los 15 empleos de mayor crecimiento absoluto proyectados para 2030 a nivel global.
+      </p>
+      <WefSourceNote fig="Figura 2.4" />
+    </div>
+  );
+}
+
+// G6: Roles de seguridad (dominio jurídico/social) — barras por posición en ranking
+function WefG6SeguridadJuridico() {
+  // Position in top-15 ranking → bar length = 15 - position + 1 (inverted so lower position = longer bar)
+  const items = [
+    { label: 'Security management specialists', pos: 5,  color: '#D85A30' },
+    { label: 'Information security analysts',   pos: 13, color: '#F0997B' },
+  ];
+  const data = {
+    labels: items.map(i => i.label),
+    datasets: [{
+      data: items.map(i => 16 - i.pos), // pos 5 → length 11, pos 13 → length 3
+      backgroundColor: items.map(i => i.color),
+      borderRadius: 4,
+    }],
+  };
+  const opts = {
+    indexAxis: 'y' as const,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: {
+        label: (ctx: { dataIndex: number }) => ` Posición #${items[ctx.dataIndex].pos} de 15 en crecimiento porcentual global`,
+      }},
+    },
+    scales: {
+      x: { display: false, min: 0, max: 15 },
+      y: { ticks: { font: { size: 11 }, color: '#374151' }, grid: { display: false } },
+    },
+  };
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid #E5E7EB`, padding: '16px 20px' }}>
+      <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 4px' }}>
+        Roles de seguridad entre los de mayor crecimiento porcentual
+      </p>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '0 0 10px' }}>Relevante para este programa</p>
+      <div style={{ display: 'flex', gap: 12, fontSize: 9, fontWeight: 700, marginBottom: 8 }}>
+        <span style={{ color: '#D85A30' }}>▮ Mayor crecimiento</span>
+        <span style={{ color: '#F0997B' }}>▮ Crecimiento significativo</span>
+      </div>
+      <div style={{ height: 110 }}>
+        <Bar data={data} options={opts} />
+      </div>
+      <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+        {items.map(i => (
+          <span key={i.label} style={{ fontSize: 10, color: i.color, fontWeight: 700 }}>
+            {i.label}: #{i.pos}/15
+          </span>
+        ))}
+      </div>
+      <p style={{ fontSize: 10, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.5, fontStyle: 'italic' }}>
+        Ambos roles figuran en el top 15 global de empleos de más rápido crecimiento porcentual a 2030, impulsados por el aumento de tensiones geopolíticas y de fragmentación tecnológica.
+      </p>
+      <WefSourceNote fig="Figura 2.2" />
+    </div>
+  );
+}
+
+// ─── WEF Charts section (3 general + 1 conditional) ──────────────────────────
+function WefChartsSection({ nombrePrograma }: { nombrePrograma: string }) {
+  const dominio = detectDominio(nombrePrograma);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', margin: 0, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+        Visualizaciones WEF Future of Jobs Report 2025
+      </p>
+      {/* Fila de los 3 generales: G1 y G3 en columna izquierda, G2 ocupa derecha */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <WefG1Disruption />
+          <WefG3JobBalance />
+        </div>
+        <WefG2SkillsTrends />
+      </div>
+      {/* Gráfico condicional por dominio */}
+      {dominio === 'datos_ia'          && <WefG4DatosIA />}
+      {dominio === 'salud_educacion'   && <WefG5SaludEducacion />}
+      {dominio === 'juridico_social'   && <WefG6SeguridadJuridico />}
+    </div>
+  );
+}
+
 function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
   const [analisis, setAnalisis]   = useState<string | null>(null);
   const [loading, setLoading]     = useState(false);
@@ -1129,6 +1449,9 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
           </div>
         ))}
       </div>
+
+      {/* WEF Charts — 3 generales + 1 condicional por dominio */}
+      <WefChartsSection nombrePrograma={meta.nombre} />
 
       {/* Parte B — AI personalized analysis */}
       <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 20px', flexShrink: 0 }}>
@@ -1181,9 +1504,9 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
       <DashPanel title="Indicadores clave de los estudios">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
           {[
-            { label: '40%',   desc: 'de las habilidades laborales cambiarán para 2030', color: '#2563EB', source: 'WEF 2025' },
-            { label: '63%',   desc: 'de empleadores ven la brecha de skills como barrera principal', color: '#DC2626', source: 'WEF 2025' },
-            { label: '2026',  desc: 'Colombia prioriza productividad + upskilling sobre volumen', color: '#059669', source: 'Adecco CO' },
+            { label: '39%',   desc: 'de las habilidades laborales cambiarán a nivel global para 2030', color: '#2563EB', source: 'WEF 2025' },
+            { label: '170M',  desc: 'empleos nuevos netos proyectados globalmente para 2030', color: '#059669', source: 'WEF 2025' },
+            { label: '91,3%', desc: 'tasa de vinculación laboral de graduados de posgrado en Colombia (2023)', color: '#7C3AED', source: 'OLE MEN 2023' },
           ].map(kpi => (
             <div key={kpi.label} style={{ textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: `${kpi.color}08`, border: `1px solid ${kpi.color}22` }}>
               <p style={{ fontSize: 28, fontWeight: 900, color: kpi.color, margin: '0 0 6px', lineHeight: 1 }}>{kpi.label}</p>
