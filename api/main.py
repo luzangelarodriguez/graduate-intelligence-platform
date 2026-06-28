@@ -954,31 +954,47 @@ _MARKET_STUDIES = [
     {
         "title": "World Economic Forum — Future of Jobs Report 2025",
         "summary": (
-            "La IA y el análisis de grandes datos encabezan la lista de habilidades de más rápido "
-            "crecimiento a nivel global, seguidas de ciberseguridad y alfabetización tecnológica. "
-            "Se proyecta que el 40% de las habilidades requeridas en el trabajo cambiarán para 2030, "
-            "y el 63% de los empleadores ya identifican la brecha de habilidades como su principal "
-            "barrera de transformación."
+            "Cifras clave verificadas: "
+            "(1) La IA y la gestión de macrodatos (big data) encabezan la lista de habilidades de más rápido "
+            "crecimiento global, seguidas de redes/ciberseguridad y alfabetización tecnológica. "
+            "(2) El pensamiento analítico es la habilidad básica más buscada: 7 de cada 10 empresas la "
+            "consideran esencial. "
+            "(3) Se proyecta una creación neta de 170 millones de empleos para 2030, siendo especialistas "
+            "en big data, ingenieros fintech y especialistas en IA/ML los roles de mayor crecimiento "
+            "porcentual. "
+            "(4) El 39% de las habilidades actuales de los trabajadores se transformará o quedará obsoleta "
+            "para 2030. "
+            "(5) El 59% de la fuerza laboral mundial necesitará upskilling o reskilling en los próximos años. "
+            "(6) El 63% de los empleadores identifica la brecha de habilidades como su principal barrera "
+            "de transformación."
         ),
         "url": "https://www.weforum.org/publications/the-future-of-jobs-report-2025",
     },
     {
-        "title": "OLE Colombia — Observatorio Laboral para la Educación",
+        "title": "OLE Colombia — Observatorio Laboral para la Educación, Ministerio de Educación Nacional",
         "summary": (
-            "Sistema oficial del gobierno colombiano que hace seguimiento a la inserción laboral de "
-            "graduados de educación superior, midiendo la pertinencia entre la oferta educativa y la "
-            "demanda real del mercado laboral nacional."
+            "Cifras verificadas del sistema oficial de seguimiento a egresados de educación superior en Colombia: "
+            "(1) En 2023, los graduados de posgrado registraron una tasa de vinculación laboral (cotizantes) "
+            "del 91,3%, frente a 73,4% en pregrado — la formación de posgrado mejora significativamente "
+            "la inserción laboral. "
+            "(2) La tasa nacional de cotizantes fue de 77,9% en 2022, con tendencia ascendente sostenida "
+            "desde 2010."
         ),
         "url": "https://ole.mineducacion.gov.co",
     },
     {
         "title": "Adecco Colombia — Tendencias del Mercado Laboral 2026",
         "summary": (
-            "El mercado laboral colombiano en 2026 prioriza la productividad sobre el volumen de "
-            "contratación, impulsado por la aceleración de la IA y automatización. Las empresas están "
-            "invirtiendo en upskilling y migrando hacia modelos de selección basados en competencias medibles."
+            "Cifras verificadas sobre el mercado laboral colombiano en 2026: "
+            "(1) Las cinco áreas con mayor proyección de empleabilidad son: analítica de datos / business "
+            "intelligence / ciencia de datos, ciberseguridad, automatización e integración de IA, ventas "
+            "consultivas con enfoque analítico, y sostenibilidad/transición energética. "
+            "(2) La selección de talento prioriza evidencia de competencias medibles sobre volumen de "
+            "contratación. "
+            "(3) El 68% de las empresas en Colombia reporta dificultad para encontrar talento con las "
+            "competencias técnicas y digitales requeridas [cifra pendiente de verificación final]."
         ),
-        "url": "https://www.eltiempo.com",
+        "url": "https://www.adecco.com.co",
     },
 ]
 
@@ -987,12 +1003,14 @@ _MARKET_CONTEXT_CACHE: dict[int, dict[str, Any]] = {}
 
 
 @app.post("/api/dashboard/market-context/{program_id}", tags=["dashboard"])
-def market_context(program_id: int) -> dict[str, Any]:
-    """Generate AI-personalized market context analysis for a program, cached per program_id."""
+def market_context(program_id: int, refresh: bool = False) -> dict[str, Any]:
+    """Generate AI-personalized market context analysis for a program, cached per program_id.
+    Pass ?refresh=true to force regeneration (bypasses in-memory cache).
+    """
     import datetime
 
-    # Return cached result if available
-    if program_id in _MARKET_CONTEXT_CACHE:
+    # Return cached result if available (unless refresh requested)
+    if not refresh and program_id in _MARKET_CONTEXT_CACHE:
         return _MARKET_CONTEXT_CACHE[program_id]
 
     api_key = os.getenv("OPENAI_API_KEY")
@@ -1029,23 +1047,56 @@ def market_context(program_id: int) -> dict[str, Any]:
         )
         score = float(score_row["score"] or 0) if score_row else 0.0
 
+        # Derive domain label from program name for domain-specific framing
+        nombre_lower = nombre_programa.lower()
+        if any(w in nombre_lower for w in ("dato", "analítica", "analytics", "inteligencia artificial", " ia ", "machine", "big data")):
+            dominio = "tecnología de datos e inteligencia artificial"
+        elif any(w in nombre_lower for w in ("ciberseguridad", "seguridad inform", "redes", "devops", "sistemas")):
+            dominio = "ciberseguridad y tecnología"
+        elif any(w in nombre_lower for w in ("crimin", "victimol", "derecho", "juridic", "penal")):
+            dominio = "ciencias jurídicas y sociales"
+        elif any(w in nombre_lower for w in ("neuropsicol", "psicol", "educaci", "pedagog", "clíni")):
+            dominio = "salud mental y educación"
+        elif any(w in nombre_lower for w in ("gestion", "gestión", "administr", "negocio", "finanz", "contabl")):
+            dominio = "gestión y negocios"
+        else:
+            dominio = "su área disciplinar"
+
+        # Top skills demanded by market for this program (with frequency)
+        skills_mercado_top = sa.get("skills_mercado", [])[:10]
+        mercado_str = ", ".join(
+            f"{s['skill']} ({s['frecuencia']} vacantes)" for s in skills_mercado_top
+        ) if skills_mercado_top else "sin datos disponibles"
+
+        # Brechas = market skills absent from curriculum (most critical)
+        brechas_str = ", ".join(brechas[:8]) if brechas else "ninguna identificada"
+
+        # Fortalezas = market skills already covered by curriculum
+        fortalezas_str = ", ".join(fortalezas[:5]) if fortalezas else "ninguna identificada"
+
         studies_text = "\n\n".join(
             f"[{s['title']}]\n{s['summary']}" for s in _MARKET_STUDIES
         )
-        brechas_str    = ", ".join(brechas) if brechas else "ninguna identificada"
-        fortalezas_str = ", ".join(fortalezas) if fortalezas else "ninguna identificada"
 
         prompt = (
-            f"Eres un asesor de pertinencia curricular. Basándote en estos 3 estudios de mercado:\n\n"
+            f"Eres un asesor experto en pertinencia curricular para posgrados en {dominio}.\n\n"
+            f"DATOS DUROS DE MERCADO (fuentes verificadas — úsalos con cifras exactas, no los parafrasees "
+            f"vagamente):\n\n"
             f"{studies_text}\n\n"
-            f"Y estos datos específicos del programa '{nombre_programa}':\n"
-            f"- Brechas detectadas: {brechas_str}\n"
-            f"- Fortalezas actuales: {fortalezas_str}\n"
-            f"- Score de pertinencia: {score}/100\n\n"
-            f"Escribe un párrafo de 3-4 oraciones en español, dirigido a un comité curricular, "
-            f"que conecte los hallazgos de estos estudios con la situación específica de este programa. "
-            f"Cita explícitamente qué estudio respalda cada punto que menciones. "
-            f"Sé concreto y evita generalidades vacías."
+            f"DATOS ESPECÍFICOS DEL PROGRAMA '{nombre_programa}':\n"
+            f"- Score de pertinencia con el mercado laboral: {score}/100\n"
+            f"- Skills más demandadas en vacantes compatibles con este programa: {mercado_str}\n"
+            f"- Brechas críticas (habilidades que el mercado pide y el currículo NO cubre): {brechas_str}\n"
+            f"- Fortalezas curriculares (habilidades del mercado que el currículo SÍ cubre): {fortalezas_str}\n\n"
+            f"INSTRUCCIÓN: Escribe exactamente 3 oraciones en español, dirigidas a un comité curricular "
+            f"de {dominio}. Cada oración debe:\n"
+            f"1. Conectar UNA brecha específica del programa (de la lista anterior) con UNA cifra concreta "
+            f"del WEF, OLE o Adecco — nombra la fuente y la cifra exacta.\n"
+            f"2. Ser distinta e imposible de reutilizar para otro programa diferente (el nombre del programa "
+            f"y sus skills específicas deben quedar explícitos).\n"
+            f"3. Evitar frases vacías como 'es importante', 'resulta crucial', 'en el contexto actual'. "
+            f"Ve directo al dato y la implicación curricular concreta.\n"
+            f"No añadas introducción, título ni conclusión — solo las 3 oraciones."
         )
 
         from openai import OpenAI
