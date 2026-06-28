@@ -701,6 +701,8 @@ def load_jobs(conn) -> List[JobProfile]:
                 )                                                   AS skill_name
             FROM empleos e
             LEFT JOIN empleo_skills es ON es.empleo_id = e.id
+            -- Only active (non-expired) vacancies; COALESCE handles pre-migration rows
+            WHERE COALESCE(e.activo, TRUE) = TRUE
         """)
     if "jobs" in existing:
         parts.append("""
@@ -714,6 +716,7 @@ def load_jobs(conn) -> List[JobProfile]:
                 COALESCE(js.canonical_skill, '')        AS skill_name
             FROM jobs j
             LEFT JOIN job_skills js ON js.job_id = j.id
+            WHERE COALESCE(j.activo, TRUE) = TRUE
         """)
 
     if not parts:

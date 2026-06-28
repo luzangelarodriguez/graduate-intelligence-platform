@@ -599,6 +599,58 @@ def related_universities(program_id: int) -> dict[str, Any]:
         return {"program_id": program_id, "competitors": [], "total": 0, "error": str(e)}
 
 
+@app.get("/api/dashboard/compare-programs", tags=["dashboard"])
+def compare_programs(ids: str = Query(default="94,92,108,20")) -> list[dict]:
+    """Compare key metrics across multiple programs for the dashboard Comparativa view."""
+    try:
+        from api.database import fetch_all
+
+        id_list = [int(x.strip()) for x in ids.split(",") if x.strip().isdigit()]
+        if not id_list:
+            return []
+
+        rows = fetch_all(
+            """
+            SELECT
+                m.especializacion_id AS id,
+                COALESCE(e.nombre, m.program_name) AS nombre,
+                ROUND(AVG(m.score_match)::numeric, 1) AS pertinencia,
+                COUNT(*) FILTER (
+                    WHERE m.skills_en_comun IS NOT NULL
+                    AND m.skills_en_comun != '[]'::jsonb
+                    AND jsonb_array_length(m.skills_en_comun) > 0
+                ) AS empleos_compatibles
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = (
+                SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match'
+            )
+              AND m.especializacion_id = ANY(%s)
+            GROUP BY m.especializacion_id, e.nombre, m.program_name
+            """,
+            (id_list,),
+        )
+
+        by_id = {int(r["id"]): r for r in rows}
+        result = []
+        for pid in id_list:
+            sa = dashboard_skills_analysis(pid)
+            r = by_id.get(pid)
+            result.append({
+                "id":                  pid,
+                "nombre":              (r["nombre"] if r else None) or f"Programa {pid}",
+                "pertinencia":         float(r["pertinencia"] or 0) if r else 0.0,
+                "cobertura_pct":       sa.get("cobertura_pct", 0.0),
+                "empleos_compatibles": int(r["empleos_compatibles"] or 0) if r else 0,
+                "brechas_count":       len(sa.get("brechas", [])),
+            })
+
+        return sorted(result, key=lambda x: x["pertinencia"], reverse=True)
+    except Exception as exc:
+        logger.error("compare_programs error: %s", exc, exc_info=True)
+        return []
+
+
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
@@ -643,6 +695,9 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
                   AND skills_empleo IS NOT NULL
                   AND skills_empleo != '[]'::jsonb
                   AND jsonb_typeof(skills_empleo) = 'array'
+                  AND skills_en_comun IS NOT NULL
+                  AND skills_en_comun != '[]'::jsonb
+                  AND jsonb_array_length(skills_en_comun) > 0
             ) t
             GROUP BY skill
             HAVING COUNT(*) >= 2
@@ -662,7 +717,8 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         prog_rows = fetch_all(
             """
             SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
-                   COUNT(*) AS cobertura
+                   COUNT(*) AS cobertura,
+                   ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
             FROM microcurriculo_skills ms
             JOIN microcurriculos m ON m.id = ms.microcurriculo_id
             WHERE m.specialization_id = %s
@@ -673,7 +729,11 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             (program_id,),
         )
         skills_programa = [
-            {"skill": r["skill_name"], "cobertura": int(r["cobertura"])}
+            {
+                "skill":       r["skill_name"],
+                "cobertura":   int(r["cobertura"]),
+                "asignaturas": list(r["asignaturas"]) if r["asignaturas"] else [],
+            }
             for r in prog_rows
             if r["skill_name"]
         ]
@@ -711,9 +771,27 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         total_mercado = len(skills_mercado)
         cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
 
+        # Build matriz_completa: union of all skills from both sides
+        # Keys: normalized skill name → {demanda_mercado, oferta_programa}
+        matriz: dict[str, dict] = {}
+        for m in skills_mercado:
+            key = _norm(m["skill"])
+            matriz[key] = {"skill": m["skill"], "demanda_mercado": m["frecuencia"], "oferta_programa": 0}
+        for p in skills_programa:
+            key = _norm(p["skill"])
+            # Try to find if this prog skill already exists under a market-skill key (prefix match)
+            matched_key = next(
+                (k for k in matriz if _match(p["skill"], matriz[k]["skill"])), None
+            )
+            if matched_key:
+                matriz[matched_key]["oferta_programa"] = p["cobertura"]
+            else:
+                matriz[key] = {"skill": p["skill"], "demanda_mercado": 0, "oferta_programa": p["cobertura"]}
+        matriz_completa = sorted(matriz.values(), key=lambda x: -x["demanda_mercado"])
+
         logger.info(
-            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d",
-            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas),
+            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d, matriz=%d",
+            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas), len(matriz_completa),
         )
 
         return {
@@ -724,6 +802,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             "fortalezas":          fortalezas,
             "exclusivas_programa": exclusivas_programa,
             "cobertura_pct":       cobertura_pct,
+            "matriz_completa":     matriz_completa,
         }
     except Exception as exc:
         logger.error("skills_analysis error program_id=%s: %s", program_id, exc, exc_info=True)
@@ -867,6 +946,190 @@ def pipeline_run(
         "status": "queued",
         "message": "El matching semántico corre localmente o via GitHub Actions (cada noche). El botón solo recarga microcurrículos desde Excel.",
     })
+
+
+# ─── Market Context ───────────────────────────────────────────────────────────
+
+_MARKET_STUDIES = [
+    {
+        "title": "World Economic Forum — Future of Jobs Report 2025",
+        "summary": (
+            "Cifras clave verificadas: "
+            "(1) La IA y la gestión de macrodatos (big data) encabezan la lista de habilidades de más rápido "
+            "crecimiento global, seguidas de redes/ciberseguridad y alfabetización tecnológica. "
+            "(2) El pensamiento analítico es la habilidad básica más buscada: 7 de cada 10 empresas la "
+            "consideran esencial. "
+            "(3) Se proyecta una creación neta de 170 millones de empleos para 2030, siendo especialistas "
+            "en big data, ingenieros fintech y especialistas en IA/ML los roles de mayor crecimiento "
+            "porcentual. "
+            "(4) El 39% de las habilidades actuales de los trabajadores se transformará o quedará obsoleta "
+            "para 2030. "
+            "(5) El 59% de la fuerza laboral mundial necesitará upskilling o reskilling en los próximos años. "
+            "(6) El 63% de los empleadores identifica la brecha de habilidades como su principal barrera "
+            "de transformación."
+        ),
+        "url": "https://www.weforum.org/publications/the-future-of-jobs-report-2025",
+    },
+    {
+        "title": "OLE Colombia — Observatorio Laboral para la Educación, Ministerio de Educación Nacional",
+        "summary": (
+            "Cifras verificadas del sistema oficial de seguimiento a egresados de educación superior en Colombia: "
+            "(1) En 2023, los graduados de posgrado registraron una tasa de vinculación laboral (cotizantes) "
+            "del 91,3%, frente a 73,4% en pregrado — la formación de posgrado mejora significativamente "
+            "la inserción laboral. "
+            "(2) La tasa nacional de cotizantes fue de 77,9% en 2022, con tendencia ascendente sostenida "
+            "desde 2010."
+        ),
+        "url": "https://ole.mineducacion.gov.co",
+    },
+    {
+        "title": "Tendencias del Mercado Laboral Colombia 2026 — Adecco / ManpowerGroup",
+        "summary": (
+            "Cifras verificadas sobre el mercado laboral colombiano en 2026: "
+            "(1) Según Adecco Colombia, las cinco áreas con mayor proyección de empleabilidad son: "
+            "analítica de datos / business intelligence / ciencia de datos, ciberseguridad, "
+            "automatización e integración de IA, ventas consultivas con enfoque analítico, y "
+            "sostenibilidad/transición energética. "
+            "(2) La selección de talento prioriza evidencia de competencias medibles sobre volumen de "
+            "contratación. "
+            "(3) Según Experis/ManpowerGroup (Expectativas sobre Talento Tecnológico Q1 2026), el 68% "
+            "de las empresas en Colombia reporta dificultad para encontrar talento en los ámbitos de "
+            "TI y datos, frente a un país que proyecta necesitar 85.000 talentos digitales adicionales "
+            "para fin de la década."
+        ),
+        "url": "https://www.adecco.com.co",
+    },
+]
+
+# In-memory cache: program_id → {analisis, generado_en}
+_MARKET_CONTEXT_CACHE: dict[int, dict[str, Any]] = {}
+
+
+@app.post("/api/dashboard/market-context/{program_id}", tags=["dashboard"])
+def market_context(program_id: int, refresh: bool = False) -> dict[str, Any]:
+    """Generate AI-personalized market context analysis for a program, cached per program_id.
+    Pass ?refresh=true to force regeneration (bypasses in-memory cache).
+    """
+    import datetime
+
+    # Return cached result if available (unless refresh requested)
+    if not refresh and program_id in _MARKET_CONTEXT_CACHE:
+        return _MARKET_CONTEXT_CACHE[program_id]
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return {
+            "analisis": "Análisis no disponible: OPENAI_API_KEY no configurada.",
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": True,
+        }
+
+    try:
+        # Get program skills data
+        sa = dashboard_skills_analysis(program_id)
+        brechas    = [b["skill"] for b in sa.get("brechas", [])[:8]]
+        fortalezas = [f["skill"] for f in sa.get("fortalezas", [])[:6]]
+
+        # Get program name
+        from api.database import fetch_one
+        row = fetch_one(
+            "SELECT nombre FROM especializaciones WHERE id = %s",
+            (program_id,),
+        )
+        nombre_programa = row["nombre"] if row else f"Programa {program_id}"
+
+        # Get pertinencia score from latest run
+        score_row = fetch_one(
+            """
+            SELECT ROUND(AVG(score_match)::numeric, 1) AS score
+            FROM ml_program_job_matches
+            WHERE especializacion_id = %s
+              AND run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')
+            """,
+            (program_id,),
+        )
+        score = float(score_row["score"] or 0) if score_row else 0.0
+
+        # Derive domain label from program name for domain-specific framing
+        nombre_lower = nombre_programa.lower()
+        if any(w in nombre_lower for w in ("dato", "analítica", "analytics", "inteligencia artificial", " ia ", "machine", "big data")):
+            dominio = "tecnología de datos e inteligencia artificial"
+        elif any(w in nombre_lower for w in ("ciberseguridad", "seguridad inform", "redes", "devops", "sistemas")):
+            dominio = "ciberseguridad y tecnología"
+        elif any(w in nombre_lower for w in ("crimin", "victimol", "derecho", "juridic", "penal")):
+            dominio = "ciencias jurídicas y sociales"
+        elif any(w in nombre_lower for w in ("neuropsicol", "psicol", "educaci", "pedagog", "clíni")):
+            dominio = "salud mental y educación"
+        elif any(w in nombre_lower for w in ("gestion", "gestión", "administr", "negocio", "finanz", "contabl")):
+            dominio = "gestión y negocios"
+        else:
+            dominio = "su área disciplinar"
+
+        # Top skills demanded by market for this program (with frequency)
+        skills_mercado_top = sa.get("skills_mercado", [])[:10]
+        mercado_str = ", ".join(
+            f"{s['skill']} ({s['frecuencia']} vacantes)" for s in skills_mercado_top
+        ) if skills_mercado_top else "sin datos disponibles"
+
+        # Top 2-3 skill gaps as "oportunidades de fortalecimiento" (soft framing, not deficit list)
+        oportunidades_str = ", ".join(brechas[:3]) if brechas else "ninguna identificada"
+
+        # Fortalezas = market skills already covered by curriculum
+        fortalezas_str = ", ".join(fortalezas[:5]) if fortalezas else "ninguna identificada"
+
+        studies_text = "\n\n".join(
+            f"[{s['title']}]\n{s['summary']}" for s in _MARKET_STUDIES
+        )
+
+        prompt = (
+            f"Eres un analista de tendencias del mercado laboral especializado en {dominio}.\n\n"
+            f"DATOS DE MERCADO VERIFICADOS (usa las cifras tal como aparecen — no las parafrasees "
+            f"vagamente ni las atribuyas a la fuente incorrecta):\n\n"
+            f"{studies_text}\n\n"
+            f"CONTEXTO DEL PROGRAMA '{nombre_programa}':\n"
+            f"- Dominio de formación: {dominio}\n"
+            f"- Skills que el mercado más demanda para este tipo de perfil: {mercado_str}\n"
+            f"- Fortalezas ya presentes en el currículo: {fortalezas_str}\n"
+            f"- Áreas con oportunidad de fortalecimiento: {oportunidades_str}\n\n"
+            f"INSTRUCCIÓN: Escribe un párrafo de 3-4 oraciones en español, dirigido a un comité "
+            f"curricular, que presente el panorama de hacia dónde se dirige el campo de "
+            f"'{nombre_programa}' según estos tres estudios.\n\n"
+            f"El eje del párrafo son las TENDENCIAS del área — qué habilidades están creciendo, "
+            f"qué está demandando el mercado, cómo está evolucionando la empleabilidad en este campo — "
+            f"NO una lista de lo que le falta al currículo.\n\n"
+            f"Puedes mencionar las áreas con oportunidad de fortalecimiento de forma natural y breve "
+            f"(una sola frase, al pasar), como contexto adicional que el comité puede considerar, "
+            f"pero esto no debe ser el tema central ni sonar a auditoría de déficits.\n\n"
+            f"Cita el estudio que respalda cada tendencia (WEF, OLE Colombia o Adecco/Experis), "
+            f"con cifras exactas. Tono informativo y prospectivo. "
+            f"Sin introducción, título ni conclusión — solo el párrafo."
+        )
+
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=400,
+        )
+        analisis = response.choices[0].message.content.strip()
+
+        result = {
+            "analisis": analisis,
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": False,
+        }
+        _MARKET_CONTEXT_CACHE[program_id] = result
+        return result
+
+    except Exception as exc:
+        logger.error("market_context error program_id=%s: %s", program_id, exc, exc_info=True)
+        return {
+            "analisis": f"Error al generar el análisis: {exc}",
+            "generado_en": datetime.datetime.utcnow().isoformat(),
+            "error": True,
+        }
 
 
 # ─── Curriculum Redesign ──────────────────────────────────────────────────────
