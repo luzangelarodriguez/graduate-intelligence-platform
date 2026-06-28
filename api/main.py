@@ -1071,8 +1071,8 @@ def market_context(program_id: int, refresh: bool = False) -> dict[str, Any]:
             f"{s['skill']} ({s['frecuencia']} vacantes)" for s in skills_mercado_top
         ) if skills_mercado_top else "sin datos disponibles"
 
-        # Brechas = market skills absent from curriculum (most critical)
-        brechas_str = ", ".join(brechas[:8]) if brechas else "ninguna identificada"
+        # Top 2-3 skill gaps as "oportunidades de fortalecimiento" (soft framing, not deficit list)
+        oportunidades_str = ", ".join(brechas[:3]) if brechas else "ninguna identificada"
 
         # Fortalezas = market skills already covered by curriculum
         fortalezas_str = ", ".join(fortalezas[:5]) if fortalezas else "ninguna identificada"
@@ -1082,24 +1082,27 @@ def market_context(program_id: int, refresh: bool = False) -> dict[str, Any]:
         )
 
         prompt = (
-            f"Eres un asesor experto en pertinencia curricular para posgrados en {dominio}.\n\n"
-            f"DATOS DUROS DE MERCADO (fuentes verificadas — úsalos con cifras exactas, no los parafrasees "
-            f"vagamente):\n\n"
+            f"Eres un analista de tendencias del mercado laboral especializado en {dominio}.\n\n"
+            f"DATOS DE MERCADO VERIFICADOS (usa las cifras tal como aparecen — no las parafrasees "
+            f"vagamente ni las atribuyas a la fuente incorrecta):\n\n"
             f"{studies_text}\n\n"
-            f"DATOS ESPECÍFICOS DEL PROGRAMA '{nombre_programa}':\n"
-            f"- Score de pertinencia con el mercado laboral: {score}/100\n"
-            f"- Skills más demandadas en vacantes compatibles con este programa: {mercado_str}\n"
-            f"- Brechas críticas (habilidades que el mercado pide y el currículo NO cubre): {brechas_str}\n"
-            f"- Fortalezas curriculares (habilidades del mercado que el currículo SÍ cubre): {fortalezas_str}\n\n"
-            f"INSTRUCCIÓN: Escribe exactamente 3 oraciones en español, dirigidas a un comité curricular "
-            f"de {dominio}. Cada oración debe:\n"
-            f"1. Conectar UNA brecha específica del programa (de la lista anterior) con UNA cifra concreta "
-            f"del WEF, OLE o Adecco — nombra la fuente y la cifra exacta.\n"
-            f"2. Ser distinta e imposible de reutilizar para otro programa diferente (el nombre del programa "
-            f"y sus skills específicas deben quedar explícitos).\n"
-            f"3. Evitar frases vacías como 'es importante', 'resulta crucial', 'en el contexto actual'. "
-            f"Ve directo al dato y la implicación curricular concreta.\n"
-            f"No añadas introducción, título ni conclusión — solo las 3 oraciones."
+            f"CONTEXTO DEL PROGRAMA '{nombre_programa}':\n"
+            f"- Dominio de formación: {dominio}\n"
+            f"- Skills que el mercado más demanda para este tipo de perfil: {mercado_str}\n"
+            f"- Fortalezas ya presentes en el currículo: {fortalezas_str}\n"
+            f"- Áreas con oportunidad de fortalecimiento: {oportunidades_str}\n\n"
+            f"INSTRUCCIÓN: Escribe un párrafo de 3-4 oraciones en español, dirigido a un comité "
+            f"curricular, que presente el panorama de hacia dónde se dirige el campo de "
+            f"'{nombre_programa}' según estos tres estudios.\n\n"
+            f"El eje del párrafo son las TENDENCIAS del área — qué habilidades están creciendo, "
+            f"qué está demandando el mercado, cómo está evolucionando la empleabilidad en este campo — "
+            f"NO una lista de lo que le falta al currículo.\n\n"
+            f"Puedes mencionar las áreas con oportunidad de fortalecimiento de forma natural y breve "
+            f"(una sola frase, al pasar), como contexto adicional que el comité puede considerar, "
+            f"pero esto no debe ser el tema central ni sonar a auditoría de déficits.\n\n"
+            f"Cita el estudio que respalda cada tendencia (WEF, OLE Colombia o Adecco/Experis), "
+            f"con cifras exactas. Tono informativo y prospectivo. "
+            f"Sin introducción, título ni conclusión — solo el párrafo."
         )
 
         from openai import OpenAI
