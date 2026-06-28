@@ -9,6 +9,7 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconAlertTriangle, IconBriefcase, IconListCheck,
+  IconLayoutColumns,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -79,6 +80,11 @@ interface RediseniJob {
   current_step?: string | null; result?: RediseniResult; error?: string;
 }
 
+interface CompareRow {
+  id: number; nombre: string; pertinencia: number;
+  cobertura_pct: number; empleos_compatibles: number; brechas_count: number;
+}
+
 // ─── Static program metadata ──────────────────────────────────────────────────
 const PROGRAMS = [
   { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
@@ -88,7 +94,7 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones' | 'comparativa';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
@@ -98,6 +104,7 @@ const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<Ic
   { id: 'brechas',         label: 'Brechas',          Icon: IconAlertTriangle },
   { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
+  { id: 'comparativa',     label: 'Comparativa',      Icon: IconLayoutColumns },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -922,6 +929,94 @@ function ViewRecomendaciones({
   );
 }
 
+function ViewComparativa({ compareData }: { compareData: CompareRow[] | null }) {
+  if (!compareData) return <div style={{ padding: 24 }}><Spinner /></div>;
+  if (compareData.length === 0) return (
+    <div style={{ padding: 24 }}>
+      <p style={{ fontSize: 13, color: '#6B7280' }}>Sin datos de comparación disponibles.</p>
+    </div>
+  );
+
+  const shortName = (n: string) => n.replace(/Especialización en /i, '').slice(0, 18);
+  const labels   = compareData.map(r => shortName(r.nombre));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+      <div style={{ flexShrink: 0 }}>
+        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Comparativa entre Programas</h1>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{compareData.length} programas · métricas del último run</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <DashPanel title="Pertinencia (score /100)">
+          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
+            <HorizBarChart
+              labels={labels}
+              values={compareData.map(r => r.pertinencia)}
+              valueLabel="pts"
+            />
+          </div>
+        </DashPanel>
+
+        <DashPanel title="Cobertura Curricular (%)">
+          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
+            <HorizBarChart
+              labels={labels}
+              values={compareData.map(r => r.cobertura_pct)}
+              valueLabel="%"
+            />
+          </div>
+        </DashPanel>
+
+        <DashPanel title="Empleos Compatibles">
+          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
+            <HorizBarChart
+              labels={labels}
+              values={compareData.map(r => r.empleos_compatibles)}
+              valueLabel="vacantes"
+            />
+          </div>
+        </DashPanel>
+
+        <DashPanel title="Brechas Detectadas">
+          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
+            <HorizBarChart
+              labels={[...labels].reverse()}
+              values={[...compareData].reverse().map(r => r.brechas_count)}
+              color="#EF4444"
+              valueLabel="brechas"
+            />
+          </div>
+        </DashPanel>
+      </div>
+
+      {/* Summary table */}
+      <DashPanel title="Resumen comparativo">
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+              {['Programa', 'Pertinencia', 'Cobertura', 'Empleos', 'Brechas'].map(h => (
+                <th key={h} style={{ textAlign: h === 'Programa' ? 'left' : 'right', padding: '4px 10px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {compareData.map((r, i) => (
+              <tr key={r.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
+                <td style={{ padding: '8px 10px', fontWeight: 600, color: C.navy }}>{shortName(r.nombre)}</td>
+                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700, color: r.pertinencia >= 65 ? '#059669' : r.pertinencia >= 45 ? '#2563EB' : '#D97706' }}>{r.pertinencia.toFixed(1)}</td>
+                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#374151' }}>{r.cobertura_pct.toFixed(1)}%</td>
+                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#374151' }}>{r.empleos_compatibles}</td>
+                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 600, color: r.brechas_count >= 10 ? '#DC2626' : r.brechas_count >= 5 ? '#D97706' : '#059669' }}>{r.brechas_count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </DashPanel>
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
   const [summary, setSummary]               = useState<Summary | null>(null);
@@ -936,6 +1031,7 @@ export default function ObservatorioStorytelling() {
   const [pipelineStep, setPipelineStep]       = useState<string | null>(null);
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
+  const [compareData, setCompareData]         = useState<CompareRow[] | null>(null);
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -970,6 +1066,14 @@ export default function ObservatorioStorytelling() {
       .then((d: UniversityData) => setUniv(d))
       .catch(() => setUniv(null));
   }, [programaId]);
+
+  // Fetch compare data once on mount (all 4 programs, not per-program)
+  useEffect(() => {
+    fetch(`${API}/api/dashboard/compare-programs?ids=94,92,108,20`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: CompareRow[]) => setCompareData(d))
+      .catch(() => setCompareData([]));
+  }, []);
 
   // Reset redesign on program change
   useEffect(() => {
@@ -1090,6 +1194,7 @@ export default function ObservatorioStorytelling() {
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
+    comparativa:     <ViewComparativa     compareData={compareData} />,
   };
 
   return (

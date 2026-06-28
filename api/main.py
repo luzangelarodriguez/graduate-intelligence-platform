@@ -599,6 +599,58 @@ def related_universities(program_id: int) -> dict[str, Any]:
         return {"program_id": program_id, "competitors": [], "total": 0, "error": str(e)}
 
 
+@app.get("/api/dashboard/compare-programs", tags=["dashboard"])
+def compare_programs(ids: str = Query(default="94,92,108,20")) -> list[dict]:
+    """Compare key metrics across multiple programs for the dashboard Comparativa view."""
+    try:
+        from api.database import fetch_all
+
+        id_list = [int(x.strip()) for x in ids.split(",") if x.strip().isdigit()]
+        if not id_list:
+            return []
+
+        rows = fetch_all(
+            """
+            SELECT
+                m.especializacion_id AS id,
+                COALESCE(e.nombre, m.program_name) AS nombre,
+                ROUND(AVG(m.score_match)::numeric, 1) AS pertinencia,
+                COUNT(*) FILTER (
+                    WHERE m.skills_en_comun IS NOT NULL
+                    AND m.skills_en_comun != '[]'::jsonb
+                    AND jsonb_array_length(m.skills_en_comun) > 0
+                ) AS empleos_compatibles
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = (
+                SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match'
+            )
+              AND m.especializacion_id = ANY(%s)
+            GROUP BY m.especializacion_id, e.nombre, m.program_name
+            """,
+            (id_list,),
+        )
+
+        by_id = {int(r["id"]): r for r in rows}
+        result = []
+        for pid in id_list:
+            sa = dashboard_skills_analysis(pid)
+            r = by_id.get(pid)
+            result.append({
+                "id":                  pid,
+                "nombre":              (r["nombre"] if r else None) or f"Programa {pid}",
+                "pertinencia":         float(r["pertinencia"] or 0) if r else 0.0,
+                "cobertura_pct":       sa.get("cobertura_pct", 0.0),
+                "empleos_compatibles": int(r["empleos_compatibles"] or 0) if r else 0,
+                "brechas_count":       len(sa.get("brechas", [])),
+            })
+
+        return sorted(result, key=lambda x: x["pertinencia"], reverse=True)
+    except Exception as exc:
+        logger.error("compare_programs error: %s", exc, exc_info=True)
+        return []
+
+
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
