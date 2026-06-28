@@ -4,8 +4,9 @@ import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement,
   ArcElement, Tooltip, Legend,
+  ScatterController, PointElement,
 } from 'chart.js';
-import { Bar, Doughnut } from 'react-chartjs-2';
+import { Bar, Doughnut, Scatter } from 'react-chartjs-2';
 import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconAlertTriangle, IconBriefcase, IconListCheck,
@@ -14,7 +15,7 @@ import {
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, ScatterController, PointElement);
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -50,11 +51,13 @@ interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string
 interface Brecha        { skill: string; frecuencia_mercado: number }
 interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number }
 interface Exclusiva     { skill: string; cobertura: number }
+interface MatrizSkill   { skill: string; demanda_mercado: number; oferta_programa: number }
 interface SkillsAnalysis {
   program_id: number;
   skills_mercado: SkillMercado[]; skills_programa: SkillPrograma[];
   brechas: Brecha[]; fortalezas: Fortaleza[]; exclusivas_programa: Exclusiva[];
   cobertura_pct: number;
+  matriz_completa?: MatrizSkill[];
 }
 interface Competitor {
   nombre_ies: string; nombre_programa: string; ciudad: string; modalidad: string;
@@ -370,6 +373,81 @@ function DonutChart({ labels, values, colors }: { labels: string[]; values: numb
     cutout: '62%',
   };
   return <Doughnut data={data} options={options} />;
+}
+
+function SkillScatter({ matriz }: { matriz: MatrizSkill[] }) {
+  if (matriz.length === 0) return <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', paddingTop: 20 }}>Sin datos de matriz</p>;
+
+  const medX = [...matriz].sort((a, b) => a.demanda_mercado - b.demanda_mercado)[Math.floor(matriz.length / 2)]?.demanda_mercado ?? 0;
+  const medY = [...matriz].sort((a, b) => a.oferta_programa - b.oferta_programa)[Math.floor(matriz.length / 2)]?.oferta_programa ?? 0;
+
+  const quadrant = (d: number, o: number) => {
+    if (d >= medX && o >= medY) return { color: '#059669', q: 'Bien cubiertas' };
+    if (d >= medX && o < medY)  return { color: '#EF4444', q: 'Brecha crítica' };
+    if (d < medX  && o >= medY) return { color: '#2563EB', q: 'Exclusiva prog.' };
+    return { color: '#9CA3AF', q: 'Sin relevancia' };
+  };
+
+  // Group by quadrant color for datasets (Chart.js scatter needs datasets per color)
+  const groups: Record<string, { label: string; color: string; points: { x: number; y: number; skill: string }[] }> = {
+    green: { label: 'Bien cubiertas',  color: '#059669', points: [] },
+    red:   { label: 'Brechas críticas', color: '#EF4444', points: [] },
+    blue:  { label: 'Exclusivas prog.', color: '#2563EB', points: [] },
+    gray:  { label: 'Sin relevancia',  color: '#9CA3AF', points: [] },
+  };
+  for (const m of matriz) {
+    const { q } = quadrant(m.demanda_mercado, m.oferta_programa);
+    const key = q === 'Bien cubiertas' ? 'green' : q === 'Brecha crítica' ? 'red' : q === 'Exclusiva prog.' ? 'blue' : 'gray';
+    groups[key].points.push({ x: m.demanda_mercado, y: m.oferta_programa, skill: m.skill });
+  }
+
+  const datasets = Object.values(groups).map(g => ({
+    label: g.label,
+    data: g.points,
+    backgroundColor: g.color + 'CC',
+    borderColor: g.color,
+    borderWidth: 1,
+    pointRadius: 5,
+    pointHoverRadius: 7,
+  }));
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' as const, labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
+      tooltip: {
+        callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          label: (ctx: any) =>
+            `${(ctx.raw as { skill?: string }).skill ?? ''} — Demanda: ${ctx.raw.x} vac / Oferta: ${ctx.raw.y} mat`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Demanda del mercado (vacantes)', font: { size: 10 }, color: '#9CA3AF' },
+        grid: { color: '#F3F4F6' },
+        ticks: { font: { size: 10 }, color: '#9CA3AF' },
+      },
+      y: {
+        title: { display: true, text: 'Oferta del programa (materias)', font: { size: 10 }, color: '#9CA3AF' },
+        grid: { color: '#F3F4F6' },
+        ticks: { font: { size: 10 }, color: '#9CA3AF' },
+      },
+    },
+  };
+
+  return (
+    <div style={{ position: 'relative', height: '100%' }}>
+      {/* Quadrant labels */}
+      <div style={{ position: 'absolute', top: 6, right: 10, fontSize: 9, fontWeight: 700, color: '#059669', opacity: 0.7, pointerEvents: 'none' }}>Bien cubiertas ↑</div>
+      <div style={{ position: 'absolute', bottom: 28, right: 10, fontSize: 9, fontWeight: 700, color: '#EF4444', opacity: 0.7, pointerEvents: 'none' }}>Brechas críticas ↘</div>
+      <div style={{ position: 'absolute', top: 6, left: 52, fontSize: 9, fontWeight: 700, color: '#2563EB', opacity: 0.7, pointerEvents: 'none' }}>Exclusivas ↑</div>
+      <div style={{ position: 'absolute', bottom: 28, left: 52, fontSize: 9, fontWeight: 700, color: '#9CA3AF', opacity: 0.7, pointerEvents: 'none' }}>Sin relevancia</div>
+      <Scatter data={{ datasets }} options={options} />
+    </div>
+  );
 }
 
 // ─── Dashboard primitives ─────────────────────────────────────────────────────
@@ -717,6 +795,15 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
           );
         })}
       </div>
+
+      {/* Scatter: Currículo vs Mercado */}
+      {skills.matriz_completa && skills.matriz_completa.length > 0 && (
+        <DashPanel title="Mapa Currículo vs Mercado — posición de cada skill por cuadrante">
+          <div style={{ height: 340 }}>
+            <SkillScatter matriz={skills.matriz_completa} />
+          </div>
+        </DashPanel>
+      )}
 
       {skills.exclusivas_programa.length > 0 && (
         <DashPanel title="Skills exclusivas del programa (no demandadas aún en el mercado)">

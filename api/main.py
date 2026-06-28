@@ -768,9 +768,27 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         total_mercado = len(skills_mercado)
         cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
 
+        # Build matriz_completa: union of all skills from both sides
+        # Keys: normalized skill name → {demanda_mercado, oferta_programa}
+        matriz: dict[str, dict] = {}
+        for m in skills_mercado:
+            key = _norm(m["skill"])
+            matriz[key] = {"skill": m["skill"], "demanda_mercado": m["frecuencia"], "oferta_programa": 0}
+        for p in skills_programa:
+            key = _norm(p["skill"])
+            # Try to find if this prog skill already exists under a market-skill key (prefix match)
+            matched_key = next(
+                (k for k in matriz if _match(p["skill"], matriz[k]["skill"])), None
+            )
+            if matched_key:
+                matriz[matched_key]["oferta_programa"] = p["cobertura"]
+            else:
+                matriz[key] = {"skill": p["skill"], "demanda_mercado": 0, "oferta_programa": p["cobertura"]}
+        matriz_completa = sorted(matriz.values(), key=lambda x: -x["demanda_mercado"])
+
         logger.info(
-            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d",
-            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas),
+            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d, matriz=%d",
+            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas), len(matriz_completa),
         )
 
         return {
@@ -781,6 +799,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             "fortalezas":          fortalezas,
             "exclusivas_programa": exclusivas_programa,
             "cobertura_pct":       cobertura_pct,
+            "matriz_completa":     matriz_completa,
         }
     except Exception as exc:
         logger.error("skills_analysis error program_id=%s: %s", program_id, exc, exc_info=True)
