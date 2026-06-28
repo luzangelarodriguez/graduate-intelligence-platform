@@ -983,16 +983,19 @@ _MARKET_STUDIES = [
         "url": "https://ole.mineducacion.gov.co",
     },
     {
-        "title": "Adecco Colombia — Tendencias del Mercado Laboral 2026",
+        "title": "Tendencias del Mercado Laboral Colombia 2026 — Adecco / ManpowerGroup",
         "summary": (
             "Cifras verificadas sobre el mercado laboral colombiano en 2026: "
-            "(1) Las cinco áreas con mayor proyección de empleabilidad son: analítica de datos / business "
-            "intelligence / ciencia de datos, ciberseguridad, automatización e integración de IA, ventas "
-            "consultivas con enfoque analítico, y sostenibilidad/transición energética. "
+            "(1) Según Adecco Colombia, las cinco áreas con mayor proyección de empleabilidad son: "
+            "analítica de datos / business intelligence / ciencia de datos, ciberseguridad, "
+            "automatización e integración de IA, ventas consultivas con enfoque analítico, y "
+            "sostenibilidad/transición energética. "
             "(2) La selección de talento prioriza evidencia de competencias medibles sobre volumen de "
             "contratación. "
-            "(3) El 68% de las empresas en Colombia reporta dificultad para encontrar talento con las "
-            "competencias técnicas y digitales requeridas [cifra pendiente de verificación final]."
+            "(3) Según Experis/ManpowerGroup (Expectativas sobre Talento Tecnológico Q1 2026), el 68% "
+            "de las empresas en Colombia reporta dificultad para encontrar talento en los ámbitos de "
+            "TI y datos, frente a un país que proyecta necesitar 85.000 talentos digitales adicionales "
+            "para fin de la década."
         ),
         "url": "https://www.adecco.com.co",
     },
