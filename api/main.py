@@ -695,6 +695,9 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
                   AND skills_empleo IS NOT NULL
                   AND skills_empleo != '[]'::jsonb
                   AND jsonb_typeof(skills_empleo) = 'array'
+                  AND skills_en_comun IS NOT NULL
+                  AND skills_en_comun != '[]'::jsonb
+                  AND jsonb_array_length(skills_en_comun) > 0
             ) t
             GROUP BY skill
             HAVING COUNT(*) >= 2

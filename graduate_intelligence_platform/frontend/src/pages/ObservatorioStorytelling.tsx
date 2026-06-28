@@ -10,7 +10,6 @@ import { Bar, Doughnut, Scatter } from 'react-chartjs-2';
 import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconAlertTriangle, IconBriefcase, IconListCheck,
-  IconLayoutColumns,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -83,11 +82,6 @@ interface RediseniJob {
   current_step?: string | null; result?: RediseniResult; error?: string;
 }
 
-interface CompareRow {
-  id: number; nombre: string; pertinencia: number;
-  cobertura_pct: number; empleos_compatibles: number; brechas_count: number;
-}
-
 // ─── Static program metadata ──────────────────────────────────────────────────
 const PROGRAMS = [
   { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
@@ -97,7 +91,7 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones' | 'comparativa';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
@@ -107,7 +101,6 @@ const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<Ic
   { id: 'brechas',         label: 'Brechas',          Icon: IconAlertTriangle },
   { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
-  { id: 'comparativa',     label: 'Comparativa',      Icon: IconLayoutColumns },
 ];
 
 // ─── Fallback data ─────────────────────────────────────────────────────────────
@@ -207,9 +200,49 @@ function normalizeSkill(s: string): string {
 }
 
 const SKILL_CATS = {
-  herramienta: new Set(['python','sql','power bi','tableau','excel','aws','azure','gcp','docker','spark','databricks','tensorflow','r','hadoop','kafka','looker','salesforce','pytorch','kubernetes','git','postgresql','mysql','mongodb','redis','numpy','pandas','sklearn','scikit-learn','jupyter','colab','sap','crm','spss','wais','wisc','rorschach','bender','rstudio','powerbi']),
-  competencia:  new Set(['machine learning','deep learning','nlp','data visualization','big data','etl','business intelligence','analisis de datos','data engineering','mlops','estadistica','data warehouse','data lake','cloud computing','feature engineering','computer vision','forecasting','data governance','data mining','series de tiempo','neuropsicolog','neuropsicologia','cognitiv','funciones ejecutivas','evaluacion','intervencion','psicodiagnostico','psicometria','aprendizaje','memoria','atencion','percepcion','lenguaje','trastorno','discapacidad','rehabilitacion','psicologia','diagnostico','visualizacion de datos','pmbok','lean','scrum','agile','six sigma','metodologia','analisis de datos']),
-  habilidad:    new Set(['gestion','liderazgo','comunicacion','trabajo en equipo','pensamiento critico','innovacion','negociacion','planeacion','kanban','gestion de proyectos','orientacion a resultados','toma de decisiones','educacion','orientacion','diversidad','inclusion','desarrollo','inteligencia','pedagogia','docencia','didactica','ensenanza','formacion','resolucion de problemas']),
+  herramienta: new Set([
+    // Languages & runtimes
+    'python','sql','r','java','javascript','typescript','scala','c++','c#','go','kotlin','matlab','node','nodejs','node.js','php','ruby','swift',
+    // BI & viz tools
+    'power bi','tableau','looker','qlik','metabase','grafana','excel','powerpoint','word','google sheets',
+    // Cloud & infra
+    'aws','azure','gcp','google cloud','docker','kubernetes','terraform','ansible','linux','unix','bash','shell',
+    // Data & ML frameworks
+    'spark','hadoop','databricks','tensorflow','pytorch','sklearn','scikit-learn','keras','xgboost','lightgbm','hugging face','langchain','openai',
+    // Databases
+    'postgresql','mysql','mongodb','redis','elasticsearch','oracle','snowflake','bigquery','dbt','cassandra','dynamodb','hive',
+    // Data tools
+    'kafka','airflow','luigi','prefect','numpy','pandas','scipy','statsmodels','jupyter','colab','streamlit','fastapi','django','flask','react','angular','vue',
+    // Dev tools
+    'git','github','jenkins','gitlab','jira','confluence','sharepoint','figma',
+    // ERP / vertical tools
+    'sap','salesforce','crm','erp','power automate','zapier',
+    // Psych assessment tools
+    'spss','wais','wisc','rorschach','bender','rstudio','powerbi','sas',
+    // Security tools
+    'nmap','wireshark','metasploit','burp suite','splunk','siem',
+  ]),
+  competencia: new Set([
+    // Data science
+    'machine learning','deep learning','nlp','procesamiento lenguaje natural','data visualization','visualizacion de datos','big data','etl','business intelligence','analisis de datos','data engineering','mlops','estadistica','data warehouse','data lake','cloud computing','feature engineering','computer vision','forecasting','data governance','data mining','series de tiempo','inteligencia artificial','ciencia de datos','analítica avanzada','analitica de datos',
+    // Cybersecurity
+    'seguridad informatica','ciberseguridad','security','seguridad','hacking etico','pentesting','riesgos informaticos','criptografia','redes','networking',
+    // DevOps / Arch
+    'devops','mlops','arquitectura de software','microservicios','api rest','api','microservices','sistemas distribuidos','data architecture',
+    // Methodology
+    'pmbok','lean','scrum','agile','six sigma','metodologia','kanban','design thinking','gestion de proyectos',
+    // Psychology competences
+    'neuropsicolog','neuropsicologia','cognitiv','funciones ejecutivas','evaluacion','intervencion','psicodiagnostico','psicometria','aprendizaje','memoria','atencion','percepcion','lenguaje','trastorno','discapacidad','rehabilitacion','psicologia','diagnostico','neuropsi',
+    // Legal/criminology
+    'derecho penal','investigacion criminal','criminologia','criminalistica','peritaje','victimologia',
+    // General
+    'analisis','investigacion','redaccion','escritura','excel avanzado','elaboracion de informes',
+  ]),
+  habilidad: new Set([
+    'gestion','liderazgo','comunicacion','trabajo en equipo','pensamiento critico','innovacion','negociacion','planeacion','orientacion a resultados','toma de decisiones','resolucion de problemas','adaptabilidad','creatividad','empatia','servicio al cliente','orientacion','diversidad','inclusion','desarrollo','inteligencia emocional','pedagogia','docencia','didactica','ensenanza','formacion','facilitacion','presentaciones','relaciones interpersonales','trabajo bajo presion','autonomia','proactividad',
+    // Education-specific
+    'educacion','orientacion vocacional','coaching','mentoría',
+  ]),
 };
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
 function classifySkill(s: string): SkillCat {
@@ -610,19 +643,20 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
   const bycat: Record<SkillCat, SkillMercado[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
   for (const s of skillsMercadoDeduped) bycat[classifySkill(s.skill)].push(s);
 
-  const cols: { cat: SkillCat; items: SkillMercado[] }[] = [
-    { cat: 'herramienta', items: bycat.herramienta.slice(0, 10) },
-    { cat: 'competencia', items: bycat.competencia.slice(0, 10) },
-    { cat: 'habilidad',   items: bycat.habilidad.slice(0, 10)   },
-  ];
+  const ALL_CATS: SkillCat[] = ['herramienta', 'competencia', 'habilidad', 'otro'];
+  const cols: { cat: SkillCat; items: SkillMercado[] }[] = ALL_CATS
+    .map(cat => ({ cat, items: bycat[cat].slice(0, 10) }))
+    .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Demanda el Mercado</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{skillsMercadoDeduped.length} skills en {totales.matches} vacantes analizadas</p>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+          {skillsMercadoDeduped.length} skills en vacantes compatibles con el programa
+        </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols.length}, 1fr)`, gap: 12, flex: 1, minHeight: 0 }}>
         {cols.map(({ cat, items }) => {
           const m = CAT_META[cat];
           return (
@@ -632,7 +666,11 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
                 <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.frecuencia)} />
+                  <HorizBarChart
+                    labels={items.map(s => s.skill)}
+                    values={items.map(s => s.frecuencia)}
+                    color={cat === 'otro' ? '#94A3B8' : undefined}
+                  />
                 </div>
               )}
             </DashPanel>
@@ -649,11 +687,10 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
   const bycat: Record<SkillCat, SkillPrograma[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
   for (const s of skills.skills_programa) bycat[classifySkill(s.skill)].push(s);
 
-  const cols: { cat: SkillCat; items: SkillPrograma[] }[] = [
-    { cat: 'herramienta', items: bycat.herramienta.slice(0, 10) },
-    { cat: 'competencia', items: bycat.competencia.slice(0, 10) },
-    { cat: 'habilidad',   items: bycat.habilidad.slice(0, 10)   },
-  ];
+  const ALL_CATS_P: SkillCat[] = ['herramienta', 'competencia', 'habilidad', 'otro'];
+  const cols: { cat: SkillCat; items: SkillPrograma[] }[] = ALL_CATS_P
+    .map(cat => ({ cat, items: bycat[cat].slice(0, 10) }))
+    .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
@@ -661,7 +698,7 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Enseña el Programa</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{skills.skills_programa.length} competencias en el microcurrículo · Tamaño = presencia (materias)</p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols.length}, 1fr)`, gap: 12, flex: 1, minHeight: 0 }}>
         {cols.map(({ cat, items }) => {
           const m = CAT_META[cat];
           return (
@@ -670,7 +707,12 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
                 <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart labels={items.map(s => s.skill)} values={items.map(s => s.cobertura)} valueLabel="materias" />
+                  <HorizBarChart
+                    labels={items.map(s => s.skill)}
+                    values={items.map(s => s.cobertura)}
+                    valueLabel="materias"
+                    color={cat === 'otro' ? '#94A3B8' : undefined}
+                  />
                 </div>
               )}
             </DashPanel>
@@ -777,8 +819,8 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-        {(['herramienta', 'competencia', 'habilidad'] as SkillCat[]).map(cat => {
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${(['herramienta','competencia','habilidad','otro'] as SkillCat[]).filter(c => bycat[c].length > 0 || c !== 'otro').length}, 1fr)`, gap: 12 }}>
+        {(['herramienta', 'competencia', 'habilidad', 'otro'] as SkillCat[]).filter(c => bycat[c].length > 0 || c !== 'otro').map(cat => {
           const m = CAT_META[cat];
           const items = bycat[cat];
           return (
@@ -1016,94 +1058,6 @@ function ViewRecomendaciones({
   );
 }
 
-function ViewComparativa({ compareData }: { compareData: CompareRow[] | null }) {
-  if (!compareData) return <div style={{ padding: 24 }}><Spinner /></div>;
-  if (compareData.length === 0) return (
-    <div style={{ padding: 24 }}>
-      <p style={{ fontSize: 13, color: '#6B7280' }}>Sin datos de comparación disponibles.</p>
-    </div>
-  );
-
-  const shortName = (n: string) => n.replace(/Especialización en /i, '').slice(0, 18);
-  const labels   = compareData.map(r => shortName(r.nombre));
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
-      <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Comparativa entre Programas</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{compareData.length} programas · métricas del último run</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <DashPanel title="Pertinencia (score /100)">
-          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
-            <HorizBarChart
-              labels={labels}
-              values={compareData.map(r => r.pertinencia)}
-              valueLabel="pts"
-            />
-          </div>
-        </DashPanel>
-
-        <DashPanel title="Cobertura Curricular (%)">
-          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
-            <HorizBarChart
-              labels={labels}
-              values={compareData.map(r => r.cobertura_pct)}
-              valueLabel="%"
-            />
-          </div>
-        </DashPanel>
-
-        <DashPanel title="Empleos Compatibles">
-          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
-            <HorizBarChart
-              labels={labels}
-              values={compareData.map(r => r.empleos_compatibles)}
-              valueLabel="vacantes"
-            />
-          </div>
-        </DashPanel>
-
-        <DashPanel title="Brechas Detectadas">
-          <div style={{ height: Math.max(compareData.length * 32 + 24, 140) }}>
-            <HorizBarChart
-              labels={[...labels].reverse()}
-              values={[...compareData].reverse().map(r => r.brechas_count)}
-              color="#EF4444"
-              valueLabel="brechas"
-            />
-          </div>
-        </DashPanel>
-      </div>
-
-      {/* Summary table */}
-      <DashPanel title="Resumen comparativo">
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-          <thead>
-            <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-              {['Programa', 'Pertinencia', 'Cobertura', 'Empleos', 'Brechas'].map(h => (
-                <th key={h} style={{ textAlign: h === 'Programa' ? 'left' : 'right', padding: '4px 10px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {compareData.map((r, i) => (
-              <tr key={r.id} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                <td style={{ padding: '8px 10px', fontWeight: 600, color: C.navy }}>{shortName(r.nombre)}</td>
-                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700, color: r.pertinencia >= 65 ? '#059669' : r.pertinencia >= 45 ? '#2563EB' : '#D97706' }}>{r.pertinencia.toFixed(1)}</td>
-                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#374151' }}>{r.cobertura_pct.toFixed(1)}%</td>
-                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#374151' }}>{r.empleos_compatibles}</td>
-                <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 600, color: r.brechas_count >= 10 ? '#DC2626' : r.brechas_count >= 5 ? '#D97706' : '#059669' }}>{r.brechas_count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </DashPanel>
-    </div>
-  );
-}
-
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ObservatorioStorytelling() {
   const [summary, setSummary]               = useState<Summary | null>(null);
@@ -1118,7 +1072,6 @@ export default function ObservatorioStorytelling() {
   const [pipelineStep, setPipelineStep]       = useState<string | null>(null);
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
-  const [compareData, setCompareData]         = useState<CompareRow[] | null>(null);
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -1153,14 +1106,6 @@ export default function ObservatorioStorytelling() {
       .then((d: UniversityData) => setUniv(d))
       .catch(() => setUniv(null));
   }, [programaId]);
-
-  // Fetch compare data once on mount (all 4 programs, not per-program)
-  useEffect(() => {
-    fetch(`${API}/api/dashboard/compare-programs?ids=94,92,108,20`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: CompareRow[]) => setCompareData(d))
-      .catch(() => setCompareData([]));
-  }, []);
 
   // Reset redesign on program change
   useEffect(() => {
@@ -1281,7 +1226,6 @@ export default function ObservatorioStorytelling() {
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
-    comparativa:     <ViewComparativa     compareData={compareData} />,
   };
 
   return (
