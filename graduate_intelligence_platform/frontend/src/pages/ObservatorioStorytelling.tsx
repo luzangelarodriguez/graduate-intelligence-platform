@@ -1096,14 +1096,14 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
   function generate() {
     setLoading(true); setAiError(false);
     fetch(`${API}/api/dashboard/market-context/${programaId}`, { method: 'POST' })
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: { analisis: string; generado_en: string; error?: boolean }) => {
         setAnalisis(d.analisis);
         setGenerated(d.generado_en ? new Date(d.generado_en).toLocaleString('es-CO') : null);
         setAiError(!!d.error);
         setLoading(false);
       })
-      .catch(() => { setAiError(true); setLoading(false); });
+      .catch(() => { setAiError(true); setAnalisis('Error de conexión: no se pudo contactar el servidor. Verifica que el servicio esté disponible e inténtalo de nuevo.'); setLoading(false); });
   }
 
   return (
