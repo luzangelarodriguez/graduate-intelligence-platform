@@ -487,6 +487,9 @@ def load_jobs(cur) -> list[dict[str, Any]]:
                     '[]'::jsonb
                 ) AS skills
             FROM empleos e
+            -- Only active (non-expired) vacancies; fall back to TRUE if column
+            -- doesn't exist yet (pre-migration environments)
+            WHERE COALESCE(e.activo, TRUE) = TRUE
             """
         )
     if "jobs" in existing:
@@ -505,6 +508,7 @@ def load_jobs(cur) -> list[dict[str, Any]]:
                 '' AS skills_text,
                 '[]'::jsonb AS skills
             FROM jobs j
+            WHERE COALESCE(j.activo, TRUE) = TRUE
             """
         )
 
