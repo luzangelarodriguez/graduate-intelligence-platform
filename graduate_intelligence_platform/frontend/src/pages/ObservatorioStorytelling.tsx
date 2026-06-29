@@ -898,54 +898,58 @@ function ViewEmpleos({ top_matches, empCompatibles }: ViewProps) {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Empleos Compatibles</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{empCompatibles} vacantes con solapamiento de skills</p>
       </div>
 
       <DashPanel title={`Top ${empleos.length} vacantes más compatibles`}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-          <thead>
-            <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-              {['#', 'Empleo', 'Empresa', 'Score', 'Cobertura', 'Skills en común', 'Gaps'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {empleos.map((m, i) => {
-              const total    = m.skills_en_comun.length + m.skills_faltantes.length;
-              const coverPct = total ? Math.round((m.skills_en_comun.length / total) * 100) : 0;
-              return (
-                <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                  <td style={{ padding: '8px', color: '#9CA3AF', fontWeight: 700, fontSize: 11 }}>{i + 1}</td>
-                  <td style={{ padding: '8px', color: C.navy, fontWeight: 600 }}>{m.empleo}</td>
-                  <td style={{ padding: '8px', color: '#6B7280' }}>{m.empresa}</td>
-                  <td style={{ padding: '8px', fontWeight: 700, color: m.score >= 70 ? '#059669' : m.score >= 50 ? '#2563EB' : '#D97706' }}>{m.score.toFixed(0)}</td>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 56, height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${coverPct}%`, background: coverPct >= 60 ? '#10B981' : '#F59E0B', borderRadius: 3 }} />
+        {/* TODO(verificación visual pendiente): con datos reales de vacantes en producción,
+            verificar layout de las columnas "Skills en común" y "Gaps" con tags reales en 375px. */}
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 640 }}>
+            <thead>
+              <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                {['#', 'Empleo', 'Empresa', 'Score', 'Cobertura', 'Skills en común', 'Gaps'].map(h => (
+                  <th key={h} style={{ textAlign: 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {empleos.map((m, i) => {
+                const total    = m.skills_en_comun.length + m.skills_faltantes.length;
+                const coverPct = total ? Math.round((m.skills_en_comun.length / total) * 100) : 0;
+                return (
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
+                    <td style={{ padding: '8px', color: '#9CA3AF', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>{i + 1}</td>
+                    <td style={{ padding: '8px', color: C.navy, fontWeight: 600, whiteSpace: 'nowrap' }}>{m.empleo}</td>
+                    <td style={{ padding: '8px', color: '#6B7280', whiteSpace: 'nowrap' }}>{m.empresa}</td>
+                    <td style={{ padding: '8px', fontWeight: 700, whiteSpace: 'nowrap', color: m.score >= 70 ? '#059669' : m.score >= 50 ? '#2563EB' : '#D97706' }}>{m.score.toFixed(0)}</td>
+                    <td style={{ padding: '8px', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 56, height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${coverPct}%`, background: coverPct >= 60 ? '#10B981' : '#F59E0B', borderRadius: 3 }} />
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: coverPct >= 60 ? '#059669' : '#D97706' }}>{coverPct}%</span>
                       </div>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: coverPct >= 60 ? '#059669' : '#D97706' }}>{coverPct}%</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                      {m.skills_en_comun.slice(0, 3).map(s => <SkillTag key={s} skill={s} variant="match" />)}
-                    </div>
-                  </td>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                      {m.skills_faltantes.slice(0, 2).map(s => <SkillTag key={s} skill={s} variant="gap" />)}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td style={{ padding: '8px', minWidth: 120 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        {m.skills_en_comun.slice(0, 3).map(s => <SkillTag key={s} skill={s} variant="match" />)}
+                      </div>
+                    </td>
+                    <td style={{ padding: '8px', minWidth: 100 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        {m.skills_faltantes.slice(0, 2).map(s => <SkillTag key={s} skill={s} variant="gap" />)}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </DashPanel>
     </div>
   );
