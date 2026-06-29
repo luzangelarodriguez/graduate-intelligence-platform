@@ -1153,7 +1153,7 @@ function WefG1Disruption() {
       <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
         Disrupción de habilidades: Colombia vs. mundo
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { val: '41%', label: 'de las competencias laborales cambiarán', sub: 'Colombia 2025-2030', color: '#2563EB' },
           { val: '39%', label: 'de las competencias laborales cambiarán', sub: 'Promedio global',     color: '#7C3AED' },
@@ -1231,7 +1231,7 @@ function WefG3JobBalance() {
       <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
         Empleos creados vs. desplazados a nivel global, 2025-2030
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 14 }}>
         {[
           { val: '170M', label: '14% del empleo formal actual', sub: 'Empleos creados',    color: '#1D9E75' },
           { val: '92M',  label: '8% del empleo formal actual',  sub: 'Empleos desplazados', color: '#D85A30' },
@@ -1425,13 +1425,13 @@ function WefG6SeguridadJuridico() {
 function WefChartsSection({ nombrePrograma }: { nombrePrograma: string }) {
   const dominio = detectDominio(nombrePrograma);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div className="flex flex-col gap-3">
       <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', margin: 0, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
         Visualizaciones WEF Future of Jobs Report 2025
       </p>
-      {/* Fila de los 3 generales: G1 y G3 en columna izquierda, G2 ocupa derecha */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* G1+G3 apilados a la izquierda, G2 a la derecha — en móvil todo apilado en 1 col */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           <WefG1Disruption />
           <WefG3JobBalance />
         </div>
@@ -1467,14 +1467,14 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Contexto de Mercado — Estudios de Referencia</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hallazgos de informes externos + análisis personalizado por IA para {meta.label}</p>
       </div>
 
       {/* Parte A — 3 static study cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, flexShrink: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ flexShrink: 0 }}>
         {MARKET_STUDIES.map(s => (
           <div key={s.title} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1542,7 +1542,7 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
 
       {/* Quick reference bullets */}
       <DashPanel title="Indicadores clave de los estudios">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { label: '39%',   desc: 'de las habilidades laborales cambiarán a nivel global para 2030', color: '#2563EB', source: 'WEF 2025' },
             { label: '170M',  desc: 'empleos nuevos netos proyectados globalmente para 2030', color: '#059669', source: 'WEF 2025' },
