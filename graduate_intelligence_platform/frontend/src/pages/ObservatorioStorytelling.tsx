@@ -978,7 +978,7 @@ function ViewRecomendaciones({
   const ruido = (skills?.brechas ?? []).filter(b => classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Recomendaciones & Rediseño</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Simulación, acciones prioritarias y rediseño curricular asistido por IA</p>
@@ -987,8 +987,8 @@ function ViewRecomendaciones({
       {dataPobre ? <ExplorandoMsg /> : (
         <>
           {/* Simulation scenarios */}
-          <DashPanel title="Simulación Curricular — Impacto estimado de incorporar brechas">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          <DashPanel title="Simulación Curricular — Impacto estimado de incorporar brechas" style={{ flexShrink: 0 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {[
                 { title: 'Escenario A — Mínimo',   sub: `Incorporar top ${Math.min(brechasAlta.length, 2)} brechas críticas`,         pertinencia: `+${Math.round(brechaPct * 0.25)}%`, cobertura: `${Math.min(coberturaPct + 15, 99)}%`, empleos: `+${Math.round(empCompatibles * 0.2)}`, color: C.gold },
                 { title: 'Escenario B — Moderado', sub: `Incorporar brechas de prioridad alta (${brechasAlta.length})`,                pertinencia: `+${Math.round(brechaPct * 0.45)}%`, cobertura: `${Math.min(coberturaPct + 25, 99)}%`, empleos: `+${Math.round(empCompatibles * 0.4)}`, color: '#2563eb' },
