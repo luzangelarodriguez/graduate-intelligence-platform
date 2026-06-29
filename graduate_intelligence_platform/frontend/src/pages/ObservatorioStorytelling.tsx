@@ -836,7 +836,7 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
   const brechasAlta = sorted.filter(b => b.frecuencia_mercado >= 10);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Brechas Curriculares</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
@@ -844,15 +844,23 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${(['herramienta','competencia','habilidad','otro'] as SkillCat[]).filter(c => bycat[c].length > 0 || c !== 'otro').length}, 1fr)`, gap: 12 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {(['herramienta', 'competencia', 'habilidad', 'otro'] as SkillCat[]).filter(c => bycat[c].length > 0 || c !== 'otro').map(cat => {
           const m = CAT_META[cat];
           const items = bycat[cat];
+          const isEmpty = items.length === 0;
           return (
-            <DashPanel key={cat} title={`${m.label} faltantes`} style={{ minHeight: 240 }}>
+            <DashPanel
+              key={cat}
+              title={`${m.label} faltantes`}
+              className={isEmpty ? 'min-h-[90px] lg:min-h-[240px]' : undefined}
+              style={isEmpty ? undefined : { minHeight: 240 }}
+            >
               <p style={{ fontSize: 10, color: '#9CA3AF', margin: '-8px 0 10px' }}>{items.length} brechas</p>
-              {items.length === 0 ? (
-                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas en esta categoría</p>
+              {isEmpty ? (
+                <div className="flex items-center justify-center flex-1">
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas en esta categoría</p>
+                </div>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 160) }}>
                   <HorizBarChart labels={items.map(b => b.skill)} values={items.map(b => b.frecuencia_mercado ?? 0)} color="#EF4444" />
@@ -864,8 +872,13 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
       </div>
 
       {/* Scatter: Currículo vs Mercado */}
+      {/* TODO: el layout responsive del contenedor del scatter (375/768/1440px)
+          nunca fue verificado visualmente porque matriz_completa viene vacío en
+          el entorno de demo. Verificar con datos reales cuando matriz_completa
+          esté poblada en producción para algún programa piloto, antes de asumir
+          que el panel del scatter se ve bien en todos los anchos. */}
       {skills.matriz_completa && skills.matriz_completa.length > 0 && (
-        <DashPanel title="Mapa Currículo vs Mercado — posición de cada skill por cuadrante">
+        <DashPanel title="Mapa Currículo vs Mercado — posición de cada skill por cuadrante" style={{ flexShrink: 0 }}>
           <div style={{ height: 340 }}>
             <SkillScatter matriz={skills.matriz_completa} />
           </div>
@@ -873,7 +886,7 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
       )}
 
       {skills.exclusivas_programa.length > 0 && (
-        <DashPanel title="Skills exclusivas del programa (no demandadas aún en el mercado)">
+        <DashPanel title="Skills exclusivas del programa (no demandadas aún en el mercado)" style={{ flexShrink: 0 }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {skills.exclusivas_programa.map(e => (
               <span key={e.skill} style={{ fontSize: 11, background: '#EEF2FB', color: C.navy, borderRadius: 20, padding: '3px 10px', fontWeight: 600, border: `1px solid ${C.border}` }}>{e.skill}</span>
