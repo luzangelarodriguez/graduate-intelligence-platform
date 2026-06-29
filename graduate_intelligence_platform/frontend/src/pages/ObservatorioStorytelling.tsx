@@ -548,22 +548,22 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 flex-shrink-0">
         <div>
           <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: 0, lineHeight: 1.2 }}>{meta.nombre}</h1>
           <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0' }}>
             {totales.matches} vacantes analizadas · Run #{summary.run_id} · {summary.fecha}
           </p>
         </div>
-        <span style={{ fontSize: 9, fontWeight: 800, border: '1px solid #D1D5DB', color: '#9CA3AF', borderRadius: 20, padding: '3px 10px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 9, fontWeight: 800, border: '1px solid #D1D5DB', color: '#9CA3AF', borderRadius: 20, padding: '3px 10px', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
           {prog.labels.high}↑ · {prog.labels.medium}→ · {prog.labels.low}↓
         </span>
       </div>
 
       {/* 4 KPI cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, flexShrink: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 flex-shrink-0">
         <MetricCard label="Pertinencia" value={`${score.toFixed(0)}/100`} badge={nivel.label} color={nivel.color} />
         <MetricCard label="Cobertura curricular" value={`${coberturaPct}%`} color="#2563EB" />
         <MetricCard label="Empleos compatibles" value={empCompatibles} color="#059669" />
@@ -575,7 +575,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
       ) : (
         <>
           {/* Row 2: market skills + curriculum donut */}
-          <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 10, flexShrink: 0 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2.5 flex-shrink-0">
             <DashPanel title="Top Skills del Mercado">
               <div style={{ height: 190 }}>
                 {topMarket.length > 0
@@ -597,7 +597,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           </div>
 
           {/* Row 3: priority gaps + SNIES */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, flexShrink: 0 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 flex-shrink-0">
             <DashPanel title="Brechas Prioritarias">
               <div style={{ height: 160 }}>
                 {topBrechas.length > 0
@@ -609,8 +609,8 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
               {!univ || univ.competitors.length === 0 ? (
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Sin programas similares en SNIES.</p>
               ) : (
-                <div style={{ overflowY: 'auto', maxHeight: 160 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                <div style={{ overflowY: 'auto', overflowX: 'auto', maxHeight: 160 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, minWidth: 280 }}>
                     <thead>
                       <tr>
                         <th style={{ textAlign: 'left', padding: '3px 6px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase' }}>Universidad</th>
@@ -1534,6 +1534,7 @@ export default function ObservatorioStorytelling() {
   const [pipelineStep, setPipelineStep]       = useState<string | null>(null);
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
+  const [sidebarOpen, setSidebarOpen]         = useState(false);
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -1692,10 +1693,41 @@ export default function ObservatorioStorytelling() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', overflow: 'hidden' }}>
+    <div className="flex min-h-screen lg:h-screen lg:overflow-hidden" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+
+      {/* Mobile: hamburger button (fixed, only visible <lg) */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-50 flex items-center justify-center w-10 h-10 rounded-lg shadow-lg"
+        style={{ background: '#0B1730', border: 'none', cursor: 'pointer', color: '#fff' }}
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Abrir menú"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* Mobile: backdrop overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40"
+          style={{ background: 'rgba(0,0,0,0.55)' }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* ── SIDEBAR ── */}
-      <aside style={{ width: 200, flexShrink: 0, background: '#0B1730', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
+      <aside
+        className={[
+          'fixed lg:static inset-y-0 left-0 z-50',
+          'flex-shrink-0 flex flex-col',
+          'transition-transform duration-300 ease-in-out',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        ].join(' ')}
+        style={{ width: 200, background: '#0B1730' }}
+      >
 
         {/* Logo */}
         <div style={{ padding: '20px 16px 14px', flexShrink: 0 }}>
@@ -1747,7 +1779,7 @@ export default function ObservatorioStorytelling() {
             return (
               <button
                 key={id}
-                onClick={() => setActiveView(id)}
+                onClick={() => { setActiveView(id); setSidebarOpen(false); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   width: '100%', padding: '9px 10px', marginBottom: 1,
@@ -1807,7 +1839,7 @@ export default function ObservatorioStorytelling() {
       </aside>
 
       {/* ── MAIN ── */}
-      <main style={{ flex: 1, minWidth: 0, background: C.bg, overflowY: 'auto' }}>
+      <main className="flex-1 min-w-0 lg:overflow-y-auto pt-14 lg:pt-0" style={{ background: C.bg }}>
         {viewMap[activeView]}
       </main>
     </div>
