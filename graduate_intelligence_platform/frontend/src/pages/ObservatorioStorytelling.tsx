@@ -487,9 +487,9 @@ function SkillScatter({ matriz }: { matriz: MatrizSkill[] }) {
 
 // ─── Dashboard primitives ─────────────────────────────────────────────────────
 
-function DashPanel({ title, children, style }: { title: string; children: React.ReactNode; style?: React.CSSProperties }) {
+function DashPanel({ title, children, style, className }: { title: string; children: React.ReactNode; style?: React.CSSProperties; className?: string }) {
   return (
-    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: 16, display: 'flex', flexDirection: 'column', ...style }}>
+    <div className={className} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: 16, display: 'flex', flexDirection: 'column', ...style }}>
       <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#9CA3AF', margin: '0 0 12px' }}>{title}</p>
       <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
     </div>
@@ -651,21 +651,29 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
     .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Demanda el Mercado</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
           {skillsMercadoDeduped.length} skills en vacantes compatibles con el programa
         </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols.length}, 1fr)`, gap: 12, flex: 1, minHeight: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" style={{ minHeight: 0 }}>
         {cols.map(({ cat, items }) => {
           const m = CAT_META[cat];
+          const isEmpty = items.length === 0;
           return (
-            <DashPanel key={cat} title={m.label} style={{ minHeight: 320 }}>
+            <DashPanel
+              key={cat}
+              title={m.label}
+              className={isEmpty ? 'min-h-[90px] lg:min-h-[320px]' : undefined}
+              style={isEmpty ? undefined : { minHeight: 320 }}
+            >
               <p style={{ fontSize: 10, color: '#9CA3AF', margin: '-8px 0 10px' }}>{bycat[cat].length} identificadas</p>
-              {items.length === 0 ? (
-                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
+              {isEmpty ? (
+                <div className="flex items-center justify-center flex-1">
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
+                </div>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
                   <HorizBarChart
@@ -695,18 +703,26 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
     .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Enseña el Programa</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{skills.skills_programa.length} competencias en el microcurrículo · Tamaño = presencia (materias)</p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols.length}, 1fr)`, gap: 12, flex: 1, minHeight: 0 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" style={{ minHeight: 0 }}>
         {cols.map(({ cat, items }) => {
           const m = CAT_META[cat];
+          const isEmpty = items.length === 0;
           return (
-            <DashPanel key={cat} title={m.label} style={{ minHeight: 280 }}>
-              {items.length === 0 ? (
-                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+            <DashPanel
+              key={cat}
+              title={m.label}
+              className={isEmpty ? 'min-h-[90px] lg:min-h-[280px]' : undefined}
+              style={isEmpty ? undefined : { minHeight: 280 }}
+            >
+              {isEmpty ? (
+                <div className="flex items-center justify-center flex-1">
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+                </div>
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
                   <HorizBarChart
