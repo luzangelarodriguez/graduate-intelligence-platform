@@ -746,13 +746,14 @@ function ViewCobertura({ coberturaPct, skills, univ, dataPobre }: ViewProps) {
   if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', overflowY: 'auto', padding: '20px 24px' }}>
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Cobertura Curricular</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>% de las skills del mercado que el programa ya cubre</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12, flexShrink: 0 }}>
+      {/* Donut + stats: apilados en móvil, 220px+1fr en desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-3 flex-shrink-0">
         {/* Donut coverage */}
         <DashPanel title="Cobertura">
           <div style={{ height: 180 }}>
@@ -764,12 +765,12 @@ function ViewCobertura({ coberturaPct, skills, univ, dataPobre }: ViewProps) {
           </div>
         </DashPanel>
 
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, alignContent: 'start' }}>
+        {/* Stats: 3 KPIs + fortalezas */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5" style={{ alignContent: 'start' }}>
           <MetricCard label="Cobertura" value={`${coberturaPct}%`} color="#059669" />
           <MetricCard label="Skills cubiertas" value={skills.fortalezas.length} color="#2563EB" />
           <MetricCard label="Brechas" value={skills.brechas.length} color="#DC2626" />
-          <div style={{ gridColumn: '1 / -1' }}>
+          <div className="sm:col-span-3">
             <DashPanel title="Fortalezas (en programa y en mercado)">
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {skills.fortalezas.slice(0, 12).map(f => <SkillTag key={f.skill} skill={f.skill} variant="match" />)}
@@ -779,33 +780,39 @@ function ViewCobertura({ coberturaPct, skills, univ, dataPobre }: ViewProps) {
         </div>
       </div>
 
-      {/* SNIES table */}
-      {univ && univ.competitors.length > 0 && (
-        <DashPanel title={`Benchmark SNIES — ${univ.total} programas similares activos`}>
-          <div style={{ overflowY: 'auto', maxHeight: 220 }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+      {/* SNIES table — 5 cols, scroll horizontal contenido.
+          TODO(verificación visual pendiente): con datos SNIES reales en producción,
+          verificar layout de la tabla con filas pobladas en 375px/768px/1440px. */}
+      <DashPanel title={univ && univ.competitors.length > 0 ? `Benchmark SNIES — ${univ.total} programas similares activos` : 'Benchmark SNIES'}>
+        {!univ ? (
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Cargando datos institucionales…</p>
+        ) : univ.competitors.length === 0 ? (
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Sin programas similares en SNIES para este programa.</p>
+        ) : (
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 220 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 540 }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${C.border}` }}>
                   {['Universidad', 'Programa', 'Modalidad', 'Matr.', 'Grad.'].map(h => (
-                    <th key={h} style={{ textAlign: h === 'Matr.' || h === 'Grad.' ? 'right' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase' }}>{h}</th>
+                    <th key={h} style={{ textAlign: h === 'Matr.' || h === 'Grad.' ? 'right' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {univ.competitors.slice(0, 12).map((c, i) => (
                   <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                    <td style={{ padding: '6px 8px', color: '#374151', fontWeight: 600 }}>{c.nombre_ies}</td>
+                    <td style={{ padding: '6px 8px', color: '#374151', fontWeight: 600, whiteSpace: 'nowrap' }}>{c.nombre_ies}</td>
                     <td style={{ padding: '6px 8px', color: '#6B7280', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nombre_programa}</td>
-                    <td style={{ padding: '6px 8px', color: '#6B7280' }}>{c.modalidad}</td>
-                    <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{(c.matriculados ?? 0).toLocaleString('es-CO')}</td>
-                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{(c.graduados ?? 0).toLocaleString('es-CO')}</td>
+                    <td style={{ padding: '6px 8px', color: '#6B7280', whiteSpace: 'nowrap' }}>{c.modalidad}</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy, whiteSpace: 'nowrap' }}>{(c.matriculados ?? 0).toLocaleString('es-CO')}</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280', whiteSpace: 'nowrap' }}>{(c.graduados ?? 0).toLocaleString('es-CO')}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </DashPanel>
-      )}
+        )}
+      </DashPanel>
     </div>
   );
 }
