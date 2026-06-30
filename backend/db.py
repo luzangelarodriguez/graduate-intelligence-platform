@@ -7,7 +7,7 @@ from typing import Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from backend.database_config import get_connection_parameters, get_database_url
+from backend.database_config import get_connection_parameters
 
 
 logger = logging.getLogger(__name__)
@@ -45,9 +45,13 @@ def _log_database_diagnostics(config: dict[str, Any]) -> None:
 def get_conn(db_name: str | None = None):
     config = get_connection_parameters(db_name=db_name)
     _log_database_diagnostics(config)
-    database_url = get_database_url(db_name=db_name)
     return psycopg2.connect(
-        dsn=database_url,
+        host=str(config["host"]),
+        port=int(config["port"]),
+        dbname=str(config["database"]),
+        user=str(config["user"]),
+        password=str(config["password"]),
+        sslmode=str(config["sslmode"]),
         connect_timeout=int(config["connect_timeout"]),
         application_name=str(config["application_name"]),
         cursor_factory=RealDictCursor,
