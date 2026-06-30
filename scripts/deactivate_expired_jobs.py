@@ -32,15 +32,21 @@ RETURNING id;
 def run_deactivation() -> None:
     try:
         from api.database import get_connection
-    except ImportError:
-        # Fallback: use psycopg2 directly with DATABASE_URL
+    except (ImportError, Exception) as _import_err:
+        # Fallback: use psycopg2 directly.
+        # Mirrors the priority order in backend/database_config.py:
+        # RAILWAY_DATABASE_URL is checked first, DATABASE_URL second.
+        log.warning("api.database import failed (%s) — using psycopg2 fallback.", _import_err)
         import os
         import psycopg2
         import psycopg2.extras
 
-        url = os.environ.get("DATABASE_URL")
+        url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
         if not url:
-            log.error("DATABASE_URL not set and api.database not importable — aborting.")
+            log.error(
+                "Neither RAILWAY_DATABASE_URL nor DATABASE_URL is set "
+                "and api.database is not importable — aborting."
+            )
             sys.exit(1)
 
         conn = psycopg2.connect(url)
