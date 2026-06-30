@@ -64,3 +64,16 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/
+
+.edge-profile/
+check_*.py
+filter_snies*.py
+find_header*.py
+download_snies.py
+load_snies*.py
+inspect_snies*.py
+test_*.py
+outputs/snies/*.xlsx
+outputs/snies/*.csv
+outputs/mineducacion_*.xlsx
+outputs/mineducacion_*.csv

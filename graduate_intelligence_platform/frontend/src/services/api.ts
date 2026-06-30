@@ -164,6 +164,30 @@ export async function getProgramAlignment(programId: number) {
   return data;
 }
 
+export async function getProgramMarketAlignment(programId: number) {
+  const { data } = await apiClient.get<UniversityMarketAlignmentResponse>(`/api/programas/${programId}/market-alignment`);
+  return data;
+}
+
+export async function getProgramSkillGaps(programId: number) {
+  const { data } = await apiClient.get<{ program_id: number; program_name: string; missing_skills: unknown[]; taught_not_demanded?: unknown[] }>(
+    `/api/programas/${programId}/skill-gaps`,
+  );
+  return data;
+}
+
+export async function getProgramRecommendedJobs(programId: number) {
+  const { data } = await apiClient.get<{ program_id: number; program_name: string; recommended_jobs: unknown[]; nearest_jobs?: unknown[]; nearest_programs?: unknown[] }>(
+    `/api/programas/${programId}/recommended-jobs`,
+  );
+  return data;
+}
+
+export async function getEmpleoDetail(empleoId: string) {
+  const { data } = await apiClient.get<Job>(`/api/empleos/${encodeURIComponent(empleoId)}`);
+  return data;
+}
+
 export async function getCurriculumSimulator(programId: number, proposedSkills: string[], horizonMonths = 12) {
   const { data } = await apiClient.get<CurriculumSimulationResponse>('/curriculum-simulator', {
     params: {

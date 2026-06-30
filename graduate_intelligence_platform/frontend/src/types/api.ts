@@ -143,6 +143,8 @@ export interface Job {
   empleo_id: string;
   titulo: string;
   ubicacion: string;
+  empresa?: string;
+  url?: string;
 }
 
 export interface RecommendationProgram {
