@@ -79,9 +79,18 @@ def _db_url() -> Optional[str]:
     return None
 
 
+def _normalize_db_url(url: str) -> str:
+    """Add missing // after scheme so urlparse/psycopg2 can parse netloc correctly."""
+    for prefix in ("postgresql:", "postgres:"):
+        if url.startswith(prefix) and not url.startswith(prefix + "//"):
+            return prefix + "//" + url[len(prefix):]
+    return url
+
+
 def connect() -> psycopg2.extensions.connection:
     url = _db_url()
     if url:
+        url = _normalize_db_url(url)
         # Use direct IP to avoid DNS resolution failures in some envs
         url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
         return psycopg2.connect(url, sslmode="require",

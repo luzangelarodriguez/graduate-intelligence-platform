@@ -55,13 +55,26 @@ def _compose_local_url(host: str, port: str, database: str, user: str, password:
     return f"postgresql://{quote_plus(user)}:{quote_plus(password)}@{host}:{port}/{database}?sslmode={sslmode}"
 
 
+def _normalize_db_url(url: str) -> str:
+    """Ensure postgres:/postgresql: URLs have the // authority prefix required by urlparse.
+
+    Some environments store the URL as postgres:user:pass@host/db (no //), which
+    causes urlparse to treat the entire string as a path with no netloc, returning
+    hostname=None and breaking all individual-param extraction.
+    """
+    for prefix in ("postgresql:", "postgres:"):
+        if url.startswith(prefix) and not url.startswith(prefix + "//"):
+            return prefix + "//" + url[len(prefix):]
+    return url
+
+
 def _select_source() -> tuple[str, str | None]:
     railway_url = _first_env("RAILWAY_DATABASE_URL")
     if railway_url:
-        return "railway", railway_url
+        return "railway", _normalize_db_url(railway_url)
     database_url = _first_env("DATABASE_URL")
     if database_url:
-        return "database_url", database_url
+        return "database_url", _normalize_db_url(database_url)
     local_host = _first_env("LOCAL_DB_HOST")
     local_port = _first_env("LOCAL_DB_PORT")
     local_name = _first_env("LOCAL_DB_NAME")
