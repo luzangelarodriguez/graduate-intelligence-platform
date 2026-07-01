@@ -42,9 +42,9 @@ def test_railway_database_url_priority(monkeypatch):
 
 
 def test_railway_database_url_without_double_slash(monkeypatch):
-    # Railway sometimes stores URLs as postgres:user:pass@host/db (no //)
-    # which breaks urlparse — _normalize_db_url must fix this before parsing.
-    monkeypatch.setenv("RAILWAY_DATABASE_URL", "postgres:secret@66.33.22.248:59250/railway")
+    # Railway sometimes stores URLs as postgres:TOKEN@host/db (no //) where TOKEN
+    # is the password and the postgres user defaults to "postgres".
+    monkeypatch.setenv("RAILWAY_DATABASE_URL", "postgres:mytoken@66.33.22.248:59250/railway")
     monkeypatch.delenv("DB_HOST", raising=False)
     monkeypatch.delenv("DB_PORT", raising=False)
     monkeypatch.delenv("DB_NAME", raising=False)
@@ -56,6 +56,8 @@ def test_railway_database_url_without_double_slash(monkeypatch):
     assert isinstance(conn, DummyConnection)
     assert captured["host"] == "66.33.22.248"
     assert captured["dbname"] == "railway"
+    assert captured["password"] == "mytoken"
+    assert captured["user"] == "postgres"
     assert backend_db.get_database_diagnostics()["connection_source"] == "RAILWAY_DATABASE_URL"
 
 
