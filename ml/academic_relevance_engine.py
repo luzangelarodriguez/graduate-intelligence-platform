@@ -48,6 +48,7 @@ except ImportError:
 import numpy as np
 import psycopg2
 import psycopg2.extras
+from backend.database_config import get_connection_parameters
 
 logger = logging.getLogger(__name__)
 
@@ -71,36 +72,16 @@ EMBED_DIM = 384
 # DB connection
 # ---------------------------------------------------------------------------
 
-def _db_url() -> Optional[str]:
-    for key in ("RAILWAY_DATABASE_URL", "DATABASE_URL"):
-        v = os.getenv(key)
-        if v:
-            return v
-    return None
-
-
-def _normalize_db_url(url: str) -> str:
-    """Add missing // after scheme so urlparse/psycopg2 can parse netloc correctly."""
-    for prefix in ("postgresql:", "postgres:"):
-        if url.startswith(prefix) and not url.startswith(prefix + "//"):
-            return prefix + "//" + url[len(prefix):]
-    return url
-
-
 def connect() -> psycopg2.extensions.connection:
-    url = _db_url()
-    if url:
-        url = _normalize_db_url(url)
-        # Use direct IP to avoid DNS resolution failures in some envs
-        url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
-        return psycopg2.connect(url, sslmode="require",
-                                cursor_factory=psycopg2.extras.RealDictCursor)
+    config = get_connection_parameters()
     return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=int(os.getenv("DB_PORT", "5432")),
-        dbname=os.getenv("DB_NAME", "graduate_intelligence"),
-        user=os.getenv("DB_USER", "postgres"),
-        password=os.getenv("DB_PASSWORD", ""),
+        host=str(config["host"]),
+        port=int(config["port"]),
+        dbname=str(config["database"]),
+        user=str(config["user"]),
+        password=str(config["password"]),
+        sslmode=str(config["sslmode"]),
+        connect_timeout=int(config["connect_timeout"]),
         cursor_factory=psycopg2.extras.RealDictCursor,
     )
 
