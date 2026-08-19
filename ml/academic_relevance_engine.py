@@ -286,6 +286,10 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
                      "victimologia", "derecho penal", "investigacion criminal"],
     "finanzas": ["finanzas", "contabilidad", "financiero", "tesoreria", "presupuesto",
                  "auditoria", "tributario"],
+    "project_management": ["proyecto", "project manager", "pmo", "scrum", "agile",
+                            "kanban", "pmbok", "pmp", "planificacion", "gestion de proyectos",
+                            "prince2", "ipma", "iso 21500", "valor ganado", "riesgo proyecto",
+                            "presupuesto proyecto", "cronograma", "ms project"],
 }
 
 
@@ -300,6 +304,9 @@ def _infer_domain(text: str, program_name: str = "") -> str:
     )
     if any(kw in name_n for kw in _EDUCATION_OVERRIDE):
         return "education"
+    _PM_OVERRIDE = ("proyecto", "project manager", "pmo", "scrum master", "agile coach")
+    if any(kw in name_n for kw in _PM_OVERRIDE):
+        return "project_management"
     n = _normalize(text)
     # Also check full text for override keywords
     if any(kw in n for kw in _EDUCATION_OVERRIDE):
@@ -323,6 +330,7 @@ _COMPATIBLE_DOMAINS: Dict[str, set] = {
     "criminologia": {"criminologia", "general"},
     "education":    {"education", "general"},
     "finanzas": {"finanzas", "general"},
+    "project_management": {"project_management", "gestion", "general"},
     "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
 }
 

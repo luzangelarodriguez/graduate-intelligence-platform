@@ -143,6 +143,13 @@ def get_connection_parameters(db_name: str | None = None) -> dict[str, Any]:
         parsed = urlparse(url)
         query = parse_qs(parsed.query, keep_blank_values=True)
         sslmode = query.get("sslmode", [_sslmode_for_mode(mode)])[0]
+        raw_user = unquote(parsed.username or "")
+        raw_password = unquote(parsed.password or "")
+        # Railway sometimes stores URLs as postgres://TOKEN@host/db with no explicit
+        # user:password split (the token IS the password, user defaults to "postgres").
+        if raw_user and not raw_password:
+            raw_password = raw_user
+            raw_user = _first_env("DB_USER", "PGUSER") or "postgres"
         return {
             "mode": mode,
             "connection_source": "RAILWAY_DATABASE_URL" if mode == "railway" else "DATABASE_URL",
@@ -150,8 +157,8 @@ def get_connection_parameters(db_name: str | None = None) -> dict[str, Any]:
             "host": parsed.hostname or "",
             "port": parsed.port or 5432,
             "database": db_name or parsed.path.lstrip("/"),
-            "user": unquote(parsed.username or ""),
-            "password": unquote(parsed.password or ""),
+            "user": raw_user,
+            "password": raw_password,
             "sslmode": sslmode,
             "connect_timeout": connect_timeout,
             "application_name": application_name,
