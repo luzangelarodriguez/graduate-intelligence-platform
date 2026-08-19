@@ -76,9 +76,19 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
         "docente psicología",
         "terapeuta ocupacional educativo",
     ],
+    "project_management": [
+        "gerente de proyectos",
+        "director de proyectos",
+        "project manager",
+        "coordinador de proyectos",
+        "PMO",
+        "oficina de proyectos",
+        "scrum master",
+        "agile coach",
+    ],
 }
 
-DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education"]
+DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education", "project_management"]
 
 
 # ---------------------------------------------------------------------------
