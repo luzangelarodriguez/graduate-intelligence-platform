@@ -97,10 +97,26 @@ SKILLS_POR_ASIGNATURA: dict[str, list[str]] = {
     "Electiva": [],
 }
 
+# ── Paso 2b: Obtener o crear el registro en microcurriculos ───────────────────
+cur.execute("SELECT id FROM microcurriculos WHERE specialization_id = %s", (prog_id,))
+mc_row = cur.fetchone()
+if mc_row:
+    mc_id = mc_row[0]
+    print(f"Microcurrículo ya existe: id={mc_id}")
+else:
+    cur.execute(
+        "INSERT INTO microcurriculos (specialization_id) VALUES (%s) RETURNING id",
+        (prog_id,),
+    )
+    mc_id = cur.fetchone()[0]
+    print(f"Microcurrículo creado: id={mc_id}")
+
 for nombre, orden, creditos in ASIGNATURAS:
     cur.execute("""
-        SELECT id FROM microcurriculo_asignaturas
-        WHERE especializacion_id = %s AND nombre = %s
+        SELECT ma.id
+        FROM microcurriculo_asignaturas ma
+        JOIN microcurriculos m ON ma.microcurriculo_id = m.id
+        WHERE m.specialization_id = %s AND ma.nombre = %s
     """, (prog_id, nombre))
     existing = cur.fetchone()
     if existing:
@@ -109,9 +125,9 @@ for nombre, orden, creditos in ASIGNATURAS:
     else:
         cur.execute("""
             INSERT INTO microcurriculo_asignaturas
-                (especializacion_id, nombre, orden, creditos)
+                (microcurriculo_id, nombre, orden, creditos)
             VALUES (%s, %s, %s, %s) RETURNING id
-        """, (prog_id, nombre, orden, creditos))
+        """, (mc_id, nombre, orden, creditos))
         asig_id = cur.fetchone()[0]
         print(f"  Asignatura creada: {nombre} (id={asig_id})")
 
