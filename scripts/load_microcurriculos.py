@@ -342,74 +342,69 @@ def _extract_pdf_text(path: Path) -> str:
 
 
 def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
-    """Parse a microcurriculum PDF into one record per asignatura.
+    """Parse a UNIR-style microcurriculum PDF.
 
-    Strategy:
-    - Extract full text.
-    - Detect program name from common header patterns.
-    - Split into asignatura sections on capitalized headings that look like
-      course names (lines of 20-120 chars in ALL-CAPS or Title Case, not
-      matching section keywords like "OBJETIVO", "CRÉDITOS", etc.).
-    - Build one record per asignatura with skills extracted from its section text.
+    Document structure (repeating block per asignatura):
+        DENOMINACIÓN DE LA ASIGNATURA
+            <nombre real>
+        SEMESTRE CRÉDITOS/HORAS
+            <valores>
+        COMPONENTE FORMATIVO DE LA ASIGNATURA
+            ...
+        DESCRIPCIÓN DE LA ASIGNATURA
+            <descripción>
+        ACTIVIDADES FORMATIVAS
+            ...
+        EVALUACIÓN Y CALIFICACIÓN
+            ...
+        Bibliografía
+            ...
+
+    Strategy: split on occurrences of "DENOMINACIÓN DE LA ASIGNATURA"
+    (case-insensitive). Everything between one occurrence and the next is
+    one asignatura block. The course name is the first non-empty,
+    non-template line inside the block.
     """
     full_text = _extract_pdf_text(path)
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
 
     # ── detect program name ────────────────────────────────────────────────────
     programa = ""
-    for line in full_text.splitlines()[:30]:
+    for line in full_text.splitlines()[:40]:
         line = line.strip()
-        if re.search(r"especializaci[oó]n|maestr[ií]a|programa", line, re.I) and 15 < len(line) < 150:
+        if re.search(r"especializaci[oó]n|maestr[ií]a|programa\s+acad", line, re.I) and 15 < len(line) < 150:
             programa = line
             break
     if not programa:
-        # Use folder name as fallback
-        programa = path.parent.name
+        programa = path.parent.name  # folder name as fallback
 
-    # ── split into asignatura sections ─────────────────────────────────────────
-    # Lines that likely are asignatura headers: mostly title/upper-case, 20-120 chars,
-    # not typical section keywords.
-    _SECTION_SKIP = re.compile(
-        r"^(objetivo|cr[eé]dito|descripci[oó]n|modalidad|p[aá]gina|fecha|versi[oó]n|"
-        r"contenido|tema|unidad|bibliograf|resultado|perfil|egreso|misi[oó]n|visi[oó]n|"
-        r"competencia|metodolog|evaluaci[oó]n|prerrequisito)",
-        re.I,
+    domain_key = infer_domain(programa)
+
+    # ── split on "DENOMINACIÓN DE LA ASIGNATURA" ─────────────────────────────
+    # Use a regex that matches this label regardless of accents/caps/whitespace
+    _DENOM_RE = re.compile(
+        r"DENOMINACI[OÓ]N\s+DE\s+LA\s+ASIGNATURA",
+        re.IGNORECASE,
     )
 
-    sections: list[tuple[str, str]] = []  # (asignatura_name, section_text)
-    current_asig: str = ""
-    current_lines: list[str] = []
+    # Template section labels — these lines are structural, not content
+    _TEMPLATE_LABELS = re.compile(
+        r"^("
+        r"SEMESTRE|CR[EÉ]DITOS?|HORAS?|COMPONENTE\s+FORMATIVO|"
+        r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA|ACTIVIDADES?\s+FORMATIVAS?|"
+        r"EVALUACI[OÓ]N\s+Y?\s+CALIFICACI[OÓ]N|BIBLIOGRAF[IÍ]A|"
+        r"CONTENIDO(S)?\s+TEM[AÁ]TICO|RESULTADO(S)?\s+DE\s+APRENDIZAJE|"
+        r"METODOLOG[IÍ]A|RECURSOS?\s+EDUCATIVOS?|PERFIL\s+DE\s+EGRESO|"
+        r"COMPETENCIA|PRERREQUISITO|ACTIVIDAD\s+\d|TEST\s+\d|CARACTERÍSTICA"
+        r")",
+        re.IGNORECASE,
+    )
 
-    lines = full_text.splitlines()
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            current_lines.append("")
-            continue
+    blocks = _DENOM_RE.split(full_text)
+    # blocks[0] is the preamble (program header), blocks[1:] are asignatura blocks
 
-        # Candidate header: 20-120 chars, starts with uppercase, no sentence punctuation mid-word
-        is_header = (
-            20 <= len(stripped) <= 120
-            and re.match(r"^[A-ZÁÉÍÓÚÑÜ]", stripped)
-            and not _SECTION_SKIP.match(stripped)
-            and stripped.isupper() or (
-                stripped.istitle() and not re.search(r"[,;]", stripped)
-            )
-        )
-        if is_header and not stripped.endswith((".",":",",")):
-            # Save previous section
-            if current_asig and current_lines:
-                sections.append((current_asig, "\n".join(current_lines)))
-            current_asig = stripped
-            current_lines = []
-        else:
-            current_lines.append(stripped)
-
-    if current_asig and current_lines:
-        sections.append((current_asig, "\n".join(current_lines)))
-
-    # If no sections detected, treat the whole document as one record
-    if not sections:
+    if len(blocks) <= 1:
+        # Fallback: no template detected — one record for the whole document
         skills = extract_skills(full_text)
         return [{
             "programa": programa,
@@ -422,25 +417,96 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
             "source_document": path.name,
             "source_path": str(path.relative_to(REPO_ROOT)),
             "document_hash": doc_hash,
-            "domain_key": infer_domain(programa),
+            "domain_key": domain_key,
         }]
 
     results: list[dict[str, Any]] = []
-    for i, (asig, section_text) in enumerate(sections):
-        skills = extract_skills(section_text)
+    seen_names: set[str] = set()
+
+    for i, block in enumerate(blocks[1:], start=1):
+        lines = [ln.strip() for ln in block.splitlines()]
+
+        # Course name: first non-empty line that is not a template label
+        asig_name = ""
+        for ln in lines:
+            if not ln:
+                continue
+            if _TEMPLATE_LABELS.match(ln):
+                continue
+            # Skip very short lines (page numbers, %, single chars)
+            if len(ln) < 4:
+                continue
+            # Skip lines that look like "Actividad 1 / ... 10%"
+            if re.search(r"\d+\s*%", ln):
+                continue
+            asig_name = ln
+            break
+
+        if not asig_name:
+            continue  # empty block, skip
+
+        # Deduplicate: same course name can appear on multiple pages
+        name_key = _normalize_text(asig_name)
+        if name_key in seen_names:
+            # Merge content into existing record
+            for rec in results:
+                if _normalize_text(rec["asignatura"]) == name_key:
+                    rec["descripcion"] = (rec["descripcion"] + "\n" + block)[:2000]
+                    new_skills = extract_skills(block)
+                    for tipo, skill_list in new_skills.items():
+                        rec["skills"].setdefault(tipo, [])
+                        for s in skill_list:
+                            if s not in rec["skills"][tipo]:
+                                rec["skills"][tipo].append(s)
+                    break
+            continue
+
+        seen_names.add(name_key)
+
+        # Semestre / créditos
+        semestre = ""
+        creditos = ""
+        sem_match = re.search(
+            r"semestre\s*[:\-]?\s*(\d+)",
+            block, re.IGNORECASE,
+        )
+        if sem_match:
+            semestre = sem_match.group(1)
+        cred_match = re.search(
+            r"cr[eé]ditos?\s*[:\-]?\s*(\d+)",
+            block, re.IGNORECASE,
+        )
+        if cred_match:
+            creditos = cred_match.group(1)
+
+        # Descripción: text after "DESCRIPCIÓN DE LA ASIGNATURA" label
+        desc = ""
+        desc_match = re.search(
+            r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA\s*([\s\S]*?)(?="
+            r"ACTIVIDADES?\s+FORMATIVAS?|EVALUACI[OÓ]N|BIBLIOGRAF|$)",
+            block, re.IGNORECASE,
+        )
+        if desc_match:
+            desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
+
+        skills = extract_skills(block)
+
         results.append({
             "programa": programa,
-            "asignatura": asig,
-            "descripcion": section_text[:2000],
+            "asignatura": asig_name,
+            "descripcion": desc or block[:500],
             "resultados_aprendizaje": [],
-            "contenido_tematico": [],
+            "contenido_tematico": [f"Semestre {semestre}" if semestre else ""],
             "herramientas_recursos": "",
             "skills": skills,
+            "semestre_num": semestre,
+            "creditos_num": creditos,
             "source_document": path.name,
             "source_path": str(path.relative_to(REPO_ROOT)),
-            "document_hash": f"{doc_hash}:{i}:{asig[:20]}",
-            "domain_key": infer_domain(programa),
+            "document_hash": f"{doc_hash}:{i}:{name_key[:20]}",
+            "domain_key": domain_key,
         })
+
     return results
 
 
