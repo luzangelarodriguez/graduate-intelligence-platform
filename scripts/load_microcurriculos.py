@@ -187,6 +187,30 @@ def _table_all_text(table) -> str:
     return "\n".join(parts)
 
 
+def _doc_full_text(doc) -> str:
+    """Extract all readable text from a Word document: paragraphs + all table cells.
+
+    Some docx files store content exclusively in tables (no paragraph text).
+    This function is the safe union of both sources.
+    """
+    parts: list[str] = []
+    # Paragraphs (may be empty for table-only docs)
+    for p in doc.paragraphs:
+        t = p.text.strip()
+        if t:
+            parts.append(t)
+    # All tables — iterate every row and cell
+    for table in doc.tables:
+        for row in table.rows:
+            seen_in_row: set[str] = set()
+            for cell in row.cells:
+                txt = cell.text.strip()
+                if txt and txt not in seen_in_row:
+                    seen_in_row.add(txt)
+                    parts.append(txt)
+    return "\n".join(parts)
+
+
 # ── parse a standard 10-table microcurriculum docx ────────────────────────────
 
 def parse_standard_docx(path: Path) -> dict[str, Any] | None:
@@ -240,7 +264,7 @@ def parse_standard_docx(path: Path) -> dict[str, Any] | None:
         if re.match(r"^Tema\s+\d", line, re.I):
             temas.append(line)
 
-    full_text = "\n".join([descripcion, resultados_text, contenido_tematico, medios_text])
+    full_text = "\n".join([descripcion, resultados_text, contenido_tematico, medios_text, _doc_full_text(doc)])
     skills = extract_skills(full_text)
 
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
@@ -299,7 +323,7 @@ def parse_criminologia_docx(path: Path) -> list[dict[str, Any]]:
             asig_ras[current].append(first[:300])
 
     # Program-level skills (from all paragraph text)
-    full_text = "\n".join(p.text for p in doc.paragraphs)
+    full_text = _doc_full_text(doc)
     skills = extract_skills(full_text)
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
 
