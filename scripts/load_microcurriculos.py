@@ -369,14 +369,29 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
 
     # ── detect program name ────────────────────────────────────────────────────
+    # Template labels that must NOT be treated as the program name
+    _GENERIC_PROG_LABELS = re.compile(
+        r"^(PROGRAMA\s+ACAD[EÉ]MICO|NOMBRE\s+DEL\s+PROGRAMA|"
+        r"PROGRAMA|ASIGNATURA|MICROCURR[IÍ]CULO)",
+        re.IGNORECASE,
+    )
     programa = ""
     for line in full_text.splitlines()[:40]:
         line = line.strip()
-        if re.search(r"especializaci[oó]n|maestr[ií]a|programa\s+acad", line, re.I) and 15 < len(line) < 150:
+        if (
+            re.search(r"especializaci[oó]n|maestr[ií]a", line, re.I)
+            and 15 < len(line) < 150
+            and not _GENERIC_PROG_LABELS.match(line)
+        ):
             programa = line
             break
-    if not programa:
-        programa = path.parent.name  # folder name as fallback
+
+    # Use folder name as primary source when PDF header is generic or missing.
+    # The folder name (e.g. "Dirección y Gestión de Proyectos") is explicitly
+    # mapped in _EXPLICIT_ESP_MAP and DOMAIN_MAP, so prefer it over a generic label.
+    folder_name = path.parent.name
+    if not programa or _GENERIC_PROG_LABELS.match(programa):
+        programa = f"Especialización en {folder_name}" if folder_name != "test_microcurriculos" else programa
 
     domain_key = infer_domain(programa)
 
