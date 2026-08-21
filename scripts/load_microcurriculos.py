@@ -41,9 +41,11 @@ DOMAIN_MAP: dict[str, str] = {
     "machine learning": "artificial_intelligence",
     "criminolog": "criminology",
     "victimolog": "criminology",
+    "gestion de proyectos": "project_management",
+    "direccion y gestion": "project_management",
+    "gerencia de proyectos": "project_management",
     "gerencia": "business",
     "administracion": "business",
-    "gestion de proyectos": "business",
     "direccion": "business",
     "derecho": "law",
     "educacion": "education",
@@ -103,7 +105,9 @@ _RE_TRANSVERSAL = re.compile(
 
 _RE_METHODS = re.compile(
     r"\b(Scrum|Agile|CRISP.?DM|Design\s*Thinking|Lean|Six\s*Sigma|"
-    r"PMBOK|PRINCE2|Kanban|DevOps|DataOps|MLOps|"
+    r"PMBOK|PRINCE2|IPMA|PMI|PMP|ISO\s*21500|Kanban|DevOps|DataOps|MLOps|"
+    r"Valor\s+Ganado|Gesti[oó]n\s+de\s+Riesgos|Gesti[oó]n\s+de\s+Proyectos|"
+    r"Planificaci[oó]n\s+de\s+Proyectos|MS\s*Project|"
     r"Regresi[oó]n\s+lineal|Regresi[oó]n\s+log[ií]stica|"
     r"An[aá]lisis\s+factorial|Series\s+de\s+tiempo|"
     r"Validaci[oó]n\s+cruzada|Hiperpar[aá]metros|"
@@ -319,18 +323,147 @@ def parse_criminologia_docx(path: Path) -> list[dict[str, Any]]:
     return results
 
 
-# ── discover all docx ─────────────────────────────────────────────────────────
+# ── parse a PDF microcurriculum (one record per asignatura detected) ──────────
+
+def _extract_pdf_text(path: Path) -> str:
+    """Return full text from all PDF pages using pdfplumber."""
+    try:
+        import pdfplumber  # type: ignore
+    except ImportError:
+        raise ImportError(
+            "pdfplumber is required for PDF support: pip install pdfplumber"
+        )
+    pages: list[str] = []
+    with pdfplumber.open(str(path)) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text() or ""
+            pages.append(text)
+    return "\n".join(pages)
+
+
+def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
+    """Parse a microcurriculum PDF into one record per asignatura.
+
+    Strategy:
+    - Extract full text.
+    - Detect program name from common header patterns.
+    - Split into asignatura sections on capitalized headings that look like
+      course names (lines of 20-120 chars in ALL-CAPS or Title Case, not
+      matching section keywords like "OBJETIVO", "CRÉDITOS", etc.).
+    - Build one record per asignatura with skills extracted from its section text.
+    """
+    full_text = _extract_pdf_text(path)
+    doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
+
+    # ── detect program name ────────────────────────────────────────────────────
+    programa = ""
+    for line in full_text.splitlines()[:30]:
+        line = line.strip()
+        if re.search(r"especializaci[oó]n|maestr[ií]a|programa", line, re.I) and 15 < len(line) < 150:
+            programa = line
+            break
+    if not programa:
+        # Use folder name as fallback
+        programa = path.parent.name
+
+    # ── split into asignatura sections ─────────────────────────────────────────
+    # Lines that likely are asignatura headers: mostly title/upper-case, 20-120 chars,
+    # not typical section keywords.
+    _SECTION_SKIP = re.compile(
+        r"^(objetivo|cr[eé]dito|descripci[oó]n|modalidad|p[aá]gina|fecha|versi[oó]n|"
+        r"contenido|tema|unidad|bibliograf|resultado|perfil|egreso|misi[oó]n|visi[oó]n|"
+        r"competencia|metodolog|evaluaci[oó]n|prerrequisito)",
+        re.I,
+    )
+
+    sections: list[tuple[str, str]] = []  # (asignatura_name, section_text)
+    current_asig: str = ""
+    current_lines: list[str] = []
+
+    lines = full_text.splitlines()
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            current_lines.append("")
+            continue
+
+        # Candidate header: 20-120 chars, starts with uppercase, no sentence punctuation mid-word
+        is_header = (
+            20 <= len(stripped) <= 120
+            and re.match(r"^[A-ZÁÉÍÓÚÑÜ]", stripped)
+            and not _SECTION_SKIP.match(stripped)
+            and stripped.isupper() or (
+                stripped.istitle() and not re.search(r"[,;]", stripped)
+            )
+        )
+        if is_header and not stripped.endswith((".",":",",")):
+            # Save previous section
+            if current_asig and current_lines:
+                sections.append((current_asig, "\n".join(current_lines)))
+            current_asig = stripped
+            current_lines = []
+        else:
+            current_lines.append(stripped)
+
+    if current_asig and current_lines:
+        sections.append((current_asig, "\n".join(current_lines)))
+
+    # If no sections detected, treat the whole document as one record
+    if not sections:
+        skills = extract_skills(full_text)
+        return [{
+            "programa": programa,
+            "asignatura": programa,
+            "descripcion": full_text[:2000],
+            "resultados_aprendizaje": [],
+            "contenido_tematico": [],
+            "herramientas_recursos": "",
+            "skills": skills,
+            "source_document": path.name,
+            "source_path": str(path.relative_to(REPO_ROOT)),
+            "document_hash": doc_hash,
+            "domain_key": infer_domain(programa),
+        }]
+
+    results: list[dict[str, Any]] = []
+    for i, (asig, section_text) in enumerate(sections):
+        skills = extract_skills(section_text)
+        results.append({
+            "programa": programa,
+            "asignatura": asig,
+            "descripcion": section_text[:2000],
+            "resultados_aprendizaje": [],
+            "contenido_tematico": [],
+            "herramientas_recursos": "",
+            "skills": skills,
+            "source_document": path.name,
+            "source_path": str(path.relative_to(REPO_ROOT)),
+            "document_hash": f"{doc_hash}:{i}:{asig[:20]}",
+            "domain_key": infer_domain(programa),
+        })
+    return results
+
+
+# ── discover all docx + pdf ───────────────────────────────────────────────────
 
 def discover_all() -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-    for docx_path in sorted(STORAGE_DIR.rglob("*.docx")):
-        folder = docx_path.relative_to(STORAGE_DIR).parts[0]
-        if "Criminolog" in folder or "criminolog" in folder:
-            records.extend(parse_criminologia_docx(docx_path))
-        else:
-            parsed = parse_standard_docx(docx_path)
-            if parsed:
-                records.append(parsed)
+    for path in sorted(STORAGE_DIR.rglob("*")):
+        if path.suffix.lower() == ".docx":
+            folder = path.relative_to(STORAGE_DIR).parts[0]
+            if "Criminolog" in folder or "criminolog" in folder:
+                records.extend(parse_criminologia_docx(path))
+            else:
+                parsed = parse_standard_docx(path)
+                if parsed:
+                    records.append(parsed)
+        elif path.suffix.lower() == ".pdf":
+            try:
+                records.extend(parse_pdf_microcurriculum(path))
+            except ImportError as exc:
+                print(f"  WARNING: skipping {path.name} — {exc}")
+            except Exception as exc:
+                print(f"  WARNING: could not parse {path.name} — {exc}")
     return records
 
 
@@ -352,15 +485,31 @@ def _load_env() -> None:
 
 def get_conn():
     _load_env()
-    url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
-    if not url:
-        raise RuntimeError(
-            "RAILWAY_DATABASE_URL not set.\n"
-            "Create .env.local in the repo root with:\n"
-            "  RAILWAY_DATABASE_URL=postgresql://user:pass@host:port/db"
+    sys.path.insert(0, str(REPO_ROOT))
+    try:
+        from backend.database_config import get_connection_parameters  # type: ignore
+        cfg = get_connection_parameters()
+        import psycopg2  # type: ignore
+        return psycopg2.connect(
+            host=str(cfg["host"]),
+            port=int(cfg["port"]),
+            dbname=str(cfg["database"]),
+            user=str(cfg["user"]),
+            password=str(cfg["password"]),
+            sslmode=str(cfg["sslmode"]),
+            connect_timeout=int(cfg["connect_timeout"]),
         )
-    import psycopg2  # type: ignore
-    return psycopg2.connect(url)
+    except Exception:
+        # Fallback: direct URL (kept for environments without the backend package)
+        import psycopg2  # type: ignore
+        url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
+        if not url:
+            raise RuntimeError(
+                "RAILWAY_DATABASE_URL not set.\n"
+                "Create .env.local in the repo root with:\n"
+                "  RAILWAY_DATABASE_URL=postgresql://user:pass@host:port/db"
+            )
+        return psycopg2.connect(url)
 
 
 def fetch_especializaciones(conn) -> list[dict]:
@@ -377,6 +526,9 @@ _EXPLICIT_ESP_MAP: dict[str, int] = {
     "victimologia": 108,
     "criminolog": 108,
     "victimolog": 108,
+    # Dirección y Gestión de Proyectos (UNIR) → id=9
+    "direccion y gestion de proyectos": 9,
+    "gestion de proyectos": 9,
     # Administración de Empresas → id=82 (Alta Gerencia)
     "administracion de empresas": 82,
     "alta gerencia": 82,
