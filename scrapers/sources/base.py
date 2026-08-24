@@ -75,6 +75,104 @@ class SourceConfig:
     reuse_page_for_details: bool = False
 
 
+# Section-header keywords used to split a job description into named fields.
+# Ordered by specificity: more specific variants are matched first.
+_SECTION_HEADERS = {
+    "responsabilidades": re.compile(
+        r"(responsabilidades|funciones|actividades\s+a\s+realizar|"
+        r"descripci[oó]n\s+del\s+(cargo|puesto)|que\s+har[aá]s|"
+        r"qu[eé]\s+buscamos.*hacer|tus\s+funciones|el\s+cargo)",
+        re.IGNORECASE,
+    ),
+    "requisitos": re.compile(
+        r"(requisitos|perfil\s+requerido|perfil\s+del\s+candidato|"
+        r"lo\s+que\s+buscamos|qu[eé]\s+necesitas|"
+        r"conocimientos\s+requeridos|habilidades\s+y\s+conocimientos|"
+        r"formaci[oó]n\s+acad[eé]mica|experiencia\s+requerida)",
+        re.IGNORECASE,
+    ),
+}
+
+
+async def extract_named_sections(page: "Page") -> dict[str, str]:
+    """Extract responsibilities and requirements from a job detail page.
+
+    Tries two strategies in order:
+    1. CSS selectors that are common in Colombian job portals
+    2. Text-scanning: iterate visible paragraphs/list-items in the main content
+       area and group them under section headers when a header keyword is detected.
+
+    Returns a dict with keys 'responsabilidades' and/or 'requisitos'.
+    """
+    result: dict[str, str] = {}
+
+    # Strategy 1: dedicated CSS selectors per section
+    _css_candidates: list[tuple[str, str]] = [
+        # Elempleo uses data-section attributes
+        ("responsabilidades", "[data-section*='function'], [data-section*='responsabilidad'], "
+                              "[class*='functions'], [class*='responsabilidad']"),
+        ("requisitos",        "[data-section*='requirement'], [data-section*='requisito'], "
+                              "[class*='requirements'], [class*='requisito']"),
+        # Magneto
+        ("responsabilidades", "[class*='job-function'], [class*='responsibilities']"),
+        ("requisitos",        "[class*='job-requirement'], [class*='requirements-section']"),
+    ]
+    for field, selector in _css_candidates:
+        if field in result:
+            continue
+        try:
+            locator = page.locator(selector).first
+            if await locator.count():
+                text = (await locator.inner_text(timeout=1500)).strip()
+                if text and len(text) > 30:
+                    result[field] = re.sub(r"\s+", " ", text)
+        except Exception:
+            pass
+
+    # Strategy 2: scan main body text and split on section headers
+    if len(result) < 2:
+        try:
+            # Grab inner text of the main content node
+            body_text = ""
+            for sel in ("[class*='description']", "[class*='descripcion']", "main", "article"):
+                try:
+                    loc = page.locator(sel).first
+                    if await loc.count():
+                        body_text = await loc.inner_text(timeout=2000)
+                        if len(body_text) > 80:
+                            break
+                except Exception:
+                    pass
+
+            if body_text:
+                lines = [l.strip() for l in body_text.splitlines() if l.strip()]
+                current_section: str | None = None
+                buckets: dict[str, list[str]] = {"responsabilidades": [], "requisitos": []}
+                for line in lines:
+                    matched_section = None
+                    for section_name, pattern in _SECTION_HEADERS.items():
+                        if pattern.search(line) and len(line) < 120:
+                            matched_section = section_name
+                            break
+                    if matched_section:
+                        current_section = matched_section
+                        continue
+                    if current_section and line and not any(
+                        other_pat.search(line) and len(line) < 120
+                        for other_name, other_pat in _SECTION_HEADERS.items()
+                        if other_name != current_section
+                    ):
+                        buckets[current_section].append(line)
+
+                for field, parts in buckets.items():
+                    if parts and field not in result:
+                        result[field] = " ".join(parts)
+        except Exception:
+            pass
+
+    return result
+
+
 @dataclass(frozen=True)
 class WaitResult:
     selector: str
@@ -395,18 +493,28 @@ class PlaywrightJobSource:
             description = await first_text(page, self.config.description_selectors)
             if looks_like_non_job_page(title, description, url):
                 return {}
-            domain = classify_text_domain(f"{title} {description}").primary_domain
-            skills = extract_skills(description, domain_hint=domain)
+            # Extract named sections (responsabilidades / requisitos) from the same
+            # page visit — no extra HTTP requests.
+            sections = await extract_named_sections(page)
+            responsabilidades = sections.get("responsabilidades", "")
+            requisitos = sections.get("requisitos", "")
+            # Build full text for domain classification and skill extraction:
+            # title + full description body + named sections (de-duplicated by concat)
+            full_text = " ".join(filter(None, [title, description, responsabilidades, requisitos]))
+            domain = classify_text_domain(full_text).primary_domain
+            skills = extract_skills(full_text, domain_hint=domain)
             job = {
                 "portal": self.config.portal,
                 "titulo": title,
                 "titulo_normalizado": normalize_role(title),
                 "empresa": company,
                 "ciudad": city,
-                "modalidad": self._detect_modality(description),
-                "salario": self._detect_salary(description),
+                "modalidad": self._detect_modality(full_text),
+                "salario": self._detect_salary(full_text),
                 "descripcion": description,
-                "seniority": self._detect_seniority(f"{title} {description}"),
+                "responsabilidades": responsabilidades,
+                "requisitos": requisitos,
+                "seniority": self._detect_seniority(full_text),
                 "sector": "",
                 "dominio": domain,
                 "fecha_publicacion": None,

@@ -712,7 +712,11 @@ def load_jobs(conn) -> List[JobProfile]:
                 e.id::text                                          AS job_id,
                 COALESCE(e.titulo, '')                              AS title,
                 COALESCE(e.empresa, '')                             AS company,
-                COALESCE(e.descripcion, '')                         AS description,
+                TRIM(
+                    COALESCE(e.descripcion, '') || ' ' ||
+                    COALESCE(e.responsabilidades, '') || ' ' ||
+                    COALESCE(e.requisitos, '')
+                )                                                   AS description,
                 COALESCE(
                     NULLIF(es.skill_normalized, ''),
                     NULLIF(es.skill_original, '')
@@ -728,9 +732,11 @@ def load_jobs(conn) -> List[JobProfile]:
                 j.id::text                              AS job_id,
                 COALESCE(j.title, '')                   AS title,
                 COALESCE(j.company, '')                 AS company,
-                TRIM(COALESCE(j.description, '') || ' ' ||
-                     COALESCE(j.responsibilities, '') || ' ' ||
-                     COALESCE(j.requirements, ''))      AS description,
+                TRIM(
+                    COALESCE(j.description, '') || ' ' ||
+                    COALESCE(j.responsibilities, '') || ' ' ||
+                    COALESCE(j.requirements, '')
+                )                                       AS description,
                 COALESCE(js.canonical_skill, '')        AS skill_name
             FROM jobs j
             LEFT JOIN job_skills js ON js.job_id = j.id
