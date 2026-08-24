@@ -41,6 +41,19 @@ CONFIG = SourceConfig(
         "[class*='ciudad']",
         "[class*='ubicacion']",
     ),
+    # Magneto detail pages are React-rendered. Try Magneto-specific containers
+    # before falling back to generic selectors.
+    description_selectors=(
+        "[class*='VacancyDetail']",
+        "[class*='vacancy-detail']",
+        "[class*='job-detail']",
+        "[data-testid*='description']",
+        "[data-testid*='detail']",
+        "[class*='description']",
+        "[class*='descripcion']",
+        "main",
+        "article",
+    ),
 )
 
 

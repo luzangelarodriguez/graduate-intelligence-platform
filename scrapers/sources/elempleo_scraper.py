@@ -12,6 +12,23 @@ CONFIG = SourceConfig(
         "a[href*='ofertas-trabajo']",
         "article a[href]",
     ),
+    # Elempleo detail pages are React-rendered; the description lives in a
+    # named container that appears after hydration. Try specific selectors
+    # before falling back to generic ones.
+    description_selectors=(
+        "[class*='DescripcionCargo']",
+        "[class*='descripcion-cargo']",
+        "[class*='job-detail']",
+        "[class*='oferta-detalle']",
+        "[class*='content-offer']",
+        "[class*='detalle-oferta']",
+        "[id*='descripcionCargo']",
+        "[id*='job-description']",
+        "[class*='description']",
+        "[class*='descripcion']",
+        "main",
+        "article",
+    ),
     headless_override=False,
     max_runtime_seconds=300,
     max_detail_attempts=50,

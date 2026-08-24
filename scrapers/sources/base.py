@@ -486,11 +486,36 @@ class PlaywrightJobSource:
         try:
             await page.wait_for_timeout(random.randint(300, 900))
             await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-            await page.wait_for_timeout(3000)
+            # Wait for the description element to be rendered (JS-heavy portals like
+            # Elempleo render content after React hydration). Try each selector;
+            # fall back to a 4s timeout if none appear within 6s.
+            description_appeared = False
+            for sel in self.config.description_selectors:
+                try:
+                    await page.wait_for_selector(sel, state="attached", timeout=6000)
+                    description_appeared = True
+                    break
+                except PlaywrightTimeoutError:
+                    continue
+                except Exception:
+                    continue
+            if not description_appeared:
+                await page.wait_for_timeout(4000)
             title = await first_text(page, self.config.title_selectors)
             company = await first_text(page, self.config.company_selectors)
             city = await first_text(page, self.config.city_selectors)
-            description = await first_text(page, self.config.description_selectors)
+            # Use a longer timeout for description (JS-rendered pages need more time)
+            description = ""
+            for sel in self.config.description_selectors:
+                try:
+                    locator = page.locator(sel).first
+                    if await locator.count():
+                        text = (await locator.inner_text(timeout=4000)).strip()
+                        if text and len(text) > 20:
+                            description = re.sub(r"\s+", " ", text)
+                            break
+                except Exception:
+                    continue
             if looks_like_non_job_page(title, description, url):
                 return {}
             # Extract named sections (responsabilidades / requisitos) from the same
