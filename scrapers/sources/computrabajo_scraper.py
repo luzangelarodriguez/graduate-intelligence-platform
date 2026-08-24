@@ -94,6 +94,7 @@ def _fetch_detail(session: requests.Session, url: str) -> dict[str, str]:
     try:
         resp = session.get(url, timeout=_SESSION_TIMEOUT)
         if resp.status_code != 200:
+            logger.debug("Computrabajo detail HTTP %s — %s", resp.status_code, url)
             return empty
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(resp.text, "html.parser")
@@ -111,6 +112,11 @@ def _fetch_detail(session: requests.Session, url: str) -> dict[str, str]:
                 break
 
         if not container:
+            logger.debug(
+                "Computrabajo detail: ningún selector de contenedor matcheó en %s "
+                "(HTML len=%d, primeros 500 chars: %r)",
+                url, len(resp.text), resp.text[:500],
+            )
             return empty
 
         full_text = _clean(container.get_text(" "))
