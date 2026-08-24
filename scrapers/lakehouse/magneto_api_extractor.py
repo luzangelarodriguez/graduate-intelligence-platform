@@ -13,6 +13,7 @@ from typing import Any
 from urllib.parse import quote_plus
 
 import psycopg2
+import re
 import requests
 from psycopg2.extras import Json, RealDictCursor, execute_values
 
@@ -278,11 +279,21 @@ def normalize_record(record: dict[str, Any], run_id: str, bronze_payload_id: int
     return job
 
 
+_FRAUD_WARNING_RE = re.compile(
+    r"ten\s+cuidado|fraude|aviso\s+de\s+seguridad|alerta\s+de\s+fraude"
+    r"|phishing|estafa|no\s+pagues|nunca\s+pagues",
+    re.IGNORECASE,
+)
+
+
 def is_real_job_evidence(job: dict[str, Any]) -> bool:
     title = (job.get("titulo") or "").strip().casefold()
     url = (job.get("url") or "").casefold()
     description_words = len((job.get("descripcion") or "").split())
     if not title:
+        return False
+    # Platform UI elements / security notices are not real vacancies
+    if _FRAUD_WARNING_RE.search(job.get("titulo") or ""):
         return False
     if title.startswith("trabajos en ") or title.startswith("empleos en "):
         return False

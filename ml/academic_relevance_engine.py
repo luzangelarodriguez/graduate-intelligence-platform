@@ -415,6 +415,22 @@ SKILLS_LOOKUP: List[str] = [
     "scrum", "agile", "kanban", "jira", "confluence", "trello",
     "gestion de proyectos", "project management",
     "metodologias agiles",
+    # --- Project Management (PM domain) ---
+    "project manager", "gerente de proyectos", "director de proyectos",
+    "coordinador de proyectos", "lider de proyectos",
+    "pmo", "oficina de proyectos", "scrum master", "agile coach",
+    "pmbok", "pmp", "prince2", "ipma", "iso 21500",
+    "ms project", "microsoft project",
+    "valor ganado", "earned value",
+    "gestion de riesgos", "riesgo proyecto",
+    "cronograma", "planificacion de proyectos",
+    "presupuesto de proyecto", "alcance del proyecto",
+    "acta de constitucion", "caso de negocio",
+    "interesados", "stakeholders",
+    "control de cambios", "gestion de cambios",
+    "ciclo de vida del proyecto", "entregables",
+    "gestion de recursos", "recursos del proyecto",
+    "bizagi", "bpms", "gestion por procesos",
     # --- Security ---
     "ciberseguridad", "cybersecurity",
     "siem", "soc", "pentest", "seguridad informatica",
@@ -737,17 +753,31 @@ def load_jobs(conn) -> List[JobProfile]:
         """)
         rows = cur.fetchall()
 
+    # Patterns that indicate a UI element / platform notice, not a real vacancy.
+    _NON_JOB_TITLE_RE = re.compile(
+        r"ten\s+cuidado|fraude|aviso\s+de\s+seguridad|alerta\s+de\s+fraude"
+        r"|phishing|estafa|no\s+pagues|nunca\s+pagues"
+        r"|politica\s+de\s+privacidad|terminos\s+y\s+condiciones"
+        r"|boletin|newsletter|suscribete",
+        re.IGNORECASE,
+    )
+
     profiles: List[JobProfile] = []
     n_from_db = 0
     n_from_text = 0
+    n_filtered = 0
     for row in rows:
+        title_raw = row["title"] or ""
+        if _NON_JOB_TITLE_RE.search(title_raw):
+            n_filtered += 1
+            continue
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
         # Use full description (up to 3000 chars) so inline keyword extraction
         # covers complete job postings from Elempleo, even when empleo_skills
         # is empty or has ID-mismatch issues.
         raw_desc = (row["description"] or "")[:3000]
         text = " ".join(filter(None, [
-            row["title"],
+            title_raw,
             raw_desc,
             " ".join(db_skills),
         ]))[:3500]
@@ -757,10 +787,10 @@ def load_jobs(conn) -> List[JobProfile]:
         text_skills = extract_skills_from_text(text)
         skills = sorted(set(db_skills) | set(text_skills))
         # Debug: log extraction results for jobs whose title contains "big data"
-        if "big data" in (row["title"] or "").lower():
+        if "big data" in title_raw.lower():
             logger.info(
                 "[SKILLS-TEST] titulo=%r  text_len=%d  db_skills=%s  extracted=%s",
-                row["title"], len(raw_desc), db_skills, text_skills,
+                title_raw, len(raw_desc), db_skills, text_skills,
             )
         if db_skills:
             n_from_db += 1
@@ -777,6 +807,8 @@ def load_jobs(conn) -> List[JobProfile]:
             skill_tokens=skill_tokens,
         ))
 
+    if n_filtered:
+        logger.info("load_jobs: %d registros descartados como avisos/disclaimers (título no corresponde a vacante real)", n_filtered)
     logger.info(
         "load_jobs: %d empleos cargados  "
         "(con skills en DB: %d  |  solo extracción de texto: %d  |  sin skills: %d)",
