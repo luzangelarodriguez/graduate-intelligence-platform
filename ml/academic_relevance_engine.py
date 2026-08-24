@@ -322,21 +322,25 @@ def _infer_domain(text: str, program_name: str = "") -> str:
 # Domains that are considered compatible with each other even when not equal.
 # E.g. "datos" programs are relevant for "software" jobs and vice-versa.
 _COMPATIBLE_DOMAINS: Dict[str, set] = {
-    "datos":    {"datos", "software", "general"},
-    "software": {"software", "datos", "general"},
-    "gestion":  {"gestion", "general"},
-    "seguridad":{"seguridad", "general"},
-    "redes":    {"redes", "general"},
-    "criminologia": {"criminologia", "general"},
-    "education":    {"education", "general"},
-    "finanzas": {"finanzas", "general"},
-    "project_management": {"project_management", "gestion", "general"},
-    "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
+    # "general" is intentionally absent from every specific domain's set.
+    # Unclassified jobs (domain="general") reach specific programs only through the
+    # skill-evidence bypass in match_jobs_to_programs — not via this table.
+    "datos":    {"datos", "software"},
+    "software": {"software", "datos"},
+    "gestion":  {"gestion"},
+    "seguridad":{"seguridad", "redes"},
+    "redes":    {"redes", "seguridad"},
+    "criminologia": {"criminologia"},
+    "education":    {"education"},
+    "finanzas": {"finanzas"},
+    "project_management": {"project_management", "gestion"},
+    "general":  {"general"},   # no longer a wildcard
 }
 
 
 def _domains_compatible(d1: str, d2: str) -> bool:
-    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1, "general"})
+    # Unknown domains default to only being compatible with themselves.
+    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1})
 
 
 # ---------------------------------------------------------------------------
@@ -937,6 +941,22 @@ def run_matching(
         for j_idx, job in enumerate(jobs):
             # --- Domain filter (OBLIGATORIO) ---
             domain_ok = _domains_compatible(prog.domain, job.domain)
+            # Bypass for domain="general" jobs: admit them when they share at least
+            # GENERAL_SKILL_BYPASS_MIN skills with the program curriculum.
+            # This avoids noise (unrelated jobs whose domain the classifier couldn't
+            # determine) while preserving genuinely cross-domain roles that have real
+            # skill overlap with the program (e.g. "Director de área" with PM skills).
+            # N=2 requires two independent skill signals → strong evidence of relevance
+            # without being so strict that thin microcurriculums never get bypass matches.
+            _GENERAL_SKILL_BYPASS_MIN = 2
+            if domain_filter and not domain_ok and job.domain == "general" and prog.skills and job.skills:
+                n_common_quick = len(set(prog.skills) & set(job.skills))
+                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN:
+                    domain_ok = True
+                    logger.debug(
+                        "[DOMAIN-BYPASS] prog='%s' ← job='%s' (general, %d skills comunes)",
+                        prog.program_name[:40], job.title[:40], n_common_quick,
+                    )
             if domain_filter and not domain_ok:
                 if not _debug_done and prog.skills:
                     logger.info(
