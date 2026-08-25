@@ -333,7 +333,13 @@ def program_skill_profile(name: str, faculty: str) -> List[str]:
     elif "revisoria fiscal" in title:
         extend_unique(skills, ["Finance", "Compliance", "Evaluation", "Data Modeling"])
     elif "direccion y gestion de proyectos" in title:
-        extend_unique(skills, ["Project Management", "Agile", "Leadership", "Communication"])
+        extend_unique(skills, [
+            "gerente de proyectos", "director de proyectos", "coordinador de proyectos",
+            "PMO", "scrum master", "agile coach", "lider de proyectos",
+            "PMBOK", "PMP", "PRINCE2", "Agile", "Scrum", "Kanban", "Lean",
+            "gestion de riesgos", "cronograma", "planificacion de proyectos",
+            "stakeholders", "entregables", "Project Management",
+        ])
     elif "ingenieria de software" in title or "ingenieria informatica" in title:
         extend_unique(skills, ["Python", "APIs", "Git", "Testing", "Cloud", "Agile"])
     elif "inteligencia artificial" in title:
@@ -424,9 +430,10 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
     except Exception:
         return None
     try:
-        # id >= 80: low ids are mojibake duplicates from initial import.
-        # detected_domain lives in microcurriculos, not especializaciones —
-        # use DISTINCT ON to get one row per especialización.
+        # Include programs that have a microcurriculo registered OR that have
+        # an explicit nombre (avoids mojibake-duplicate rows that have NULL/empty
+        # nombres from the initial bulk import).  The old `id >= 80` filter was
+        # too broad and excluded intentionally-registered low-id programs like PM.
         rows = fetch_all(
             """
             SELECT
@@ -438,8 +445,7 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
                 COALESCE(e.plan_estudios, '')  AS plan_estudios,
                 COALESCE(e.campo_laboral, '')  AS campo_laboral
             FROM especializaciones e
-            LEFT JOIN microcurriculos m ON m.specialization_id = e.id
-            WHERE e.id >= 80
+            WHERE e.nombre IS NOT NULL AND TRIM(e.nombre) <> ''
             ORDER BY e.id
             """
         )
@@ -470,7 +476,7 @@ def _fetch_db_programs() -> List[Dict[str, Any]] | None:
             FROM especializaciones e
             JOIN microcurriculos m  ON m.specialization_id  = e.id
             JOIN microcurriculo_skills ms ON ms.microcurriculo_id = m.id
-            WHERE e.id >= 80
+            WHERE e.nombre IS NOT NULL AND TRIM(e.nombre) <> ''
               AND COALESCE(NULLIF(ms.skill_normalized, ''),
                            NULLIF(ms.skill_original,   '')) IS NOT NULL
             ORDER BY ms.confidence_score DESC
@@ -621,7 +627,13 @@ def clean_program_skill_profile(name: str, faculty: str) -> List[str]:
     elif "revisoria fiscal" in title:
         extend_unique(skills, ["Finance", "Compliance", "Evaluation", "Data Modeling"])
     elif "direccion y gestion de proyectos" in title:
-        extend_unique(skills, ["Project Management", "Agile", "Leadership", "Communication"])
+        extend_unique(skills, [
+            "gerente de proyectos", "director de proyectos", "coordinador de proyectos",
+            "PMO", "scrum master", "agile coach", "lider de proyectos",
+            "PMBOK", "PMP", "PRINCE2", "Agile", "Scrum", "Kanban", "Lean",
+            "gestion de riesgos", "cronograma", "planificacion de proyectos",
+            "stakeholders", "entregables", "Project Management",
+        ])
     elif "ingenieria de software" in title or "ingenieria informatica" in title:
         extend_unique(skills, ["Python", "APIs", "Git", "Testing", "Cloud", "Agile"])
     elif "inteligencia artificial" in title:
