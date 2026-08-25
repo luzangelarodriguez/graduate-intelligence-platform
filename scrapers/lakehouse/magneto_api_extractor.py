@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import os
+import re
 import sys
 import uuid
 from datetime import date, datetime, timezone
@@ -30,6 +31,12 @@ from scrapers.normalization.normalize_skills import extract_skills_with_rejectio
 
 SOURCE = "magneto_api"
 BASE_URL = "https://api.magneto365.com"
+
+_FRAUD_WARNING_RE = re.compile(
+    r"ten\s+cuidado|fraude|aviso\s+de\s+seguridad|alerta\s+de\s+fraude"
+    r"|phishing|estafa|no\s+pagues|nunca\s+pagues",
+    re.IGNORECASE,
+)
 
 
 def get_connection() -> psycopg2.extensions.connection:
@@ -283,6 +290,8 @@ def is_real_job_evidence(job: dict[str, Any]) -> bool:
     url = (job.get("url") or "").casefold()
     description_words = len((job.get("descripcion") or "").split())
     if not title:
+        return False
+    if _FRAUD_WARNING_RE.search(job.get("titulo") or ""):
         return False
     if title.startswith("trabajos en ") or title.startswith("empleos en "):
         return False
