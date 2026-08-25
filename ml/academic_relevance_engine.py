@@ -322,21 +322,23 @@ def _infer_domain(text: str, program_name: str = "") -> str:
 # Domains that are considered compatible with each other even when not equal.
 # E.g. "datos" programs are relevant for "software" jobs and vice-versa.
 _COMPATIBLE_DOMAINS: Dict[str, set] = {
-    "datos":    {"datos", "software", "general"},
-    "software": {"software", "datos", "general"},
-    "gestion":  {"gestion", "general"},
-    "seguridad":{"seguridad", "general"},
-    "redes":    {"redes", "general"},
-    "criminologia": {"criminologia", "general"},
-    "education":    {"education", "general"},
-    "finanzas": {"finanzas", "general"},
-    "project_management": {"project_management", "gestion", "general"},
-    "general":  set(_DOMAIN_BUCKETS.keys()) | {"general"},
+    "datos":    {"datos", "software"},
+    "software": {"software", "datos"},
+    "gestion":  {"gestion"},
+    "seguridad":{"seguridad", "redes"},
+    "redes":    {"redes", "seguridad"},
+    "criminologia": {"criminologia"},
+    "education":    {"education"},
+    "finanzas": {"finanzas"},
+    "project_management": {"project_management", "gestion"},
+    "general":  {"general"},
 }
+
+_GENERAL_SKILL_BYPASS_MIN = 2
 
 
 def _domains_compatible(d1: str, d2: str) -> bool:
-    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1, "general"})
+    return d2 in _COMPATIBLE_DOMAINS.get(d1, {d1})
 
 
 # ---------------------------------------------------------------------------
@@ -346,6 +348,14 @@ def _domains_compatible(d1: str, d2: str) -> bool:
 # All terms are stored in their NORMALISED form (lowercase ASCII, no accents).
 # _normalize() is applied to both the lookup terms and the input text, so
 # accent/case differences between DB text and the lookup list are irrelevant.
+_NON_JOB_TITLE_RE = re.compile(
+    r"ten\s+cuidado|fraude|aviso\s+de\s+seguridad|alerta\s+de\s+fraude"
+    r"|phishing|estafa|no\s+pagues|nunca\s+pagues"
+    r"|politica\s+de\s+privacidad|terminos\s+y\s+condiciones"
+    r"|boletin|newsletter|suscribete",
+    re.IGNORECASE,
+)
+
 SKILLS_LOOKUP: List[str] = [
     # --- Programming languages ---
     "python", "sql", "java", "javascript", "typescript",
@@ -490,6 +500,22 @@ SKILLS_LOOKUP: List[str] = [
     "excel avanzado", "tablas dinamicas", "pivot",
     "presentaciones ejecutivas", "storytelling con datos",
     "sql avanzado", "pl/sql", "t-sql",
+    # --- Project Management ---
+    "project manager", "gerente de proyectos", "director de proyectos",
+    "coordinador de proyectos", "lider de proyectos",
+    "pmo", "oficina de proyectos", "scrum master", "agile coach",
+    "pmbok", "pmp", "prince2", "ipma", "iso 21500",
+    "ms project", "microsoft project",
+    "valor ganado", "earned value",
+    "gestion de riesgos", "riesgo proyecto",
+    "cronograma", "planificacion de proyectos",
+    "presupuesto de proyecto", "alcance del proyecto",
+    "acta de constitucion", "caso de negocio",
+    "interesados", "stakeholders",
+    "control de cambios", "gestion de cambios",
+    "ciclo de vida del proyecto", "entregables",
+    "gestion de recursos", "recursos del proyecto",
+    "bizagi", "bpms", "gestion por procesos",
 ]
 
 # Single-character and noise tokens that must never be treated as skills.
@@ -692,7 +718,11 @@ def load_jobs(conn) -> List[JobProfile]:
                 e.id::text                                          AS job_id,
                 COALESCE(e.titulo, '')                              AS title,
                 COALESCE(e.empresa, '')                             AS company,
-                COALESCE(e.descripcion, '')                         AS description,
+                TRIM(
+                    COALESCE(e.descripcion, '') || ' ' ||
+                    COALESCE(e.responsabilidades, '') || ' ' ||
+                    COALESCE(e.requisitos, '')
+                )                                                   AS description,
                 COALESCE(
                     NULLIF(es.skill_normalized, ''),
                     NULLIF(es.skill_original, '')
@@ -736,7 +766,12 @@ def load_jobs(conn) -> List[JobProfile]:
     profiles: List[JobProfile] = []
     n_from_db = 0
     n_from_text = 0
+    n_filtered = 0
     for row in rows:
+        title_raw = row["title"] or ""
+        if _NON_JOB_TITLE_RE.search(title_raw):
+            n_filtered += 1
+            continue
         db_skills = [_normalize(s) for s in (row["db_skills"] or []) if s]
         # Use full description (up to 3000 chars) so inline keyword extraction
         # covers complete job postings from Elempleo, even when empleo_skills
@@ -775,9 +810,9 @@ def load_jobs(conn) -> List[JobProfile]:
 
     logger.info(
         "load_jobs: %d empleos cargados  "
-        "(con skills en DB: %d  |  solo extracción de texto: %d  |  sin skills: %d)",
+        "(con skills en DB: %d  |  solo extracción de texto: %d  |  sin skills: %d  |  filtrados: %d)",
         len(profiles), n_from_db, n_from_text,
-        len(profiles) - n_from_db - n_from_text,
+        len(profiles) - n_from_db - n_from_text, n_filtered,
     )
     # Debug: show first 3 jobs with their skill counts
     for j in profiles[:3]:
@@ -937,6 +972,14 @@ def run_matching(
         for j_idx, job in enumerate(jobs):
             # --- Domain filter (OBLIGATORIO) ---
             domain_ok = _domains_compatible(prog.domain, job.domain)
+            if domain_filter and not domain_ok and job.domain == "general" and prog.skills and job.skills:
+                n_common_quick = len(set(prog.skills) & set(job.skills))
+                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN:
+                    domain_ok = True
+                    logger.debug(
+                        "[DOMAIN-BYPASS] prog='%s' ← job='%s' (general, %d skills comunes)",
+                        prog.program_name, job.title, n_common_quick,
+                    )
             if domain_filter and not domain_ok:
                 if not _debug_done and prog.skills:
                     logger.info(

@@ -69,26 +69,85 @@ def _normalize_role(title: str) -> str:
     return normalize_role(title)
 
 
-def _fetch_detail(session: requests.Session, url: str) -> str:
-    """Fetch job detail page and return description text."""
+_SECTION_HEADER_RE = re.compile(
+    r"^(responsabilidades|funciones|actividades\s+a\s+realizar|"
+    r"descripci[oó]n\s+del\s+cargo|qu[eé]\s+har[aá]s|"
+    r"requisitos|perfil\s+requerido|perfil\s+del\s+candidato|"
+    r"lo\s+que\s+buscamos|conocimientos\s+requeridos|"
+    r"habilidades\s+y\s+conocimientos|experiencia\s+requerida)[:\s]*$",
+    re.IGNORECASE,
+)
+_RESPONSABILIDADES_RE = re.compile(
+    r"responsabilidades|funciones|actividades|descripci[oó]n\s+del\s+cargo|qu[eé]\s+har[aá]s",
+    re.IGNORECASE,
+)
+_REQUISITOS_RE = re.compile(
+    r"requisitos|perfil\s+requerido|perfil\s+del|lo\s+que\s+buscamos|"
+    r"conocimientos\s+requeridos|habilidades\s+y\s+conocimientos|experiencia\s+requerida",
+    re.IGNORECASE,
+)
+
+
+def _fetch_detail(session: requests.Session, url: str) -> dict[str, str]:
+    """Fetch job detail page and return dict with description, responsabilidades, requisitos."""
+    empty: dict[str, str] = {"descripcion": "", "responsabilidades": "", "requisitos": ""}
     try:
         resp = session.get(url, timeout=_SESSION_TIMEOUT)
         if resp.status_code != 200:
-            return ""
+            logger.debug("Computrabajo detail HTTP %s — %s", resp.status_code, url)
+            return empty
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(resp.text, "html.parser")
-        for sel in (
-            "[class*='offer-description']",
-            "[class*='job-description']",
-            "[id*='offer-description']",
-            "section.box_content",
-        ):
-            el = soup.select_one(sel)
-            if el:
-                return _clean(el.get_text(" "))
+
+        # Computrabajo uses utility classes; container is <main class="detail_fs">
+        container = soup.select_one("main.detail_fs")
+        if not container:
+            container = soup.select_one("main") or soup.select_one("div.box_detail")
+
+        if not container:
+            logger.debug(
+                "Computrabajo detail: ningún selector de contenedor matcheó en %s "
+                "(HTML len=%d, primeros 500 chars: %r)",
+                url, len(resp.text), resp.text[:500],
+            )
+            return empty
+
+        # Use div.box_detail blocks to skip nav text that precedes the job body
+        body_divs = container.select("div.box_detail")
+        if body_divs:
+            full_text = _clean(" ".join(_clean(d.get_text(" ")) for d in body_divs))
+        else:
+            full_text = _clean(container.get_text(" "))
+
+        # Split into named sections by scanning heading/bold elements
+        responsabilidades_parts: list[str] = []
+        requisitos_parts: list[str] = []
+        current_section: str | None = None
+
+        for el in container.find_all(["h1", "h2", "h3", "h4", "strong", "b", "p", "li"]):
+            text = _clean(el.get_text(" "))
+            if not text:
+                continue
+            if _SECTION_HEADER_RE.match(text) or (len(text) < 80 and _SECTION_HEADER_RE.search(text)):
+                if _RESPONSABILIDADES_RE.search(text):
+                    current_section = "responsabilidades"
+                elif _REQUISITOS_RE.search(text):
+                    current_section = "requisitos"
+                continue
+            if current_section and el.name not in ("h1", "h2", "h3", "h4"):
+                if current_section == "responsabilidades":
+                    responsabilidades_parts.append(text)
+                else:
+                    requisitos_parts.append(text)
+
+        return {
+            "descripcion": full_text,
+            "responsabilidades": " ".join(responsabilidades_parts),
+            "requisitos": " ".join(requisitos_parts),
+        }
     except Exception:
         pass
-    return ""
+    return empty
 
 
 def scrape_jobs(
@@ -159,7 +218,13 @@ def scrape_jobs(
                 title    = _clean(title_el.get_text() if title_el else
                                   card.get("title") or "")
                 # Company
-                comp_el  = card.select_one("[class*='company'], [class*='empresa'], [itemprop='hiringOrganization']")
+                comp_el  = (
+                    card.select_one("[itemprop='hiringOrganization']")
+                    or card.select_one("a[href*='/empresa/']")
+                    or card.select_one("[class*='company']")
+                    or card.select_one("[class*='empresa']")
+                    or card.select_one("p.fs16")
+                )
                 company  = _clean(comp_el.get_text() if comp_el else "")
                 # Location
                 loc_el   = card.select_one("[class*='location'], [class*='ciudad'], [itemprop='jobLocation']")
@@ -172,14 +237,31 @@ def scrape_jobs(
                 if not title:
                     continue
 
-                # Fetch description (limited attempts to stay within runtime)
-                description = ""
+                # Fetch description and named sections
+                detail: dict[str, str] = {"descripcion": "", "responsabilidades": "", "requisitos": ""}
                 if full_url and detail_attempts < 15:
-                    description = _fetch_detail(session, full_url)
+                    detail = _fetch_detail(session, full_url)
                     detail_attempts += 1
                     time.sleep(0.3)
 
-                domain, skills = _classify(title, description)
+                description     = detail["descripcion"]
+                responsabilidades = detail["responsabilidades"]
+                requisitos      = detail["requisitos"]
+                full_text = " ".join(filter(None, [title, description, responsabilidades, requisitos]))
+                domain, skills = _classify(title, full_text)
+
+                # Detect modality / salary from full text
+                low = full_text.casefold()
+                if "remoto" in low or "teletrabajo" in low:
+                    modalidad = "Remoto"
+                elif "hibrid" in low:
+                    modalidad = "Hibrido"
+                elif "presencial" in low:
+                    modalidad = "Presencial"
+                else:
+                    modalidad = ""
+                sal_match = re.search(r"(\$ ?[\d.,]+(?:\s*a\s*\$? ?[\d.,]+)?)", full_text)
+                salario = sal_match.group(1) if sal_match else ""
 
                 jobs.append({
                     "portal":             "computrabajo",
@@ -187,15 +269,17 @@ def scrape_jobs(
                     "titulo_normalizado": _normalize_role(title),
                     "empresa":            company,
                     "ciudad":             location_text,
-                    "modalidad":          "",
-                    "salario":            "",
+                    "modalidad":          modalidad,
+                    "salario":            salario,
                     "descripcion":        description,
+                    "responsabilidades":  responsabilidades,
+                    "requisitos":         requisitos,
                     "seniority":          "",
                     "sector":             "",
                     "dominio":            domain,
                     "fecha_publicacion":  None,
                     "url":                full_url,
-                    "skills_empleo":      skills,
+                    "skills":             skills,
                 })
             except Exception as exc:
                 logger.debug("Computrabajo card error: %s", exc)
