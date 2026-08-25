@@ -240,6 +240,18 @@ def _build_insert_payload(
         # fingerprint = same as content_hash for our purposes
         payload["fingerprint"] = job_hash
 
+    for db_col, scraper_keys in [
+        ("responsibilities", ("responsabilidades", "responsibilities")),
+        ("requirements",     ("requisitos", "requirements")),
+        ("modalidad",        ("modalidad",)),
+        ("salario",          ("salario",)),
+        ("seniority",        ("seniority",)),
+    ]:
+        if db_col in cols:
+            val = pick(db_col, *scraper_keys)
+            if val:
+                payload[db_col] = val
+
     return payload
 
 

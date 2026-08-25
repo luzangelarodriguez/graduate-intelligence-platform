@@ -159,6 +159,16 @@ def extract_skills(text: str) -> dict[str, list[str]]:
 
 # ── docx helpers ───────────────────────────────────────────────────────────────
 
+def _doc_full_text(doc) -> str:
+    """Extract all text from a docx, including table cells."""
+    parts = [p.text for p in doc.paragraphs]
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                parts.append(cell.text)
+    return "\n".join(parts)
+
+
 def _cell(table, row: int, col: int = 0) -> str:
     try:
         return table.rows[row].cells[col].text.strip()
@@ -236,7 +246,7 @@ def parse_standard_docx(path: Path) -> dict[str, Any] | None:
         if re.match(r"^Tema\s+\d", line, re.I):
             temas.append(line)
 
-    full_text = "\n".join([descripcion, resultados_text, contenido_tematico, medios_text])
+    full_text = "\n".join([descripcion, resultados_text, contenido_tematico, medios_text, _doc_full_text(doc)])
     skills = extract_skills(full_text)
 
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
@@ -294,8 +304,8 @@ def parse_criminologia_docx(path: Path) -> list[dict[str, Any]]:
         if first.startswith("RA") and current:
             asig_ras[current].append(first[:300])
 
-    # Program-level skills (from all paragraph text)
-    full_text = "\n".join(p.text for p in doc.paragraphs)
+    # Program-level skills (from all paragraph and table text)
+    full_text = _doc_full_text(doc)
     skills = extract_skills(full_text)
     doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
 
