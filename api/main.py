@@ -565,6 +565,33 @@ def related_universities(program_id: int) -> dict[str, Any]:
                        OR m.nombre_programa ILIKE '%forense%'
                        OR m.nombre_programa ILIKE '%criminalistica%'
                        OR m.nombre_programa ILIKE '%seguridad ciudadana%')""",
+            9: """WHERE (
+                    m.nombre_programa ILIKE '%gerencia de proyecto%'
+                 OR m.nombre_programa ILIKE '%gesti_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%direcci_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%direcci_n y gesti_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%formulaci_n y evaluaci_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%evaluaci_n y gerencia de proyecto%'
+                 OR m.nombre_programa ILIKE '%project management%'
+                 OR m.nombre_programa ILIKE '%pmo%'
+                 OR m.nombre_programa ILIKE '%scrum%'
+               )
+               AND m.nombre_programa NOT ILIKE '%construcci_n%'
+               AND m.nombre_programa NOT ILIKE '%agropecuari%'
+               AND m.nombre_programa NOT ILIKE '%telecomunicaciones%'
+               AND m.nombre_programa NOT ILIKE '%ambiental%'
+               AND m.nombre_programa NOT ILIKE '%socio%'
+               AND m.nombre_programa NOT ILIKE '%multimedial%'
+               AND m.nombre_programa NOT ILIKE '%audiovisual%'
+               AND m.nombre_programa NOT ILIKE '%bim%'
+               AND m.nombre_programa NOT ILIKE '%tur_stic%'
+               AND m.nombre_programa NOT ILIKE '%creativ%'
+               AND m.nombre_programa NOT ILIKE '%ingenier_a%'
+               AND m.nombre_programa NOT ILIKE '%cooperaci_n internacional%'
+               AND m.nombre_programa NOT ILIKE '%estatal%'
+               AND m.nombre_programa NOT ILIKE '%inform_tica%'
+               AND m.nombre_programa NOT ILIKE '%inteligencia de negocio%'
+               AND m.nombre_programa NOT ILIKE '%desarrollo%'""",
         }
         where = PROGRAM_WHERE.get(program_id)
         if not where:
