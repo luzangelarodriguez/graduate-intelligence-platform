@@ -89,8 +89,7 @@ const PROGRAMS = [
   { id: 92,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
   { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
-  // TODO: replace id 0 with the real DB id returned by the registration script (Paso 1)
-  { id: 0,   label: 'Dirección y Gestión de Proyectos', nombre: 'Especialización en Dirección y Gestión de Proyectos', creditos: 24, duracion: '2', periodicidad: 'Semestral' },
+  { id: 9,   label: 'Dirección y Gestión de Proyectos', nombre: 'Especialización en Dirección y Gestión de Proyectos', creditos: 24, duracion: '2', periodicidad: 'Semestral' },
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
@@ -115,7 +114,7 @@ const FALLBACK: Summary = {
     { id: 94,  nombre: 'Visual Analytics and Big Data',   matches_total: 31, score_promedio: 68.5, score_maximo: 85.1, labels: { high: 14, medium: 12, low: 5 } },
     { id: 108, nombre: 'Especialización en Criminología', matches_total: 22, score_promedio: 52.3, score_maximo: 67.8, labels: { high: 4,  medium: 10, low: 8 } },
     { id: 20,  nombre: 'Neuropsicología y Educación',     matches_total: 0,  score_promedio: 0,    score_maximo: 0,    labels: { high: 0,  medium: 0,  low: 0 } },
-    { id: 0,   nombre: 'Dirección y Gestión de Proyectos', matches_total: 0, score_promedio: 0,    score_maximo: 0,    labels: { high: 0,  medium: 0,  low: 0 } },
+    { id: 9,   nombre: 'Dirección y Gestión de Proyectos', matches_total: 0, score_promedio: 0,    score_maximo: 0,    labels: { high: 0,  medium: 0,  low: 0 } },
   ],
   top_matches: [
     { programa: 'Visual Analytics', empleo: 'Data Scientist Senior', empresa: 'Bancolombia', score: 88.4, label: 'high', skills_en_comun: ['Python', 'Machine Learning', 'SQL'], skills_faltantes: ['Spark', 'Kafka'] },
@@ -187,7 +186,7 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
     exclusivas_programa: [{ skill: 'Criminología', cobertura: 4 }],
   },
   20: { program_id: 20, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], cobertura_pct: 0 },
-  0:  { program_id: 0, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [] },
+  9:  { program_id: 9, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [] },
 };
 
 // ─── Pertinencia scale ─────────────────────────────────────────────────────────
