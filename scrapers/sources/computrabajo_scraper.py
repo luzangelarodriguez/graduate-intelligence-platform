@@ -99,17 +99,13 @@ def _fetch_detail(session: requests.Session, url: str) -> dict[str, str]:
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        # Find the main description container
-        container = None
-        for sel in (
-            "[class*='offer-description']",
-            "[class*='job-description']",
-            "[id*='offer-description']",
-            "section.box_content",
-        ):
-            container = soup.select_one(sel)
-            if container:
-                break
+        # Find the main description container.
+        # Computrabajo uses utility classes (Tailwind-style); the detail page
+        # wraps content in <main class="detail_fs">.
+        container = soup.select_one("main.detail_fs")
+        if not container:
+            # Fallback: try any <main> or the first large <div>
+            container = soup.select_one("main") or soup.select_one("div.box_detail")
 
         if not container:
             logger.debug(
@@ -119,7 +115,14 @@ def _fetch_detail(session: requests.Session, url: str) -> dict[str, str]:
             )
             return empty
 
-        full_text = _clean(container.get_text(" "))
+        # Skip navigation/UI text that precedes the job body.
+        # Content lives inside div.box_detail elements after the <h1>.
+        body_divs = container.select("div.box_detail")
+        if body_divs:
+            # Use only div.box_detail blocks to skip nav text that precedes them
+            full_text = _clean(" ".join(_clean(d.get_text(" ")) for d in body_divs))
+        else:
+            full_text = _clean(container.get_text(" "))
 
         # Try to split into named sections by scanning heading/bold elements
         responsabilidades_parts: list[str] = []
@@ -221,8 +224,14 @@ def scrape_jobs(
                 title_el = card.select_one("h2 a, h3 a, [class*='title'] a, a[title]")
                 title    = _clean(title_el.get_text() if title_el else
                                   card.get("title") or "")
-                # Company
-                comp_el  = card.select_one("[class*='company'], [class*='empresa'], [itemprop='hiringOrganization']")
+                # Company — Computrabajo cards use utility classes; try several patterns
+                comp_el  = (
+                    card.select_one("[itemprop='hiringOrganization']")
+                    or card.select_one("a[href*='/empresa/']")
+                    or card.select_one("[class*='company']")
+                    or card.select_one("[class*='empresa']")
+                    or card.select_one("p.fs16")  # common text size for company name
+                )
                 company  = _clean(comp_el.get_text() if comp_el else "")
                 # Location
                 loc_el   = card.select_one("[class*='location'], [class*='ciudad'], [itemprop='jobLocation']")
