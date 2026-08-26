@@ -1127,24 +1127,33 @@ def persist_embeddings(
                 n_prog += 1
 
             # job_embeddings table is our own (not the production microcurriculo table)
-            # Only attempt if the table already exists — skip silently otherwise.
+            # job_id is stored as str in JobProfile (load_jobs casts to text) but the
+            # column is BIGINT — cast explicitly to avoid a type-mismatch error that
+            # the old bare `except` was silently swallowing after rollback+break.
+            n_job_errors = 0
             for j in jobs:
                 if j.embedding is None:
                     continue
+                cur.execute("SAVEPOINT sp_job_embed")
                 try:
                     cur.execute("""
                         INSERT INTO job_embeddings
                             (job_id, embedding_scope, model_version, embedding_vector)
-                        VALUES (%s, %s, %s, %s)
+                        VALUES (%s::bigint, %s, %s, %s::jsonb)
                         ON CONFLICT (job_id, embedding_scope, model_version) DO UPDATE
                             SET embedding_vector     = EXCLUDED.embedding_vector,
                                 embedding_created_at = now()
                     """, (j.job_id, "jobs", model,
-                          j.embedding.astype(np.float32).tolist()))
+                          json.dumps(j.embedding.astype(np.float32).tolist())))
+                    cur.execute("RELEASE SAVEPOINT sp_job_embed")
                     n_job += 1
-                except Exception:
-                    conn.rollback()
-                    break
+                except Exception as exc:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_job_embed")
+                    cur.execute("RELEASE SAVEPOINT sp_job_embed")
+                    logger.debug("persist_embeddings: job %s error: %s", j.job_id, exc)
+                    n_job_errors += 1
+            if n_job_errors:
+                logger.warning("persist_embeddings: %d empleos fallaron al persistir", n_job_errors)
 
         conn.commit()
         logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
