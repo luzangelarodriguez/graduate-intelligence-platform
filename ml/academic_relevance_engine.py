@@ -1131,19 +1131,16 @@ def persist_embeddings(
             for j in jobs:
                 if j.embedding is None:
                     continue
-                vec = j.embedding.astype(np.float32).tolist()
-                th = hashlib.md5(j.text.encode()).hexdigest()
                 try:
                     cur.execute("""
                         INSERT INTO job_embeddings
-                            (job_id, job_table, model_name, embedding, text_hash)
-                        VALUES (%s, %s, %s, %s, %s)
-                        ON CONFLICT (job_id, job_table, model_name) DO UPDATE
-                            SET embedding  = EXCLUDED.embedding,
-                                text_hash  = EXCLUDED.text_hash,
-                                created_at = now()
-                    """, (j.job_id, "jobs", model, psycopg2.Binary(
-                        j.embedding.astype(np.float32).tobytes()), th))
+                            (job_id, embedding_scope, model_version, embedding_vector)
+                        VALUES (%s, %s, %s, %s)
+                        ON CONFLICT (job_id, embedding_scope, model_version) DO UPDATE
+                            SET embedding_vector     = EXCLUDED.embedding_vector,
+                                embedding_created_at = now()
+                    """, (j.job_id, "jobs", model,
+                          j.embedding.astype(np.float32).tolist()))
                     n_job += 1
                 except Exception:
                     conn.rollback()
