@@ -563,7 +563,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           </p>
         </div>
         <span style={{ fontSize: 9, fontWeight: 800, border: '1px solid #D1D5DB', color: '#9CA3AF', borderRadius: 20, padding: '3px 10px', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
-          {prog.labels.high}↑ · {prog.labels.medium}→ · {prog.labels.low}↓
+          {prog?.labels?.high ?? 0}↑ · {prog?.labels?.medium ?? 0}→ · {prog?.labels?.low ?? 0}↓
         </span>
       </div>
 
