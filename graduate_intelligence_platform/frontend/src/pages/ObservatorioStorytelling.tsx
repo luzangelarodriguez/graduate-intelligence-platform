@@ -121,7 +121,7 @@ const FALLBACK: Summary = {
     { programa: 'Visual Analytics', empleo: 'Analista BI',           empresa: 'Rappi',       score: 85.1, label: 'high', skills_en_comun: ['Power BI', 'SQL'],                  skills_faltantes: ['dbt', 'Airflow'] },
     { programa: 'Visual Analytics', empleo: 'ML Engineer',           empresa: 'Mercado Libre', score: 83.7, label: 'high', skills_en_comun: ['TensorFlow', 'Python'],           skills_faltantes: ['Kubernetes'] },
   ],
-  totales: { matches: 91, alta: 36, media: 36, baja: 19 },
+  totales: { matches: 91, alta: 36, media: 36, baja: 19, empleos_compatibles: 3 },
 };
 
 const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
@@ -1590,7 +1590,7 @@ export default function ObservatorioStorytelling() {
       .catch(() => {
         const fb = { ...FALLBACK, programas: FALLBACK.programas.filter(p => p.id === programaId) };
         const prog = fb.programas[0];
-        if (prog) fb.totales = { matches: prog.matches_total, alta: prog.labels.high, media: prog.labels.medium, baja: prog.labels.low };
+        if (prog) fb.totales = { matches: prog.matches_total, alta: prog.labels.high, media: prog.labels.medium, baja: prog.labels.low, empleos_compatibles: 0 };
         setSummary(fb); setIsFallback(true); setLoading(false);
       });
   }, [programaId]);
