@@ -421,12 +421,19 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             "SELECT id, created_at FROM ml_training_runs "
             "WHERE task_name = 'program_job_match' ORDER BY id DESC LIMIT 1"
         )
+        # Fallback: if ml_training_runs has no matching row, derive run_id from
+        # the matches table directly so existing data is still served.
         if not run_row:
-            return {
-                "run_id": None, "fecha": None,
-                "programas": [], "top_matches": [], "skill_matches": [],
-                "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0, "empleos_compatibles": 0},
-            }
+            fallback_row = fetch_one(
+                "SELECT MAX(run_id) AS id FROM ml_program_job_matches"
+            )
+            if not fallback_row or not fallback_row.get("id"):
+                return {
+                    "run_id": None, "fecha": None,
+                    "programas": [], "top_matches": [], "skill_matches": [],
+                    "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0, "empleos_compatibles": 0},
+                }
+            run_row = {"id": fallback_row["id"], "created_at": None}
 
         run_id: int = int(run_row["id"])
         fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
