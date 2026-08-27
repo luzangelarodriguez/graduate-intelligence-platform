@@ -1085,6 +1085,7 @@ def persist_embeddings(
     programs: List[ProgramProfile],
     jobs: List[JobProfile],
     conn,
+    batch_size: int = 100,
 ) -> None:
     """Cache embeddings to DB using the production microcurriculo_embeddings schema.
 
@@ -1096,6 +1097,9 @@ def persist_embeddings(
         dimensions INTEGER
 
     Non-critical — errors are logged and swallowed.
+
+    Jobs are committed in batches of `batch_size` so progress is visible in the
+    DB during the run and a mid-run failure only loses the current batch.
     """
     model = EMBED_MODEL_NAME
     n_prog = n_job = 0
@@ -1126,36 +1130,49 @@ def persist_embeddings(
                       json.dumps(vec), len(vec)))
                 n_prog += 1
 
-            # job_embeddings table is our own (not the production microcurriculo table)
-            # job_id is stored as str in JobProfile (load_jobs casts to text) but the
-            # column is BIGINT — cast explicitly to avoid a type-mismatch error that
-            # the old bare `except` was silently swallowing after rollback+break.
-            n_job_errors = 0
-            for j in jobs:
-                if j.embedding is None:
-                    continue
-                cur.execute("SAVEPOINT sp_job_embed")
-                try:
-                    cur.execute("""
-                        INSERT INTO job_embeddings
-                            (job_id, embedding_scope, model_version, embedding_vector)
-                        VALUES (%s::bigint, %s, %s, %s::jsonb)
-                        ON CONFLICT (job_id, embedding_scope, model_version) DO UPDATE
-                            SET embedding_vector     = EXCLUDED.embedding_vector,
-                                embedding_created_at = now()
-                    """, (j.job_id, "jobs", model,
-                          json.dumps(j.embedding.astype(np.float32).tolist())))
-                    cur.execute("RELEASE SAVEPOINT sp_job_embed")
-                    n_job += 1
-                except Exception as exc:
-                    cur.execute("ROLLBACK TO SAVEPOINT sp_job_embed")
-                    cur.execute("RELEASE SAVEPOINT sp_job_embed")
-                    logger.debug("persist_embeddings: job %s error: %s", j.job_id, exc)
-                    n_job_errors += 1
-            if n_job_errors:
-                logger.warning("persist_embeddings: %d empleos fallaron al persistir", n_job_errors)
-
         conn.commit()
+        logger.info("Embeddings persistidos: %d programas.", n_prog)
+
+        # job_embeddings: incremental commits every batch_size rows so progress is
+        # visible externally and a crash only loses the in-flight batch.
+        # job_id is str in JobProfile but BIGINT in the table — cast explicitly.
+        jobs_with_embed = [j for j in jobs if j.embedding is not None]
+        total = len(jobs_with_embed)
+        n_job_errors = 0
+
+        for batch_start in range(0, total, batch_size):
+            batch = jobs_with_embed[batch_start: batch_start + batch_size]
+            batch_ok = 0
+            with conn.cursor() as cur:
+                for j in batch:
+                    cur.execute("SAVEPOINT sp_job_embed")
+                    try:
+                        cur.execute("""
+                            INSERT INTO job_embeddings
+                                (job_id, embedding_scope, model_version, embedding_vector)
+                            VALUES (%s::bigint, %s, %s, %s::jsonb)
+                            ON CONFLICT (job_id, embedding_scope, model_version) DO UPDATE
+                                SET embedding_vector     = EXCLUDED.embedding_vector,
+                                    embedding_created_at = now()
+                        """, (j.job_id, "jobs", model,
+                              json.dumps(j.embedding.astype(np.float32).tolist())))
+                        cur.execute("RELEASE SAVEPOINT sp_job_embed")
+                        batch_ok += 1
+                    except Exception as exc:
+                        cur.execute("ROLLBACK TO SAVEPOINT sp_job_embed")
+                        cur.execute("RELEASE SAVEPOINT sp_job_embed")
+                        logger.debug("persist_embeddings: job %s error: %s", j.job_id, exc)
+                        n_job_errors += 1
+
+            conn.commit()
+            n_job += batch_ok
+            logger.info(
+                "Progreso: %d/%d empleos (%d insertados, %d errores acumulados)",
+                min(batch_start + len(batch), total), total, n_job, n_job_errors,
+            )
+
+        if n_job_errors:
+            logger.warning("persist_embeddings: %d empleos fallaron al persistir", n_job_errors)
         logger.info("Embeddings persistidos: %d programas, %d empleos.", n_prog, n_job)
     except Exception as exc:
         logger.warning("persist_embeddings: error (no crítico): %s", exc)
@@ -1354,6 +1371,8 @@ def main(argv: Optional[List[str]] = None) -> None:
                         help="Limitar número de empleos procesados (0 = todos)")
     parser.add_argument("--limit-programs", type=int, default=0,
                         help="Limitar número de programas (0 = todos)")
+    parser.add_argument("--batch-size", type=int, default=100,
+                        help="Empleos por commit parcial en persist-embeddings (default 100)")
     parser.add_argument("--dataset-version", default="hybrid_v2",
                         help="Versión del dataset para ml_training_runs")
     parser.add_argument("--report", default="outputs/academic_relevance_report.md",
@@ -1390,7 +1409,7 @@ def main(argv: Optional[List[str]] = None) -> None:
         conn2 = connect()
         try:
             if args.persist_embeddings:
-                persist_embeddings(programs, jobs, conn2)
+                persist_embeddings(programs, jobs, conn2, batch_size=args.batch_size)
             run_id = _ensure_run(conn2, args.dataset_version)
             saved = save_matches(results, run_id, conn2)
             logger.info("Guardados %d matches en run_id=%d", saved, run_id)
