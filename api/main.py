@@ -424,8 +424,8 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         if not run_row:
             return {
                 "run_id": None, "fecha": None,
-                "programas": [], "top_matches": [],
-                "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+                "programas": [], "top_matches": [], "skill_matches": [],
+                "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0, "empleos_compatibles": 0},
             }
 
         run_id: int = int(run_row["id"])
