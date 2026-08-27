@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from psycopg2.extras import Json, execute_values
 
@@ -124,46 +127,65 @@ def fetch_jobs(limit: int = 500) -> list[dict[str, Any]]:
     return rows
 
 
+_JOB_PERSIST_BATCH = 50  # jobs per intermediate commit
+
+
 def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
+    jobs = payload["jobs"]
+    total_jobs = len(jobs)
+
+    # --- Phase 1: job resolution updates (incremental commits every _JOB_PERSIST_BATCH) ---
     with get_conn() as conn:
         with conn.cursor() as cur:
             apply_migrations(cur)
-            for job in payload["jobs"]:
-                resolution = job["company_resolution"]
-                cur.execute(
-                    """
-                    UPDATE jobs
-                    SET canonical_company_name = %s,
-                        company_resolution_confidence = %s,
-                        inferred_company = %s,
-                        resolution_method = %s,
-                        updated_at = now()
-                    WHERE id = %s
-                    """,
-                    (
-                        resolution["canonical_company_name"],
-                        resolution["company_resolution_confidence"],
-                        resolution["inferred_company"],
-                        resolution["resolution_method"],
-                        job["id"],
-                    ),
-                )
-                for alias in resolution.get("company_aliases") or []:
+
+        n_committed = 0
+        for batch_start in range(0, total_jobs, _JOB_PERSIST_BATCH):
+            batch = jobs[batch_start: batch_start + _JOB_PERSIST_BATCH]
+            with conn.cursor() as cur:
+                for job in batch:
+                    resolution = job["company_resolution"]
                     cur.execute(
                         """
-                        INSERT INTO company_aliases (canonical_company_name, alias, alias_normalized, confidence)
-                        VALUES (%s, %s, %s, %s)
-                        ON CONFLICT (alias_normalized) DO UPDATE SET
-                            canonical_company_name = EXCLUDED.canonical_company_name,
-                            confidence = GREATEST(company_aliases.confidence, EXCLUDED.confidence)
+                        UPDATE jobs
+                        SET canonical_company_name = %s,
+                            company_resolution_confidence = %s,
+                            inferred_company = %s,
+                            resolution_method = %s,
+                            updated_at = now()
+                        WHERE id = %s
                         """,
                         (
                             resolution["canonical_company_name"],
-                            alias,
-                            alias.casefold().strip(),
                             resolution["company_resolution_confidence"],
+                            resolution["inferred_company"],
+                            resolution["resolution_method"],
+                            job["id"],
                         ),
                     )
+                    for alias in resolution.get("company_aliases") or []:
+                        cur.execute(
+                            """
+                            INSERT INTO company_aliases (canonical_company_name, alias, alias_normalized, confidence)
+                            VALUES (%s, %s, %s, %s)
+                            ON CONFLICT (alias_normalized) DO UPDATE SET
+                                canonical_company_name = EXCLUDED.canonical_company_name,
+                                confidence = GREATEST(company_aliases.confidence, EXCLUDED.confidence)
+                            """,
+                            (
+                                resolution["canonical_company_name"],
+                                alias,
+                                alias.casefold().strip(),
+                                resolution["company_resolution_confidence"],
+                            ),
+                        )
+            conn.commit()
+            n_committed += len(batch)
+            logger.info("Progreso jobs: %d/%d actualizados", n_committed, total_jobs)
+
+    # --- Phase 2: aggregate batch inserts (single transaction — fast execute_values) ---
+    with get_conn() as conn:
+        with conn.cursor() as cur:
             profile_rows = [
                 (
                     item.company,
@@ -349,6 +371,15 @@ def persist_intelligence(payload: dict[str, Any]) -> dict[str, int]:
                     ],
                 )
         conn.commit()
+        logger.info(
+            "persist_intelligence: company_profiles=%d recommendations=%d role_signals=%d "
+            "career_transitions=%d forecasts=%d",
+            len(payload["company_profiles"]),
+            len(payload["recommendations"]),
+            len(payload["role_signals"]),
+            len(payload["career_transitions"]),
+            len(payload["forecasts"]),
+        )
     return {
         "company_profiles": len(payload["company_profiles"]),
         "recommendations": len(payload["recommendations"]),
@@ -546,7 +577,9 @@ def run_intelligence(limit: int = 500, persist: bool = True, program_id: int | N
         persist_executive_metrics(executive_metrics)
 
         curriculum_simulations: list[dict[str, Any]] = []
-        for item in program_intelligence_records:
+        n_programs = len(program_intelligence_records)
+        for idx, item in enumerate(program_intelligence_records, 1):
+            logger.info("Simulación programa %d/%d: id=%d", idx, n_programs, item.program_id)
             simulation = build_curriculum_impact_simulation(
                 item.program_id,
                 proposed_skills=item.top_gaps and [str(gap.get("missing_skill") or "") for gap in item.top_gaps if str(gap.get("missing_skill") or "").strip()] or None,
@@ -589,6 +622,10 @@ def _print_database_banner() -> None:
 
 
 def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
     parser = argparse.ArgumentParser(description="Run semantic labor and curriculum intelligence layer.")
     parser.add_argument("--limit", type=int, default=500)
     parser.add_argument("--no-persist", action="store_true")
