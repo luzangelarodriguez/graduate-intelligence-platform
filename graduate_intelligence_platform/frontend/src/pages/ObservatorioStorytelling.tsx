@@ -44,7 +44,7 @@ interface TopMatch {
 interface Summary {
   run_id: number | null; fecha: string;
   programas: Programa[]; top_matches: TopMatch[];
-  totales: { matches: number; alta: number; media: number; baja: number };
+  totales: { matches: number; alta: number; media: number; baja: number; empleos_compatibles: number };
 }
 interface SkillMercado  { skill: string; frecuencia: number }
 interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string[] }
@@ -1699,7 +1699,8 @@ export default function ObservatorioStorytelling() {
   const nivel = pertinenciaLevel(score);
   const coberturaPct   = skills?.cobertura_pct ?? 0;
   const brechaPct      = skills ? 100 - coberturaPct : 0;
-  const empCompatibles = top_matches.filter(m => m.skills_en_comun.length > 0).length;
+  // Use the backend-aggregated count over ALL matches (not the truncated top-30 sample).
+  const empCompatibles = totales.empleos_compatibles ?? top_matches.filter(m => m.skills_en_comun.length > 0).length;
   const qualityMatches = top_matches.filter(m => (m.skills_en_comun?.length ?? 0) > 0).length;
   const dataPobre      = totales.matches < 10 || qualityMatches < 3;
 

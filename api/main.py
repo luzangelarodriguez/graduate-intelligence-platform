@@ -509,16 +509,29 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         )
         lbl = {r["relevance_label"]: int(r["cnt"]) for r in tot_rows}
 
+        # Count matches with real skill overlap across ALL rows, not just the top-30 sample.
+        # Replicates the same predicate used in /api/dashboard/compare-programs.
+        emp_row = fetch_one(
+            f"SELECT COUNT(*) AS cnt "
+            f"FROM ml_program_job_matches "
+            f"WHERE run_id = {run_id} {pid_filter_bare} "
+            f"  AND skills_en_comun IS NOT NULL "
+            f"  AND skills_en_comun != '[]'::jsonb "
+            f"  AND jsonb_array_length(skills_en_comun) > 0",
+        )
+        empleos_compatibles: int = int(emp_row["cnt"]) if emp_row else 0
+
         return {
             "run_id":      run_id,
             "fecha":       fecha,
             "programas":   programas,
             "top_matches": top_matches,
             "totales": {
-                "matches": sum(lbl.values()),
-                "alta":    lbl.get("high", 0) + lbl.get("high_semantic", 0),
-                "media":   lbl.get("medium", 0) + lbl.get("medium_semantic", 0),
-                "baja":    lbl.get("low", 0) + lbl.get("low_semantic", 0),
+                "matches":             sum(lbl.values()),
+                "alta":                lbl.get("high", 0) + lbl.get("high_semantic", 0),
+                "media":               lbl.get("medium", 0) + lbl.get("medium_semantic", 0),
+                "baja":                lbl.get("low", 0) + lbl.get("low_semantic", 0),
+                "empleos_compatibles": empleos_compatibles,
             },
         }
     except Exception as exc:
@@ -526,7 +539,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         return {
             "run_id": None, "fecha": None,
             "programas": [], "top_matches": [],
-            "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0},
+            "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0, "empleos_compatibles": 0},
             "error": str(exc),
         }
 
