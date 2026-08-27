@@ -1704,8 +1704,7 @@ export default function ObservatorioStorytelling() {
   const brechaPct      = skills ? 100 - coberturaPct : 0;
   // Use the backend-aggregated count over ALL matches (not the truncated top-30 sample).
   const empCompatibles = totales.empleos_compatibles ?? top_matches.filter(m => m.skills_en_comun.length > 0).length;
-  const qualityMatches = top_matches.filter(m => (m.skills_en_comun?.length ?? 0) > 0).length;
-  const dataPobre      = totales.matches < 10 || qualityMatches < 3;
+  const dataPobre      = totales.matches < 10 || totales.empleos_compatibles < 3;
 
   // Deduplicated market skills
   const skillsMercadoDeduped: SkillMercado[] = (() => {
