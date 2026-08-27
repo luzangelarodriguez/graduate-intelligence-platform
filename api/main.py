@@ -521,11 +521,46 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         )
         empleos_compatibles: int = int(emp_row["cnt"]) if emp_row else 0
 
+        # Fetch the actual list of matches with real skill overlap (not limited by top-30 score ranking).
+        skill_match_rows = fetch_all(
+            f"""
+            SELECT
+                COALESCE(e.nombre, m.program_name) AS programa,
+                m.job_title                        AS empleo,
+                m.company_name                     AS empresa,
+                m.score_match                      AS score,
+                m.relevance_label                  AS label,
+                m.skills_en_comun                  AS skills_en_comun,
+                m.skills_faltantes                 AS skills_faltantes
+            FROM ml_program_job_matches m
+            LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            WHERE m.run_id = {run_id} {pid_filter}
+              AND m.skills_en_comun IS NOT NULL
+              AND m.skills_en_comun != '[]'::jsonb
+              AND jsonb_array_length(m.skills_en_comun) > 0
+            ORDER BY m.score_match DESC
+            LIMIT 30
+            """,
+        )
+        skill_matches = [
+            {
+                "programa":         r["programa"] or "",
+                "empleo":           r["empleo"] or "",
+                "empresa":          r["empresa"],
+                "score":            float(r["score"] or 0),
+                "label":            r["label"],
+                "skills_en_comun":  r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
+                "skills_faltantes": r["skills_faltantes"] if r["skills_faltantes"] is not None else [],
+            }
+            for r in skill_match_rows
+        ]
+
         return {
-            "run_id":      run_id,
-            "fecha":       fecha,
-            "programas":   programas,
-            "top_matches": top_matches,
+            "run_id":       run_id,
+            "fecha":        fecha,
+            "programas":    programas,
+            "top_matches":  top_matches,
+            "skill_matches": skill_matches,
             "totales": {
                 "matches":             sum(lbl.values()),
                 "alta":                lbl.get("high", 0) + lbl.get("high_semantic", 0),
@@ -538,7 +573,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         logger.error("dashboard_summary error program_id=%s: %s", program_id, exc, exc_info=True)
         return {
             "run_id": None, "fecha": None,
-            "programas": [], "top_matches": [],
+            "programas": [], "top_matches": [], "skill_matches": [],
             "totales": {"matches": 0, "alta": 0, "media": 0, "baja": 0, "empleos_compatibles": 0},
             "error": str(exc),
         }

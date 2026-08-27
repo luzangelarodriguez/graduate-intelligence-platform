@@ -43,7 +43,7 @@ interface TopMatch {
 }
 interface Summary {
   run_id: number | null; fecha: string;
-  programas: Programa[]; top_matches: TopMatch[];
+  programas: Programa[]; top_matches: TopMatch[]; skill_matches: TopMatch[];
   totales: { matches: number; alta: number; media: number; baja: number; empleos_compatibles: number };
 }
 interface SkillMercado  { skill: string; frecuencia: number }
@@ -122,6 +122,7 @@ const FALLBACK: Summary = {
     { programa: 'Visual Analytics', empleo: 'ML Engineer',           empresa: 'Mercado Libre', score: 83.7, label: 'high', skills_en_comun: ['TensorFlow', 'Python'],           skills_faltantes: ['Kubernetes'] },
   ],
   totales: { matches: 91, alta: 36, media: 36, baja: 19, empleos_compatibles: 3 },
+  skill_matches: [],
 };
 
 const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
@@ -528,6 +529,7 @@ interface ViewProps {
   univ: UniversityData | null;
   totales: Summary['totales'];
   top_matches: TopMatch[];
+  skill_matches: TopMatch[];
   dataPobre: boolean;
   programaId: number;
   redesignJob: RediseniJob | null;
@@ -902,8 +904,9 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
   );
 }
 
-function ViewEmpleos({ top_matches, empCompatibles }: ViewProps) {
-  const empleos = top_matches.filter(m => m.skills_en_comun.length > 0 && m.score >= 45).slice(0, 10);
+function ViewEmpleos({ skill_matches, empCompatibles }: ViewProps) {
+  // skill_matches comes from the backend pre-filtered (skills_en_comun non-empty), ordered by score DESC.
+  const empleos = skill_matches.slice(0, 10);
 
   if (empleos.length === 0) return (
     <div style={{ padding: 24 }}>
@@ -1692,7 +1695,7 @@ export default function ObservatorioStorytelling() {
   );
 
   const d = summary!;
-  const { totales, programas, top_matches } = d;
+  const { totales, programas, top_matches, skill_matches } = d;
   const prog  = programas.find(p => p.id === programaId) ?? programas[0];
   const meta  = PROGRAMS.find(p => p.id === programaId) ?? PROGRAMS[0];
   const score = prog?.score_promedio ?? 0;
@@ -1718,7 +1721,7 @@ export default function ObservatorioStorytelling() {
 
   const viewProps: ViewProps = {
     summary: d, prog, meta, score, nivel, coberturaPct, brechaPct, empCompatibles,
-    skills, skillsMercadoDeduped, univ, totales, top_matches, dataPobre, programaId,
+    skills, skillsMercadoDeduped, univ, totales, top_matches, skill_matches, dataPobre, programaId,
     redesignJob, redesignDlError,
     onStartRedesign: startRedesign,
     onDownloadRedesign: downloadRedesign,
