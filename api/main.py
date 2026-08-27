@@ -534,7 +534,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             SELECT
                 COALESCE(e.nombre, m.program_name) AS programa,
                 m.job_title                        AS empleo,
-                m.company_name                     AS empresa,
+                COALESCE(m.company, '')             AS empresa,
                 m.score_match                      AS score,
                 m.relevance_label                  AS label,
                 m.skills_en_comun                  AS skills_en_comun,
