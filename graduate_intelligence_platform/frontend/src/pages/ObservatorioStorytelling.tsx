@@ -491,10 +491,42 @@ function SkillScatter({ matriz }: { matriz: MatrizSkill[] }) {
 
 // ─── Dashboard primitives ─────────────────────────────────────────────────────
 
-function DashPanel({ title, children, style, className }: { title: string; children: React.ReactNode; style?: React.CSSProperties; className?: string }) {
+function isNoiseSkill(skill: string): boolean {
+  return skill.length > 40 || skill.toLowerCase().includes('confianza extraccion');
+}
+
+function SkillBarList({ items, color, valueLabel = 'vacantes' }: {
+  items: { label: string; value: number }[];
+  color: string;
+  valueLabel?: string;
+}) {
+  const max = Math.max(...items.map(i => i.value), 1);
   return (
-    <div className={className} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: 16, display: 'flex', flexDirection: 'column', ...style }}>
-      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#9CA3AF', margin: '0 0 12px' }}>{title}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+      {items.map(({ label, value }) => (
+        <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
+          <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+          <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${(value / max) * 100}%`, borderRadius: 6, background: color }} />
+          </div>
+          <span title={`${value} ${valueLabel}`} style={{ fontSize: 10, color: '#9CA3AF', minWidth: 22, textAlign: 'right' }}>{value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DashPanel({ title, children, style, className, badge }: {
+  title: string; children: React.ReactNode; style?: React.CSSProperties; className?: string; badge?: string | number;
+}) {
+  return (
+    <div className={className} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '1.1rem 1.25rem', display: 'flex', flexDirection: 'column', ...style }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#9CA3AF', margin: 0 }}>{title}</p>
+        {badge !== undefined && (
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', background: '#F3F4F6', borderRadius: 20, padding: '2px 7px', whiteSpace: 'nowrap' }}>{badge}</span>
+        )}
+      </div>
       <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
     </div>
   );
@@ -671,22 +703,19 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
             <DashPanel
               key={cat}
               title={m.label}
+              badge={`${bycat[cat].length} identificadas`}
               className={isEmpty ? 'min-h-[90px] lg:min-h-[320px]' : undefined}
               style={isEmpty ? undefined : { minHeight: 320 }}
             >
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '-8px 0 10px' }}>{bycat[cat].length} identificadas</p>
               {isEmpty ? (
                 <div className="flex items-center justify-center flex-1">
                   <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
                 </div>
               ) : (
-                <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart
-                    labels={items.map(s => s.skill)}
-                    values={items.map(s => s.frecuencia)}
-                    color={cat === 'otro' ? '#94A3B8' : undefined}
-                  />
-                </div>
+                <SkillBarList
+                  items={items.map(s => ({ label: s.skill, value: s.frecuencia }))}
+                  color={m.bar}
+                />
               )}
             </DashPanel>
           );
@@ -834,7 +863,7 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
     </div>
   );
 
-  const sorted = [...skills.brechas].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
+  const sorted = [...skills.brechas].filter(b => !isNoiseSkill(b.skill)).sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
   const bycat: Record<SkillCat, Brecha[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
   for (const b of sorted) bycat[classifySkill(b.skill)].push(b);
 
@@ -858,18 +887,20 @@ function ViewBrechas({ skills, dataPobre }: ViewProps) {
             <DashPanel
               key={cat}
               title={`${m.label} faltantes`}
+              badge={`${items.length} brechas`}
               className={isEmpty ? 'min-h-[90px] lg:min-h-[240px]' : undefined}
               style={isEmpty ? undefined : { minHeight: 240 }}
             >
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '-8px 0 10px' }}>{items.length} brechas</p>
               {isEmpty ? (
                 <div className="flex items-center justify-center flex-1">
                   <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas en esta categoría</p>
                 </div>
               ) : (
-                <div style={{ height: Math.max(items.length * 26 + 20, 160) }}>
-                  <HorizBarChart labels={items.map(b => b.skill)} values={items.map(b => b.frecuencia_mercado ?? 0)} color="#EF4444" />
-                </div>
+                <SkillBarList
+                  items={items.map(b => ({ label: b.skill, value: b.frecuencia_mercado ?? 0 }))}
+                  color={m.bar}
+                  valueLabel="vacantes"
+                />
               )}
             </DashPanel>
           );
@@ -1711,6 +1742,7 @@ export default function ObservatorioStorytelling() {
     if (!skills) return [];
     const seen = new Map<string, SkillMercado>();
     for (const s of skills.skills_mercado) {
+      if (isNoiseSkill(s.skill)) continue;
       const norm = normalizeSkill(s.skill);
       if (seen.has(norm)) seen.get(norm)!.frecuencia += s.frecuencia;
       else seen.set(norm, { ...s, skill: norm });
@@ -1784,7 +1816,7 @@ export default function ObservatorioStorytelling() {
             </span>
             <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 900, color: '#fff' }}>R</span>
           </div>
-          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>
+          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#7B8AAE', marginBottom: 14 }}>
             Observatorio
           </div>
 
@@ -1828,16 +1860,15 @@ export default function ObservatorioStorytelling() {
                 onClick={() => { setActiveView(id); setSidebarOpen(false); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 9,
-                  width: '100%', padding: '9px 10px', marginBottom: 1,
-                  background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  width: '100%', padding: '8px 10px', marginBottom: 2,
+                  background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
                   border: 'none',
-                  borderLeft: `3px solid ${isActive ? '#60A5FA' : 'transparent'}`,
-                  borderRadius: '0 7px 7px 0',
+                  borderRadius: 8,
                   cursor: 'pointer', textAlign: 'left' as const,
                   transition: 'background 0.12s',
                 }}>
-                <Icon size={15} color={isActive ? '#93C5FD' : 'rgba(255,255,255,0.35)'} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 400, color: isActive ? '#fff' : 'rgba(255,255,255,0.55)' }}>
+                <Icon size={15} color={isActive ? '#FFFFFF' : '#8B9AC0'} />
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? '#FFFFFF' : '#8B9AC0' }}>
                   {label}
                 </span>
               </button>
