@@ -225,8 +225,30 @@ const ACCENT_MAP: Record<string, string> = {
   'gestion de riesgos': 'gestión de riesgos', 'gestion del cambio': 'gestión del cambio',
 };
 
-// Capitalizes first letter preserving accents and ñ; maps no-tilde forms if known
+// Relabeling map: purely visual — replaces generic single-word terms with more specific display labels.
+// Matching is accent-insensitive and case-insensitive. Data/logic always uses the original term.
+const LABEL_MAP: Record<string, string> = {
+  'gestion':        'Gestión de proyectos, procesos o equipos',
+  'administracion': 'Administración de recursos',
+  'comunicacion':   'Comunicación de resultados y presentación ejecutiva',
+  'indicadores':    'Diseño y seguimiento de KPIs',
+  'financiero':     'Análisis financiero o modelación financiera',
+  'estrategia':     'Planeación estratégica basada en datos',
+  'atencion':       'Atención al cliente o gestión de servicios',
+  'orientacion':    'Orientación a resultados o al cliente',
+};
+
+function stripAccents(s: string): string {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+// Returns the display label for a skill:
+//   1. Checks LABEL_MAP for generic-term relabeling (accent-insensitive exact match)
+//   2. Falls back to ACCENT_MAP for accent restoration
+//   3. Capitalizes first letter, preserving ñ and tildes
 function displaySkill(s: string): string {
+  const lookupKey = stripAccents(s.toLowerCase().trim());
+  if (LABEL_MAP[lookupKey]) return LABEL_MAP[lookupKey];
   const lower = s.toLowerCase().trim();
   const fixed = ACCENT_MAP[lower] ?? s;
   return fixed.charAt(0).toUpperCase() + fixed.slice(1);
@@ -286,14 +308,6 @@ const SKILL_FORCE_HERRAMIENTA = new Set([
 // Skills that are certifications/frameworks — shown with a "Marco/Cert." badge in cards
 const CERT_SKILLS = new Set(['pmi', 'pmbok', 'pmp', 'capm', 'prince2', 'itil', 'cobit', 'iso 27001']);
 
-// Single generic terms that may produce false positives — shown with an info tooltip in cards
-const GENERIC_SKILLS = new Set([
-  'gestion', 'gestión', 'administracion', 'administración', 'comunicacion', 'comunicación',
-  'orientacion', 'orientación', 'atencion', 'atención', 'financiero', 'estrategia',
-  'indicadores', 'desarrollo', 'coordinacion', 'coordinación', 'planificacion', 'planificación',
-  'organizacion', 'organización', 'formacion', 'formación',
-]);
-
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
 function classifySkill(s: string): SkillCat {
   const key = normalizeSkill(s);
@@ -311,10 +325,6 @@ function classifySkill(s: string): SkillCat {
 
 function isCertSkill(s: string): boolean {
   return CERT_SKILLS.has(normalizeSkill(s));
-}
-function isGenericTerm(s: string): boolean {
-  const n = s.toLowerCase().trim();
-  return GENERIC_SKILLS.has(n) && !n.includes(' ');
 }
 const CAT_META: Record<SkillCat, { label: string; color: string; bar: string }> = {
   herramienta: { label: 'Herramientas', color: '#2563EB', bar: '#3B82F6' },
@@ -559,19 +569,12 @@ function SkillBarList({ items, color, valueLabel = 'vacantes' }: {
       {items.map(({ label, value, rawSkill }) => {
         const sk = rawSkill ?? label;
         const isCert = isCertSkill(sk);
-        const isGeneric = isGenericTerm(sk);
         return (
           <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0 }}>
               <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
               {isCert && (
                 <span style={{ fontSize: 8, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap' }}>Marco/Cert.</span>
-              )}
-              {isGeneric && !isCert && (
-                <span
-                  title="Término genérico — puede generar falsos positivos. Considera especificar (ej. 'gestión de proyectos' en vez de 'gestión')"
-                  style={{ fontSize: 10, color: '#9CA3AF', cursor: 'help', flexShrink: 0 }}
-                >ⓘ</span>
               )}
             </div>
             <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
@@ -685,7 +688,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             <DashPanel title="Top Skills del Mercado">
               <div style={{ height: 190 }}>
                 {topMarket.length > 0
-                  ? <HorizBarChart labels={topMarket.map(s => s.skill)} values={topMarket.map(s => s.frecuencia)} />
+                  ? <HorizBarChart labels={topMarket.map(s => displaySkill(s.skill))} values={topMarket.map(s => s.frecuencia)} />
                   : <Spinner />}
               </div>
             </DashPanel>
@@ -707,7 +710,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             <DashPanel title="Brechas Prioritarias">
               <div style={{ height: 160 }}>
                 {topBrechas.length > 0
-                  ? <HorizBarChart labels={topBrechas.map(b => b.skill)} values={topBrechas.map(b => b.frecuencia_mercado ?? 0)} color="#EF4444" />
+                  ? <HorizBarChart labels={topBrechas.map(b => displaySkill(b.skill))} values={topBrechas.map(b => b.frecuencia_mercado ?? 0)} color="#EF4444" />
                   : <p style={{ fontSize: 12, color: '#6B7280', textAlign: 'center', paddingTop: 20 }}>Sin brechas críticas identificadas ✓</p>}
               </div>
             </DashPanel>
@@ -782,7 +785,7 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
                 </div>
               ) : (
                 <SkillBarList
-                  items={items.map(s => ({ label: s.skill, value: s.frecuencia }))}
+                  items={items.map(s => ({ label: displaySkill(s.skill), value: s.frecuencia, rawSkill: s.skill }))}
                   color={m.bar}
                 />
               )}
@@ -829,7 +832,7 @@ function ViewPrograma({ skills, dataPobre }: ViewProps) {
               ) : (
                 <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
                   <HorizBarChart
-                    labels={items.map(s => s.skill)}
+                    labels={items.map(s => displaySkill(s.skill))}
                     values={items.map(s => s.cobertura)}
                     valueLabel="materias"
                     color={cat === 'otro' ? '#94A3B8' : undefined}
