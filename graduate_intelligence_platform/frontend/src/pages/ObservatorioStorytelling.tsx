@@ -883,10 +883,10 @@ function SparkBars({ color, bars = [4, 6, 5, 8, 6, 9, 7] }: { color: string; bar
 // ─── BrechasScatter ───────────────────────────────────────────────────────────
 function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; topThirdDemand: number }) {
   const QUAD_COLORS = {
-    verde: { color: '#0ca30c', label: 'Bien cubiertas' },
-    rojo:  { color: '#d03b3b', label: 'Brechas críticas' },
-    azul:  { color: '#2a78d6', label: 'En desarrollo' },
-    gris:  { color: '#898781', label: 'Sin relevancia' },
+    verde: { color: '#0ca30c', label: 'Fortaleza consolidada' },
+    rojo:  { color: '#d03b3b', label: 'Brecha crítica' },
+    azul:  { color: '#2a78d6', label: 'Consolidar' },
+    gris:  { color: '#898781', label: 'Monitorear' },
   } as const;
   type QKey = keyof typeof QUAD_COLORS;
 
@@ -918,14 +918,36 @@ function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; top
       tooltip: { callbacks: { label: (ctx: any) => `${(ctx.raw as { skill?: string }).skill ?? ''} — Demanda: ${ctx.raw.x} · Cobertura: ${ctx.raw.y}` } },
     },
     scales: {
-      x: { title: { display: true, text: 'Demanda del mercado (cuartiles)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#E5E7EB', borderDash: [4, 4] }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
-      y: { title: { display: true, text: 'Cobertura en el currículo (0-10)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#F3F4F6' }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
+      x: { title: { display: true, text: 'Demanda del mercado (percentil)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#E5E7EB', borderDash: [4, 4] }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
+      y: { title: { display: true, text: 'Cobertura en el currículo (%)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#F3F4F6' }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
     },
   };
 
   return (
     <div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginBottom: 10 }}>
+      {/* Quadrant labels */}
+      <div style={{ position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 4, left: '8%', zIndex: 1, pointerEvents: 'none' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Consolidar</div>
+          <div style={{ fontSize: 9, color: '#9CA3AF' }}>Alta cobertura, baja demanda</div>
+        </div>
+        <div style={{ position: 'absolute', top: 4, left: '58%', zIndex: 1, pointerEvents: 'none' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Actualizar</div>
+          <div style={{ fontSize: 9, color: '#9CA3AF' }}>Alta cobertura, alta demanda</div>
+        </div>
+        <div style={{ position: 'absolute', bottom: 28, left: '8%', zIndex: 1, pointerEvents: 'none' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Monitorear</div>
+          <div style={{ fontSize: 9, color: '#9CA3AF' }}>Baja cobertura, baja demanda</div>
+        </div>
+        <div style={{ position: 'absolute', bottom: 28, left: '58%', zIndex: 1, pointerEvents: 'none' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Diferenciar</div>
+          <div style={{ fontSize: 9, color: '#9CA3AF' }}>Baja cobertura, alta demanda</div>
+        </div>
+        <div style={{ height: 280 }}>
+          <Scatter data={{ datasets }} options={options} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 8 }}>
         {(Object.keys(QUAD_COLORS) as QKey[]).map(k => (
           <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <div style={{ width: 9, height: 9, borderRadius: '50%', background: QUAD_COLORS[k].color }} />
@@ -933,21 +955,18 @@ function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; top
           </div>
         ))}
       </div>
-      <div style={{ height: 300 }}>
-        <Scatter data={{ datasets }} options={options} />
-      </div>
     </div>
   );
 }
 
 function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
-  if (dataPobre) return <div style={{ padding: 24 }}><ExplorandoMsg /></div>;
-  if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
+  if (dataPobre) return <div style={{ padding: 24, background: '#F5F1E8', minHeight: '100%' }}><ExplorandoMsg /></div>;
+  if (!skills)   return <div style={{ padding: 24, background: '#F5F1E8', minHeight: '100%' }}><Spinner /></div>;
 
   const rawBrechas = skills.brechas.filter(b => !isNoiseSkill(b.skill));
 
   if (rawBrechas.length === 0) return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: 24, background: '#F5F1E8', minHeight: '100%' }}>
       <div style={{ background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 12, padding: '24px', textAlign: 'center' }}>
         <p style={{ fontSize: 15, fontWeight: 700, color: '#065F46' }}>✓ Sin brechas críticas identificadas</p>
         <p style={{ fontSize: 12, color: '#059669', margin: '6px 0 0' }}>El programa cubre las principales skills del mercado.</p>
@@ -988,46 +1007,43 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
     otro:        <IconListCheck size={14} />,
   };
   const CAT_ICONS_LG: Record<SkillCat, React.ReactNode> = {
-    herramienta: <IconTool size={20} />,
-    competencia: <IconSchool size={20} />,
-    habilidad:   <IconUser size={20} />,
-    otro:        <IconChartBar size={20} />,
+    herramienta: <IconBriefcase size={22} />,
+    competencia: <IconSchool size={22} />,
+    habilidad:   <IconUser size={22} />,
+    otro:        <IconChartBar size={22} />,
   };
 
+  const PRIORITY_ICON_BG = ['#5C1A1A', '#5C1A1A', '#78500A', '#0D2158'];
+
+  const BG = '#F5F1E8';
+  const CARD = '#FFFFFF';
+
   return (
-    <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+    <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px', background: BG }}>
 
       {/* ── Header ── */}
       <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: 0 }}>Brechas Curriculares</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Brechas curriculares</h1>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Resumen ejecutivo para la toma de decisiones académicas</p>
       </div>
 
       {/* ── KPI row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ flexShrink: 0 }}>
-        {/* Card 1: mini donut */}
-        <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <MiniDonut pct={coberturaPct} color="#3B82F6" />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 2 }}>Índice de alineación</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{coberturaPct}%</div>
-          </div>
-          <SparkBars color="#3B82F6" bars={[4, 5, 6, 7, 6, 8, 7]} />
-        </div>
-        {/* Cards 2-4 */}
-        {[
-          { label: 'Skills analizadas',    value: skillsAnalizadas, Icon: IconClipboardList, iconBg: '#EFF6FF', iconColor: '#3B82F6', valueColor: C.navy,    barColor: '#3B82F6', bars: [3, 5, 4, 7, 5, 8, 6] as number[] },
-          { label: 'Brechas prioritarias', value: brechasAlta.length, Icon: IconAlertTriangle, iconBg: '#FEF2F2', iconColor: '#EF4444', valueColor: '#DC2626', barColor: '#EF4444', bars: [7, 5, 8, 6, 4, 7, 5] as number[] },
-          { label: 'Skills bien cubiertas',value: wellCovered,         Icon: IconCircleCheck,  iconBg: '#F0FDF4', iconColor: '#22C55E', valueColor: '#16A34A', barColor: '#22C55E', bars: [5, 6, 7, 5, 8, 7, 9] as number[] },
-        ].map(({ label, value, Icon, iconBg, iconColor, valueColor, barColor, bars }) => (
-          <div key={label} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: iconColor, flexShrink: 0 }}>
-              <Icon size={22} />
+        {([
+          { label: 'Alineación curricular',   value: `${coberturaPct}%`, Icon: IconTarget,        iconBg: C.navy,    barColor: '#3B82F6', bars: [4, 5, 6, 7, 6, 8, 7] as number[] },
+          { label: 'Competencias analizadas', value: skillsAnalizadas,   Icon: IconClipboardList, iconBg: '#78500A', barColor: '#B7791F', bars: [3, 5, 4, 7, 5, 8, 6] as number[] },
+          { label: 'Brechas críticas',        value: brechasAlta.length, Icon: IconAlertTriangle, iconBg: '#7A1010', barColor: '#EF4444', bars: [7, 5, 8, 6, 4, 7, 5] as number[] },
+          { label: 'Fortalezas consolidadas', value: wellCovered,        Icon: IconCircleCheck,   iconBg: '#0D5C2E', barColor: '#22C55E', bars: [5, 6, 7, 5, 8, 7, 9] as number[] },
+        ] as const).map(({ label, value, Icon, iconBg, barColor, bars }) => (
+          <div key={label} style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 58, height: 58, borderRadius: '50%', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', flexShrink: 0 }}>
+              <Icon size={28} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 2 }}>{label}</div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: valueColor, lineHeight: 1 }}>{value}</div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{value}</div>
             </div>
-            <SparkBars color={barColor} bars={bars} />
+            <SparkBars color={barColor} bars={bars as number[]} />
           </div>
         ))}
       </div>
@@ -1037,19 +1053,14 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
 
         {/* LEFT: Composición + Scatter */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Section title */}
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Composición de brechas</p>
-          </div>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Composición de brechas</p>
 
-          {/* 4 category cards in one row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {(['herramienta', 'competencia', 'habilidad', 'otro'] as SkillCat[]).map(cat => {
               const m = CAT_META[cat];
               const items = bycat[cat];
               return (
-                <div key={cat} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px' }}>
-                  {/* Card header */}
+                <div key={cat} style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${m.bar}1A`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: m.color, flexShrink: 0 }}>
                       {CAT_ICONS_SM[cat]}
@@ -1071,11 +1082,10 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
             })}
           </div>
 
-          {/* Scatter */}
           {matriz.length > 0 && (
-            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px' }}>
+            <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Mapa currículo vs. mercado</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Mapa de pertinencia curricular</p>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{skillsAnalizadas} skills</span>
               </div>
               <BrechasScatter matriz={matriz} topThirdDemand={scatterTopThird} />
@@ -1083,25 +1093,28 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
           )}
         </div>
 
-        {/* RIGHT: Prioridades + Recomendación */}
+        {/* RIGHT: Agenda prioritaria + Decisión */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Prioridades de intervención</p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Agenda prioritaria</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {topBrechas.map((b, i) => {
-              const isAlta = i < 2;
+              const isCritica = i < 2;
               const cat = classifySkill(b.skill);
               return (
-                <div key={b.skill} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px' }}>
+                <div key={b.skill} style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3B82F6', flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: PRIORITY_ICON_BG[i] ?? PRIORITY_ICON_BG[3], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', flexShrink: 0 }}>
                       {CAT_ICONS_LG[cat]}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: C.navy, marginBottom: 2 }}>{cap(b.skill)}</div>
                       <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8 }}>{PRIORITY_DESCS[i] ?? PRIORITY_DESCS[3]}</div>
-                      <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '3px 10px', background: isAlta ? '#FEE2E2' : '#FEF3C7', color: isAlta ? '#B91C1C' : '#92400E' }}>
-                        {isAlta ? 'Alta prioridad' : 'Media prioridad'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 9, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Prioridad</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 4, padding: '3px 10px', background: isCritica ? '#DC2626' : '#D97706', color: '#FFFFFF', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
+                          {isCritica ? 'CRÍTICA' : 'ALTA'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1109,15 +1122,17 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
             })}
           </div>
 
-          {/* Recomendación ejecutiva */}
           {topBrecha && (
-            <div style={{ background: '#EAF3DE', border: '1px solid #B7E08A', borderRadius: 12, padding: '16px', marginTop: 4 }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <div style={{ color: '#27500A', flexShrink: 0 }}><IconTarget size={22} /></div>
+            <div style={{ background: '#F2EDD6', border: '1px solid #C9B96A', borderRadius: 12, padding: '16px', marginTop: 4 }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E0D4A0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7A5E10', flexShrink: 0 }}>
+                  <IconTarget size={22} />
+                </div>
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#27500A', margin: '0 0 6px' }}>Recomendación ejecutiva</p>
-                  <p style={{ fontSize: 12, color: '#27500A', margin: 0, lineHeight: 1.65 }}>
-                    Enfocar recursos en las brechas de alta prioridad para mejorar la alineación del programa con las demandas del mercado y potenciar la empleabilidad de los estudiantes.
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#7A5E10', margin: '0 0 5px', letterSpacing: '0.03em' }}>Decisión recomendada</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: C.navy, margin: 0, lineHeight: 1.6 }}>
+                    Priorizar la actualización de {cap(topBrechas[0]?.skill ?? '')}
+                    {topBrechas[1] ? ` y ${cap(topBrechas[1].skill)}` : ''} en el próximo comité curricular.
                   </p>
                 </div>
               </div>
@@ -1126,13 +1141,13 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
         </div>
       </div>
 
-      {/* ── Skills diferenciadoras ── */}
+      {/* ── Fortalezas diferenciadoras ── */}
       {skills.exclusivas_programa.length > 0 && (
-        <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px', flexShrink: 0 }}>
-          <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Skills diferenciadoras del programa</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ flexShrink: 0, paddingTop: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap', borderRight: `1px solid ${C.border}`, paddingRight: 16 }}>Fortalezas diferenciadoras</span>
             {[...skills.exclusivas_programa].sort((a, b) => b.cobertura - a.cobertura).slice(0, 8).map(e => (
-              <span key={e.skill} style={{ fontSize: 12, color: C.navy, border: `1px solid #BFDBFE`, borderRadius: 8, padding: '5px 14px', fontWeight: 500, background: '#fff' }}>{cap(e.skill)}</span>
+              <span key={e.skill} style={{ fontSize: 12, color: C.navy, border: `1.5px solid ${C.navy}`, borderRadius: 20, padding: '5px 16px', fontWeight: 600, background: 'transparent' }}>{cap(e.skill)}</span>
             ))}
           </div>
         </div>
@@ -1140,6 +1155,8 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
     </div>
   );
 }
+
+
 function ViewEmpleos({ skill_matches, empCompatibles }: ViewProps) {
   // skill_matches comes from the backend pre-filtered (skills_en_comun non-empty), ordered by score DESC.
   const empleos = skill_matches.slice(0, 10);
