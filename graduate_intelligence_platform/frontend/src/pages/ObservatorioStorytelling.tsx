@@ -206,6 +206,32 @@ function normalizeSkill(s: string): string {
   return SKILL_ALIASES[lower] ?? lower;
 }
 
+// Maps no-tilde forms (as they may arrive from DB) to properly accented display names
+const ACCENT_MAP: Record<string, string> = {
+  'gestion': 'gestión', 'administracion': 'administración', 'comunicacion': 'comunicación',
+  'orientacion': 'orientación', 'atencion': 'atención', 'evaluacion': 'evaluación',
+  'intervencion': 'intervención', 'formacion': 'formación', 'educacion': 'educación',
+  'investigacion': 'investigación', 'informacion': 'información', 'planificacion': 'planificación',
+  'implementacion': 'implementación', 'creacion': 'creación', 'revision': 'revisión',
+  'elaboracion': 'elaboración', 'redaccion': 'redacción', 'coordinacion': 'coordinación',
+  'capacitacion': 'capacitación', 'medicion': 'medición', 'seleccion': 'selección',
+  'organizacion': 'organización', 'decision': 'decisión', 'produccion': 'producción',
+  'actualizacion': 'actualización', 'aplicacion': 'aplicación', 'resolucion': 'resolución',
+  'integracion': 'integración', 'participacion': 'participación', 'motivacion': 'motivación',
+  'negociacion': 'negociación', 'presentacion': 'presentación', 'atencion al cliente': 'atención al cliente',
+  'gestion de proyectos': 'gestión de proyectos', 'gestion del tiempo': 'gestión del tiempo',
+  'comunicacion efectiva': 'comunicación efectiva', 'comunicacion asertiva': 'comunicación asertiva',
+  'orientacion al logro': 'orientación al logro', 'atencion al detalle': 'atención al detalle',
+  'gestion de riesgos': 'gestión de riesgos', 'gestion del cambio': 'gestión del cambio',
+};
+
+// Capitalizes first letter preserving accents and ñ; maps no-tilde forms if known
+function displaySkill(s: string): string {
+  const lower = s.toLowerCase().trim();
+  const fixed = ACCENT_MAP[lower] ?? s;
+  return fixed.charAt(0).toUpperCase() + fixed.slice(1);
+}
+
 const SKILL_CATS = {
   herramienta: new Set([
     // Languages & runtimes
@@ -251,9 +277,27 @@ const SKILL_CATS = {
     'educacion','orientacion vocacional','coaching','mentoría',
   ]),
 };
+// Force specific skills into herramienta regardless of backend classification
+const SKILL_FORCE_HERRAMIENTA = new Set([
+  'excel avanzado', 'excel basico', 'excel intermedio', 'excel avanzado y tablas dinamicas',
+  'power automate', 'google analytics', 'google data studio', 'looker studio',
+]);
+
+// Skills that are certifications/frameworks — shown with a "Marco/Cert." badge in cards
+const CERT_SKILLS = new Set(['pmi', 'pmbok', 'pmp', 'capm', 'prince2', 'itil', 'cobit', 'iso 27001']);
+
+// Single generic terms that may produce false positives — shown with an info tooltip in cards
+const GENERIC_SKILLS = new Set([
+  'gestion', 'gestión', 'administracion', 'administración', 'comunicacion', 'comunicación',
+  'orientacion', 'orientación', 'atencion', 'atención', 'financiero', 'estrategia',
+  'indicadores', 'desarrollo', 'coordinacion', 'coordinación', 'planificacion', 'planificación',
+  'organizacion', 'organización', 'formacion', 'formación',
+]);
+
 type SkillCat = 'herramienta' | 'competencia' | 'habilidad' | 'otro';
 function classifySkill(s: string): SkillCat {
   const key = normalizeSkill(s);
+  if (SKILL_FORCE_HERRAMIENTA.has(key)) return 'herramienta';
   if (SKILL_CATS.herramienta.has(key)) return 'herramienta';
   if (SKILL_CATS.competencia.has(key))  return 'competencia';
   if (SKILL_CATS.habilidad.has(key))    return 'habilidad';
@@ -263,6 +307,14 @@ function classifySkill(s: string): SkillCat {
     }
   }
   return 'otro';
+}
+
+function isCertSkill(s: string): boolean {
+  return CERT_SKILLS.has(normalizeSkill(s));
+}
+function isGenericTerm(s: string): boolean {
+  const n = s.toLowerCase().trim();
+  return GENERIC_SKILLS.has(n) && !n.includes(' ');
 }
 const CAT_META: Record<SkillCat, { label: string; color: string; bar: string }> = {
   herramienta: { label: 'Herramientas', color: '#2563EB', bar: '#3B82F6' },
@@ -497,22 +549,38 @@ function isNoiseSkill(skill: string): boolean {
 }
 
 function SkillBarList({ items, color, valueLabel = 'vacantes' }: {
-  items: { label: string; value: number }[];
+  items: { label: string; value: number; rawSkill?: string }[];
   color: string;
   valueLabel?: string;
 }) {
   const max = Math.max(...items.map(i => i.value), 1);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-      {items.map(({ label, value }) => (
-        <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
-          <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
-          <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${(value / max) * 100}%`, borderRadius: 6, background: color }} />
+      {items.map(({ label, value, rawSkill }) => {
+        const sk = rawSkill ?? label;
+        const isCert = isCertSkill(sk);
+        const isGeneric = isGenericTerm(sk);
+        return (
+          <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0 }}>
+              <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
+              {isCert && (
+                <span style={{ fontSize: 8, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap' }}>Marco/Cert.</span>
+              )}
+              {isGeneric && !isCert && (
+                <span
+                  title="Término genérico — puede generar falsos positivos. Considera especificar (ej. 'gestión de proyectos' en vez de 'gestión')"
+                  style={{ fontSize: 10, color: '#9CA3AF', cursor: 'help', flexShrink: 0 }}
+                >ⓘ</span>
+              )}
+            </div>
+            <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${(value / max) * 100}%`, borderRadius: 6, background: color }} />
+            </div>
+            <span title={`${value} ${valueLabel}`} style={{ fontSize: 10, color: '#9CA3AF', minWidth: 22, textAlign: 'right' }}>{value}</span>
           </div>
-          <span title={`${value} ${valueLabel}`} style={{ fontSize: 10, color: '#9CA3AF', minWidth: 22, textAlign: 'right' }}>{value}</span>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -881,30 +949,46 @@ function SparkBars({ color, bars = [4, 6, 5, 8, 6, 9, 7] }: { color: string; bar
 }
 
 // ─── BrechasScatter ───────────────────────────────────────────────────────────
-function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; topThirdDemand: number }) {
-  const QUAD_COLORS = {
-    verde: { color: '#0ca30c', label: 'Fortaleza consolidada' },
-    rojo:  { color: '#d03b3b', label: 'Brecha crítica' },
-    azul:  { color: '#2a78d6', label: 'Consolidar' },
-    gris:  { color: '#898781', label: 'Monitorear' },
-  } as const;
-  type QKey = keyof typeof QUAD_COLORS;
+const UMBRAL_BIEN_CUBIERTA = 2; // oferta_programa >= 2 → skill cubierta por ≥2 asignaturas
 
-  const groups: Record<QKey, { x: number; y: number; skill: string }[]> = { verde: [], rojo: [], azul: [], gris: [] };
+export function computeScatterGroups(matriz: MatrizSkill[], topThirdDemand: number) {
+  const groups = {
+    verde:    [] as { x: number; y: number; skill: string }[],
+    amarillo: [] as { x: number; y: number; skill: string }[],
+    rojo:     [] as { x: number; y: number; skill: string }[],
+    gris:     [] as { x: number; y: number; skill: string }[],
+  };
   for (const m of matriz) {
-    let key: QKey;
-    if (m.demanda_mercado > 0 && m.oferta_programa > 0) key = 'verde';
-    else if (topThirdDemand > 0 && m.demanda_mercado >= topThirdDemand && m.oferta_programa === 0) key = 'rojo';
-    else if (m.demanda_mercado > 0 && m.oferta_programa === 0) key = 'azul';
-    else key = 'gris';
-    groups[key].push({ x: m.demanda_mercado, y: m.oferta_programa, skill: m.skill });
+    const pt = { x: m.demanda_mercado, y: m.oferta_programa, skill: m.skill };
+    if (m.demanda_mercado > 0 && m.oferta_programa >= UMBRAL_BIEN_CUBIERTA) {
+      groups.verde.push(pt);
+    } else if (m.demanda_mercado > 0 && m.oferta_programa > 0 && m.oferta_programa < UMBRAL_BIEN_CUBIERTA) {
+      groups.amarillo.push(pt);
+    } else if (m.demanda_mercado > 0 && m.oferta_programa === 0 && topThirdDemand > 0 && m.demanda_mercado >= topThirdDemand) {
+      groups.rojo.push(pt);
+    } else {
+      groups.gris.push(pt);
+    }
   }
+  return groups;
+}
 
-  const datasets = (Object.keys(QUAD_COLORS) as QKey[]).map(k => ({
-    label: QUAD_COLORS[k].label,
+const SCATTER_CATS = {
+  verde:    { color: '#0ca30c', label: 'Bien cubierta' },
+  amarillo: { color: '#D97706', label: 'Cobertura parcial' },
+  rojo:     { color: '#d03b3b', label: 'Brecha crítica' },
+  gris:     { color: '#898781', label: 'Baja relevancia' },
+} as const;
+type SCKey = keyof typeof SCATTER_CATS;
+
+function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; topThirdDemand: number }) {
+  const groups = computeScatterGroups(matriz, topThirdDemand);
+
+  const datasets = (Object.keys(SCATTER_CATS) as SCKey[]).map(k => ({
+    label: SCATTER_CATS[k].label,
     data: groups[k],
-    backgroundColor: QUAD_COLORS[k].color + 'CC',
-    borderColor: QUAD_COLORS[k].color,
+    backgroundColor: SCATTER_CATS[k].color + 'CC',
+    borderColor: SCATTER_CATS[k].color,
     borderWidth: 1,
     pointRadius: 5,
     pointHoverRadius: 7,
@@ -925,7 +1009,6 @@ function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; top
 
   return (
     <div>
-      {/* Quadrant labels */}
       <div style={{ position: 'relative' }}>
         <div style={{ position: 'absolute', top: 4, left: '8%', zIndex: 1, pointerEvents: 'none' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Consolidar</div>
@@ -948,10 +1031,10 @@ function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; top
         </div>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 8 }}>
-        {(Object.keys(QUAD_COLORS) as QKey[]).map(k => (
+        {(Object.keys(SCATTER_CATS) as SCKey[]).map(k => (
           <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 9, height: 9, borderRadius: '50%', background: QUAD_COLORS[k].color }} />
-            <span style={{ fontSize: 10, color: '#6B7280' }}>{QUAD_COLORS[k].label}</span>
+            <div style={{ width: 9, height: 9, borderRadius: '50%', background: SCATTER_CATS[k].color }} />
+            <span style={{ fontSize: 10, color: '#6B7280' }}>{SCATTER_CATS[k].label}</span>
           </div>
         ))}
       </div>
@@ -974,8 +1057,6 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
     </div>
   );
 
-  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
   const sorted = [...rawBrechas].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
   const bycat: Record<SkillCat, Brecha[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
   for (const b of sorted) bycat[classifySkill(b.skill)].push(b);
@@ -992,6 +1073,16 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
 
   const demandsSorted = [...matriz.map(m => m.demanda_mercado)].sort((a, b) => a - b);
   const scatterTopThird = demandsSorted[Math.floor(demandsSorted.length * 2 / 3)] ?? 1;
+
+  // 4-category totals for stacked bar (verified: sum = matriz.length)
+  const scatterGroups = computeScatterGroups(matriz, scatterTopThird);
+  const catCounts = [
+    { key: 'verde',    label: 'Bien cubierta',    color: '#0ca30c', count: scatterGroups.verde.length },
+    { key: 'amarillo', label: 'Cobertura parcial', color: '#D97706', count: scatterGroups.amarillo.length },
+    { key: 'rojo',     label: 'Brecha crítica',    color: '#d03b3b', count: scatterGroups.rojo.length },
+    { key: 'gris',     label: 'Baja relevancia',   color: '#898781', count: scatterGroups.gris.length },
+  ];
+  const catTotal = catCounts.reduce((s, c) => s + c.count, 0);
 
   const PRIORITY_DESCS = [
     'Mayor brecha y alta demanda del mercado.',
@@ -1029,8 +1120,25 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
 
       {/* ── KPI row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ flexShrink: 0 }}>
+        {/* Card 1: Alineación with formula tooltip */}
+        <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 58, height: 58, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', flexShrink: 0 }}>
+            <IconTarget size={28} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 2 }}>Alineación curricular</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{coberturaPct}%</div>
+            <div
+              title="Skills del mercado con cobertura en el programa ÷ total de skills del mercado × 100"
+              style={{ fontSize: 9, color: '#9CA3AF', marginTop: 3, lineHeight: 1.3, cursor: 'help' }}
+            >
+              Skills cubiertas / total mercado ⓘ
+            </div>
+          </div>
+          <SparkBars color="#3B82F6" bars={[4, 5, 6, 7, 6, 8, 7]} />
+        </div>
+        {/* Cards 2-4 */}
         {([
-          { label: 'Alineación curricular',   value: `${coberturaPct}%`, Icon: IconTarget,        iconBg: C.navy,    barColor: '#3B82F6', bars: [4, 5, 6, 7, 6, 8, 7] as number[] },
           { label: 'Competencias analizadas', value: skillsAnalizadas,   Icon: IconClipboardList, iconBg: '#78500A', barColor: '#B7791F', bars: [3, 5, 4, 7, 5, 8, 6] as number[] },
           { label: 'Brechas críticas',        value: brechasAlta.length, Icon: IconAlertTriangle, iconBg: '#7A1010', barColor: '#EF4444', bars: [7, 5, 8, 6, 4, 7, 5] as number[] },
           { label: 'Fortalezas consolidadas', value: wellCovered,        Icon: IconCircleCheck,   iconBg: '#0D5C2E', barColor: '#22C55E', bars: [5, 6, 7, 5, 8, 7, 9] as number[] },
@@ -1051,8 +1159,41 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
       {/* ── Two-column body ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4" style={{ flexShrink: 0 }}>
 
-        {/* LEFT: Composición + Scatter */}
+        {/* LEFT: Estado de alineación + Categorías + Scatter */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Stacked bar: Estado de la alineación curricular */}
+          {catTotal > 0 && (
+            <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px 16px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>
+                Estado de la alineación curricular
+                <span style={{ fontSize: 10, fontWeight: 400, color: '#9CA3AF', marginLeft: 8 }}>
+                  {catTotal} skills analizadas
+                </span>
+              </p>
+              <div style={{ display: 'flex', height: 18, borderRadius: 6, overflow: 'hidden', gap: 1 }}>
+                {catCounts.map(c => c.count > 0 && (
+                  <div
+                    key={c.key}
+                    style={{ flex: c.count, background: c.color, minWidth: 2 }}
+                    title={`${c.label}: ${c.count} skills (${Math.round(c.count / catTotal * 100)}%)`}
+                  />
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px 14px', marginTop: 8 }}>
+                {catCounts.map(c => (
+                  <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: 2, background: c.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 10, color: '#6B7280' }}>
+                      {c.label}: <b style={{ color: '#374151' }}>{c.count}</b>
+                      <span style={{ color: '#9CA3AF' }}> ({Math.round(c.count / catTotal * 100)}%)</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Composición de brechas</p>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -1072,7 +1213,7 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
                     <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>Sin brechas</p>
                   ) : (
                     <SkillBarList
-                      items={items.slice(0, 10).map(b => ({ label: cap(b.skill), value: b.frecuencia_mercado ?? 0 }))}
+                      items={items.slice(0, 10).map(b => ({ label: displaySkill(b.skill), value: b.frecuencia_mercado ?? 0, rawSkill: b.skill }))}
                       color={m.bar}
                       valueLabel="vacantes"
                     />
@@ -1107,7 +1248,7 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
                       {CAT_ICONS_LG[cat]}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy, marginBottom: 2 }}>{cap(b.skill)}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy, marginBottom: 2 }}>{displaySkill(b.skill)}</div>
                       <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8 }}>{PRIORITY_DESCS[i] ?? PRIORITY_DESCS[3]}</div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 9, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Prioridad</span>
@@ -1131,8 +1272,8 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#7A5E10', margin: '0 0 5px', letterSpacing: '0.03em' }}>Decisión recomendada</p>
                   <p style={{ fontSize: 12, fontWeight: 600, color: C.navy, margin: 0, lineHeight: 1.6 }}>
-                    Priorizar la actualización de {cap(topBrechas[0]?.skill ?? '')}
-                    {topBrechas[1] ? ` y ${cap(topBrechas[1].skill)}` : ''} en el próximo comité curricular.
+                    Priorizar la actualización de {displaySkill(topBrechas[0]?.skill ?? '')}
+                    {topBrechas[1] ? ` y ${displaySkill(topBrechas[1].skill)}` : ''} en el próximo comité curricular.
                   </p>
                 </div>
               </div>
@@ -1147,7 +1288,7 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', whiteSpace: 'nowrap', borderRight: `1px solid ${C.border}`, paddingRight: 16 }}>Fortalezas diferenciadoras</span>
             {[...skills.exclusivas_programa].sort((a, b) => b.cobertura - a.cobertura).slice(0, 8).map(e => (
-              <span key={e.skill} style={{ fontSize: 12, color: C.navy, border: `1.5px solid ${C.navy}`, borderRadius: 20, padding: '5px 16px', fontWeight: 600, background: 'transparent' }}>{cap(e.skill)}</span>
+              <span key={e.skill} style={{ fontSize: 12, color: C.navy, border: `1.5px solid ${C.navy}`, borderRadius: 20, padding: '5px 16px', fontWeight: 600, background: 'transparent' }}>{displaySkill(e.skill)}</span>
             ))}
           </div>
         </div>
