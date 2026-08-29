@@ -1689,3 +1689,39 @@ def pipeline_status(job_id: str) -> _UnicodeJSONResponse:
     # Return last 50 log lines to keep response light
     payload = {**job, "log": job["log"][-50:]}
     return _UnicodeJSONResponse(payload)  # type: ignore[name-defined]
+
+
+# ── Deep Curriculum Analysis ──────────────────────────────────────────────────
+
+@app.get("/api/programs/{program_id}/deep-analysis", tags=["curriculum"])
+def get_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
+    """Return the most recent persisted deep curriculum analysis, or 404."""
+    try:
+        from intelligence.curriculum_deep_analysis_engine import get_latest_deep_analysis
+        result = get_latest_deep_analysis(program_id)
+        if result is None:
+            return _UnicodeJSONResponse(  # type: ignore[name-defined]
+                {"error": f"No deep analysis found for program {program_id}. "
+                          "POST to /api/programs/{id}/deep-analysis/generate to create one."},
+                status_code=404,
+            )
+        return _UnicodeJSONResponse(result)  # type: ignore[name-defined]
+    except Exception as exc:
+        logger.exception("get_deep_analysis failed for program_id=%s", program_id)
+        return _UnicodeJSONResponse({"error": str(exc)}, status_code=500)  # type: ignore[name-defined]
+
+
+@app.post("/api/programs/{program_id}/deep-analysis/generate", tags=["curriculum"])
+def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
+    """Trigger a new LLM-based deep curriculum analysis and persist it."""
+    try:
+        from intelligence.curriculum_deep_analysis_engine import build_deep_analysis
+        result = build_deep_analysis(program_id, persist=True)
+        return _UnicodeJSONResponse(result)  # type: ignore[name-defined]
+    except ValueError as exc:
+        return _UnicodeJSONResponse({"error": str(exc)}, status_code=404)  # type: ignore[name-defined]
+    except RuntimeError as exc:
+        return _UnicodeJSONResponse({"error": str(exc)}, status_code=503)  # type: ignore[name-defined]
+    except Exception as exc:
+        logger.exception("generate_deep_analysis failed for program_id=%s", program_id)
+        return _UnicodeJSONResponse({"error": str(exc)}, status_code=500)  # type: ignore[name-defined]
