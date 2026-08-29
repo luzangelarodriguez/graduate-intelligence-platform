@@ -233,19 +233,34 @@ def parse_standard_docx(path: Path) -> dict[str, Any] | None:
     descripcion = _table_all_text(desc_table) if desc_table else ""
 
     # Split RA table: first body cell = learning outcomes, second = thematic content
+    # Some docx use a column layout (headers side-by-side in row 0, content in row 1)
+    # while others use a row layout (each label is its own row, content follows below).
+    # Both structures can produce section labels as body_cells entries — filter them out.
+    _RA_SECTION_LABELS = {
+        "RESULTADOS DE APRENDIZAJE",
+        "CONTENIDO TEMÁTICO",
+        "CONTENIDO TEMATICO",
+        "MEDIOS EDUCATIVOS",
+        "MEDIOS Y AYUDAS EDUCATIVAS",
+    }
     resultados_text = ""
     contenido_tematico = ""
     if ra_table:
-        body_cells = [
-            c.text.strip()
-            for row in ra_table.rows[1:]
-            for c in row.cells
-            if c.text.strip()
-        ]
-        if len(body_cells) >= 1:
-            resultados_text = body_cells[0]
-        if len(body_cells) >= 2:
-            contenido_tematico = body_cells[1]
+        # Deduplicate within each row (handles merged cells that repeat text)
+        body_cells: list[str] = []
+        for row in ra_table.rows[1:]:
+            seen_in_row: set[str] = set()
+            for cell in row.cells:
+                txt = cell.text.strip()
+                if txt and txt not in seen_in_row:
+                    seen_in_row.add(txt)
+                    body_cells.append(txt)
+        # Drop section label cells so positional assignment is content-only
+        content_cells = [c for c in body_cells if c.upper().strip() not in _RA_SECTION_LABELS]
+        if len(content_cells) >= 1:
+            resultados_text = content_cells[0]
+        if len(content_cells) >= 2:
+            contenido_tematico = content_cells[1]
 
     medios_text = _table_all_text(media_table) if media_table else ""
 
@@ -275,6 +290,7 @@ def parse_standard_docx(path: Path) -> dict[str, Any] | None:
         "descripcion": descripcion[:2000],
         "resultados_aprendizaje": resultados[:15],
         "contenido_tematico": temas or [contenido_tematico[:500]],
+        "resultados_text_raw": resultados_text,
         "herramientas_recursos": medios_text[:1000],
         "skills": skills,
         "source_document": path.name,
@@ -707,7 +723,7 @@ def insert_record(conn, rec: dict, esp_id: int | None) -> int:
                 rec["document_hash"],
                 "\n\n".join([
                     rec["descripcion"],
-                    "\n".join(rec["resultados_aprendizaje"]),
+                    rec.get("resultados_text_raw", ""),
                     "\n".join(rec["contenido_tematico"]),
                 ]).strip(),
                 rec["domain_key"],
