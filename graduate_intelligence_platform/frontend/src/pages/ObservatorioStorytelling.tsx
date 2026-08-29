@@ -994,110 +994,116 @@ function ViewPrograma({ programaId }: ViewProps) {
     .slice(0, 4);
 
   // ── Render ─────────────────────────────────────────────────────────────────
+  const D = {
+    bg:      '#0B1730',   // fondo global navy oscuro
+    card:    '#112448',   // tarjetas navy medio
+    cardAlt: '#0F1E3D',   // tarjetas navy más oscuro
+    border:  '#1E3560',   // bordes internos
+    white:   '#FFFFFF',
+    gold:    '#F0A500',
+    orange:  '#E87722',
+    green:   '#16A34A',
+    greenL:  '#22C55E',
+    muted:   'rgba(255,255,255,0.55)',
+    mutedD:  'rgba(255,255,255,0.35)',
+  } as const;
+
   return (
-    <div style={{ background: INF.gray50, minHeight: '100%', fontFamily: 'inherit' }}>
+    <div style={{ background: D.bg, minHeight: '100%', fontFamily: 'inherit', padding: '0 0 4px' }}>
 
-      {/* ══ BANNER HEADER ══ */}
-      <div style={{
-        background: `linear-gradient(135deg, ${INF.navy} 0%, ${INF.navy2} 100%)`,
-        padding: '24px 28px 20px',
-        borderBottom: `3px solid ${INF.orange}`,
-      }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: INF.orange, fontWeight: 700, marginBottom: 6 }}>
-          Análisis de competencias del programa
+      {/* ══ HEADER ══ */}
+      <div style={{ padding: '22px 24px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}` }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: D.white, margin: '0 0 4px', lineHeight: 1.15 }}>
+            Análisis de competencias del programa
+          </h1>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.orange, margin: 0 }}>{data.programa}</p>
         </div>
-        <h1 style={{ fontSize: 20, fontWeight: 800, color: INF.white, margin: '0 0 18px', lineHeight: 1.2 }}>
-          {data.programa}
-        </h1>
-
-        {/* 4 KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-          {([
-            { value: uniqueAsignaturas, label: 'Asignaturas analizadas', note: 'con evidencia' },
-            { value: 5,                 label: 'Ejes formativos',         note: 'del modelo' },
-            { value: metodologiasCount, label: 'Metodologías clave',      note: 'marcos + herr.' },
-            { value: coherencia,        label: 'Coherencia curricular',    note: 'evidencia prom.' },
-          ] as { value: string | number; label: string; note: string }[]).map((kpi, i) => (
-            <div key={i} style={{
-              background: 'rgba(255,255,255,0.08)',
-              borderRadius: 10,
-              padding: '12px 14px',
-              borderTop: `3px solid ${INF.orange}`,
-            }}>
-              <div style={{ fontSize: 26, fontWeight: 900, color: INF.gold, lineHeight: 1 }}>
-                {kpi.value}
-              </div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: INF.white, marginTop: 4 }}>{kpi.label}</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>{kpi.note}</div>
-            </div>
-          ))}
+        <div style={{ width: 44, height: 44, borderRadius: 10, background: D.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 12 }}>
+          <IconChartBar size={24} color={D.bg} />
         </div>
       </div>
 
+      {/* ══ KPI ROW ══ */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border, borderBottom: `1px solid ${D.border}` }}>
+        {([
+          { icon: <IconClipboardList size={22} color={D.bg} />, value: uniqueAsignaturas, label: 'Asignaturas analizadas' },
+          { icon: <IconSchool size={22} color={D.bg} />,        value: 5,                 label: 'Ejes formativos' },
+          { icon: <IconListCheck size={22} color={D.bg} />,     value: metodologiasCount, label: 'Metodologías clave' },
+          { icon: <IconAward size={22} color={D.bg} />,         value: coherencia,        label: 'Coherencia curricular', highlight: true },
+        ] as { icon: React.ReactNode; value: string|number; label: string; highlight?: boolean }[]).map((k, i) => (
+          <div key={i} style={{ background: D.white, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 8, background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {k.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: k.highlight ? D.orange : D.bg, lineHeight: 1 }}>{k.value}</div>
+              <div style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>{k.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* ══ CUERPO ══ */}
-      <div style={{ padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ padding: '14px 14px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* ── Fila 1: Fortaleza formativa + Competencias principales ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
           {/* Fortaleza formativa */}
-          <div style={{ background: INF.white, borderRadius: 12, padding: 18, border: `1px solid ${INF.border}` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: INF.navy, marginBottom: 14 }}>
+          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 14, letterSpacing: '0.02em' }}>
               Fortaleza formativa
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {CATS_ORDER.map(cat => {
                 const pct = fortalezaPct(data[cat] ?? []);
                 return (
                   <div key={cat}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 11, color: INF.gray700 }}>{CAT_LABEL[cat]}</span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: INF.green }}>{pct}%</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontSize: 11, color: D.muted }}>{CAT_LABEL[cat]}</span>
                     </div>
-                    <div style={{ height: 8, borderRadius: 4, background: INF.gray100, overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', height: 20, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                       <div style={{
                         width: `${pct}%`, height: '100%',
-                        background: `linear-gradient(90deg, ${INF.green} 0%, #22C55E 100%)`,
-                        borderRadius: 4,
-                        transition: 'width 0.6s ease',
-                      }} />
+                        background: `linear-gradient(90deg, ${D.green} 0%, ${D.greenL} 100%)`,
+                        borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+                        paddingRight: 6,
+                      }}>
+                        {pct >= 18 && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: D.white }}>{pct}%</span>
+                        )}
+                      </div>
+                      {pct < 18 && (
+                        <span style={{ position: 'absolute', right: 0, top: 0, height: '100%', display: 'flex', alignItems: 'center', paddingRight: 6, fontSize: 11, fontWeight: 700, color: D.muted }}>{pct}%</span>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
-            <p style={{ fontSize: 10, color: INF.gray400, margin: '12px 0 0', lineHeight: 1.4 }}>
-              % = promedio de evidencia por categoría ÷ 3 × 100
+            <p style={{ fontSize: 9, color: D.mutedD, margin: '10px 0 0', lineHeight: 1.4 }}>
+              % = promedio de evidencia ÷ 3 × 100
             </p>
           </div>
 
           {/* Competencias principales */}
-          <div style={{ background: INF.white, borderRadius: 12, padding: 18, border: `1px solid ${INF.border}` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: INF.navy, marginBottom: 14 }}>
+          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 14 }}>
               Competencias principales
             </div>
             {competenciasPrincipales.length === 0 ? (
-              <p style={{ fontSize: 12, color: INF.gray400, fontStyle: 'italic' }}>Sin datos</p>
+              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic' }}>Sin datos</p>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 10 }}>
-                {competenciasPrincipales.map(item => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
+                {competenciasPrincipales.slice(0, 10).map(item => (
                   <div key={item.nombre} style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: 6, padding: '10px 6px',
-                    background: INF.gray50, borderRadius: 8,
-                    border: `1px solid ${INF.border}`,
-                    textAlign: 'center',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                    padding: '10px 4px', background: D.cardAlt, borderRadius: 8, textAlign: 'center',
                   }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      background: INF.navy,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: INF.gold, flexShrink: 0,
-                    }}>
-                      {iconoCompetencia(item.nombre)}
-                    </div>
-                    <span style={{ fontSize: 10, color: INF.gray700, lineHeight: 1.3 }}>
-                      {item.nombre}
+                    <div style={{ color: D.gold }}>{iconoCompetencia(item.nombre)}</div>
+                    <span style={{ fontSize: 9, color: D.muted, lineHeight: 1.3, wordBreak: 'break-word' }}>
+                      {item.nombre.length > 18 ? item.nombre.slice(0, 17) + '…' : item.nombre}
                     </span>
                   </div>
                 ))}
@@ -1107,120 +1113,89 @@ function ViewPrograma({ programaId }: ViewProps) {
         </div>
 
         {/* ── Oportunidades de fortalecimiento ── */}
-        <div style={{ background: INF.white, borderRadius: 12, border: `1px solid ${INF.border}`, overflow: 'hidden' }}>
-          <div style={{
-            background: INF.navy, padding: '12px 18px',
-            fontSize: 13, fontWeight: 700, color: INF.white,
-          }}>
-            Oportunidades de fortalecimiento y evidencia
+        <div style={{ background: D.card, borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 18px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <IconTarget size={16} color={D.gold} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Oportunidades de fortalecimiento y evidencia</span>
           </div>
           {oportunidades.length === 0 ? (
-            <p style={{ padding: 16, fontSize: 12, color: INF.gray400, fontStyle: 'italic', margin: 0 }}>
-              Sin oportunidades identificadas.
-            </p>
+            <p style={{ padding: 16, fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin oportunidades identificadas.</p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: INF.gray50 }}>
-                  <th style={{ width: 36, padding: '8px 14px', fontSize: 11, color: INF.gray400, fontWeight: 600, textAlign: 'center', borderBottom: `1px solid ${INF.border}` }}>#</th>
-                  <th style={{ padding: '8px 14px', fontSize: 11, color: INF.gray400, fontWeight: 600, textAlign: 'left', borderBottom: `1px solid ${INF.border}` }}>Oportunidad</th>
-                  <th style={{ padding: '8px 14px', fontSize: 11, color: INF.gray400, fontWeight: 600, textAlign: 'left', borderBottom: `1px solid ${INF.border}` }}>¿Por qué se identifica?</th>
-                  <th style={{ width: 80, padding: '8px 14px', fontSize: 11, color: INF.gray400, fontWeight: 600, textAlign: 'center', borderBottom: `1px solid ${INF.border}` }}>Impacto</th>
+                <tr>
+                  <th style={{ width: 36, padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'center', borderBottom: `1px solid ${D.border}` }}>N°</th>
+                  <th style={{ width: '32%', padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'left', borderBottom: `1px solid ${D.border}` }}>Oportunidad</th>
+                  <th style={{ padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'left', borderBottom: `1px solid ${D.border}` }}>¿Por qué se identifica?</th>
                 </tr>
               </thead>
               <tbody>
-                {oportunidades.map((d, i) => {
-                  const impactColor = d.impacto === 'alto' ? '#DC2626' : d.impacto === 'medio' ? '#D97706' : '#6B7280';
-                  return (
-                    <tr key={i} style={{ borderBottom: i < oportunidades.length - 1 ? `1px solid ${INF.border}` : 'none' }}>
-                      <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                        <span style={{
-                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          width: 22, height: 22, borderRadius: '50%',
-                          background: INF.navy, color: INF.white, fontSize: 11, fontWeight: 700,
-                        }}>{i + 1}</span>
-                      </td>
-                      <td style={{ padding: '10px 14px', fontSize: 12, color: INF.navy, fontWeight: 600, verticalAlign: 'top' }}>
-                        {d.hallazgo.length > 80 ? d.hallazgo.slice(0, 78) + '…' : d.hallazgo}
-                      </td>
-                      <td style={{ padding: '10px 14px', fontSize: 11, color: INF.gray600, verticalAlign: 'top', lineHeight: 1.5 }}>
-                        {d.recomendacion}
-                      </td>
-                      <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, color: impactColor,
-                          background: impactColor + '18', padding: '3px 8px', borderRadius: 20,
-                          textTransform: 'capitalize',
-                        }}>{d.impacto}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {oportunidades.map((d, i) => (
+                  <tr key={i} style={{ borderBottom: i < oportunidades.length - 1 ? `1px solid ${D.border}` : 'none' }}>
+                    <td style={{ padding: '9px 12px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
+                      }}>{i + 1}</span>
+                    </td>
+                    <td style={{ padding: '9px 12px', fontSize: 11, color: D.white, fontWeight: 600, verticalAlign: 'top', lineHeight: 1.4 }}>
+                      {d.hallazgo.length > 70 ? d.hallazgo.slice(0, 68) + '…' : d.hallazgo}
+                    </td>
+                    <td style={{ padding: '9px 12px', fontSize: 11, color: D.muted, verticalAlign: 'top', lineHeight: 1.5 }}>
+                      {d.recomendacion}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}
         </div>
 
         {/* ── Fila 2: Herramientas + Prioridades ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 14 }}>
 
           {/* Herramientas identificadas */}
-          <div style={{ background: INF.white, borderRadius: 12, padding: 18, border: `1px solid ${INF.border}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              {herramientasPills.length > 0 && (
-                <div style={{
-                  width: 24, height: 24, borderRadius: '50%',
-                  background: INF.greenL, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <IconCheck size={14} color={INF.green} />
-                </div>
-              )}
-              <span style={{ fontSize: 13, fontWeight: 700, color: INF.navy }}>Herramientas identificadas</span>
+          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <IconTool size={16} color={D.gold} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Herramientas identificadas</span>
             </div>
             {herramientasPills.length === 0 ? (
-              <p style={{ fontSize: 12, color: INF.gray400, fontStyle: 'italic', margin: 0 }}>
-                Sin evidencia suficiente
-              </p>
+              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin evidencia suficiente</p>
             ) : (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                {herramientasPills.map((nombre, i) => (
-                  <span key={i} style={{
-                    fontSize: 11, fontWeight: 600,
-                    background: INF.greenL, color: INF.green,
-                    padding: '4px 10px', borderRadius: 20,
-                    border: `1px solid #BBF7D0`,
-                  }}>
-                    {nombre}
-                  </span>
-                ))}
-              </div>
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <IconCheck size={13} color="#4ADE80" />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#4ADE80' }}>Sí se evidencian</span>
+                </div>
+                <p style={{ fontSize: 12, color: D.muted, margin: 0, lineHeight: 1.8 }}>
+                  {herramientasPills.join(' · ')}
+                </p>
+              </>
             )}
           </div>
 
           {/* Prioridades */}
-          <div style={{ background: INF.white, borderRadius: 12, padding: 18, border: `1px solid ${INF.border}` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: INF.navy, marginBottom: 14 }}>
-              Prioridades de mejora
+          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <IconBolt size={16} color={D.gold} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Prioridades</span>
             </div>
             {prioridades.length === 0 ? (
-              <p style={{ fontSize: 12, color: INF.gray400, fontStyle: 'italic', margin: 0 }}>Sin datos</p>
+              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin datos</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
                 {prioridades.map((r, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
-                      background: INF.orange, color: INF.white, fontSize: 12, fontWeight: 800,
+                      width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+                      background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
                     }}>{i + 1}</span>
-                    <div>
-                      <div style={{ fontSize: 12, color: INF.gray700, fontWeight: 600, lineHeight: 1.4 }}>
-                        {r.accion}
-                      </div>
-                      <div style={{ fontSize: 10, color: INF.gray400, marginTop: 2 }}>
-                        Prioridad {r.prioridad}
-                      </div>
-                    </div>
+                    <span style={{ fontSize: 11, color: D.muted, lineHeight: 1.45 }}>{r.accion}</span>
                   </div>
                 ))}
               </div>
@@ -1228,8 +1203,12 @@ function ViewPrograma({ programaId }: ViewProps) {
           </div>
         </div>
 
-        {/* ── Nota metodológica ── */}
-        <p style={{ fontSize: 11, color: INF.gray400, margin: 0, lineHeight: 1.6, borderTop: `1px solid ${INF.border}`, paddingTop: 14 }}>
+      </div>
+
+      {/* ── Footer nota metodológica ── */}
+      <div style={{ padding: '10px 18px 14px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <IconCircleCheck size={14} color={D.mutedD} style={{ flexShrink: 0, marginTop: 1 }} />
+        <p style={{ fontSize: 10, color: D.mutedD, margin: 0, lineHeight: 1.6 }}>
           Las cifras representan evidencias identificadas en resultados de aprendizaje, contenidos y actividades formativas; no equivalen al nivel de dominio del estudiante.
         </p>
       </div>
