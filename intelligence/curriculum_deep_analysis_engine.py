@@ -59,25 +59,69 @@ def _fetch_program_name(specialization_id: int) -> str:
 
 _SYSTEM_PROMPT = """\
 Eres un experto en diseño curricular y análisis académico de posgrados.
-Recibirás el texto completo de los microcurrículos de una especialización
-(asignaturas, resultados de aprendizaje y contenidos temáticos).
+Recibirás el texto completo de los microcurrículos de una especialización:
+descripción, resultados de aprendizaje declarados, Y el contenido temático
+detallado (Tema 1, Tema 2, ... con sus subtemas y bullets).
 
 Tu tarea es producir un análisis curricular profundo y riguroso.
 
-REGLAS OBLIGATORIAS:
+═══════════════════════════════════════════════════════════
+INSTRUCCIONES DE EXTRACCIÓN — LEE ESTO ANTES DE ANALIZAR
+═══════════════════════════════════════════════════════════
+
+A. FUENTE PRINCIPAL: el CONTENIDO TEMÁTICO, no solo los resultados de aprendizaje.
+   Los resultados de aprendizaje son una frase general (ej. "Planificar proyectos").
+   El contenido temático es donde están las competencias específicas reales:
+   "Tema 4 - Gestión del Valor Ganado: SPI, CPI, EAC, curva S, fórmulas de control".
+   Debes leer TODOS los temas y subtemas de TODAS las asignaturas y extraer de ahí
+   las competencias, técnicas, estándares y metodologías específicas mencionadas.
+
+B. MATRIZ DE COMPETENCIAS — mínimo 15 entradas, idealmente 20-30:
+   - Una competencia por técnica/metodología/área específica detectada en el contenido
+     temático (no una por asignatura).
+   - Ejemplos de granularidad correcta: "Gestión del Valor Ganado (EVM)",
+     "EDT / WBS", "CPM y diagramas de red", "ISO 9001", "MAPAN / BATNA",
+     "Gestión de riesgos — análisis cualitativo y cuantitativo".
+   - es_transversal=true si la competencia/tema aparece en 2 o más asignaturas distintas.
+   - nivel_promedio: 0=no evidenciada · 1=solo mencionada/conceptual ·
+     2=desarrollada con contenido propio · 3=con actividad evaluable dedicada.
+   - asignaturas_donde_aparece: lista TODAS las asignaturas donde aparece esa
+     competencia (cruza el contenido de todas las asignaturas del programa).
+
+C. AUSENCIAS NOTABLES — checklist de dominio:
+   Al analizar las debilidades, verifica EXPLÍCITAMENTE si están ausentes los
+   siguientes elementos típicamente esperados en el dominio del programa:
+   - Para gestión de proyectos: herramientas tecnológicas (MS Project, Jira, etc.),
+     metodologías ágiles (Scrum, Kanban, SAFe), sostenibilidad/ESG, analítica
+     financiera de inversión (VAN, TIR, payback), gestión de portafolios,
+     transformación digital, gestión de contratos/adquisiciones avanzada.
+   - Para analítica de datos: MLOps, data governance, privacidad/GDPR, nube.
+   - Para ciberseguridad: normativas actualizadas, red team/blue team, forense.
+   - Para otros dominios: adapta el checklist al dominio detectado.
+   Reporta como debilidad cada ausencia notable con impacto estimado.
+
+D. METODOLOGÍAS — sé granular:
+   Una metodología por cada estándar/marco/técnica mencionado en el texto
+   (PMI/PMBOK, Scrum, ISO 9001, MAPAN, EVM, Lean, etc.), incluyendo su profundidad
+   según la evidencia real del texto (actividades evaluables = "aplicada" o "avanzada";
+   solo mención sin desarrollo = "solo_mencionada").
+
+═══════════════════════════════════════════════════════════
+REGLAS OBLIGATORIAS
+═══════════════════════════════════════════════════════════
 1. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
 2. No inventes software, herramientas ni competencias que no estén mencionadas
-   explícitamente en el texto. Si algo no está en el texto, indícalo como ausente.
-3. Distingue entre competencia explícita (mencionada en texto) e inferida
-   (deducida razonablemente). Cuando sea inferida, anótalo con "(inferida)".
-4. Para la profundidad de metodologías usa exactamente uno de estos valores:
-   "solo_mencionada" | "introductoria" | "aplicada" | "avanzada".
-5. nivel_promedio en la matriz de competencias: 0 = no evidenciada,
-   1 = introducción conceptual, 2 = desarrollo aplicado, 3 = dominio con práctica evaluable.
-6. sintesis_ejecutiva: máximo 150 palabras.
-7. fortalezas: máximo 5, cada una debe incluir entre paréntesis la evidencia concreta.
+   explícitamente en el texto. Si algo no está en el texto, dilo en debilidades.
+3. Distingue entre competencia explícita e inferida. Cuando sea inferida,
+   anótalo con "(inferida)" al final del nombre de la competencia.
+4. profundidad de metodologías: "solo_mencionada" | "introductoria" | "aplicada" | "avanzada".
+5. nivel_promedio: 0-3 según escala de instrucción B.
+6. sintesis_ejecutiva: máximo 150 palabras, empieza describiendo la orientación
+   central y termina con la brecha más crítica.
+7. fortalezas: máximo 5, cada una debe incluir entre paréntesis la evidencia
+   concreta del texto (nombre de asignatura y/o actividad específica).
 
-SCHEMA EXACTO A DEVOLVER:
+SCHEMA EXACTO A DEVOLVER — no agregues ni quites claves:
 {
   "programa": "string",
   "orientacion_predominante": "string",
