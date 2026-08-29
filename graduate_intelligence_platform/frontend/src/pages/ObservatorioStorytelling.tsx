@@ -797,52 +797,185 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
   );
 }
 
-function ViewPrograma({ skills, dataPobre }: ViewProps) {
-  if (!skills) return <div style={{ padding: 24 }}><Spinner /></div>;
+// ─── ViewPrograma — deep analysis API consumer ────────────────────────────────
 
-  const bycat: Record<SkillCat, SkillPrograma[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
-  for (const s of skills.skills_programa) bycat[classifySkill(s.skill)].push(s);
+type DeepItem = { nombre: string; evidencia: number; asignaturas: string[] };
 
-  const ALL_CATS_P: SkillCat[] = ['herramienta', 'competencia', 'habilidad', 'otro'];
-  const cols: { cat: SkillCat; items: SkillPrograma[] }[] = ALL_CATS_P
-    .map(cat => ({ cat, items: bycat[cat].slice(0, 10) }))
-    .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
+interface DeepAnalysis {
+  programa: string;
+  orientacion_predominante: string;
+  competencia_global: string;
+  herramientas_tecnicas: DeepItem[];
+  competencias_metodologicas: DeepItem[];
+  habilidades_transversales: DeepItem[];
+  gestion_y_negocio: DeepItem[];
+  marcos_estandares_referentes: DeepItem[];
+  sintesis_ejecutiva: string;
+}
+
+type Prog5Cat = 'herramientas_tecnicas' | 'competencias_metodologicas' | 'habilidades_transversales' | 'gestion_y_negocio' | 'marcos_estandares_referentes';
+
+const PROG_CAT_META: Record<Prog5Cat, { label: string; color: string; bar: string; icon: React.ReactNode }> = {
+  herramientas_tecnicas:      { label: 'Herramientas y técnicas',      color: '#0D2158', bar: '#2563EB', icon: <IconTool size={15} /> },
+  competencias_metodologicas: { label: 'Competencias metodológicas',   color: '#065F46', bar: '#10B981', icon: <IconBrain size={15} /> },
+  habilidades_transversales:  { label: 'Habilidades transversales',    color: '#92400E', bar: '#F59E0B', icon: <IconUser size={15} /> },
+  gestion_y_negocio:          { label: 'Gestión y negocio',            color: '#1E3A5F', bar: '#3B82F6', icon: <IconBriefcase size={15} /> },
+  marcos_estandares_referentes: { label: 'Marcos y estándares',        color: '#4C1D95', bar: '#7C3AED', icon: <IconListCheck size={15} /> },
+};
+
+const CATS_ORDER: Prog5Cat[] = [
+  'herramientas_tecnicas',
+  'competencias_metodologicas',
+  'habilidades_transversales',
+  'gestion_y_negocio',
+  'marcos_estandares_referentes',
+];
+
+const EVIDENCIA_LABEL: Record<number, string> = { 3: 'Aplicado', 2: 'Desarrollado', 1: 'Mencionado' };
+
+function ViewPrograma({ programaId }: ViewProps) {
+  const [data, setData]       = useState<DeepAnalysis | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(false);
+    setData(null);
+    fetch(`${API}/api/programs/${programaId}/deep-analysis`)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((json) => {
+        setData(json.analysis_json ?? json.analysis ?? json);
+        setLoading(false);
+      })
+      .catch(() => { setError(true); setLoading(false); });
+  }, [programaId]);
+
+  if (loading) return <div style={{ padding: 24 }}><Spinner /></div>;
+  if (error || !data) return (
+    <div style={{ padding: 24, color: '#6B7280', fontSize: 13 }}>
+      No hay análisis curricular disponible para este programa.
+    </div>
+  );
+
+  const totalItems = CATS_ORDER.reduce((acc, k) => acc + (data[k]?.length ?? 0), 0);
+  const activeCats = CATS_ORDER.filter(k => (data[k]?.length ?? 0) > 0);
+
+  // Dominant + weakest for callout
+  const catSizes = activeCats.map(k => ({ k, n: data[k].length })).sort((a, b) => b.n - a.n);
+  const dominant = catSizes[0];
+  const weakest  = catSizes[catSizes.length - 1];
+  const calloutText = dominant && weakest && dominant.k !== weakest.k
+    ? `El programa evidencia una orientación sólida hacia ${PROG_CAT_META[dominant.k].label.toLowerCase()}, con oportunidad de ampliar la diversidad en ${PROG_CAT_META[weakest.k].label.toLowerCase()}.`
+    : `El programa muestra una distribución equilibrada de competencias en sus ${activeCats.length} categorías identificadas.`;
 
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
-      <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Enseña el Programa</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{skills.skills_programa.length} competencias en el microcurrículo · Tamaño = presencia (materias)</p>
+    <div style={{ padding: '20px 24px', background: '#FFFFFF', minHeight: '100%', fontFamily: 'inherit' }}>
+
+      {/* ── Header ── */}
+      <h1 style={{ fontSize: 20, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>
+        Qué enseña el programa
+      </h1>
+      <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>
+        {totalItems} competencias identificadas en el microcurrículo · Análisis curricular profundo
+      </p>
+
+      {/* ── Fila de 3 métricas ── */}
+      <div style={{
+        display: 'flex', alignItems: 'stretch', gap: 0,
+        border: `1px solid ${C.border}`, borderRadius: 10,
+        marginBottom: 20, overflow: 'hidden', background: '#fff',
+      }}>
+        {([
+          {
+            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconListCheck size={18} color="#fff" /></div>,
+            number: totalItems,
+            label: 'competencias',
+          },
+          {
+            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconChartBar size={18} color="#fff" /></div>,
+            number: activeCats.length,
+            label: 'categorías',
+          },
+          {
+            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#4C1D95', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconBrain size={18} color="#fff" /></div>,
+            number: (data[dominant?.k]?.filter(i => i.evidencia === 3).length ?? 0),
+            label: 'con nivel aplicado',
+          },
+        ] as { icon: React.ReactNode; number: number; label: string }[]).map((m, i, arr) => (
+          <div key={i} style={{
+            flex: 1, padding: '16px 20px',
+            borderRight: i < arr.length - 1 ? `1px solid ${C.border}` : 'none',
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            {m.icon}
+            <div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{m.number}</div>
+              <div style={{ fontSize: 12, color: '#6B7280' }}>{m.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" style={{ minHeight: 0 }}>
-        {cols.map(({ cat, items }) => {
-          const m = CAT_META[cat];
-          const isEmpty = items.length === 0;
+
+      {/* ── Grid de 5 tarjetas ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 20 }}>
+        {CATS_ORDER.map(cat => {
+          const meta  = PROG_CAT_META[cat];
+          const items = (data[cat] ?? []).slice().sort((a, b) => b.evidencia - a.evidencia).slice(0, 12);
+          const maxEv = items[0]?.evidencia ?? 1;
           return (
-            <DashPanel
-              key={cat}
-              title={m.label}
-              className={isEmpty ? 'min-h-[90px] lg:min-h-[280px]' : undefined}
-              style={isEmpty ? undefined : { minHeight: 280 }}
-            >
-              {isEmpty ? (
-                <div className="flex items-center justify-center flex-1">
-                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+            <div key={cat} style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, background: '#fff' }}>
+              {/* Card header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                  {meta.icon}
                 </div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>{meta.label}</span>
+                <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>{items.length}</span>
+              </div>
+
+              {items.length === 0 ? (
+                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>Sin datos</p>
               ) : (
-                <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart
-                    labels={items.map(s => displaySkill(s.skill))}
-                    values={items.map(s => s.cobertura)}
-                    valueLabel="materias"
-                    color={cat === 'otro' ? '#94A3B8' : undefined}
-                  />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {items.map(item => {
+                    const pct = maxEv > 0 ? (item.evidencia / maxEv) * 100 : 0;
+                    return (
+                      <div key={item.nombre}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                          <span style={{ fontSize: 11, color: '#374151', flex: 1, marginRight: 8 }}>{item.nombre}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: meta.color, flexShrink: 0 }}>
+                            {EVIDENCIA_LABEL[item.evidencia] ?? item.evidencia}
+                          </span>
+                        </div>
+                        <div style={{ height: 5, borderRadius: 3, background: '#F3F4F6', overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: meta.bar, borderRadius: 3 }} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
-            </DashPanel>
+            </div>
           );
         })}
       </div>
+
+      {/* ── Callout ── */}
+      <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'flex-start', gap: 12, background: '#fff', marginBottom: 12 }}>
+        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <IconBolt size={16} color="#D97706" />
+        </div>
+        <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
+      </div>
+
+      {/* ── Nota metodológica ── */}
+      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
+        Las cifras representan evidencias identificadas en resultados de aprendizaje, contenidos y actividades formativas; no equivalen al nivel de dominio del estudiante.
+      </p>
     </div>
   );
 }
