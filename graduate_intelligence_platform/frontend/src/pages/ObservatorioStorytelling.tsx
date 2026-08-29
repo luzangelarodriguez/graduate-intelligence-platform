@@ -995,221 +995,258 @@ function ViewPrograma({ programaId }: ViewProps) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   const D = {
-    bg:      '#0B1730',   // fondo global navy oscuro
-    card:    '#112448',   // tarjetas navy medio
-    cardAlt: '#0F1E3D',   // tarjetas navy más oscuro
-    border:  '#1E3560',   // bordes internos
+    bg:      '#0B1730',
+    card:    '#112448',
+    cardAlt: '#0D1E3A',
+    border:  '#1E3560',
     white:   '#FFFFFF',
     gold:    '#F0A500',
     orange:  '#E87722',
-    green:   '#16A34A',
-    greenL:  '#22C55E',
-    muted:   'rgba(255,255,255,0.55)',
+    green:   '#22C55E',   // Aplicado dot
+    blue:    '#60A5FA',   // Desarrollado dot
+    yellow:  '#FACC15',   // Mencionado dot
+    muted:   'rgba(255,255,255,0.60)',
     mutedD:  'rgba(255,255,255,0.35)',
   } as const;
 
+  // KPI total elementos curriculares
+  const totalElementos = allItems.length;
+
+  // Icono por prioridad (mapeo semántico para flujo de prioridades)
+  const iconosPrioridad = [
+    <IconChartBar size={22} color={D.gold} />,
+    <IconBrain size={22} color={D.gold} />,
+    <IconShield size={22} color={D.gold} />,
+    <IconWorld size={22} color={D.gold} />,
+  ];
+
+  // Color dot por nivel de evidencia
+  const dotColor = (ev: number) =>
+    ev === 3 ? D.green : ev === 2 ? D.blue : D.yellow;
+
+  // Label row izquierda
+  const SectionLabel = ({ n, q1, q2 }: { n: string; q1: string; q2: string }) => (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 6, padding: '10px 8px', minWidth: 82, width: 82, flexShrink: 0,
+    }}>
+      <span style={{
+        width: 30, height: 30, borderRadius: '50%', background: D.gold,
+        color: D.bg, fontSize: 15, fontWeight: 900,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>{n}</span>
+      <span style={{ fontSize: 10, color: D.muted, textAlign: 'center', lineHeight: 1.4 }}>{q1}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, color: D.white, textAlign: 'center', lineHeight: 1.3 }}>{q2}</span>
+    </div>
+  );
+
   return (
-    <div style={{ background: D.bg, minHeight: '100%', fontFamily: 'inherit', padding: '0 0 4px' }}>
+    <div style={{ background: D.bg, minHeight: '100%', fontFamily: 'inherit' }}>
 
       {/* ══ HEADER ══ */}
-      <div style={{ padding: '22px 24px 18px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}` }}>
+      <div style={{ padding: '18px 20px 14px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: D.white, margin: '0 0 4px', lineHeight: 1.15 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 900, color: D.white, margin: '0 0 3px', lineHeight: 1.15 }}>
             Análisis de competencias del programa
           </h1>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.orange, margin: 0 }}>{data.programa}</p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: D.orange, margin: '0 0 5px' }}>{data.programa}</p>
+          <p style={{ fontSize: 10, color: D.mutedD, margin: 0 }}>
+            Ruta de lectura: alcance → fortalezas → mapa curricular → oportunidades → prioridades
+          </p>
         </div>
-        <div style={{ width: 44, height: 44, borderRadius: 10, background: D.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 12 }}>
-          <IconChartBar size={24} color={D.bg} />
+        <div style={{ width: 40, height: 40, borderRadius: 8, background: D.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <IconChartBar size={22} color={D.bg} />
         </div>
       </div>
 
-      {/* ══ KPI ROW ══ */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border, borderBottom: `1px solid ${D.border}` }}>
-        {([
-          { icon: <IconClipboardList size={22} color={D.bg} />, value: uniqueAsignaturas, label: 'Asignaturas analizadas' },
-          { icon: <IconSchool size={22} color={D.bg} />,        value: 5,                 label: 'Ejes formativos' },
-          { icon: <IconListCheck size={22} color={D.bg} />,     value: metodologiasCount, label: 'Metodologías clave' },
-          { icon: <IconAward size={22} color={D.bg} />,         value: coherencia,        label: 'Coherencia curricular', highlight: true },
-        ] as { icon: React.ReactNode; value: string|number; label: string; highlight?: boolean }[]).map((k, i) => (
-          <div key={i} style={{ background: D.white, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 8, background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {k.icon}
+      {/* ══ FILA ①: ¿Qué se analizó? — KPIs ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="1" q1="¿Qué se" q2="analizó?" />
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border }}>
+          {([
+            { icon: <IconClipboardList size={20} color={D.bg} />, value: uniqueAsignaturas, label: 'Asignaturas\nanalizadas' },
+            { icon: <IconSchool        size={20} color={D.bg} />, value: totalElementos,    label: 'Elementos\ncurriculares' },
+            { icon: <IconListCheck     size={20} color={D.bg} />, value: 5,                  label: 'Categorías' },
+            { icon: <IconAward         size={20} color={D.bg} />, value: coherencia,         label: 'Coherencia\ncurricular', hi: true },
+          ] as { icon: React.ReactNode; value: string|number; label: string; hi?: boolean }[]).map((k, i) => (
+            <div key={i} style={{ background: D.white, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 7, background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {k.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: k.hi ? D.orange : D.bg, lineHeight: 1 }}>{k.value}</div>
+                <div style={{ fontSize: 10, color: '#4B5563', marginTop: 2, whiteSpace: 'pre-line' }}>{k.label}</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: k.highlight ? D.orange : D.bg, lineHeight: 1 }}>{k.value}</div>
-              <div style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>{k.label}</div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* ══ CUERPO ══ */}
-      <div style={{ padding: '14px 14px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-        {/* ── Fila 1: Fortaleza formativa + Competencias principales ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      {/* ══ FILA ②: ¿Dónde es fuerte? — Fortaleza + Mapa de capacidades ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="2" q1="¿Dónde es" q2="fuerte?" />
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', gap: 1, background: D.border, minHeight: 0 }}>
 
           {/* Fortaleza formativa */}
-          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 14, letterSpacing: '0.02em' }}>
+          <div style={{ background: D.card, padding: '14px 14px' }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: D.white, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
               Fortaleza formativa
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 9, color: D.mutedD, marginBottom: 12, lineHeight: 1.3 }}>
+              Índice estimado por presencia y profundidad curricular
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {CATS_ORDER.map(cat => {
                 const pct = fortalezaPct(data[cat] ?? []);
+                const label = CAT_LABEL[cat];
                 return (
                   <div key={cat}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                      <span style={{ fontSize: 11, color: D.muted }}>{CAT_LABEL[cat]}</span>
-                    </div>
-                    <div style={{ position: 'relative', height: 20, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 10, color: D.muted, marginBottom: 3 }}>{label}</div>
+                    <div style={{ position: 'relative', height: 18, borderRadius: 3, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
                       <div style={{
                         width: `${pct}%`, height: '100%',
-                        background: `linear-gradient(90deg, ${D.green} 0%, ${D.greenL} 100%)`,
-                        borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-                        paddingRight: 6,
+                        background: `linear-gradient(90deg, #16A34A 0%, #22C55E 100%)`,
+                        borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 5,
                       }}>
-                        {pct >= 18 && (
-                          <span style={{ fontSize: 11, fontWeight: 700, color: D.white }}>{pct}%</span>
-                        )}
+                        {pct >= 20 && <span style={{ fontSize: 10, fontWeight: 700, color: D.white }}>{pct}%</span>}
                       </div>
-                      {pct < 18 && (
-                        <span style={{ position: 'absolute', right: 0, top: 0, height: '100%', display: 'flex', alignItems: 'center', paddingRight: 6, fontSize: 11, fontWeight: 700, color: D.muted }}>{pct}%</span>
+                      {pct < 20 && (
+                        <span style={{ position: 'absolute', right: 4, top: 0, height: '100%', display: 'flex', alignItems: 'center', fontSize: 10, fontWeight: 700, color: D.mutedD }}>{pct}%</span>
                       )}
                     </div>
                   </div>
                 );
               })}
             </div>
-            <p style={{ fontSize: 9, color: D.mutedD, margin: '10px 0 0', lineHeight: 1.4 }}>
-              % = promedio de evidencia ÷ 3 × 100
-            </p>
+            {/* Eje x */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              {['0%','20%','40%','60%','80%','100%'].map(t => (
+                <span key={t} style={{ fontSize: 8, color: D.mutedD }}>{t}</span>
+              ))}
+            </div>
           </div>
 
-          {/* Competencias principales */}
-          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 14 }}>
-              Competencias principales
+          {/* Mapa de capacidades */}
+          <div style={{ background: D.cardAlt, padding: '14px 12px', overflow: 'hidden' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 12, textAlign: 'center' }}>
+              Mapa de capacidades: ¿qué enseña el programa?
             </div>
-            {competenciasPrincipales.length === 0 ? (
-              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic' }}>Sin datos</p>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
-                {competenciasPrincipales.slice(0, 10).map(item => (
-                  <div key={item.nombre} style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                    padding: '10px 4px', background: D.cardAlt, borderRadius: 8, textAlign: 'center',
-                  }}>
-                    <div style={{ color: D.gold }}>{iconoCompetencia(item.nombre)}</div>
-                    <span style={{ fontSize: 9, color: D.muted, lineHeight: 1.3, wordBreak: 'break-word' }}>
-                      {item.nombre.length > 18 ? item.nombre.slice(0, 17) + '…' : item.nombre}
-                    </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
+              {CATS_ORDER.map((cat, ci) => {
+                const items = [...(data[cat] ?? [])].sort((a, b) => b.evidencia - a.evidencia);
+                const headerColors = ['#3B82F6','#60A5FA','#93C5FD','#A78BFA','#C4B5FD'];
+                return (
+                  <div key={cat} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                      fontSize: 10, fontWeight: 700, color: headerColors[ci],
+                      marginBottom: 8, lineHeight: 1.3, borderBottom: `1px solid ${D.border}`, paddingBottom: 6,
+                    }}>
+                      {ci + 1}. {CAT_LABEL[cat]} · {items.length}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {items.map(item => (
+                        <div key={item.nombre} style={{ display: 'flex', alignItems: 'flex-start', gap: 5 }}>
+                          <span style={{
+                            width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                            background: dotColor(item.evidencia), marginTop: 2,
+                          }} />
+                          <span style={{ fontSize: 9.5, color: D.muted, lineHeight: 1.35 }}>{item.nombre}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
+            {/* Leyenda */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12, paddingTop: 8, borderTop: `1px solid ${D.border}` }}>
+              {([
+                { color: D.green,  label: 'Aplicado' },
+                { color: D.blue,   label: 'Desarrollado' },
+                { color: D.yellow, label: 'Mencionado' },
+              ]).map(l => (
+                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 9, height: 9, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 9, color: D.muted }}>{l.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* ── Oportunidades de fortalecimiento ── */}
-        <div style={{ background: D.card, borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ padding: '12px 18px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <IconTarget size={16} color={D.gold} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Oportunidades de fortalecimiento y evidencia</span>
+      {/* ══ FILA ④: ¿Qué debe fortalecerse? — Oportunidades (tarjetas horizontales) ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="4" q1="¿Qué debe" q2="fortalecerse?" />
+        <div style={{ flex: 1, padding: '14px 12px', background: D.card }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: D.white, marginBottom: 10 }}>
+            Oportunidades de fortalecimiento y evidencia
           </div>
           {oportunidades.length === 0 ? (
-            <p style={{ padding: 16, fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin oportunidades identificadas.</p>
+            <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin oportunidades identificadas.</p>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  <th style={{ width: 36, padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'center', borderBottom: `1px solid ${D.border}` }}>N°</th>
-                  <th style={{ width: '32%', padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'left', borderBottom: `1px solid ${D.border}` }}>Oportunidad</th>
-                  <th style={{ padding: '8px 12px', fontSize: 10, color: D.orange, fontWeight: 700, textAlign: 'left', borderBottom: `1px solid ${D.border}` }}>¿Por qué se identifica?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {oportunidades.map((d, i) => (
-                  <tr key={i} style={{ borderBottom: i < oportunidades.length - 1 ? `1px solid ${D.border}` : 'none' }}>
-                    <td style={{ padding: '9px 12px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%',
-                        background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
-                      }}>{i + 1}</span>
-                    </td>
-                    <td style={{ padding: '9px 12px', fontSize: 11, color: D.white, fontWeight: 600, verticalAlign: 'top', lineHeight: 1.4 }}>
-                      {d.hallazgo.length > 70 ? d.hallazgo.slice(0, 68) + '…' : d.hallazgo}
-                    </td>
-                    <td style={{ padding: '9px 12px', fontSize: 11, color: D.muted, verticalAlign: 'top', lineHeight: 1.5 }}>
-                      {d.recomendacion}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* ── Fila 2: Herramientas + Prioridades ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingBottom: 14 }}>
-
-          {/* Herramientas identificadas */}
-          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <IconTool size={16} color={D.gold} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Herramientas identificadas</span>
-            </div>
-            {herramientasPills.length === 0 ? (
-              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin evidencia suficiente</p>
-            ) : (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <IconCheck size={13} color="#4ADE80" />
-                  </div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#4ADE80' }}>Sí se evidencian</span>
-                </div>
-                <p style={{ fontSize: 12, color: D.muted, margin: 0, lineHeight: 1.8 }}>
-                  {herramientasPills.join(' · ')}
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Prioridades */}
-          <div style={{ background: D.card, borderRadius: 10, padding: '16px 18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <IconBolt size={16} color={D.gold} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: D.white }}>Prioridades</span>
-            </div>
-            {prioridades.length === 0 ? (
-              <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin datos</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {prioridades.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${oportunidades.length}, 1fr)`, gap: 8 }}>
+              {oportunidades.map((d, i) => (
+                <div key={i} style={{ background: D.cardAlt, borderRadius: 8, padding: '10px 10px', border: `1px solid ${D.border}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
                     <span style={{
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                       background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     }}>{i + 1}</span>
-                    <span style={{ fontSize: 11, color: D.muted, lineHeight: 1.45 }}>{r.accion}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: D.white, lineHeight: 1.3 }}>
+                      {d.hallazgo.length > 40 ? d.hallazgo.slice(0, 38) + '…' : d.hallazgo}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <p style={{ fontSize: 9.5, color: D.mutedD, margin: 0, lineHeight: 1.45 }}>
+                    {d.recomendacion.length > 80 ? d.recomendacion.slice(0, 78) + '…' : d.recomendacion}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
 
+      {/* ══ FILA ⑤: ¿Qué se recomienda? — Prioridades flujo horizontal ══ */}
+      <div style={{ display: 'flex' }}>
+        <SectionLabel n="5" q1="¿Qué se" q2="recomienda?" />
+        <div style={{ flex: 1, padding: '14px 12px', background: D.cardAlt, display: 'flex', alignItems: 'center', gap: 0 }}>
+          {prioridades.length === 0 ? (
+            <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin datos.</p>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 0 }}>
+              {prioridades.map((r, i) => (
+                <>
+                  <div key={r.accion} style={{
+                    flex: 1, background: D.card, borderRadius: 8, padding: '12px 10px',
+                    border: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 10,
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                      <span style={{
+                        width: 24, height: 24, borderRadius: '50%', background: D.gold,
+                        color: D.bg, fontSize: 12, fontWeight: 900,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>{i + 1}</span>
+                      {iconosPrioridad[i] ?? <IconCircleCheck size={22} color={D.gold} />}
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: D.white, lineHeight: 1.4 }}>{r.accion}</span>
+                  </div>
+                  {i < prioridades.length - 1 && (
+                    <span key={`arr-${i}`} style={{ fontSize: 18, color: D.gold, padding: '0 6px', flexShrink: 0 }}>→</span>
+                  )}
+                </>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Footer nota metodológica ── */}
-      <div style={{ padding: '10px 18px 14px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-        <IconCircleCheck size={14} color={D.mutedD} style={{ flexShrink: 0, marginTop: 1 }} />
-        <p style={{ fontSize: 10, color: D.mutedD, margin: 0, lineHeight: 1.6 }}>
-          Las cifras representan evidencias identificadas en resultados de aprendizaje, contenidos y actividades formativas; no equivalen al nivel de dominio del estudiante.
+      <div style={{ padding: '8px 16px 12px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+        <IconCircleCheck size={13} color={D.mutedD} style={{ flexShrink: 0, marginTop: 1 }} />
+        <p style={{ fontSize: 9.5, color: D.mutedD, margin: 0, lineHeight: 1.6 }}>
+          Los niveles reflejan evidencia en resultados de aprendizaje, contenidos y actividades; no equivale al dominio alcanzado por el estudiante. La ausencia documental no confirma que el contenido no se trabaje en otros espacios.
         </p>
       </div>
     </div>
