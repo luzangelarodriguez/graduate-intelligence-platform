@@ -797,51 +797,207 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
   );
 }
 
+// ─── ViewPrograma helpers ─────────────────────────────────────────────────────
+
+// Keywords that send a skill to the "Gestión y negocio" bucket regardless of
+// its base category — covers gestión, proyectos, riesgos, PMI/PMBOK, etc.
+const GESTION_TERMS = [
+  'gestion','proyecto','proyectos','riesgo','riesgos','pmi','pmbok','pmp','capm',
+  'prince2','valor ganado','calidad','negocio','negocios','negociacion','planeacion',
+  'presupuesto','adquisicion','cronograma','alcance','interesados','stakeholder',
+  'scrum','agile','kanban','lean','six sigma','devops','direccion','gerencia',
+  'estrategia','procesos','equipos','presentacion ejecutiva','clarificacion',
+];
+
+type Prog4Cat = 'herramienta' | 'metodologica' | 'transversal' | 'gestion';
+
+const PROG_CAT_META: Record<Prog4Cat, { label: string; color: string; bar: string; icon: React.ReactNode }> = {
+  herramienta:  { label: 'Herramientas',                color: '#0D2158', bar: '#2563EB', icon: <IconTool size={15} /> },
+  metodologica: { label: 'Competencias metodológicas',  color: '#065F46', bar: '#10B981', icon: <IconBrain size={15} /> },
+  transversal:  { label: 'Habilidades transversales',   color: '#92400E', bar: '#F59E0B', icon: <IconUser size={15} /> },
+  gestion:      { label: 'Gestión y negocio',           color: '#1E3A5F', bar: '#3B82F6', icon: <IconBriefcase size={15} /> },
+};
+
+function classifyProg4(skill: string): Prog4Cat {
+  const key = normalizeSkill(skill);
+  // Gestión bucket first — skills matching gestión terms go here regardless of herramienta/competencia
+  for (const term of GESTION_TERMS) {
+    if (key === term || (term.length >= 5 && (key.startsWith(term) || key.includes(term)))) return 'gestion';
+  }
+  const base = classifySkill(skill);
+  if (base === 'herramienta') return 'herramienta';
+  if (base === 'habilidad') return 'transversal';
+  return 'metodologica';
+}
+
 function ViewPrograma({ skills, dataPobre }: ViewProps) {
   if (!skills) return <div style={{ padding: 24 }}><Spinner /></div>;
 
-  const bycat: Record<SkillCat, SkillPrograma[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
-  for (const s of skills.skills_programa) bycat[classifySkill(s.skill)].push(s);
+  // Filter noise skills (same guard used in Brechas and Mercado views)
+  const clean = skills.skills_programa.filter(s => !isNoiseSkill(s.skill));
 
-  const ALL_CATS_P: SkillCat[] = ['herramienta', 'competencia', 'habilidad', 'otro'];
-  const cols: { cat: SkillCat; items: SkillPrograma[] }[] = ALL_CATS_P
-    .map(cat => ({ cat, items: bycat[cat].slice(0, 10) }))
-    .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
+  // Bucket into 4 visual categories
+  const bycat: Record<Prog4Cat, SkillPrograma[]> = {
+    herramienta: [], metodologica: [], transversal: [], gestion: [],
+  };
+  for (const s of clean) bycat[classifyProg4(s.skill)].push(s);
+
+  // Sort each bucket descending by cobertura
+  for (const k of Object.keys(bycat) as Prog4Cat[]) {
+    bycat[k].sort((a, b) => b.cobertura - a.cobertura);
+  }
+
+  const totalSkills = clean.length;
+  const activeCats = (Object.keys(bycat) as Prog4Cat[]).filter(k => bycat[k].length > 0);
+  const totalCats = activeCats.length;
+
+  // Cobertura = % of skills that appear in at least 2 asignaturas (cobertura >= 2)
+  const covered = clean.filter(s => s.cobertura >= 2).length;
+  const coveragePct = totalSkills > 0 ? Math.round((covered / totalSkills) * 100) : 0;
+
+  // Callout: dominant category + weakest category
+  const catCounts = activeCats.map(k => ({ k, n: bycat[k].length })).sort((a, b) => b.n - a.n);
+  const dominant = catCounts[0];
+  const weakest  = catCounts[catCounts.length - 1];
+  const dominantLabel = dominant ? PROG_CAT_META[dominant.k].label.toLowerCase() : '';
+  const weakestLabel  = weakest  ? PROG_CAT_META[weakest.k].label.toLowerCase()  : '';
+  const calloutText = dominant && weakest && dominant.k !== weakest.k
+    ? `El programa evidencia una orientación sólida hacia ${dominantLabel}, con oportunidad de ampliar la diversidad de ${weakestLabel}.`
+    : `El programa muestra una distribución equilibrada de competencias en sus ${totalCats} categorías identificadas.`;
+
+  const CATS_ORDER: Prog4Cat[] = ['herramienta', 'metodologica', 'transversal', 'gestion'];
 
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
-      <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Enseña el Programa</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{skills.skills_programa.length} competencias en el microcurrículo · Tamaño = presencia (materias)</p>
+    <div style={{ padding: '20px 24px', background: '#FFFFFF', minHeight: '100%', fontFamily: 'inherit' }}>
+
+      {/* ── Header ── */}
+      <h1 style={{ fontSize: 20, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>
+        Qué enseña el programa
+      </h1>
+      <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>
+        {totalSkills} competencias identificadas en el microcurrículo
+      </p>
+
+      {/* ── Fila de 3 métricas ── */}
+      <div style={{
+        display: 'flex', alignItems: 'stretch', gap: 0,
+        border: `1px solid ${C.border}`, borderRadius: 10,
+        marginBottom: 20, overflow: 'hidden', background: '#fff',
+      }}>
+        {[
+          {
+            icon: (
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IconListCheck size={18} color="#fff" />
+              </div>
+            ),
+            number: totalSkills,
+            label: 'competencias',
+          },
+          {
+            icon: (
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IconChartBar size={18} color="#fff" />
+              </div>
+            ),
+            number: totalCats,
+            label: 'categorías',
+          },
+          {
+            icon: (
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#92400E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IconChartDonut size={18} color="#fff" />
+              </div>
+            ),
+            number: null,
+            label: 'Cobertura del microcurrículo',
+            sub: `${coveragePct}% de las competencias distribuidas`,
+          },
+        ].map((m, i, arr) => (
+          <div key={i} style={{
+            flex: 1, padding: '16px 20px',
+            borderRight: i < arr.length - 1 ? `1px solid ${C.border}` : 'none',
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            {m.icon}
+            <div>
+              {m.number !== null
+                ? <div style={{ fontSize: 28, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{m.number}</div>
+                : null}
+              <div style={{ fontSize: 12, color: '#6B7280', fontWeight: m.number !== null ? 400 : 600 }}>
+                {m.number !== null ? m.label : m.label}
+              </div>
+              {m.sub && <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{m.sub}</div>}
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" style={{ minHeight: 0 }}>
-        {cols.map(({ cat, items }) => {
-          const m = CAT_META[cat];
-          const isEmpty = items.length === 0;
+
+      {/* ── Grid de 4 tarjetas ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 20 }}>
+        {CATS_ORDER.map(cat => {
+          const meta = PROG_CAT_META[cat];
+          const items = bycat[cat].slice(0, 12);
+          const maxVal = items[0]?.cobertura ?? 1;
           return (
-            <DashPanel
-              key={cat}
-              title={m.label}
-              className={isEmpty ? 'min-h-[90px] lg:min-h-[280px]' : undefined}
-              style={isEmpty ? undefined : { minHeight: 280 }}
-            >
-              {isEmpty ? (
-                <div className="flex items-center justify-center flex-1">
-                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+            <div key={cat} style={{
+              border: `1px solid ${C.border}`, borderRadius: 10,
+              padding: 16, background: '#fff',
+            }}>
+              {/* Card header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', flexShrink: 0,
+                }}>
+                  {meta.icon}
                 </div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>{meta.label}</span>
+              </div>
+
+              {items.length === 0 ? (
+                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>Sin datos</p>
               ) : (
-                <div style={{ height: Math.max(items.length * 26 + 20, 200) }}>
-                  <HorizBarChart
-                    labels={items.map(s => displaySkill(s.skill))}
-                    values={items.map(s => s.cobertura)}
-                    valueLabel="materias"
-                    color={cat === 'otro' ? '#94A3B8' : undefined}
-                  />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {items.map(s => {
+                    const pct = maxVal > 0 ? (s.cobertura / maxVal) * 100 : 0;
+                    return (
+                      <div key={s.skill}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                          <span style={{ fontSize: 11, color: '#374151', flex: 1, marginRight: 8 }}>
+                            {displaySkill(s.skill)}
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: meta.color, flexShrink: 0 }}>
+                            {s.cobertura}
+                          </span>
+                        </div>
+                        <div style={{ height: 5, borderRadius: 3, background: '#F3F4F6', overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: meta.bar, borderRadius: 3 }} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
-            </DashPanel>
+            </div>
           );
         })}
+      </div>
+
+      {/* ── Callout inferior ── */}
+      <div style={{
+        border: `1px solid ${C.border}`, borderRadius: 10,
+        padding: '14px 18px', display: 'flex', alignItems: 'flex-start', gap: 12,
+        background: '#fff',
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: '50%',
+          background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          <IconBolt size={16} color="#D97706" />
+        </div>
+        <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
       </div>
     </div>
   );
