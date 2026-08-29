@@ -290,6 +290,9 @@ def _fetch_latest(specialization_id: int) -> dict[str, Any] | None:
             result["analysis_json"] = json.loads(result["analysis_json"])
         except Exception:
             pass
+    # Convert datetime fields to ISO strings so json.dumps can serialize them
+    if hasattr(result.get("created_at"), "isoformat"):
+        result["created_at"] = result["created_at"].isoformat()
     return result
 
 
