@@ -67,31 +67,68 @@ detallado (Tema 1, Tema 2, ... con sus subtemas y bullets).
 Tu tarea es producir un análisis curricular profundo y riguroso.
 
 ═══════════════════════════════════════════════════════════
-INSTRUCCIONES DE EXTRACCIÓN — LEE ESTO ANTES DE ANALIZAR
+PASO 0 — EXCLUSIONES OBLIGATORIAS (aplica ANTES de analizar)
+═══════════════════════════════════════════════════════════
+IGNORA completamente el siguiente contenido al identificar herramientas,
+competencias, marcos o cualquier elemento del análisis:
+- Bibliografía y referencias: autores, iniciales (ej. "R. Turner", "J. Kerzner"),
+  títulos de libros, editoriales, URLs, años de publicación. Una letra suelta
+  como "R." en contexto de referencia bibliográfica NO es la tecnología R.
+- Nombres propios de docentes o perfil docente.
+- Encabezados, pies de página, textos administrativos repetidos.
+- Instrumentos de evaluación genéricos (ej. "examen final", "quiz", "asistencia").
+Solo cuenta como evidencia lo que aparece en la descripción de la asignatura,
+los resultados de aprendizaje o el contenido temático sustantivo.
+
+═══════════════════════════════════════════════════════════
+INSTRUCCIONES DE EXTRACCIÓN
 ═══════════════════════════════════════════════════════════
 
 A. FUENTE PRINCIPAL: el CONTENIDO TEMÁTICO, no solo los resultados de aprendizaje.
    Los resultados de aprendizaje son una frase general (ej. "Planificar proyectos").
    El contenido temático es donde están las competencias específicas reales:
    "Tema 4 - Gestión del Valor Ganado: SPI, CPI, EAC, curva S, fórmulas de control".
-   Debes leer TODOS los temas y subtemas de TODAS las asignaturas y extraer de ahí
+   Lee TODOS los temas y subtemas de TODAS las asignaturas y extrae de ahí
    las competencias, técnicas, estándares y metodologías específicas mencionadas.
 
-B. MATRIZ DE COMPETENCIAS — mínimo 15 entradas, idealmente 20-30:
-   - Una competencia por técnica/metodología/área específica detectada en el contenido
-     temático (no una por asignatura).
-   - Ejemplos de granularidad correcta: "Gestión del Valor Ganado (EVM)",
-     "EDT / WBS", "CPM y diagramas de red", "ISO 9001", "MAPAN / BATNA",
-     "Gestión de riesgos — análisis cualitativo y cuantitativo".
-   - es_transversal=true si la competencia/tema aparece en 2 o más asignaturas distintas.
-   - nivel_promedio: 0=no evidenciada · 1=solo mencionada/conceptual ·
-     2=desarrollada con contenido propio · 3=con actividad evaluable dedicada.
-   - asignaturas_donde_aparece: lista TODAS las asignaturas donde aparece esa
-     competencia (cruza el contenido de todas las asignaturas del programa).
+B. CINCO CATEGORÍAS DE COMPETENCIAS — mínimo 15 entradas en total, idealmente 20-30:
+   Clasifica cada elemento en exactamente una de estas 5 categorías:
+
+   1. herramientas_tecnicas: técnicas cuantitativas y herramientas operativas concretas.
+      Ejemplos: Gestión del Valor Ganado (EVM), EDT/WBS, CPM/diagramas de red, Gantt,
+      Curva S, Análisis Monte Carlo, RAM/RACI, MS Project, Jira, Excel para proyectos.
+      INCLUYE aquí: EVM, Gantt, CPM, EDT/WBS, RAM/RACI, análisis cuantitativo de riesgos.
+
+   2. competencias_metodologicas: capacidades de proceso y habilidades analíticas
+      que el estudiante desarrolla como competencia propia.
+      Ejemplos: planificación de proyectos, estimación de costos, gestión de riesgos
+      (como competencia), negociación, elaboración de propuestas técnicas.
+      NO incluyas marcos o estándares aquí — van en marcos_estandares_referentes.
+
+   3. habilidades_transversales: habilidades blandas y comunicativas.
+      Ejemplos: liderazgo, trabajo en equipo, comunicación efectiva, pensamiento crítico,
+      gestión del cambio, inteligencia emocional, presentación ejecutiva.
+
+   4. gestion_y_negocio: conocimiento de dominio de negocio y gestión organizacional.
+      Ejemplos: análisis financiero de proyectos, gestión de contratos, gestión de
+      adquisiciones, análisis de mercado, estrategia organizacional, gobernanza.
+
+   5. marcos_estandares_referentes: marcos, estándares, metodologías y certificaciones.
+      INCLUYE SIEMPRE aquí: PMI, PMBOK, PMP, CAPM, Prince2, Scrum, Agile, Kanban,
+      SAFe, ISO 9001, ISO 21500, Design Thinking, Lean, Lean Startup, Six Sigma.
+      Nunca pongas PMI/PMBOK/PMP/Scrum/Agile en herramientas_tecnicas ni en
+      competencias_metodologicas.
+
+   Escala de evidencia por elemento:
+   - 3 = Aplicado: aparece en resultados de aprendizaje Y actividades/productos evaluables
+   - 2 = Desarrollado: aparece como contenido temático con profundidad propia
+   - 1 = Mencionado: solo referencia o concepto aislado/introductorio
+   - 0 = Sin evidencia: OMITIR del array (no incluir)
+
+   Para cada elemento lista TODAS las asignaturas donde aparece.
 
 C. AUSENCIAS NOTABLES — checklist de dominio:
-   Al analizar las debilidades, verifica EXPLÍCITAMENTE si están ausentes los
-   siguientes elementos típicamente esperados en el dominio del programa:
+   Al analizar las debilidades, verifica EXPLÍCITAMENTE si están ausentes:
    - Para gestión de proyectos: herramientas tecnológicas (MS Project, Jira, etc.),
      metodologías ágiles (Scrum, Kanban, SAFe), sostenibilidad/ESG, analítica
      financiera de inversión (VAN, TIR, payback), gestión de portafolios,
@@ -101,46 +138,46 @@ C. AUSENCIAS NOTABLES — checklist de dominio:
    - Para otros dominios: adapta el checklist al dominio detectado.
    Reporta como debilidad cada ausencia notable con impacto estimado.
 
-D. METODOLOGÍAS — sé granular:
-   Una metodología por cada estándar/marco/técnica mencionado en el texto
-   (PMI/PMBOK, Scrum, ISO 9001, MAPAN, EVM, Lean, etc.), incluyendo su profundidad
-   según la evidencia real del texto (actividades evaluables = "aplicada" o "avanzada";
-   solo mención sin desarrollo = "solo_mencionada").
-
 ═══════════════════════════════════════════════════════════
 REGLAS OBLIGATORIAS
 ═══════════════════════════════════════════════════════════
 1. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
-2. No inventes software, herramientas ni competencias que no estén mencionadas
-   explícitamente en el texto. Si algo no está en el texto, dilo en debilidades.
-3. Distingue entre competencia explícita e inferida. Cuando sea inferida,
-   anótalo con "(inferida)" al final del nombre de la competencia.
-4. profundidad de metodologías: "solo_mencionada" | "introductoria" | "aplicada" | "avanzada".
-5. nivel_promedio: 0-3 según escala de instrucción B.
-6. sintesis_ejecutiva: máximo 150 palabras, empieza describiendo la orientación
+2. No inventes herramientas ni competencias que no estén en el texto.
+   Si algo no está en el texto sustantivo (excluida bibliografía), omítelo.
+3. Distingue entre competencia explícita e inferida; cuando sea inferida,
+   anótalo con "(inferida)" al final del nombre.
+4. NOMENCLATURA OBLIGATORIA — usa exactamente estas formas, sin variantes:
+   - "PMBOK" (nunca Pmbok, pmbok, PmBok)
+   - "PMI" (nunca Pmi, pmi)
+   - "PMP" (nunca Pmp, pmp)
+   - "Gestión del Valor Ganado (EVM)" (nunca "Valor Ganado" a secas)
+   - "Scrum" (nunca scrum, SCRUM)
+   - "Agile" (nunca agile, AGILE)
+5. sintesis_ejecutiva: máximo 150 palabras, empieza describiendo la orientación
    central y termina con la brecha más crítica.
-7. fortalezas: máximo 5, cada una debe incluir entre paréntesis la evidencia
+6. fortalezas: máximo 5, cada una debe incluir entre paréntesis la evidencia
    concreta del texto (nombre de asignatura y/o actividad específica).
+7. Las categorías son mutuamente excluyentes: un elemento va en UNA sola categoría.
 
 SCHEMA EXACTO A DEVOLVER — no agregues ni quites claves:
 {
   "programa": "string",
   "orientacion_predominante": "string",
   "competencia_global": "string — empieza con verbo observable en infinitivo",
-  "matriz_competencias": [
-    {
-      "competencia": "string",
-      "nivel_promedio": 0,
-      "asignaturas_donde_aparece": ["string"],
-      "es_transversal": false
-    }
+  "herramientas_tecnicas": [
+    {"nombre": "string", "evidencia": 1, "asignaturas": ["string"]}
   ],
-  "metodologias_identificadas": [
-    {
-      "nombre": "string",
-      "categoria": "string",
-      "profundidad": "solo_mencionada|introductoria|aplicada|avanzada"
-    }
+  "competencias_metodologicas": [
+    {"nombre": "string", "evidencia": 1, "asignaturas": ["string"]}
+  ],
+  "habilidades_transversales": [
+    {"nombre": "string", "evidencia": 1, "asignaturas": ["string"]}
+  ],
+  "gestion_y_negocio": [
+    {"nombre": "string", "evidencia": 1, "asignaturas": ["string"]}
+  ],
+  "marcos_estandares_referentes": [
+    {"nombre": "string", "evidencia": 1, "asignaturas": ["string"]}
   ],
   "fortalezas": ["string con evidencia entre paréntesis — máx 5"],
   "debilidades": [
@@ -333,6 +370,10 @@ def build_deep_analysis(
     # Ensure top-level required fields exist
     analysis.setdefault("programa", program_name)
     analysis.setdefault("sintesis_ejecutiva", "")
+    for cat in ("herramientas_tecnicas", "competencias_metodologicas",
+                "habilidades_transversales", "gestion_y_negocio",
+                "marcos_estandares_referentes"):
+        analysis.setdefault(cat, [])
 
     persisted_id: int | None = None
     if persist:
