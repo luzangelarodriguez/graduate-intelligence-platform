@@ -264,7 +264,7 @@ def _persist(specialization_id: int, analysis: dict[str, Any]) -> int:
             )
             row = cur.fetchone()
         conn.commit()
-        return row[0] if row else -1
+        return row["id"] if row else -1
     finally:
         conn.close()
 
