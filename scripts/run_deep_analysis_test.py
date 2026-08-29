@@ -7,8 +7,12 @@ Imprime el JSON completo en stdout para comparar con el análisis de referencia.
 No persiste en DB (persist=False).
 """
 import json
+import logging
 import sys
 from pathlib import Path
+
+logging.basicConfig(level=logging.DEBUG, stream=sys.stderr,
+                    format="%(levelname)s %(name)s: %(message)s")
 
 # Ensure project root is in sys.path
 ROOT = Path(__file__).resolve().parent.parent
@@ -21,6 +25,7 @@ from intelligence.curriculum_deep_analysis_engine import build_deep_analysis  # 
 
 if __name__ == "__main__":
     spec_id = int(sys.argv[1]) if len(sys.argv) > 1 else 9
-    print(f"[test] Running build_deep_analysis({spec_id}) — persist=False …\n")
-    result = build_deep_analysis(spec_id, persist=False)
+    persist = "--persist" in sys.argv
+    print(f"[test] Running build_deep_analysis({spec_id}) persist={persist} …\n", file=sys.stderr)
+    result = build_deep_analysis(spec_id, persist=persist)
     print(json.dumps(result, ensure_ascii=False, indent=2))

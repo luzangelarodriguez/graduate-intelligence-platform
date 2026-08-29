@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import time
+import traceback
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -243,6 +244,7 @@ def _call_openai(system_prompt: str, user_text: str) -> dict[str, Any]:
 def _persist(specialization_id: int, analysis: dict[str, Any]) -> int:
     """Insert a new row in program_deep_analysis and return the new id."""
     from backend.db import get_conn
+    from psycopg2.extras import Json as PgJson
 
     conn = get_conn()
     try:
@@ -256,7 +258,7 @@ def _persist(specialization_id: int, analysis: dict[str, Any]) -> int:
                 """,
                 (
                     specialization_id,
-                    json.dumps(analysis, ensure_ascii=False),
+                    PgJson(analysis),
                     _MODEL,
                 ),
             )
@@ -338,7 +340,10 @@ def build_deep_analysis(
             persisted_id = _persist(specialization_id, analysis)
             logger.info("[deep_analysis] persisted id=%d", persisted_id)
         except Exception as exc:
-            logger.warning("[deep_analysis] persist failed (analysis still returned): %s", exc)
+            logger.warning(
+                "[deep_analysis] persist failed (analysis still returned):\n%s",
+                traceback.format_exc(),
+            )
 
     return {
         "specialization_id": specialization_id,
