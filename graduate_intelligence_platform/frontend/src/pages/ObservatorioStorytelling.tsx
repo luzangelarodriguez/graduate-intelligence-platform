@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import unirLogoPng from '../assets/logos/UNIR_v_blanco.png';
 import { blueGradient } from '../utils/chartColors';
 import {
   Chart as ChartJS,
@@ -2583,13 +2584,7 @@ export default function ObservatorioStorytelling() {
 
         {/* Logo */}
         <div style={{ padding: '20px 16px 14px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', lineHeight: 1, marginBottom: 2 }}>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 24, fontWeight: 700, color: '#fff' }}>un</span>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 24, fontWeight: 700, color: '#fff', position: 'relative', display: 'inline-block' }}>
-              i<span style={{ position: 'absolute', top: -3, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, background: '#5BC4F5', borderRadius: '50%' }} />
-            </span>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 900, color: '#fff' }}>R</span>
-          </div>
+          <img src={unirLogoPng} alt="UNIR La Universidad en Internet" style={{ maxWidth: 150, height: 'auto', display: 'block', marginBottom: 4 }} />
           <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#7B8AAE', marginBottom: 14 }}>
             Observatorio
           </div>
