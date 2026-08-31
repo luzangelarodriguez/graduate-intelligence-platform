@@ -12,6 +12,8 @@ import {
   IconAlertTriangle, IconBriefcase, IconListCheck,
   IconWorld, IconChartDonut, IconClipboardList, IconCircleCheck,
   IconTool, IconBrain, IconBolt, IconUser,
+  IconCalendar, IconCoin, IconShield, IconAward,
+  IconBulb, IconMessage, IconUsers, IconCheck,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -797,9 +799,21 @@ function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewP
   );
 }
 
-// ─── ViewPrograma — deep analysis API consumer ────────────────────────────────
+// ─── ViewPrograma — deep analysis API consumer (infografía) ──────────────────
 
 type DeepItem = { nombre: string; evidencia: number; asignaturas: string[] };
+
+interface DeepDebilidad {
+  hallazgo: string;
+  impacto: 'alto' | 'medio' | 'bajo';
+  recomendacion: string;
+}
+
+interface DeepRecomendacion {
+  prioridad: 'alta' | 'media' | 'complementaria';
+  accion: string;
+  razon: string;
+}
 
 interface DeepAnalysis {
   programa: string;
@@ -810,18 +824,17 @@ interface DeepAnalysis {
   habilidades_transversales: DeepItem[];
   gestion_y_negocio: DeepItem[];
   marcos_estandares_referentes: DeepItem[];
+  debilidades: DeepDebilidad[];
+  recomendaciones_priorizadas: DeepRecomendacion[];
   sintesis_ejecutiva: string;
 }
 
-type Prog5Cat = 'herramientas_tecnicas' | 'competencias_metodologicas' | 'habilidades_transversales' | 'gestion_y_negocio' | 'marcos_estandares_referentes';
-
-const PROG_CAT_META: Record<Prog5Cat, { label: string; color: string; bar: string; icon: React.ReactNode }> = {
-  herramientas_tecnicas:      { label: 'Herramientas y técnicas',      color: '#0D2158', bar: '#2563EB', icon: <IconTool size={15} /> },
-  competencias_metodologicas: { label: 'Competencias metodológicas',   color: '#065F46', bar: '#10B981', icon: <IconBrain size={15} /> },
-  habilidades_transversales:  { label: 'Habilidades transversales',    color: '#92400E', bar: '#F59E0B', icon: <IconUser size={15} /> },
-  gestion_y_negocio:          { label: 'Gestión y negocio',            color: '#1E3A5F', bar: '#3B82F6', icon: <IconBriefcase size={15} /> },
-  marcos_estandares_referentes: { label: 'Marcos y estándares',        color: '#4C1D95', bar: '#7C3AED', icon: <IconListCheck size={15} /> },
-};
+type Prog5Cat =
+  | 'herramientas_tecnicas'
+  | 'competencias_metodologicas'
+  | 'habilidades_transversales'
+  | 'gestion_y_negocio'
+  | 'marcos_estandares_referentes';
 
 const CATS_ORDER: Prog5Cat[] = [
   'herramientas_tecnicas',
@@ -831,7 +844,85 @@ const CATS_ORDER: Prog5Cat[] = [
   'marcos_estandares_referentes',
 ];
 
-const EVIDENCIA_LABEL: Record<number, string> = { 3: 'Aplicado', 2: 'Desarrollado', 1: 'Mencionado' };
+const CAT_LABEL: Record<Prog5Cat, string> = {
+  herramientas_tecnicas:        'Herramientas técnicas',
+  competencias_metodologicas:   'Competencias metodológicas',
+  habilidades_transversales:    'Habilidades transversales',
+  gestion_y_negocio:            'Gestión y negocio',
+  marcos_estandares_referentes: 'Marcos y estándares',
+};
+
+// Promedio de evidencia de los items de una categoría; devuelve null si vacía
+function avgEvidencia(items: DeepItem[]): number | null {
+  if (!items || items.length === 0) return null;
+  return items.reduce((s, i) => s + i.evidencia, 0) / items.length;
+}
+
+// (promedio / 3) × 100 → 0 si categoría vacía
+function fortalezaPct(items: DeepItem[]): number {
+  const avg = avgEvidencia(items);
+  return avg === null ? 0 : Math.round((avg / 3) * 100);
+}
+
+// Etiqueta cualitativa de coherencia curricular derivada del promedio global
+function coherenciaLabel(allItems: DeepItem[]): string {
+  const avg = avgEvidencia(allItems);
+  if (avg === null) return '—';
+  if (avg >= 2.5) return 'Alta';
+  if (avg >= 2.0) return 'Media-alta';
+  if (avg >= 1.5) return 'Media';
+  return 'En desarrollo';
+}
+
+// Icono semánticamente cercano al nombre de la competencia
+function iconoCompetencia(nombre: string): React.ReactNode {
+  const n = nombre.toLowerCase();
+  if (n.includes('planif') || n.includes('cronograma') || n.includes('tiempo'))
+    return <IconCalendar size={20} />;
+  if (n.includes('costo') || n.includes('presupuesto') || n.includes('financ') || n.includes('valor ganado') || n.includes('evm'))
+    return <IconCoin size={20} />;
+  if (n.includes('riesgo'))
+    return <IconShield size={20} />;
+  if (n.includes('calidad'))
+    return <IconAward size={20} />;
+  if (n.includes('negoci') || n.includes('contrato') || n.includes('adquisic'))
+    return <IconBriefcase size={20} />;
+  if (n.includes('liderazgo') || n.includes('lider') || n.includes('innovac'))
+    return <IconBulb size={20} />;
+  if (n.includes('comunicac') || n.includes('stakeholder') || n.includes('interesado'))
+    return <IconMessage size={20} />;
+  if (n.includes('equipo') || n.includes('team') || n.includes('recurso'))
+    return <IconUsers size={20} />;
+  if (n.includes('alcance') || n.includes('scope') || n.includes('edt') || n.includes('wbs'))
+    return <IconTarget size={20} />;
+  if (n.includes('monitoreo') || n.includes('control') || n.includes('seguimiento'))
+    return <IconChartBar size={20} />;
+  if (n.includes('integrac') || n.includes('coordinac'))
+    return <IconListCheck size={20} />;
+  if (n.includes('estrateg') || n.includes('direcc'))
+    return <IconGauge size={20} />;
+  return <IconCircleCheck size={20} />;
+}
+
+const IMPACTO_ORDER: Record<string, number> = { alto: 0, medio: 1, bajo: 2 };
+const PRIORIDAD_ORDER: Record<string, number> = { alta: 0, media: 1, complementaria: 2 };
+
+// Paleta infografía
+const INF = {
+  navy:   '#0B1730',
+  navy2:  '#112040',
+  orange: '#E87722',
+  gold:   '#F0A500',
+  green:  '#16A34A',
+  greenL: '#DCFCE7',
+  white:  '#FFFFFF',
+  gray50: '#F9FAFB',
+  gray100:'#F3F4F6',
+  gray400:'#9CA3AF',
+  gray600:'#4B5563',
+  gray700:'#374151',
+  border: '#E5E7EB',
+} as const;
 
 function ViewPrograma({ programaId }: ViewProps) {
   const [data, setData]       = useState<DeepAnalysis | null>(null);
@@ -856,126 +947,308 @@ function ViewPrograma({ programaId }: ViewProps) {
 
   if (loading) return <div style={{ padding: 24 }}><Spinner /></div>;
   if (error || !data) return (
-    <div style={{ padding: 24, color: '#6B7280', fontSize: 13 }}>
+    <div style={{ padding: 24, color: INF.gray400, fontSize: 13 }}>
       No hay análisis curricular disponible para este programa.
     </div>
   );
 
-  const totalItems = CATS_ORDER.reduce((acc, k) => acc + (data[k]?.length ?? 0), 0);
-  const activeCats = CATS_ORDER.filter(k => (data[k]?.length ?? 0) > 0);
+  // ── Derivaciones ────────────────────────────────────────────────────────────
 
-  // Dominant + weakest for callout
-  const catSizes = activeCats.map(k => ({ k, n: data[k].length })).sort((a, b) => b.n - a.n);
-  const dominant = catSizes[0];
-  const weakest  = catSizes[catSizes.length - 1];
-  const calloutText = dominant && weakest && dominant.k !== weakest.k
-    ? `El programa evidencia una orientación sólida hacia ${PROG_CAT_META[dominant.k].label.toLowerCase()}, con oportunidad de ampliar la diversidad en ${PROG_CAT_META[weakest.k].label.toLowerCase()}.`
-    : `El programa muestra una distribución equilibrada de competencias en sus ${activeCats.length} categorías identificadas.`;
+  // KPI 1: asignaturas únicas en las 5 categorías combinadas
+  const uniqueAsignaturas = new Set(
+    CATS_ORDER.flatMap(k => (data[k] ?? []).flatMap(i => i.asignaturas ?? []))
+  ).size;
+
+  // KPI 3: marcos + herramientas (count)
+  const metodologiasCount =
+    (data.marcos_estandares_referentes?.length ?? 0) +
+    (data.herramientas_tecnicas?.length ?? 0);
+
+  // KPI 4: coherencia curricular — promedio evidencia de todos los items
+  const allItems = CATS_ORDER.flatMap(k => data[k] ?? []);
+  const coherencia = coherenciaLabel(allItems);
+
+  // "Competencias principales" — top 10 de competencias_metodologicas + gestion_y_negocio
+  const competenciasPrincipales = [
+    ...(data.competencias_metodologicas ?? []),
+    ...(data.gestion_y_negocio ?? []),
+  ]
+    .slice()
+    .sort((a, b) => b.evidencia - a.evidencia)
+    .slice(0, 10);
+
+  // Oportunidades — debilidades ordenadas por impacto, máx 6
+  const oportunidades = [...(data.debilidades ?? [])]
+    .sort((a, b) => (IMPACTO_ORDER[a.impacto] ?? 3) - (IMPACTO_ORDER[b.impacto] ?? 3))
+    .slice(0, 6);
+
+  // Herramientas pills — marcos + herramientas nombres
+  const herramientasPills = [
+    ...(data.marcos_estandares_referentes ?? []).map(i => i.nombre),
+    ...(data.herramientas_tecnicas ?? []).map(i => i.nombre),
+  ];
+
+  // Prioridades — alta primero, máx 4
+  const prioridades = [...(data.recomendaciones_priorizadas ?? [])]
+    .sort((a, b) => (PRIORIDAD_ORDER[a.prioridad] ?? 3) - (PRIORIDAD_ORDER[b.prioridad] ?? 3))
+    .slice(0, 4);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  const D = {
+    bg:      '#0B1730',
+    card:    '#112448',
+    cardAlt: '#0D1E3A',
+    border:  '#1E3560',
+    white:   '#FFFFFF',
+    gold:    '#F0A500',
+    orange:  '#E87722',
+    green:   '#22C55E',   // Aplicado dot
+    blue:    '#60A5FA',   // Desarrollado dot
+    yellow:  '#FACC15',   // Mencionado dot
+    muted:   'rgba(255,255,255,0.60)',
+    mutedD:  'rgba(255,255,255,0.35)',
+  } as const;
+
+  // KPI total elementos curriculares
+  const totalElementos = allItems.length;
+
+  // Icono por prioridad (mapeo semántico para flujo de prioridades)
+  const iconosPrioridad = [
+    <IconChartBar size={22} color={D.gold} />,
+    <IconBrain size={22} color={D.gold} />,
+    <IconShield size={22} color={D.gold} />,
+    <IconWorld size={22} color={D.gold} />,
+  ];
+
+  // Color dot por nivel de evidencia
+  const dotColor = (ev: number) =>
+    ev === 3 ? D.green : ev === 2 ? D.blue : D.yellow;
+
+  // Label row izquierda
+  const SectionLabel = ({ n, q1, q2 }: { n: string; q1: string; q2: string }) => (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 6, padding: '10px 8px', minWidth: 82, width: 82, flexShrink: 0,
+    }}>
+      <span style={{
+        width: 30, height: 30, borderRadius: '50%', background: D.gold,
+        color: D.bg, fontSize: 15, fontWeight: 900,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>{n}</span>
+      <span style={{ fontSize: 10, color: D.muted, textAlign: 'center', lineHeight: 1.4 }}>{q1}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, color: D.white, textAlign: 'center', lineHeight: 1.3 }}>{q2}</span>
+    </div>
+  );
 
   return (
-    <div style={{ padding: '20px 24px', background: '#FFFFFF', minHeight: '100%', fontFamily: 'inherit' }}>
+    <div style={{ background: D.bg, minHeight: '100%', fontFamily: 'inherit' }}>
 
-      {/* ── Header ── */}
-      <h1 style={{ fontSize: 20, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>
-        Qué enseña el programa
-      </h1>
-      <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>
-        {totalItems} competencias identificadas en el microcurrículo · Análisis curricular profundo
-      </p>
+      {/* ══ HEADER ══ */}
+      <div style={{ padding: '18px 20px 14px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: 20, fontWeight: 900, color: D.white, margin: '0 0 3px', lineHeight: 1.15 }}>
+            Análisis de competencias del programa
+          </h1>
+          <p style={{ fontSize: 12, fontWeight: 600, color: D.orange, margin: '0 0 5px' }}>{data.programa}</p>
+          <p style={{ fontSize: 10, color: D.mutedD, margin: 0 }}>
+            Ruta de lectura: alcance → fortalezas → mapa curricular → oportunidades → prioridades
+          </p>
+        </div>
+        <div style={{ width: 40, height: 40, borderRadius: 8, background: D.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <IconChartBar size={22} color={D.bg} />
+        </div>
+      </div>
 
-      {/* ── Fila de 3 métricas ── */}
-      <div style={{
-        display: 'flex', alignItems: 'stretch', gap: 0,
-        border: `1px solid ${C.border}`, borderRadius: 10,
-        marginBottom: 20, overflow: 'hidden', background: '#fff',
-      }}>
-        {([
-          {
-            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconListCheck size={18} color="#fff" /></div>,
-            number: totalItems,
-            label: 'competencias',
-          },
-          {
-            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#065F46', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconChartBar size={18} color="#fff" /></div>,
-            number: activeCats.length,
-            label: 'categorías',
-          },
-          {
-            icon: <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#4C1D95', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconBrain size={18} color="#fff" /></div>,
-            number: (data[dominant?.k]?.filter(i => i.evidencia === 3).length ?? 0),
-            label: 'con nivel aplicado',
-          },
-        ] as { icon: React.ReactNode; number: number; label: string }[]).map((m, i, arr) => (
-          <div key={i} style={{
-            flex: 1, padding: '16px 20px',
-            borderRight: i < arr.length - 1 ? `1px solid ${C.border}` : 'none',
-            display: 'flex', alignItems: 'center', gap: 12,
-          }}>
-            {m.icon}
-            <div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{m.number}</div>
-              <div style={{ fontSize: 12, color: '#6B7280' }}>{m.label}</div>
+      {/* ══ FILA ①: ¿Qué se analizó? — KPIs ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="1" q1="¿Qué se" q2="analizó?" />
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border }}>
+          {([
+            { icon: <IconClipboardList size={20} color={D.bg} />, value: uniqueAsignaturas, label: 'Asignaturas\nanalizadas' },
+            { icon: <IconSchool        size={20} color={D.bg} />, value: totalElementos,    label: 'Elementos\ncurriculares' },
+            { icon: <IconListCheck     size={20} color={D.bg} />, value: 5,                  label: 'Categorías' },
+            { icon: <IconAward         size={20} color={D.bg} />, value: coherencia,         label: 'Coherencia\ncurricular', hi: true },
+          ] as { icon: React.ReactNode; value: string|number; label: string; hi?: boolean }[]).map((k, i) => (
+            <div key={i} style={{ background: D.white, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 7, background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {k.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: k.hi ? D.orange : D.bg, lineHeight: 1 }}>{k.value}</div>
+                <div style={{ fontSize: 10, color: '#4B5563', marginTop: 2, whiteSpace: 'pre-line' }}>{k.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ FILA ②: ¿Dónde es fuerte? — Fortaleza + Mapa de capacidades ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="2" q1="¿Dónde es" q2="fuerte?" />
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', gap: 1, background: D.border, minHeight: 0 }}>
+
+          {/* Fortaleza formativa */}
+          <div style={{ background: D.card, padding: '14px 14px' }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: D.white, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
+              Fortaleza formativa
+            </div>
+            <div style={{ fontSize: 9, color: D.mutedD, marginBottom: 12, lineHeight: 1.3 }}>
+              Índice estimado por presencia y profundidad curricular
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {CATS_ORDER.map(cat => {
+                const pct = fortalezaPct(data[cat] ?? []);
+                const label = CAT_LABEL[cat];
+                return (
+                  <div key={cat}>
+                    <div style={{ fontSize: 10, color: D.muted, marginBottom: 3 }}>{label}</div>
+                    <div style={{ position: 'relative', height: 18, borderRadius: 3, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${pct}%`, height: '100%',
+                        background: `linear-gradient(90deg, #16A34A 0%, #22C55E 100%)`,
+                        borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 5,
+                      }}>
+                        {pct >= 20 && <span style={{ fontSize: 10, fontWeight: 700, color: D.white }}>{pct}%</span>}
+                      </div>
+                      {pct < 20 && (
+                        <span style={{ position: 'absolute', right: 4, top: 0, height: '100%', display: 'flex', alignItems: 'center', fontSize: 10, fontWeight: 700, color: D.mutedD }}>{pct}%</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Eje x */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              {['0%','20%','40%','60%','80%','100%'].map(t => (
+                <span key={t} style={{ fontSize: 8, color: D.mutedD }}>{t}</span>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* ── Grid de 5 tarjetas ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 20 }}>
-        {CATS_ORDER.map(cat => {
-          const meta  = PROG_CAT_META[cat];
-          const items = (data[cat] ?? []).slice().sort((a, b) => b.evidencia - a.evidencia).slice(0, 12);
-          const maxEv = items[0]?.evidencia ?? 1;
-          return (
-            <div key={cat} style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, background: '#fff' }}>
-              {/* Card header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-                  {meta.icon}
-                </div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: meta.color }}>{meta.label}</span>
-                <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>{items.length}</span>
-              </div>
-
-              {items.length === 0 ? (
-                <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>Sin datos</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  {items.map(item => {
-                    const pct = maxEv > 0 ? (item.evidencia / maxEv) * 100 : 0;
-                    return (
-                      <div key={item.nombre}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                          <span style={{ fontSize: 11, color: '#374151', flex: 1, marginRight: 8 }}>{item.nombre}</span>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: meta.color, flexShrink: 0 }}>
-                            {EVIDENCIA_LABEL[item.evidencia] ?? item.evidencia}
-                          </span>
-                        </div>
-                        <div style={{ height: 5, borderRadius: 3, background: '#F3F4F6', overflow: 'hidden' }}>
-                          <div style={{ width: `${pct}%`, height: '100%', background: meta.bar, borderRadius: 3 }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          {/* Mapa de capacidades */}
+          <div style={{ background: D.cardAlt, padding: '14px 12px', overflow: 'hidden' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 12, textAlign: 'center' }}>
+              Mapa de capacidades: ¿qué enseña el programa?
             </div>
-          );
-        })}
-      </div>
-
-      {/* ── Callout ── */}
-      <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'flex-start', gap: 12, background: '#fff', marginBottom: 12 }}>
-        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <IconBolt size={16} color="#D97706" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
+              {CATS_ORDER.map((cat, ci) => {
+                const items = [...(data[cat] ?? [])].sort((a, b) => b.evidencia - a.evidencia);
+                const headerColors = ['#3B82F6','#60A5FA','#93C5FD','#A78BFA','#C4B5FD'];
+                return (
+                  <div key={cat} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{
+                      fontSize: 10, fontWeight: 700, color: headerColors[ci],
+                      marginBottom: 8, lineHeight: 1.3, borderBottom: `1px solid ${D.border}`, paddingBottom: 6,
+                    }}>
+                      {ci + 1}. {CAT_LABEL[cat]} · {items.length}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      {items.map(item => (
+                        <div key={item.nombre} style={{ display: 'flex', alignItems: 'flex-start', gap: 5 }}>
+                          <span style={{
+                            width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                            background: dotColor(item.evidencia), marginTop: 2,
+                          }} />
+                          <span style={{ fontSize: 9.5, color: D.muted, lineHeight: 1.35 }}>{item.nombre}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Leyenda */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12, paddingTop: 8, borderTop: `1px solid ${D.border}` }}>
+              {([
+                { color: D.green,  label: 'Aplicado' },
+                { color: D.blue,   label: 'Desarrollado' },
+                { color: D.yellow, label: 'Mencionado' },
+              ]).map(l => (
+                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 9, height: 9, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 9, color: D.muted }}>{l.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
       </div>
 
-      {/* ── Nota metodológica ── */}
-      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
-        Las cifras representan evidencias identificadas en resultados de aprendizaje, contenidos y actividades formativas; no equivalen al nivel de dominio del estudiante.
-      </p>
+      {/* ══ FILA ④: ¿Qué debe fortalecerse? — Oportunidades (tarjetas horizontales) ══ */}
+      <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
+        <SectionLabel n="3" q1="¿Qué debe" q2="fortalecerse?" />
+        <div style={{ flex: 1, padding: '14px 12px', background: D.card }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: D.white, marginBottom: 10 }}>
+            Oportunidades de fortalecimiento y evidencia
+          </div>
+          {oportunidades.length === 0 ? (
+            <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin oportunidades identificadas.</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${oportunidades.length}, 1fr)`, gap: 8 }}>
+              {oportunidades.map((d, i) => (
+                <div key={i} style={{ background: D.cardAlt, borderRadius: 8, padding: '10px 10px', border: `1px solid ${D.border}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+                    <span style={{
+                      width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+                      background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    }}>{i + 1}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: D.white, lineHeight: 1.3 }}>
+                      {d.hallazgo}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 9.5, color: D.muted, margin: 0, lineHeight: 1.45 }}>
+                    {d.recomendacion}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ══ FILA ④: ¿Qué se recomienda? — Prioridades flujo horizontal ══ */}
+      <div style={{ display: 'flex' }}>
+        <SectionLabel n="4" q1="¿Qué se" q2="recomienda?" />
+        <div style={{ flex: 1, padding: '14px 12px', background: D.cardAlt, display: 'flex', alignItems: 'center', gap: 0 }}>
+          {prioridades.length === 0 ? (
+            <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin datos.</p>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 0 }}>
+              {prioridades.map((r, i) => (
+                <>
+                  <div key={r.accion} style={{
+                    flex: 1, background: D.card, borderRadius: 8, padding: '12px 10px',
+                    border: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 10,
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                      <span style={{
+                        width: 24, height: 24, borderRadius: '50%', background: D.gold,
+                        color: D.bg, fontSize: 12, fontWeight: 900,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>{i + 1}</span>
+                      {iconosPrioridad[i] ?? <IconCircleCheck size={22} color={D.gold} />}
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: D.white, lineHeight: 1.4 }}>{r.accion}</span>
+                  </div>
+                  {i < prioridades.length - 1 && (
+                    <span key={`arr-${i}`} style={{ fontSize: 18, color: D.gold, padding: '0 6px', flexShrink: 0 }}>→</span>
+                  )}
+                </>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Footer nota metodológica ── */}
+      <div style={{ padding: '8px 16px 12px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+        <IconCircleCheck size={13} color={D.mutedD} style={{ flexShrink: 0, marginTop: 1 }} />
+        <p style={{ fontSize: 9.5, color: D.mutedD, margin: 0, lineHeight: 1.6 }}>
+          Los niveles reflejan evidencia en resultados de aprendizaje, contenidos y actividades; no equivale al dominio alcanzado por el estudiante. La ausencia documental no confirma que el contenido no se trabaje en otros espacios.
+        </p>
+      </div>
     </div>
   );
 }
