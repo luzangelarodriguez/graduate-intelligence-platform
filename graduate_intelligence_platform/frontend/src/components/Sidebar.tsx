@@ -1,6 +1,6 @@
 import { BarChart3, GraduationCap, UserRoundCheck } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import unirLogo from '../assets/logos/unir-logo.svg';
+import unirLogo from '../assets/logos/UNIR_v_blanco.png';
 
 const items = [
   { to: '/', label: 'Observatorio', icon: BarChart3 },
@@ -13,9 +13,8 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-white px-4 py-5 lg:block">
       <div className="mb-7 border-b border-line pb-5">
         <div className="flex items-center gap-3">
-          <img src={unirLogo} alt="UNIR" className="h-8 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-          <div>
-            <strong className="block text-sm font900 text-ink">Colombia</strong>
+          <div className="flex flex-col gap-1">
+            <img src={unirLogo} alt="UNIR La Universidad en Internet" className="w-auto" style={{ maxWidth: 150, height: 'auto' }} />
             <span className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted">Observatorio</span>
           </div>
         </div>
