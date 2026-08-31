@@ -1177,7 +1177,7 @@ function ViewPrograma({ programaId }: ViewProps) {
 
       {/* ══ FILA ④: ¿Qué debe fortalecerse? — Oportunidades (tarjetas horizontales) ══ */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
-        <SectionLabel n="4" q1="¿Qué debe" q2="fortalecerse?" />
+        <SectionLabel n="3" q1="¿Qué debe" q2="fortalecerse?" />
         <div style={{ flex: 1, padding: '14px 12px', background: D.card }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: D.white, marginBottom: 10 }}>
             Oportunidades de fortalecimiento y evidencia
@@ -1195,11 +1195,11 @@ function ViewPrograma({ programaId }: ViewProps) {
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     }}>{i + 1}</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: D.white, lineHeight: 1.3 }}>
-                      {d.hallazgo.length > 40 ? d.hallazgo.slice(0, 38) + '…' : d.hallazgo}
+                      {d.hallazgo}
                     </span>
                   </div>
-                  <p style={{ fontSize: 9.5, color: D.mutedD, margin: 0, lineHeight: 1.45 }}>
-                    {d.recomendacion.length > 80 ? d.recomendacion.slice(0, 78) + '…' : d.recomendacion}
+                  <p style={{ fontSize: 9.5, color: D.muted, margin: 0, lineHeight: 1.45 }}>
+                    {d.recomendacion}
                   </p>
                 </div>
               ))}
@@ -1208,9 +1208,9 @@ function ViewPrograma({ programaId }: ViewProps) {
         </div>
       </div>
 
-      {/* ══ FILA ⑤: ¿Qué se recomienda? — Prioridades flujo horizontal ══ */}
+      {/* ══ FILA ④: ¿Qué se recomienda? — Prioridades flujo horizontal ══ */}
       <div style={{ display: 'flex' }}>
-        <SectionLabel n="5" q1="¿Qué se" q2="recomienda?" />
+        <SectionLabel n="4" q1="¿Qué se" q2="recomienda?" />
         <div style={{ flex: 1, padding: '14px 12px', background: D.cardAlt, display: 'flex', alignItems: 'center', gap: 0 }}>
           {prioridades.length === 0 ? (
             <p style={{ fontSize: 11, color: D.muted, fontStyle: 'italic', margin: 0 }}>Sin datos.</p>
