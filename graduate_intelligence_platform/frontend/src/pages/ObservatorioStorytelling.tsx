@@ -995,18 +995,20 @@ function ViewPrograma({ programaId }: ViewProps) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   const D = {
-    bg:      '#0B1730',
-    card:    '#112448',
-    cardAlt: '#0D1E3A',
-    border:  '#1E3560',
+    bg:      '#0B1730',   // header oscuro
+    card:    '#FFFFFF',   // tarjetas blancas
+    cardAlt: '#F8FAFC',   // fondo alternativo muy claro
+    border:  '#E5E7EB',   // bordes claros
     white:   '#FFFFFF',
+    ink:     '#0D2158',   // texto oscuro principal
+    text:    '#374151',   // texto cuerpo
     gold:    '#F0A500',
     orange:  '#E87722',
     green:   '#22C55E',   // Aplicado dot
-    blue:    '#60A5FA',   // Desarrollado dot
-    yellow:  '#FACC15',   // Mencionado dot
-    muted:   'rgba(255,255,255,0.60)',
-    mutedD:  'rgba(255,255,255,0.35)',
+    blue:    '#3B82F6',   // Desarrollado dot
+    yellow:  '#F59E0B',   // Mencionado dot
+    muted:   '#6B7280',   // muted claro
+    mutedD:  '#9CA3AF',   // extra muted
   } as const;
 
   // KPI total elementos curriculares
@@ -1014,10 +1016,10 @@ function ViewPrograma({ programaId }: ViewProps) {
 
   // Icono por prioridad (mapeo semántico para flujo de prioridades)
   const iconosPrioridad = [
-    <IconChartBar size={22} color={D.gold} />,
-    <IconBrain size={22} color={D.gold} />,
-    <IconShield size={22} color={D.gold} />,
-    <IconWorld size={22} color={D.gold} />,
+    <IconChartBar size={22} color={D.orange} />,
+    <IconBrain size={22} color={D.orange} />,
+    <IconShield size={22} color={D.orange} />,
+    <IconWorld size={22} color={D.orange} />,
   ];
 
   // Color dot por nivel de evidencia
@@ -1036,21 +1038,21 @@ function ViewPrograma({ programaId }: ViewProps) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>{n}</span>
       <span style={{ fontSize: 10, color: D.muted, textAlign: 'center', lineHeight: 1.4 }}>{q1}</span>
-      <span style={{ fontSize: 10, fontWeight: 700, color: D.white, textAlign: 'center', lineHeight: 1.3 }}>{q2}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, color: D.ink, textAlign: 'center', lineHeight: 1.3 }}>{q2}</span>
     </div>
   );
 
   return (
-    <div style={{ background: D.bg, minHeight: '100%', fontFamily: 'inherit' }}>
+    <div style={{ background: D.cardAlt, minHeight: '100%', fontFamily: 'inherit' }}>
 
       {/* ══ HEADER ══ */}
-      <div style={{ padding: '18px 20px 14px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ padding: '18px 20px 14px', background: D.bg, borderBottom: `1px solid #1E3560`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 900, color: D.white, margin: '0 0 3px', lineHeight: 1.15 }}>
             Análisis de competencias del programa
           </h1>
           <p style={{ fontSize: 12, fontWeight: 600, color: D.orange, margin: '0 0 5px' }}>{data.programa}</p>
-          <p style={{ fontSize: 10, color: D.mutedD, margin: 0 }}>
+          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
             Ruta de lectura: alcance → fortalezas → mapa curricular → oportunidades → prioridades
           </p>
         </div>
@@ -1064,18 +1066,18 @@ function ViewPrograma({ programaId }: ViewProps) {
         <SectionLabel n="1" q1="¿Qué se" q2="analizó?" />
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border }}>
           {([
-            { icon: <IconClipboardList size={20} color={D.bg} />, value: uniqueAsignaturas, label: 'Asignaturas\nanalizadas' },
-            { icon: <IconSchool        size={20} color={D.bg} />, value: totalElementos,    label: 'Elementos\ncurriculares' },
-            { icon: <IconListCheck     size={20} color={D.bg} />, value: 5,                  label: 'Categorías' },
-            { icon: <IconAward         size={20} color={D.bg} />, value: coherencia,         label: 'Coherencia\ncurricular', hi: true },
+            { icon: <IconClipboardList size={20} color={D.white} />, value: uniqueAsignaturas, label: 'Asignaturas\nanalizadas' },
+            { icon: <IconSchool        size={20} color={D.white} />, value: totalElementos,    label: 'Elementos\ncurriculares' },
+            { icon: <IconListCheck     size={20} color={D.white} />, value: 5,                  label: 'Categorías' },
+            { icon: <IconAward         size={20} color={D.white} />, value: coherencia,         label: 'Coherencia\ncurricular', hi: true },
           ] as { icon: React.ReactNode; value: string|number; label: string; hi?: boolean }[]).map((k, i) => (
-            <div key={i} style={{ background: D.white, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div key={i} style={{ background: D.card, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 7, background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {k.icon}
               </div>
               <div>
-                <div style={{ fontSize: 24, fontWeight: 900, color: k.hi ? D.orange : D.bg, lineHeight: 1 }}>{k.value}</div>
-                <div style={{ fontSize: 10, color: '#4B5563', marginTop: 2, whiteSpace: 'pre-line' }}>{k.label}</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: k.hi ? D.orange : D.ink, lineHeight: 1 }}>{k.value}</div>
+                <div style={{ fontSize: 10, color: D.muted, marginTop: 2, whiteSpace: 'pre-line' }}>{k.label}</div>
               </div>
             </div>
           ))}
@@ -1088,11 +1090,11 @@ function ViewPrograma({ programaId }: ViewProps) {
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', gap: 1, background: D.border, minHeight: 0 }}>
 
           {/* Fortaleza formativa */}
-          <div style={{ background: D.card, padding: '14px 14px' }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: D.white, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
+          <div style={{ background: D.card, padding: '14px 14px', borderRight: `1px solid ${D.border}` }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: D.ink, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
               Fortaleza formativa
             </div>
-            <div style={{ fontSize: 9, color: D.mutedD, marginBottom: 12, lineHeight: 1.3 }}>
+            <div style={{ fontSize: 9, color: D.muted, marginBottom: 12, lineHeight: 1.3 }}>
               Índice estimado por presencia y profundidad curricular
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
@@ -1101,8 +1103,8 @@ function ViewPrograma({ programaId }: ViewProps) {
                 const label = CAT_LABEL[cat];
                 return (
                   <div key={cat}>
-                    <div style={{ fontSize: 10, color: D.muted, marginBottom: 3 }}>{label}</div>
-                    <div style={{ position: 'relative', height: 18, borderRadius: 3, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 10, color: D.text, marginBottom: 3 }}>{label}</div>
+                    <div style={{ position: 'relative', height: 18, borderRadius: 3, background: '#E5E7EB', overflow: 'hidden' }}>
                       <div style={{
                         width: `${pct}%`, height: '100%',
                         background: `linear-gradient(90deg, #16A34A 0%, #22C55E 100%)`,
@@ -1111,7 +1113,7 @@ function ViewPrograma({ programaId }: ViewProps) {
                         {pct >= 20 && <span style={{ fontSize: 10, fontWeight: 700, color: D.white }}>{pct}%</span>}
                       </div>
                       {pct < 20 && (
-                        <span style={{ position: 'absolute', right: 4, top: 0, height: '100%', display: 'flex', alignItems: 'center', fontSize: 10, fontWeight: 700, color: D.mutedD }}>{pct}%</span>
+                        <span style={{ position: 'absolute', right: 4, top: 0, height: '100%', display: 'flex', alignItems: 'center', fontSize: 10, fontWeight: 700, color: D.muted }}>{pct}%</span>
                       )}
                     </div>
                   </div>
@@ -1127,14 +1129,14 @@ function ViewPrograma({ programaId }: ViewProps) {
           </div>
 
           {/* Mapa de capacidades */}
-          <div style={{ background: D.cardAlt, padding: '14px 12px', overflow: 'hidden' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: D.white, marginBottom: 12, textAlign: 'center' }}>
+          <div style={{ background: D.card, padding: '14px 12px', overflow: 'hidden' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: D.ink, marginBottom: 12, textAlign: 'center' }}>
               Mapa de capacidades: ¿qué enseña el programa?
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
               {CATS_ORDER.map((cat, ci) => {
                 const items = [...(data[cat] ?? [])].sort((a, b) => b.evidencia - a.evidencia);
-                const headerColors = ['#3B82F6','#60A5FA','#93C5FD','#A78BFA','#C4B5FD'];
+                const headerColors = ['#2563EB','#7C3AED','#059669','#D97706','#DC2626'];
                 return (
                   <div key={cat} style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{
@@ -1150,7 +1152,7 @@ function ViewPrograma({ programaId }: ViewProps) {
                             width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                             background: dotColor(item.evidencia), marginTop: 2,
                           }} />
-                          <span style={{ fontSize: 9.5, color: D.muted, lineHeight: 1.35 }}>{item.nombre}</span>
+                          <span style={{ fontSize: 9.5, color: D.text, lineHeight: 1.35 }}>{item.nombre}</span>
                         </div>
                       ))}
                     </div>
@@ -1175,11 +1177,11 @@ function ViewPrograma({ programaId }: ViewProps) {
         </div>
       </div>
 
-      {/* ══ FILA ④: ¿Qué debe fortalecerse? — Oportunidades (tarjetas horizontales) ══ */}
+      {/* ══ FILA ③: ¿Qué debe fortalecerse? — Oportunidades (tarjetas horizontales) ══ */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}` }}>
         <SectionLabel n="3" q1="¿Qué debe" q2="fortalecerse?" />
         <div style={{ flex: 1, padding: '14px 12px', background: D.card }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: D.white, marginBottom: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: D.ink, marginBottom: 10 }}>
             Oportunidades de fortalecimiento y evidencia
           </div>
           {oportunidades.length === 0 ? (
@@ -1191,10 +1193,10 @@ function ViewPrograma({ programaId }: ViewProps) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
                     <span style={{
                       width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                      background: D.gold, color: D.bg, fontSize: 11, fontWeight: 800,
+                      background: D.gold, color: D.white, fontSize: 11, fontWeight: 800,
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     }}>{i + 1}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: D.white, lineHeight: 1.3 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: D.ink, lineHeight: 1.3 }}>
                       {d.hallazgo}
                     </span>
                   </div>
@@ -1225,15 +1227,15 @@ function ViewPrograma({ programaId }: ViewProps) {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                       <span style={{
                         width: 24, height: 24, borderRadius: '50%', background: D.gold,
-                        color: D.bg, fontSize: 12, fontWeight: 900,
+                        color: D.white, fontSize: 12, fontWeight: 900,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>{i + 1}</span>
-                      {iconosPrioridad[i] ?? <IconCircleCheck size={22} color={D.gold} />}
+                      {iconosPrioridad[i] ?? <IconCircleCheck size={22} color={D.orange} />}
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: D.white, lineHeight: 1.4 }}>{r.accion}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: D.text, lineHeight: 1.4 }}>{r.accion}</span>
                   </div>
                   {i < prioridades.length - 1 && (
-                    <span key={`arr-${i}`} style={{ fontSize: 18, color: D.gold, padding: '0 6px', flexShrink: 0 }}>→</span>
+                    <span key={`arr-${i}`} style={{ fontSize: 18, color: D.orange, padding: '0 6px', flexShrink: 0 }}>→</span>
                   )}
                 </>
               ))}
