@@ -94,28 +94,50 @@ A. FUENTE PRINCIPAL: el CONTENIDO TEMÁTICO, no solo los resultados de aprendiza
 B. CINCO CATEGORÍAS DE COMPETENCIAS — mínimo 15 entradas en total, idealmente 20-30:
    Clasifica cada elemento en exactamente una de estas 5 categorías:
 
-   1. herramientas_tecnicas: técnicas cuantitativas y herramientas operativas concretas.
-      Ejemplos: Gestión del Valor Ganado (EVM), EDT/WBS, CPM/diagramas de red, Gantt,
-      Curva S, Análisis Monte Carlo, RAM/RACI, MS Project, Jira, Excel para proyectos.
-      INCLUYE aquí: EVM, Gantt, CPM, EDT/WBS, RAM/RACI, análisis cuantitativo de riesgos.
+   1. herramientas_tecnicas: técnicas cuantitativas y herramientas operativas concretas
+      específicas del dominio del programa.
+      Ejemplos (gestión de proyectos): EVM, EDT/WBS, CPM, Gantt, MS Project, Jira.
+      Ejemplos (analítica/IA): regresión, clustering, redes neuronales, pipelines ETL,
+        SQL/NoSQL, TensorFlow, PyTorch, Tableau, Power BI, Spark, modelos de ML.
+      Ejemplos (neuropsicología): escalas neuropsicológicas (WAIS, Stroop, TMT),
+        técnicas de neuroimagen, EEG/neurofeedback, baterías de evaluación cognitiva.
+      Ejemplos (criminología): análisis estadístico de datos criminales, SIG/mapeo del
+        delito, técnicas de entrevista forense, análisis de escena del crimen.
 
    2. competencias_metodologicas: capacidades de proceso y habilidades analíticas
       que el estudiante desarrolla como competencia propia.
-      Ejemplos: planificación de proyectos, estimación de costos, gestión de riesgos
-      (como competencia), negociación, elaboración de propuestas técnicas.
+      Ejemplos (gestión de proyectos): planificación, estimación de costos, gestión de
+        riesgos como competencia, elaboración de propuestas técnicas.
+      Ejemplos (analítica/IA): diseño experimental, validación de modelos, interpretación
+        de resultados estadísticos, evaluación de sesgos algorítmicos.
+      Ejemplos (neuropsicología): evaluación neuropsicológica, diagnóstico diferencial,
+        diseño de intervenciones cognitivas, elaboración de informes clínicos.
+      Ejemplos (criminología): metodología de investigación criminal, análisis victimológico,
+        elaboración de peritajes, análisis cualitativo/cuantitativo de fenómenos delictivos.
       NO incluyas marcos o estándares aquí — van en marcos_estandares_referentes.
 
    3. habilidades_transversales: habilidades blandas y comunicativas.
       Ejemplos: liderazgo, trabajo en equipo, comunicación efectiva, pensamiento crítico,
-      gestión del cambio, inteligencia emocional, presentación ejecutiva.
+      ética profesional, gestión del cambio, inteligencia emocional, presentación ejecutiva.
 
-   4. gestion_y_negocio: conocimiento de dominio de negocio y gestión organizacional.
-      Ejemplos: análisis financiero de proyectos, gestión de contratos, gestión de
-      adquisiciones, análisis de mercado, estrategia organizacional, gobernanza.
+   4. gestion_y_negocio: conocimiento de dominio de negocio, organizacional o institucional.
+      Ejemplos (gestión de proyectos): análisis financiero, gestión de contratos, gobernanza.
+      Ejemplos (analítica/IA): data governance, privacidad de datos, gestión de productos
+        digitales, monetización de datos, cumplimiento regulatorio (GDPR).
+      Ejemplos (neuropsicología): gestión de servicios de salud mental, marco legal clínico,
+        diseño de programas de intervención educativa, políticas de inclusión.
+      Ejemplos (criminología): política criminal, gestión de sistemas penitenciarios,
+        marco jurídico-penal, seguridad ciudadana, reinserción social.
 
    5. marcos_estandares_referentes: marcos, estándares, metodologías y certificaciones.
-      INCLUYE SIEMPRE aquí: PMI, PMBOK, PMP, CAPM, Prince2, Scrum, Agile, Kanban,
-      SAFe, ISO 9001, ISO 21500, Design Thinking, Lean, Lean Startup, Six Sigma.
+      Ejemplos (gestión de proyectos): PMI, PMBOK, PMP, Prince2, Scrum, Agile, Kanban,
+        SAFe, ISO 21500.
+      Ejemplos (analítica/IA): CRISP-DM, MLOps, FAIR (datos), ISO/IEC 25010, marcos de
+        ética en IA (IEEE, EU AI Act), certificaciones de nube (AWS/Azure/GCP).
+      Ejemplos (neuropsicología): DSM-5, CIE-11, modelos de neuropsicología cognitiva
+        (Luria, Baddeley), marcos de neurociencia educativa.
+      Ejemplos (criminología): teorías criminológicas clásicas y contemporáneas (Sutherland,
+        Becker, Hirschi), marcos de justicia restaurativa, estándares forenses internacionales.
       Nunca pongas PMI/PMBOK/PMP/Scrum/Agile en herramientas_tecnicas ni en
       competencias_metodologicas.
 
@@ -128,15 +150,41 @@ B. CINCO CATEGORÍAS DE COMPETENCIAS — mínimo 15 entradas en total, idealment
    Para cada elemento lista TODAS las asignaturas donde aparece.
 
 C. AUSENCIAS NOTABLES — checklist de dominio:
-   Al analizar las debilidades, verifica EXPLÍCITAMENTE si están ausentes:
-   - Para gestión de proyectos: herramientas tecnológicas (MS Project, Jira, etc.),
-     metodologías ágiles (Scrum, Kanban, SAFe), sostenibilidad/ESG, analítica
-     financiera de inversión (VAN, TIR, payback), gestión de portafolios,
-     transformación digital, gestión de contratos/adquisiciones avanzada.
-   - Para analítica de datos: MLOps, data governance, privacidad/GDPR, nube.
-   - Para ciberseguridad: normativas actualizadas, red team/blue team, forense.
-   - Para otros dominios: adapta el checklist al dominio detectado.
-   Reporta como debilidad cada ausencia notable con impacto estimado.
+   Identifica el dominio principal del programa y aplica ÚNICAMENTE el checklist
+   correspondiente. NO uses el checklist de otro dominio.
+
+   - Para gestión de proyectos:
+     herramientas tecnológicas de PM (MS Project, Jira, etc.), metodologías ágiles
+     (Scrum, Kanban, SAFe), sostenibilidad/ESG en proyectos, analítica financiera de
+     inversión (VAN, TIR, payback), gestión de portafolios, transformación digital,
+     gestión de contratos y adquisiciones avanzada.
+
+   - Para analítica de datos / visual analytics / big data:
+     MLOps y ciclo de vida de modelos en producción, data governance y calidad de datos,
+     privacidad/GDPR y regulación de datos, computación en nube (AWS/Azure/GCP),
+     herramientas de visualización específicas (Tableau, Power BI, D3 si no mencionadas),
+     pipelines de datos y orquestación (Airflow, dbt), testing y validación de modelos.
+
+   - Para inteligencia artificial:
+     MLOps y despliegue de modelos en producción, ética y sesgo algorítmico, explicabilidad
+     de modelos (XAI/LIME/SHAP), frameworks de desarrollo (TensorFlow, PyTorch si no
+     mencionados), IA generativa y LLMs, evaluación de riesgos de IA, certificaciones
+     o marcos regulatorios (EU AI Act, ISO/IEC 42001).
+
+   - Para neuropsicología y educación:
+     neurociencia cognitiva aplicada al aula, instrumentos de evaluación neuropsicológica
+     estandarizados (WAIS, Stroop, baterías Luria si no mencionados), tecnologías de
+     neurofeedback y biofeedback, inclusión educativa y NEE, diseño universal del
+     aprendizaje (DUA), neuropsicología del desarrollo infantil y del envejecimiento.
+
+   - Para criminología:
+     metodologías de investigación cuantitativa aplicadas a datos criminales, herramientas
+     de análisis forense digital, SIG y mapeo geoespacial del delito, perspectiva de género
+     en criminología, criminología ambiental y situacional, marco legal actualizado
+     (reformas recientes), victimología avanzada.
+
+   Reporta como debilidad ÚNICAMENTE las ausencias del checklist de SU dominio, con
+   impacto estimado. No importes ítems de otros dominios como brechas.
 
 ═══════════════════════════════════════════════════════════
 REGLAS OBLIGATORIAS
