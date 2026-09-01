@@ -58,3 +58,40 @@ def fetch_jobs_basic(*, db_name: str | None = None) -> list[dict[str, Any]]:
         """,
         db_name=db_name,
     )
+
+
+def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list[str]]:
+    """Return distinct filter option values available in the empleos table."""
+    periodos = fetch_all(
+        """
+        SELECT DISTINCT TO_CHAR(fecha_publicacion, 'YYYY-MM') AS periodo
+        FROM empleos
+        WHERE fecha_publicacion IS NOT NULL
+        ORDER BY periodo DESC
+        LIMIT 36
+        """,
+        db_name=db_name,
+    )
+    dominios = fetch_all(
+        """
+        SELECT DISTINCT dominio
+        FROM empleos
+        WHERE dominio IS NOT NULL AND TRIM(dominio) != ''
+        ORDER BY dominio
+        """,
+        db_name=db_name,
+    )
+    seniorities = fetch_all(
+        """
+        SELECT DISTINCT seniority
+        FROM empleos
+        WHERE seniority IS NOT NULL AND TRIM(seniority) != ''
+        ORDER BY seniority
+        """,
+        db_name=db_name,
+    )
+    return {
+        "periodos": [r["periodo"] for r in periodos],
+        "dominios": [r["dominio"] for r in dominios],
+        "seniorities": [r["seniority"] for r in seniorities],
+    }

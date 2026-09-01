@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import unirLogoPng from '../assets/logos/UNIR_v_blanco.png';
 import { blueGradient } from '../utils/chartColors';
 import {
   Chart as ChartJS,
@@ -749,52 +750,237 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
   );
 }
 
-function ViewMercado({ skills, skillsMercadoDeduped, totales, dataPobre }: ViewProps) {
+interface MarketFilterOptions { periodos: string[]; dominios: string[]; seniorities: string[] }
+interface DeepAnalysisItem { nombre: string; evidencia: number; asignaturas: string[] }
+interface DeepAnalysisData {
+  herramientas_tecnicas?: DeepAnalysisItem[];
+  competencias_metodologicas?: DeepAnalysisItem[];
+  habilidades_transversales?: DeepAnalysisItem[];
+  gestion_y_negocio?: DeepAnalysisItem[];
+  marcos_estandares_referentes?: DeepAnalysisItem[];
+}
+
+const DA_CATS: (keyof DeepAnalysisData)[] = [
+  'herramientas_tecnicas', 'competencias_metodologicas',
+  'habilidades_transversales', 'gestion_y_negocio', 'marcos_estandares_referentes',
+];
+
+function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alineada' | 'parcial' | 'brecha'; evidencia: string } {
+  const norm = skill.toLowerCase().replace(/[^a-z0-9\s]/gi, '').trim();
+  let best: DeepAnalysisItem | null = null;
+  let bestEv = 0;
+  for (const item of daItems) {
+    const n = item.nombre.toLowerCase().replace(/[^a-z0-9\s]/gi, '').trim();
+    const match = n === norm || n.includes(norm) || norm.includes(n) ||
+      norm.split(' ').some(w => w.length > 3 && n.includes(w));
+    if (match && (item.evidencia ?? 0) > bestEv) { best = item; bestEv = item.evidencia ?? 0; }
+  }
+  if (!best) return { estado: 'brecha', evidencia: 'No incorporado' };
+  const asigs = best.asignaturas?.slice(0, 2).join(', ') || best.nombre;
+  return { estado: bestEv >= 2 ? 'alineada' : 'parcial', evidencia: asigs };
+}
+
+function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, coberturaPct, empCompatibles }: ViewProps) {
+  const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
+  const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
+  const [filterPeriodo, setFilterPeriodo] = useState('');
+  const [filterDominio, setFilterDominio] = useState('');
+  const [filterSeniority, setFilterSeniority] = useState('');
+
+  useEffect(() => {
+    if (!programaId) return;
+    fetch(`${API}/api/programs/${programaId}/deep-analysis`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: DeepAnalysisData) => setDeepAnalysis(d))
+      .catch(() => setDeepAnalysis({}));
+  }, [programaId]);
+
+  useEffect(() => {
+    if (!programaId) return;
+    fetch(`${API}/api/programas/${programaId}/market-filters`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: MarketFilterOptions) => setFilterOptions(d))
+      .catch(() => setFilterOptions({ periodos: [], dominios: [], seniorities: [] }));
+  }, [programaId]);
+
+  const top8 = skillsMercadoDeduped.slice(0, 8);
+  const maxFreq = top8[0]?.frecuencia ?? 1;
+
+  const daItems = useMemo<DeepAnalysisItem[]>(() => {
+    if (!deepAnalysis) return [];
+    return DA_CATS.flatMap(cat => deepAnalysis[cat] ?? []);
+  }, [deepAnalysis]);
+
+  const alignmentRows = useMemo(() =>
+    top8.map(s => ({ skill: s.skill, menciones: s.frecuencia, ...alignSkill(s.skill, daItems) })),
+  [top8, daItems]);
+
+  const normalizadosCount = skillsMercadoDeduped.length;
+  const alinCount = deepAnalysis === null ? '…' : alignmentRows.filter(r => r.estado === 'alineada').length;
+  const brechasRows = alignmentRows.filter(r => r.estado === 'brecha');
+  const brechasCount = deepAnalysis === null ? '…' : brechasRows.length;
+  const topBrechas = brechasRows.slice(0, 4);
+
+  const gap1 = brechasRows[0] ? displaySkill(brechasRows[0].skill) : 'herramientas analíticas';
+  const gap2 = brechasRows[1] ? displaySkill(brechasRows[1].skill) : null;
+  const calloutText = `El mercado laboral valora habilidades técnicas y metodológicas alineadas con el perfil del programa. Se identifican ${typeof brechasCount === 'number' ? brechasCount : 'varias'} brechas prioritarias, destacando ${gap1}${gap2 ? ` y ${gap2}` : ''} como requerimientos con alta demanda y cobertura curricular limitada.`;
+
+  const ESTADO_STYLE: Record<string, { bg: string; color: string; label: string }> = {
+    alineada: { bg: '#D1FAE5', color: '#065F46', label: 'Alineada' },
+    parcial:  { bg: '#FEF3C7', color: '#92400E', label: 'Cobertura parcial' },
+    brecha:   { bg: '#FEE2E2', color: '#991B1B', label: 'Brecha' },
+  };
+
   if (dataPobre) return <div style={{ padding: 24 }}><ExplorandoMsg /></div>;
   if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
 
-  const bycat: Record<SkillCat, SkillMercado[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
-  for (const s of skillsMercadoDeduped) bycat[classifySkill(s.skill)].push(s);
-
-  const ALL_CATS: SkillCat[] = ['herramienta', 'competencia', 'habilidad', 'otro'];
-  const cols: { cat: SkillCat; items: SkillMercado[] }[] = ALL_CATS
-    .map(cat => ({ cat, items: bycat[cat].slice(0, 10) }))
-    .filter(({ cat, items }) => items.length > 0 || cat !== 'otro');
-
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
-      <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Qué Demanda el Mercado</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-          {skillsMercadoDeduped.length} skills en vacantes compatibles con el programa
-        </p>
+    <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflowY: 'auto', background: '#F7F8FC' }}>
+
+      {/* Header */}
+      <div>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Demanda del mercado y brechas curriculares</h1>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Requerimientos del mercado laboral compatibles con el perfil de egreso</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" style={{ minHeight: 0 }}>
-        {cols.map(({ cat, items }) => {
-          const m = CAT_META[cat];
-          const isEmpty = items.length === 0;
-          return (
-            <DashPanel
-              key={cat}
-              title={m.label}
-              badge={`${bycat[cat].length} identificadas`}
-              className={isEmpty ? 'min-h-[90px] lg:min-h-[320px]' : undefined}
-              style={isEmpty ? undefined : { minHeight: 320 }}
-            >
-              {isEmpty ? (
-                <div className="flex items-center justify-center flex-1">
-                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes</p>
+
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px' }}>
+        {([
+          { label: 'Periodo', value: filterPeriodo, setter: setFilterPeriodo, options: filterOptions?.periodos ?? [], placeholder: 'Todos los periodos' },
+          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], placeholder: PROGRAMS.find(p => p.id === programaId)?.label ?? '' },
+          { label: 'Familia ocupacional', value: filterDominio, setter: setFilterDominio, options: filterOptions?.dominios ?? [], placeholder: 'Todas las familias' },
+          { label: 'Nivel del cargo', value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], placeholder: 'Todos los niveles' },
+        ] as { label: string; value: string; setter: (v: string) => void; options: string[]; placeholder: string }[]).map(f => (
+          <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</label>
+            <select
+              value={f.value}
+              onChange={e => f.setter(e.target.value)}
+              disabled={f.label === 'Perfil de egreso'}
+              style={{ fontSize: 12, color: C.navy, border: '1px solid #D1D5DB', borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.label === 'Perfil de egreso' ? 'default' : 'pointer', minWidth: 160 }}>
+              {f.label !== 'Perfil de egreso' && <option value="">{f.placeholder}</option>}
+              {f.label === 'Perfil de egreso'
+                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)
+                : f.options.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+          </div>
+        ))}
+      </div>
+
+      {/* 5 KPI cards */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {([
+          { icon: '🔍', value: empCompatibles, label: 'Ofertas pertinentes\nanalizadas' },
+          { icon: '📋', value: normalizadosCount, label: 'Requerimientos\nnormalizados' },
+          { icon: '🎯', value: alinCount, label: 'Competencias\nalineadas' },
+          { icon: '⚠️', value: brechasCount, label: 'Brechas\nprioritarias' },
+          { icon: null, value: `${coberturaPct}%`, label: 'Índice de\nalineación', isCircle: true },
+        ] as { icon: string | null; value: number | string; label: string; isCircle?: boolean }[]).map((kpi, i) => (
+          <div key={i} style={{ flex: 1, minWidth: 130, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            {kpi.isCircle
+              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, borderTopColor: '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
+              : <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{kpi.icon}</div>
+            }
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{kpi.value}</div>
+              <div style={{ fontSize: 9, color: '#6B7280', lineHeight: 1.4, marginTop: 2, whiteSpace: 'pre-line' }}>{kpi.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Main 3-column grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 220px', gap: 12, minHeight: 0 }}>
+
+        {/* Left: Lo que pide el mercado */}
+        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Lo que pide el mercado</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {top8.map((s, i) => (
+            <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 9 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#D1D5DB', width: 14, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+              <span style={{ fontSize: 11, color: C.navy, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
+              <div style={{ width: 48, height: 5, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden', flexShrink: 0 }}>
+                <div style={{ width: `${(s.frecuencia / maxFreq) * 100}%`, height: '100%', background: C.navy, borderRadius: 3 }} />
+              </div>
+              <span style={{ fontSize: 9, color: '#9CA3AF', width: 30, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Center: Demanda vs cobertura */}
+        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowX: 'auto', overflowY: 'auto' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Demanda vs. cobertura curricular</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                {(['Requerimiento del mercado', 'Menciones', 'Evidencia en el programa', 'Estado'] as const).map(h => (
+                  <th key={h} style={{ textAlign: h === 'Menciones' ? 'right' : h === 'Estado' ? 'center' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {alignmentRows.map((row, i) => {
+                const st = ESTADO_STYLE[row.estado];
+                return (
+                  <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
+                    <td style={{ padding: '8px 8px', color: C.navy, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 14 }}>
+                        {row.estado === 'alineada' ? '✅' : row.estado === 'parcial' ? '🔶' : '📊'}
+                      </span>
+                      {displaySkill(row.skill)}
+                    </td>
+                    <td style={{ padding: '8px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{row.menciones}</td>
+                    <td style={{ padding: '8px 8px', color: '#6B7280', fontSize: 10 }}>{deepAnalysis === null ? '…' : row.evidencia}</td>
+                    <td style={{ padding: '8px 8px', textAlign: 'center' }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: st?.bg, color: st?.color, whiteSpace: 'nowrap' }}>
+                        {deepAnalysis === null ? '…' : st?.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Right: Brechas prioritarias */}
+        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Brechas prioritarias</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {deepAnalysis === null
+            ? <Spinner />
+            : topBrechas.length === 0
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas críticas identificadas ✓</p>
+              : topBrechas.map((b, i) => (
+                <div key={b.skill} style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#991B1B', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{displaySkill(b.skill)}</div>
+                    <div style={{ fontSize: 10, color: '#6B7280', marginTop: 1 }}>{b.menciones} menciones · sin cobertura</div>
+                  </div>
                 </div>
-              ) : (
-                <SkillBarList
-                  items={items.map(s => ({ label: displaySkill(s.skill), value: s.frecuencia, rawSkill: s.skill }))}
-                  color={m.bar}
-                />
-              )}
-            </DashPanel>
-          );
-        })}
+              ))
+          }
+        </div>
       </div>
+
+      {/* Callout */}
+      <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 10, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0 }}>
+        <span style={{ fontSize: 22, flexShrink: 0 }}>💡</span>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>Lectura para decisión curricular</div>
+          <p style={{ fontSize: 11, color: '#78350F', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
+        </div>
+      </div>
+
+      {/* Footer sources */}
+      <div style={{ display: 'flex', gap: 24, borderTop: '1px solid #E5E7EB', paddingTop: 8, flexShrink: 0 }}>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente laboral:</strong> ofertas de empleo analizadas del mercado colombiano.</p>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente académica:</strong> microcurrículos del programa.</p>
+      </div>
+
     </div>
   );
 }
@@ -2578,73 +2764,45 @@ export default function ObservatorioStorytelling() {
           'transition-transform duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         ].join(' ')}
-        style={{ width: 200, background: '#0B1730' }}
+        style={{ width: 60, background: '#0B1730' }}
       >
 
-        {/* Logo */}
-        <div style={{ padding: '20px 16px 14px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', lineHeight: 1, marginBottom: 2 }}>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 24, fontWeight: 700, color: '#fff' }}>un</span>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 24, fontWeight: 700, color: '#fff', position: 'relative', display: 'inline-block' }}>
-              i<span style={{ position: 'absolute', top: -3, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, background: '#5BC4F5', borderRadius: '50%' }} />
-            </span>
-            <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 900, color: '#fff' }}>R</span>
-          </div>
-          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#7B8AAE', marginBottom: 14 }}>
-            Observatorio
-          </div>
-
-          {/* Program selector */}
-          <div style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 7, padding: '7px 10px' }}>
-            <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Programa</div>
-            <select
-              value={programaId}
-              onChange={e => setProgramaId(Number(e.target.value))}
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', outline: 'none', width: '100%' }}>
-              {PROGRAMS.map(p => (
-                <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
-              ))}
-            </select>
-          </div>
+        {/* Logo + program selector */}
+        <div style={{ padding: '12px 6px 10px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <img src={unirLogoPng} alt="UNIR" style={{ maxWidth: 38, height: 'auto', display: 'block' }} />
+          <div style={{ fontSize: 6, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#7B8AAE' }}>OBS</div>
+          <select
+            value={programaId}
+            onChange={e => setProgramaId(Number(e.target.value))}
+            title={PROGRAMS.find(p => p.id === programaId)?.label}
+            style={{ width: 46, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 5, color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', outline: 'none', padding: '3px 2px', textAlign: 'center' }}>
+            {PROGRAMS.map(p => (
+              <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.id}</option>
+            ))}
+          </select>
         </div>
 
-        {/* KPI strip */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, padding: '0 12px 12px' }}>
-          {([
-            { v: score.toFixed(0), l: 'Score', c: nivel.color },
-            { v: `${coberturaPct}%`, l: 'Cob.', c: '#38BDF8' },
-            { v: String(empCompatibles), l: 'Emp.', c: '#34D399' },
-          ] as { v: string; l: string; c: string }[]).map(({ v, l, c }) => (
-            <div key={l} style={{ textAlign: 'center', padding: '5px 3px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: c, lineHeight: 1 }}>{v}</div>
-              <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>{l}</div>
-            </div>
-          ))}
-        </div>
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 8px 6px' }} />
 
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 12px 6px' }} />
-
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: '4px 8px' }}>
+        {/* Nav — icons only with title tooltip */}
+        <nav style={{ flex: 1, padding: '4px 6px' }}>
           {NAV_ITEMS.map(({ id, label, Icon }) => {
             const isActive = activeView === id;
             return (
               <button
                 key={id}
+                title={label}
                 onClick={() => { setActiveView(id); setSidebarOpen(false); }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 9,
-                  width: '100%', padding: '8px 10px', marginBottom: 2,
-                  background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: '100%', padding: '9px 0', marginBottom: 2,
+                  background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
                   border: 'none',
                   borderRadius: 8,
-                  cursor: 'pointer', textAlign: 'left' as const,
+                  cursor: 'pointer',
                   transition: 'background 0.12s',
                 }}>
-                <Icon size={15} color={isActive ? '#FFFFFF' : '#8B9AC0'} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? '#FFFFFF' : '#8B9AC0' }}>
-                  {label}
-                </span>
+                <Icon size={17} color={isActive ? '#FFFFFF' : '#8B9AC0'} />
               </button>
             );
           })}
