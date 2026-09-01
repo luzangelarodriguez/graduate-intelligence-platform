@@ -860,7 +860,7 @@ function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, cobe
               style={{ fontSize: 12, color: C.navy, border: '1px solid #D1D5DB', borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.label === 'Perfil de egreso' ? 'default' : 'pointer', minWidth: 160 }}>
               {f.label !== 'Perfil de egreso' && <option value="">{f.placeholder}</option>}
               {f.label === 'Perfil de egreso'
-                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)
+                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
                 : f.options.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
