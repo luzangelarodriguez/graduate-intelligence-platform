@@ -121,6 +121,7 @@ def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list
 def fetch_occupational_profiles(
     *,
     periodo: str | None = None,
+    dominio: str | None = None,
     ciudad: str | None = None,
     seniority: str | None = None,
     portal: str | None = None,
@@ -133,6 +134,9 @@ def fetch_occupational_profiles(
     if periodo:
         filters.append("TO_CHAR(fecha_publicacion, 'YYYY-MM') = %s")
         params.append(periodo)
+    if dominio:
+        filters.append("dominio = %s")
+        params.append(dominio)
     if ciudad:
         filters.append("ciudad = %s")
         params.append(ciudad)
@@ -164,6 +168,7 @@ def fetch_profile_skills(
     titulo_normalizado: str,
     *,
     periodo: str | None = None,
+    dominio: str | None = None,
     ciudad: str | None = None,
     seniority: str | None = None,
     portal: str | None = None,
@@ -180,6 +185,9 @@ def fetch_profile_skills(
     if periodo:
         job_filters.append("TO_CHAR(e.fecha_publicacion, 'YYYY-MM') = %s")
         params.append(periodo)
+    if dominio:
+        job_filters.append("e.dominio = %s")
+        params.append(dominio)
     if ciudad:
         job_filters.append("e.ciudad = %s")
         params.append(ciudad)
@@ -211,6 +219,7 @@ def fetch_profile_skills(
 def fetch_profile_kpis(
     *,
     periodo: str | None = None,
+    dominio: str | None = None,
     ciudad: str | None = None,
     seniority: str | None = None,
     portal: str | None = None,
@@ -223,6 +232,9 @@ def fetch_profile_kpis(
     if periodo:
         filters.append("TO_CHAR(fecha_publicacion, 'YYYY-MM') = %s")
         params.append(periodo)
+    if dominio:
+        filters.append("dominio = %s")
+        params.append(dominio)
     if ciudad:
         filters.append("ciudad = %s")
         params.append(ciudad)

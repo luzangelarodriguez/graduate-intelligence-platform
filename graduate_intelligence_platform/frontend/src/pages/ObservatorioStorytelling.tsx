@@ -97,12 +97,11 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'perfiles' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones' | 'contexto';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'brechas' | 'empleos' | 'recomendaciones' | 'contexto';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
   { id: 'mercado',         label: 'Mercado',          Icon: IconChartBar      },
-  { id: 'perfiles',        label: 'Perfiles',         Icon: IconUsers         },
   { id: 'programa',        label: 'Programa',         Icon: IconSchool        },
   { id: 'cobertura',       label: 'Cobertura',        Icon: IconTarget        },
   { id: 'brechas',         label: 'Brechas',          Icon: IconAlertTriangle },
@@ -781,210 +780,6 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
   return { estado: bestEv >= 2 ? 'alineada' : 'parcial', evidencia: asigs };
 }
 
-function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, coberturaPct, empCompatibles }: ViewProps) {
-  const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
-  const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
-  const [filterPeriodo, setFilterPeriodo] = useState('');
-  const [filterDominio, setFilterDominio] = useState('');
-  const [filterSeniority, setFilterSeniority] = useState('');
-
-  useEffect(() => {
-    if (!programaId) return;
-    fetch(`${API}/api/programs/${programaId}/deep-analysis`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: DeepAnalysisData) => setDeepAnalysis(d))
-      .catch(() => setDeepAnalysis({}));
-  }, [programaId]);
-
-  useEffect(() => {
-    if (!programaId) return;
-    fetch(`${API}/api/programas/${programaId}/market-filters`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: MarketFilterOptions) => setFilterOptions(d))
-      .catch(() => setFilterOptions({ periodos: [], dominios: [], seniorities: [], ciudades: [], portales: [] }));
-  }, [programaId]);
-
-  const top8 = skillsMercadoDeduped.slice(0, 8);
-  const maxFreq = top8[0]?.frecuencia ?? 1;
-
-  const daItems = useMemo<DeepAnalysisItem[]>(() => {
-    if (!deepAnalysis) return [];
-    return DA_CATS.flatMap(cat => deepAnalysis[cat] ?? []);
-  }, [deepAnalysis]);
-
-  const alignmentRows = useMemo(() =>
-    top8.map(s => ({ skill: s.skill, menciones: s.frecuencia, ...alignSkill(s.skill, daItems) })),
-  [top8, daItems]);
-
-  const normalizadosCount = skillsMercadoDeduped.length;
-  const alinCount = deepAnalysis === null ? '…' : alignmentRows.filter(r => r.estado === 'alineada').length;
-  const brechasRows = alignmentRows.filter(r => r.estado === 'brecha');
-  const brechasCount = deepAnalysis === null ? '…' : brechasRows.length;
-  const topBrechas = brechasRows.slice(0, 4);
-
-  const gap1 = brechasRows[0] ? displaySkill(brechasRows[0].skill) : 'herramientas analíticas';
-  const gap2 = brechasRows[1] ? displaySkill(brechasRows[1].skill) : null;
-  const calloutText = `El mercado laboral valora habilidades técnicas y metodológicas alineadas con el perfil del programa. Se identifican ${typeof brechasCount === 'number' ? brechasCount : 'varias'} brechas prioritarias, destacando ${gap1}${gap2 ? ` y ${gap2}` : ''} como requerimientos con alta demanda y cobertura curricular limitada.`;
-
-  const ESTADO_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-    alineada: { bg: '#D1FAE5', color: '#065F46', label: 'Alineada' },
-    parcial:  { bg: '#FEF3C7', color: '#92400E', label: 'Cobertura parcial' },
-    brecha:   { bg: '#FEE2E2', color: '#991B1B', label: 'Brecha' },
-  };
-
-  if (dataPobre) return <div style={{ padding: 24 }}><ExplorandoMsg /></div>;
-  if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
-
-  return (
-    <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflowY: 'auto', background: '#F7F8FC' }}>
-
-      {/* Header */}
-      <div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Demanda del mercado y brechas curriculares</h1>
-        <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Requerimientos del mercado laboral compatibles con el perfil de egreso</p>
-      </div>
-
-      {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px' }}>
-        {([
-          { label: 'Periodo', value: filterPeriodo, setter: setFilterPeriodo, options: filterOptions?.periodos ?? [], placeholder: 'Todos los periodos' },
-          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], placeholder: PROGRAMS.find(p => p.id === programaId)?.label ?? '' },
-          { label: 'Familia ocupacional', value: filterDominio, setter: setFilterDominio, options: filterOptions?.dominios ?? [], placeholder: 'Todas las familias' },
-          { label: 'Nivel del cargo', value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], placeholder: 'Todos los niveles' },
-        ] as { label: string; value: string; setter: (v: string) => void; options: string[]; placeholder: string }[]).map(f => (
-          <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</label>
-            <select
-              value={f.value}
-              onChange={e => f.setter(e.target.value)}
-              disabled={f.label === 'Perfil de egreso'}
-              style={{ fontSize: 12, color: C.navy, border: '1px solid #D1D5DB', borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.label === 'Perfil de egreso' ? 'default' : 'pointer', minWidth: 160 }}>
-              {f.label !== 'Perfil de egreso' && <option value="">{f.placeholder}</option>}
-              {f.label === 'Perfil de egreso'
-                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
-                : f.options.map(o => <option key={o} value={o}>{o}</option>)}
-            </select>
-          </div>
-        ))}
-      </div>
-
-      {/* 5 KPI cards */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        {([
-          { icon: '🔍', value: empCompatibles, label: 'Ofertas pertinentes\nanalizadas' },
-          { icon: '📋', value: normalizadosCount, label: 'Requerimientos\nnormalizados' },
-          { icon: '🎯', value: alinCount, label: 'Competencias\nalineadas' },
-          { icon: '⚠️', value: brechasCount, label: 'Brechas\nprioritarias' },
-          { icon: null, value: `${coberturaPct}%`, label: 'Índice de\nalineación', isCircle: true },
-        ] as { icon: string | null; value: number | string; label: string; isCircle?: boolean }[]).map((kpi, i) => (
-          <div key={i} style={{ flex: 1, minWidth: 130, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            {kpi.isCircle
-              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, borderTopColor: '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
-              : <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{kpi.icon}</div>
-            }
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{kpi.value}</div>
-              <div style={{ fontSize: 9, color: '#6B7280', lineHeight: 1.4, marginTop: 2, whiteSpace: 'pre-line' }}>{kpi.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main 3-column grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 220px', gap: 12, minHeight: 0 }}>
-
-        {/* Left: Lo que pide el mercado */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Lo que pide el mercado</h3>
-          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          {top8.map((s, i) => (
-            <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 9 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#D1D5DB', width: 14, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
-              <span style={{ fontSize: 11, color: C.navy, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
-              <div style={{ width: 48, height: 5, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden', flexShrink: 0 }}>
-                <div style={{ width: `${(s.frecuencia / maxFreq) * 100}%`, height: '100%', background: C.navy, borderRadius: 3 }} />
-              </div>
-              <span style={{ fontSize: 9, color: '#9CA3AF', width: 30, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Center: Demanda vs cobertura */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowX: 'auto', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Demanda vs. cobertura curricular</h3>
-          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                {(['Requerimiento del mercado', 'Menciones', 'Evidencia en el programa', 'Estado'] as const).map(h => (
-                  <th key={h} style={{ textAlign: h === 'Menciones' ? 'right' : h === 'Estado' ? 'center' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {alignmentRows.map((row, i) => {
-                const st = ESTADO_STYLE[row.estado];
-                return (
-                  <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                    <td style={{ padding: '8px 8px', color: C.navy, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>
-                        {row.estado === 'alineada' ? '✅' : row.estado === 'parcial' ? '🔶' : '📊'}
-                      </span>
-                      {displaySkill(row.skill)}
-                    </td>
-                    <td style={{ padding: '8px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{row.menciones}</td>
-                    <td style={{ padding: '8px 8px', color: '#6B7280', fontSize: 10 }}>{deepAnalysis === null ? '…' : row.evidencia}</td>
-                    <td style={{ padding: '8px 8px', textAlign: 'center' }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: st?.bg, color: st?.color, whiteSpace: 'nowrap' }}>
-                        {deepAnalysis === null ? '…' : st?.label}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Right: Brechas prioritarias */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Brechas prioritarias</h3>
-          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          {deepAnalysis === null
-            ? <Spinner />
-            : topBrechas.length === 0
-              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas críticas identificadas ✓</p>
-              : topBrechas.map((b, i) => (
-                <div key={b.skill} style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#991B1B', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{displaySkill(b.skill)}</div>
-                    <div style={{ fontSize: 10, color: '#6B7280', marginTop: 1 }}>{b.menciones} menciones · sin cobertura</div>
-                  </div>
-                </div>
-              ))
-          }
-        </div>
-      </div>
-
-      {/* Callout */}
-      <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 10, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0 }}>
-        <span style={{ fontSize: 22, flexShrink: 0 }}>💡</span>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>Lectura para decisión curricular</div>
-          <p style={{ fontSize: 11, color: '#78350F', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
-        </div>
-      </div>
-
-      {/* Footer sources */}
-      <div style={{ display: 'flex', gap: 24, borderTop: '1px solid #E5E7EB', paddingTop: 8, flexShrink: 0 }}>
-        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente laboral:</strong> ofertas de empleo analizadas del mercado colombiano.</p>
-        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente académica:</strong> microcurrículos del programa.</p>
-      </div>
-
-    </div>
-  );
-}
 
 // ─── ViewPerfiles — occupational profiles + curricular alignment ─────────────
 
@@ -1009,10 +804,11 @@ function classifyTipoSkill(tipo: string): string {
 
 function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
-  const [filterPeriodo, setFilterPeriodo]   = useState('');
-  const [filterCiudad, setFilterCiudad]     = useState('');
+  const [filterPeriodo, setFilterPeriodo]     = useState('');
+  const [filterDominio, setFilterDominio]     = useState('');
+  const [filterCiudad, setFilterCiudad]       = useState('');
   const [filterSeniority, setFilterSeniority] = useState('');
-  const [filterPortal, setFilterPortal]     = useState('');
+  const [filterPortal, setFilterPortal]       = useState('');
 
   const [profiles, setProfiles]         = useState<OccupationalProfile[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(true);
@@ -1043,11 +839,12 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   const filterParams = useMemo(() => {
     const p = new URLSearchParams();
     if (filterPeriodo)   p.set('periodo', filterPeriodo);
+    if (filterDominio)   p.set('dominio', filterDominio);
     if (filterCiudad)    p.set('ciudad', filterCiudad);
     if (filterSeniority) p.set('seniority', filterSeniority);
     if (filterPortal)    p.set('portal', filterPortal);
     return p.toString();
-  }, [filterPeriodo, filterCiudad, filterSeniority, filterPortal]);
+  }, [filterPeriodo, filterDominio, filterCiudad, filterSeniority, filterPortal]);
 
   useEffect(() => {
     if (!programaId) return;
@@ -1073,6 +870,7 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
     setProfileSkills(null);
     const p = new URLSearchParams({ perfil: selectedPerfil });
     if (filterPeriodo)   p.set('periodo', filterPeriodo);
+    if (filterDominio)   p.set('dominio', filterDominio);
     if (filterCiudad)    p.set('ciudad', filterCiudad);
     if (filterSeniority) p.set('seniority', filterSeniority);
     if (filterPortal)    p.set('portal', filterPortal);
@@ -1123,11 +921,12 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
       {/* Filters */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 16px' }}>
         {([
-          { label: 'Periodo',         value: filterPeriodo,   setter: setFilterPeriodo,   options: filterOptions?.periodos ?? [],   ph: 'Todos los periodos' },
-          { label: 'Perfil de egreso',value: String(programaId), setter: () => {}, options: [], ph: PROGRAMS.find(p => p.id === programaId)?.label ?? '', disabled: true },
-          { label: 'Ciudad',          value: filterCiudad,    setter: setFilterCiudad,    options: filterOptions?.ciudades ?? [],   ph: 'Todas las ciudades' },
-          { label: 'Nivel del cargo', value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], ph: 'Todos los niveles' },
-          { label: 'Fuente laboral',  value: filterPortal,    setter: setFilterPortal,    options: filterOptions?.portales ?? [],   ph: 'Todas las fuentes' },
+          { label: 'Periodo',          value: filterPeriodo,   setter: setFilterPeriodo,   options: filterOptions?.periodos ?? [],   ph: 'Todos los periodos' },
+          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], ph: PROGRAMS.find(p => p.id === programaId)?.label ?? '', disabled: true },
+          { label: 'Familia ocup.',    value: filterDominio,   setter: setFilterDominio,   options: filterOptions?.dominios ?? [],   ph: 'Todas las familias' },
+          { label: 'Ciudad',           value: filterCiudad,    setter: setFilterCiudad,    options: filterOptions?.ciudades ?? [],   ph: 'Todas las ciudades' },
+          { label: 'Nivel del cargo',  value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], ph: 'Todos los niveles' },
+          { label: 'Fuente laboral',   value: filterPortal,    setter: setFilterPortal,    options: filterOptions?.portales ?? [],   ph: 'Todas las fuentes' },
         ] as { label: string; value: string; setter: (v: string) => void; options: string[]; ph: string; disabled?: boolean }[]).map(f => (
           <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</label>
@@ -3081,8 +2880,7 @@ export default function ObservatorioStorytelling() {
 
   const viewMap: Record<ViewId, React.ReactNode> = {
     resumen:         <ViewResumen         {...viewProps} />,
-    mercado:         <ViewMercado         {...viewProps} />,
-    perfiles:        <ViewPerfiles        {...viewProps} />,
+    mercado:         <ViewPerfiles        {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewCobertura       {...viewProps} />,
     brechas:         <ViewBrechas         {...viewProps} />,
