@@ -1729,10 +1729,68 @@ def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
 
 @app.get("/api/programas/{program_id}/market-filters", tags=["market"])
 def market_filter_options(program_id: int) -> dict:
-    """Return distinct filter option values (periodos, dominios, seniorities) for the market dashboard."""
+    """Return distinct filter option values for the market dashboards."""
     try:
         from backend.repositories.empleos_repository import fetch_market_filter_options
         return fetch_market_filter_options()
     except Exception as exc:
         logger.warning("market_filter_options failed: %s", exc)
-        return {"periodos": [], "dominios": [], "seniorities": []}
+        return {"periodos": [], "dominios": [], "seniorities": [], "ciudades": [], "portales": []}
+
+
+@app.get("/api/programas/{program_id}/perfiles-ocupacionales", tags=["market"])
+def get_occupational_profiles(
+    program_id: int,
+    periodo: str | None = None,
+    ciudad: str | None = None,
+    seniority: str | None = None,
+    portal: str | None = None,
+) -> list:
+    """Return top occupational profiles (by titulo_normalizado) with vacancy counts."""
+    try:
+        from backend.repositories.empleos_repository import fetch_occupational_profiles
+        return fetch_occupational_profiles(
+            periodo=periodo, ciudad=ciudad, seniority=seniority, portal=portal
+        )
+    except Exception as exc:
+        logger.warning("get_occupational_profiles failed: %s", exc)
+        return []
+
+
+@app.get("/api/programas/{program_id}/perfil-skills", tags=["market"])
+def get_profile_skills(
+    program_id: int,
+    perfil: str,
+    periodo: str | None = None,
+    ciudad: str | None = None,
+    seniority: str | None = None,
+    portal: str | None = None,
+) -> list:
+    """Return skills for empleos matching a titulo_normalizado, grouped by tipo_skill."""
+    try:
+        from backend.repositories.empleos_repository import fetch_profile_skills
+        return fetch_profile_skills(
+            perfil, periodo=periodo, ciudad=ciudad, seniority=seniority, portal=portal
+        )
+    except Exception as exc:
+        logger.warning("get_profile_skills failed: %s", exc)
+        return []
+
+
+@app.get("/api/programas/{program_id}/perfiles-kpis", tags=["market"])
+def get_profile_kpis(
+    program_id: int,
+    periodo: str | None = None,
+    ciudad: str | None = None,
+    seniority: str | None = None,
+    portal: str | None = None,
+) -> dict:
+    """Return aggregate KPIs for the perfiles ocupacionales view."""
+    try:
+        from backend.repositories.empleos_repository import fetch_profile_kpis
+        return fetch_profile_kpis(
+            periodo=periodo, ciudad=ciudad, seniority=seniority, portal=portal
+        )
+    except Exception as exc:
+        logger.warning("get_profile_kpis failed: %s", exc)
+        return {"total_ofertas": 0, "total_perfiles": 0, "total_skills": 0}
