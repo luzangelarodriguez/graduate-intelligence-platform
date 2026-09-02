@@ -2764,45 +2764,46 @@ export default function ObservatorioStorytelling() {
           'transition-transform duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         ].join(' ')}
-        style={{ width: 60, background: '#0B1730' }}
+        style={{ width: 200, background: '#0B1730' }}
       >
 
         {/* Logo + program selector */}
-        <div style={{ padding: '12px 6px 10px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <img src={unirLogoPng} alt="UNIR" style={{ maxWidth: 38, height: 'auto', display: 'block' }} />
-          <div style={{ fontSize: 6, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#7B8AAE' }}>OBS</div>
+        <div style={{ padding: '12px 10px 10px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <img src={unirLogoPng} alt="UNIR" style={{ maxWidth: 150, height: 'auto', display: 'block' }} />
+          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.20em', textTransform: 'uppercase' as const, color: '#7B8AAE' }}>OBSERVATORIO</div>
           <select
             value={programaId}
             onChange={e => setProgramaId(Number(e.target.value))}
-            title={PROGRAMS.find(p => p.id === programaId)?.label}
-            style={{ width: 46, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 5, color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', outline: 'none', padding: '3px 2px', textAlign: 'center' }}>
+            style={{ width: '100%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 5, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', outline: 'none', padding: '5px 8px' }}>
             {PROGRAMS.map(p => (
-              <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.id}</option>
+              <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
             ))}
           </select>
         </div>
 
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 8px 6px' }} />
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 10px 6px' }} />
 
-        {/* Nav — icons only with title tooltip */}
-        <nav style={{ flex: 1, padding: '4px 6px' }}>
+        {/* Nav — icon + label */}
+        <nav style={{ flex: 1, padding: '4px 8px' }}>
           {NAV_ITEMS.map(({ id, label, Icon }) => {
             const isActive = activeView === id;
             return (
               <button
                 key={id}
-                title={label}
                 onClick={() => { setActiveView(id); setSidebarOpen(false); }}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: '100%', padding: '9px 0', marginBottom: 2,
+                  display: 'flex', alignItems: 'center', gap: 9,
+                  width: '100%', padding: '9px 10px', marginBottom: 2,
                   background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
                   border: 'none',
+                  borderLeft: isActive ? '2px solid #6366f1' : '2px solid transparent',
                   borderRadius: 8,
                   cursor: 'pointer',
                   transition: 'background 0.12s',
+                  textAlign: 'left' as const,
                 }}>
                 <Icon size={17} color={isActive ? '#FFFFFF' : '#8B9AC0'} />
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? '#FFFFFF' : '#8B9AC0' }}>{label}</span>
               </button>
             );
           })}
