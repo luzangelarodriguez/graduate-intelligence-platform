@@ -2767,18 +2767,25 @@ export default function ObservatorioStorytelling() {
         style={{ width: 200, background: '#0B1730' }}
       >
 
-        {/* Logo + program selector */}
-        <div style={{ padding: '12px 10px 10px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <img src={unirLogoPng} alt="UNIR" style={{ maxWidth: 150, height: 'auto', display: 'block' }} />
-          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.20em', textTransform: 'uppercase' as const, color: '#7B8AAE' }}>OBSERVATORIO</div>
-          <select
-            value={programaId}
-            onChange={e => setProgramaId(Number(e.target.value))}
-            style={{ width: '100%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 5, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', outline: 'none', padding: '5px 8px' }}>
-            {PROGRAMS.map(p => (
-              <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
-            ))}
-          </select>
+        {/* Logo */}
+        <div style={{ padding: '20px 16px 14px', flexShrink: 0 }}>
+          <img src={unirLogoPng} alt="UNIR La Universidad en Internet" style={{ maxWidth: 150, height: 'auto', display: 'block', marginBottom: 4 }} />
+          <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#7B8AAE', marginBottom: 14 }}>
+            Observatorio
+          </div>
+
+          {/* Program selector */}
+          <div style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 7, padding: '7px 10px' }}>
+            <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Programa</div>
+            <select
+              value={programaId}
+              onChange={e => setProgramaId(Number(e.target.value))}
+              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', outline: 'none', width: '100%' }}>
+              {PROGRAMS.map(p => (
+                <option key={p.id} value={p.id} style={{ color: '#111', background: '#fff' }}>{p.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 10px 6px' }} />
