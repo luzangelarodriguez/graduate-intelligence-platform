@@ -750,7 +750,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
   );
 }
 
-interface MarketFilterOptions { periodos: string[]; dominios: string[]; seniorities: string[] }
+interface MarketFilterOptions { periodos: string[]; dominios: string[]; seniorities: string[]; ciudades: string[]; portales: string[] }
 interface DeepAnalysisItem { nombre: string; evidencia: number; asignaturas: string[] }
 interface DeepAnalysisData {
   herramientas_tecnicas?: DeepAnalysisItem[];
@@ -780,13 +780,53 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
   return { estado: bestEv >= 2 ? 'alineada' : 'parcial', evidencia: asigs };
 }
 
-function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, coberturaPct, empCompatibles }: ViewProps) {
-  const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
-  const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
-  const [filterPeriodo, setFilterPeriodo] = useState('');
-  const [filterDominio, setFilterDominio] = useState('');
-  const [filterSeniority, setFilterSeniority] = useState('');
 
+// ─── ViewPerfiles — occupational profiles + curricular alignment ─────────────
+
+interface OccupationalProfile { perfil: string; vacantes: number }
+interface ProfileSkill { nombre: string; tipo_skill: string; vacantes: number }
+interface ProfileKpis { total_ofertas: number; total_perfiles: number; total_skills: number }
+
+const SKILL_COLS = [
+  { key: 'herramientas', label: 'Herramientas', icon: '🔧', kw: ['herramient', 'tool', 'software', 'plataform', 'tecnolog'] },
+  { key: 'conocimientos', label: 'Conocimientos', icon: '📚', kw: ['conocimient', 'saber', 'knowledge', 'marco', 'metodolog', 'estandar', 'estándar'] },
+  { key: 'competencias', label: 'Competencias', icon: '📊', kw: ['competenci', 'gestion', 'gestión', 'analisis', 'análisis', 'proceso'] },
+  { key: 'habilidades', label: 'Habilidades', icon: '👥', kw: ['habilidad', 'blanda', 'soft', 'transvers', 'interpersonal', 'comunic', 'liderazg'] },
+];
+
+function classifyTipoSkill(tipo: string): string {
+  const t = (tipo ?? '').toLowerCase();
+  for (const col of SKILL_COLS) {
+    if (col.kw.some(k => t.includes(k))) return col.key;
+  }
+  return 'competencias';
+}
+
+function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
+  const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
+  const [filterPeriodo, setFilterPeriodo]     = useState('');
+  const [filterDominio, setFilterDominio]     = useState('');
+  const [filterCiudad, setFilterCiudad]       = useState('');
+  const [filterSeniority, setFilterSeniority] = useState('');
+  const [filterPortal, setFilterPortal]       = useState('');
+
+  const [profiles, setProfiles]         = useState<OccupationalProfile[]>([]);
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [selectedPerfil, setSelectedPerfil]   = useState<string | null>(null);
+  const [profileSkills, setProfileSkills]     = useState<ProfileSkill[] | null>(null);
+  const [kpis, setKpis]                 = useState<ProfileKpis | null>(null);
+  const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
+
+  // Filter options
+  useEffect(() => {
+    if (!programaId) return;
+    fetch(`${API}/api/programas/${programaId}/market-filters`)
+      .then(r => r.json())
+      .then((d: MarketFilterOptions) => setFilterOptions(d))
+      .catch(() => setFilterOptions({ periodos: [], dominios: [], seniorities: [], ciudades: [], portales: [] }));
+  }, [programaId]);
+
+  // Deep analysis for alignment
   useEffect(() => {
     if (!programaId) return;
     fetch(`${API}/api/programs/${programaId}/deep-analysis`)
@@ -795,91 +835,128 @@ function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, cobe
       .catch(() => setDeepAnalysis({}));
   }, [programaId]);
 
+  // Profiles + KPIs when filters change
+  const filterParams = useMemo(() => {
+    const p = new URLSearchParams();
+    if (filterPeriodo)   p.set('periodo', filterPeriodo);
+    if (filterDominio)   p.set('dominio', filterDominio);
+    if (filterCiudad)    p.set('ciudad', filterCiudad);
+    if (filterSeniority) p.set('seniority', filterSeniority);
+    if (filterPortal)    p.set('portal', filterPortal);
+    return p.toString();
+  }, [filterPeriodo, filterDominio, filterCiudad, filterSeniority, filterPortal]);
+
   useEffect(() => {
     if (!programaId) return;
-    fetch(`${API}/api/programas/${programaId}/market-filters`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((d: MarketFilterOptions) => setFilterOptions(d))
-      .catch(() => setFilterOptions({ periodos: [], dominios: [], seniorities: [] }));
-  }, [programaId]);
+    setProfilesLoading(true);
+    const qs = filterParams ? `?${filterParams}` : '';
+    Promise.all([
+      fetch(`${API}/api/programas/${programaId}/perfiles-ocupacionales${qs}`).then(r => r.json()),
+      fetch(`${API}/api/programas/${programaId}/perfiles-kpis${qs}`).then(r => r.json()),
+    ]).then(([profs, kpiData]) => {
+      setProfiles(profs);
+      setKpis(kpiData);
+      setProfilesLoading(false);
+      setSelectedPerfil(prev => {
+        if (prev && profs.some((p: OccupationalProfile) => p.perfil === prev)) return prev;
+        return profs[0]?.perfil ?? null;
+      });
+    }).catch(() => { setProfiles([]); setProfilesLoading(false); });
+  }, [programaId, filterParams]);
 
-  const top8 = skillsMercadoDeduped.slice(0, 8);
-  const maxFreq = top8[0]?.frecuencia ?? 1;
+  // Skills for selected profile
+  useEffect(() => {
+    if (!programaId || !selectedPerfil) return;
+    setProfileSkills(null);
+    const p = new URLSearchParams({ perfil: selectedPerfil });
+    if (filterPeriodo)   p.set('periodo', filterPeriodo);
+    if (filterDominio)   p.set('dominio', filterDominio);
+    if (filterCiudad)    p.set('ciudad', filterCiudad);
+    if (filterSeniority) p.set('seniority', filterSeniority);
+    if (filterPortal)    p.set('portal', filterPortal);
+    fetch(`${API}/api/programas/${programaId}/perfil-skills?${p}`)
+      .then(r => r.json())
+      .then((d: ProfileSkill[]) => setProfileSkills(d))
+      .catch(() => setProfileSkills([]));
+  }, [programaId, selectedPerfil, filterParams]);
+
+  const groupedSkills = useMemo<Record<string, ProfileSkill[]> | null>(() => {
+    if (!profileSkills) return null;
+    const groups: Record<string, ProfileSkill[]> = { herramientas: [], conocimientos: [], competencias: [], habilidades: [] };
+    for (const sk of profileSkills) {
+      groups[classifyTipoSkill(sk.tipo_skill)].push(sk);
+    }
+    return groups;
+  }, [profileSkills]);
 
   const daItems = useMemo<DeepAnalysisItem[]>(() => {
     if (!deepAnalysis) return [];
     return DA_CATS.flatMap(cat => deepAnalysis[cat] ?? []);
   }, [deepAnalysis]);
 
+  const topSkillsForTable = profileSkills?.slice(0, 8) ?? [];
   const alignmentRows = useMemo(() =>
-    top8.map(s => ({ skill: s.skill, menciones: s.frecuencia, ...alignSkill(s.skill, daItems) })),
-  [top8, daItems]);
+    topSkillsForTable.map(s => ({ skill: s.nombre, vacantes: s.vacantes, ...alignSkill(s.nombre, daItems) })),
+  [topSkillsForTable, daItems]);
 
-  const normalizadosCount = skillsMercadoDeduped.length;
-  const alinCount = deepAnalysis === null ? '…' : alignmentRows.filter(r => r.estado === 'alineada').length;
-  const brechasRows = alignmentRows.filter(r => r.estado === 'brecha');
-  const brechasCount = deepAnalysis === null ? '…' : brechasRows.length;
-  const topBrechas = brechasRows.slice(0, 4);
+  const alinCount  = deepAnalysis === null ? null : alignmentRows.filter(r => r.estado === 'alineada').length;
+  const brechasCount = deepAnalysis === null ? null : alignmentRows.filter(r => r.estado !== 'alineada').length;
+  const maxVac = profiles[0]?.vacantes ?? 1;
 
-  const gap1 = brechasRows[0] ? displaySkill(brechasRows[0].skill) : 'herramientas analíticas';
-  const gap2 = brechasRows[1] ? displaySkill(brechasRows[1].skill) : null;
-  const calloutText = `El mercado laboral valora habilidades técnicas y metodológicas alineadas con el perfil del programa. Se identifican ${typeof brechasCount === 'number' ? brechasCount : 'varias'} brechas prioritarias, destacando ${gap1}${gap2 ? ` y ${gap2}` : ''} como requerimientos con alta demanda y cobertura curricular limitada.`;
-
-  const ESTADO_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-    alineada: { bg: '#D1FAE5', color: '#065F46', label: 'Alineada' },
-    parcial:  { bg: '#FEF3C7', color: '#92400E', label: 'Cobertura parcial' },
-    brecha:   { bg: '#FEE2E2', color: '#991B1B', label: 'Brecha' },
+  const ESTADO_STYLE: Record<string, { bg: string; color: string; label: string; action: string; actionColor: string }> = {
+    alineada: { bg: '#D1FAE5', color: '#065F46', label: 'Alineada',     action: 'Mantener',    actionColor: '#065F46' },
+    parcial:  { bg: '#FEF3C7', color: '#92400E', label: 'Cobertura parcial', action: 'Fortalecer', actionColor: '#92400E' },
+    brecha:   { bg: '#FEE2E2', color: '#991B1B', label: 'Brecha',       action: 'Incorporar',  actionColor: '#991B1B' },
   };
 
-  if (dataPobre) return <div style={{ padding: 24 }}><ExplorandoMsg /></div>;
-  if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
-
   return (
-    <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflowY: 'auto', background: '#F7F8FC' }}>
+    <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflowY: 'auto', background: C.bg }}>
 
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Demanda del mercado y brechas curriculares</h1>
-        <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Requerimientos del mercado laboral compatibles con el perfil de egreso</p>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Perfiles ocupacionales y pertinencia curricular</h1>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Qué empleos demanda el mercado, qué requieren y cómo responde el programa</p>
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 16px' }}>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 16px' }}>
         {([
-          { label: 'Periodo', value: filterPeriodo, setter: setFilterPeriodo, options: filterOptions?.periodos ?? [], placeholder: 'Todos los periodos' },
-          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], placeholder: PROGRAMS.find(p => p.id === programaId)?.label ?? '' },
-          { label: 'Familia ocupacional', value: filterDominio, setter: setFilterDominio, options: filterOptions?.dominios ?? [], placeholder: 'Todas las familias' },
-          { label: 'Nivel del cargo', value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], placeholder: 'Todos los niveles' },
-        ] as { label: string; value: string; setter: (v: string) => void; options: string[]; placeholder: string }[]).map(f => (
+          { label: 'Periodo',          value: filterPeriodo,   setter: setFilterPeriodo,   options: filterOptions?.periodos ?? [],   ph: 'Todos los periodos' },
+          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], ph: PROGRAMS.find(p => p.id === programaId)?.label ?? '', disabled: true },
+          { label: 'Familia ocup.',    value: filterDominio,   setter: setFilterDominio,   options: filterOptions?.dominios ?? [],   ph: 'Todas las familias' },
+          { label: 'Ciudad',           value: filterCiudad,    setter: setFilterCiudad,    options: filterOptions?.ciudades ?? [],   ph: 'Todas las ciudades' },
+          { label: 'Nivel del cargo',  value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], ph: 'Todos los niveles' },
+          { label: 'Fuente laboral',   value: filterPortal,    setter: setFilterPortal,    options: filterOptions?.portales ?? [],   ph: 'Todas las fuentes' },
+        ] as { label: string; value: string; setter: (v: string) => void; options: string[]; ph: string; disabled?: boolean }[]).map(f => (
           <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</label>
             <select
               value={f.value}
               onChange={e => f.setter(e.target.value)}
-              disabled={f.label === 'Perfil de egreso'}
-              style={{ fontSize: 12, color: C.navy, border: '1px solid #D1D5DB', borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.label === 'Perfil de egreso' ? 'default' : 'pointer', minWidth: 160 }}>
-              {f.label !== 'Perfil de egreso' && <option value="">{f.placeholder}</option>}
-              {f.label === 'Perfil de egreso'
-                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
+              disabled={f.disabled}
+              style={{ fontSize: 12, color: C.navy, border: `1px solid ${C.border}`, borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.disabled ? 'default' : 'pointer', minWidth: 155 }}>
+              {!f.disabled && <option value="">{f.ph}</option>}
+              {f.disabled
+                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)
                 : f.options.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
         ))}
       </div>
 
-      {/* 5 KPI cards */}
+      {/* KPIs */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {([
-          { icon: '🔍', value: empCompatibles, label: 'Ofertas pertinentes\nanalizadas' },
-          { icon: '📋', value: normalizadosCount, label: 'Requerimientos\nnormalizados' },
-          { icon: '🎯', value: alinCount, label: 'Competencias\nalineadas' },
-          { icon: '⚠️', value: brechasCount, label: 'Brechas\nprioritarias' },
-          { icon: null, value: `${coberturaPct}%`, label: 'Índice de\nalineación', isCircle: true },
+          { icon: '💼', value: kpis?.total_ofertas ?? '…',   label: 'Ofertas\npertinentes' },
+          { icon: '👤', value: kpis?.total_perfiles ?? '…',  label: 'Perfiles\nocupacionales' },
+          { icon: '📋', value: kpis?.total_skills ?? '…',    label: 'Requisitos\nnormalizados' },
+          { icon: null, value: `${coberturaPct}%`,            label: 'Alineación\ncurricular', isCircle: true },
+          { icon: '⚠️', value: brechasCount ?? '…',           label: 'Brechas\nprioritarias' },
         ] as { icon: string | null; value: number | string; label: string; isCircle?: boolean }[]).map((kpi, i) => (
-          <div key={i} style={{ flex: 1, minWidth: 130, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div key={i} style={{ flex: 1, minWidth: 130, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             {kpi.isCircle
-              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, borderTopColor: '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
-              : <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{kpi.icon}</div>
+              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, borderTopColor: C.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
+              : <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>{kpi.icon}</div>
             }
             <div>
               <div style={{ fontSize: 20, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{kpi.value}</div>
@@ -889,95 +966,177 @@ function ViewMercado({ skills, skillsMercadoDeduped, dataPobre, programaId, cobe
         ))}
       </div>
 
-      {/* Main 3-column grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 220px', gap: 12, minHeight: 0 }}>
+      {/* Two-column: profiles list + skill columns */}
+      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12 }}>
 
-        {/* Left: Lo que pide el mercado */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Lo que pide el mercado</h3>
+        {/* Left: ranked profiles */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Perfiles ocupacionales demandados</h3>
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          {top8.map((s, i) => (
-            <div key={s.skill} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 9 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#D1D5DB', width: 14, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
-              <span style={{ fontSize: 11, color: C.navy, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
-              <div style={{ width: 48, height: 5, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden', flexShrink: 0 }}>
-                <div style={{ width: `${(s.frecuencia / maxFreq) * 100}%`, height: '100%', background: C.navy, borderRadius: 3 }} />
-              </div>
-              <span style={{ fontSize: 9, color: '#9CA3AF', width: 30, textAlign: 'right', flexShrink: 0 }}>{s.frecuencia}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Center: Demanda vs cobertura */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowX: 'auto', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Demanda vs. cobertura curricular</h3>
-          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                {(['Requerimiento del mercado', 'Menciones', 'Evidencia en el programa', 'Estado'] as const).map(h => (
-                  <th key={h} style={{ textAlign: h === 'Menciones' ? 'right' : h === 'Estado' ? 'center' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {alignmentRows.map((row, i) => {
-                const st = ESTADO_STYLE[row.estado];
-                return (
-                  <tr key={i} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                    <td style={{ padding: '8px 8px', color: C.navy, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>
-                        {row.estado === 'alineada' ? '✅' : row.estado === 'parcial' ? '🔶' : '📊'}
-                      </span>
-                      {displaySkill(row.skill)}
-                    </td>
-                    <td style={{ padding: '8px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{row.menciones}</td>
-                    <td style={{ padding: '8px 8px', color: '#6B7280', fontSize: 10 }}>{deepAnalysis === null ? '…' : row.evidencia}</td>
-                    <td style={{ padding: '8px 8px', textAlign: 'center' }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: st?.bg, color: st?.color, whiteSpace: 'nowrap' }}>
-                        {deepAnalysis === null ? '…' : st?.label}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Right: Brechas prioritarias */}
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '16px', overflowY: 'auto' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Brechas prioritarias</h3>
-          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
-          {deepAnalysis === null
+          {profilesLoading
             ? <Spinner />
-            : topBrechas.length === 0
-              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas críticas identificadas ✓</p>
-              : topBrechas.map((b, i) => (
-                <div key={b.skill} style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#991B1B', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{displaySkill(b.skill)}</div>
-                    <div style={{ fontSize: 10, color: '#6B7280', marginTop: 1 }}>{b.menciones} menciones · sin cobertura</div>
-                  </div>
+            : profiles.length === 0
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos para los filtros seleccionados</p>
+              : profiles.map((p, i) => {
+                  const isSelected = selectedPerfil === p.perfil;
+                  return (
+                    <button
+                      key={p.perfil}
+                      onClick={() => setSelectedPerfil(p.perfil)}
+                      style={{
+                        width: '100%', textAlign: 'left', background: isSelected ? '#EEF2FB' : 'transparent',
+                        border: `1px solid ${isSelected ? C.navy : 'transparent'}`, borderRadius: 7,
+                        padding: '8px 10px', marginBottom: 4, cursor: 'pointer',
+                      }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                        <span style={{ fontSize: 11, fontWeight: isSelected ? 700 : 500, color: C.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                          <span style={{ color: '#9CA3AF', marginRight: 6, fontSize: 10 }}>{i + 1}</span>
+                          {p.perfil}
+                        </span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: C.navy, flexShrink: 0, marginLeft: 4 }}>{p.vacantes}</span>
+                      </div>
+                      <div style={{ width: '100%', height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ width: `${(p.vacantes / maxVac) * 100}%`, height: '100%', background: isSelected ? C.navy : C.mid, borderRadius: 2 }} />
+                      </div>
+                    </button>
+                  );
+                })
+          }
+        </div>
+
+        {/* Right: 4 skill columns */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
+            Requisitos del perfil seleccionado:{' '}
+            <span style={{ color: '#F0A500' }}>{selectedPerfil ?? '—'}</span>
+          </h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {!selectedPerfil
+            ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Selecciona un perfil para ver sus requisitos</p>
+            : groupedSkills === null
+              ? <Spinner />
+              : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                  {SKILL_COLS.map(col => {
+                    const items = (groupedSkills[col.key] ?? []).slice(0, 5);
+                    const colMax = items[0]?.vacantes ?? 1;
+                    return (
+                      <div key={col.key}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 16 }}>{col.icon}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>{col.label}</span>
+                        </div>
+                        <div style={{ fontSize: 9, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6, textAlign: 'right' }}>vacantes</div>
+                        {items.length === 0
+                          ? <p style={{ fontSize: 10, color: '#D1D5DB', fontStyle: 'italic' }}>Sin datos</p>
+                          : items.map((sk, si) => (
+                            <div key={sk.nombre} style={{ marginBottom: 8 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                                <span style={{ fontSize: 10, color: C.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90 }}>{si + 1} {sk.nombre}</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: C.navy, flexShrink: 0, marginLeft: 4 }}>{sk.vacantes}</span>
+                              </div>
+                              <div style={{ width: '100%', height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ width: `${(sk.vacantes / colMax) * 100}%`, height: '100%', background: C.navy, borderRadius: 2 }} />
+                              </div>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    );
+                  })}
                 </div>
-              ))
+              )
           }
         </div>
       </div>
 
-      {/* Callout */}
-      <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 10, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0 }}>
-        <span style={{ fontSize: 22, flexShrink: 0 }}>💡</span>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>Lectura para decisión curricular</div>
-          <p style={{ fontSize: 11, color: '#78350F', margin: 0, lineHeight: 1.6 }}>{calloutText}</p>
+      {/* Bottom: alignment table + callout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 12 }}>
+
+        {/* Alignment table */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, overflowX: 'auto' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>
+            Respuesta del programa frente al perfil:{' '}
+            <span style={{ color: '#F0A500' }}>{selectedPerfil ?? '—'}</span>
+          </h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {!selectedPerfil || topSkillsForTable.length === 0
+            ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Selecciona un perfil para ver la alineación</p>
+            : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                    {(['Requisito', 'Vacantes', 'Cobertura curricular', 'Estado', 'Acción'] as const).map(h => (
+                      <th key={h} style={{ textAlign: h === 'Vacantes' ? 'right' : h === 'Estado' || h === 'Acción' ? 'center' : 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {alignmentRows.map((row, i) => {
+                    const st = ESTADO_STYLE[row.estado];
+                    const coverBar = row.estado === 'alineada' ? 100 : row.estado === 'parcial' ? 50 : 0;
+                    const coverColor = row.estado === 'alineada' ? '#10B981' : row.estado === 'parcial' ? '#F59E0B' : '#D1D5DB';
+                    return (
+                      <tr key={i} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                        <td style={{ padding: '8px 8px', color: C.navy, fontWeight: 500 }}>
+                          <span style={{ marginRight: 6 }}>{row.estado === 'alineada' ? '📗' : row.estado === 'parcial' ? '📒' : '🔧'}</span>
+                          {row.skill}
+                        </td>
+                        <td style={{ padding: '8px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{row.vacantes}</td>
+                        <td style={{ padding: '8px 8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 10, color: '#374151', whiteSpace: 'nowrap', minWidth: 30 }}>
+                              {row.estado === 'alineada' ? 'Alta' : row.estado === 'parcial' ? 'Parcial' : 'Nula'}
+                            </span>
+                            <div style={{ flex: 1, height: 5, background: '#E5E7EB', borderRadius: 3 }}>
+                              <div style={{ width: `${coverBar}%`, height: '100%', background: coverColor, borderRadius: 3 }} />
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '8px 8px', textAlign: 'center' }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: st?.bg, color: st?.color, whiteSpace: 'nowrap' }}>
+                            {deepAnalysis === null ? '…' : st?.label}
+                          </span>
+                        </td>
+                        <td style={{ padding: '8px 8px', textAlign: 'center' }}>
+                          <span style={{ fontSize: 9, fontWeight: 600, color: st?.actionColor, border: `1px solid ${st?.actionColor}`, borderRadius: 5, padding: '2px 8px', whiteSpace: 'nowrap', cursor: 'default' }}>
+                            {deepAnalysis === null ? '…' : st?.action} ›
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )
+          }
+        </div>
+
+        {/* Lectura ejecutiva */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>Lectura ejecutiva</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500' }} />
+          <blockquote style={{ margin: 0, borderLeft: '3px solid #F0A500', paddingLeft: 12, fontSize: 12, color: '#374151', lineHeight: 1.6 }}>
+            {selectedPerfil
+              ? `El mercado demanda el perfil "${selectedPerfil}" con ${profiles.find(p => p.perfil === selectedPerfil)?.vacantes ?? 0} vacantes. El programa presenta ${alinCount ?? '…'} competencias alineadas y ${brechasCount ?? '…'} brechas a fortalecer.`
+              : 'Selecciona un perfil ocupacional para ver la lectura ejecutiva del programa frente al mercado.'
+            }
+          </blockquote>
+          {brechasCount !== null && brechasCount > 0 && (
+            <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '10px 12px', marginTop: 4 }}>
+              <p style={{ fontSize: 11, color: '#92400E', margin: 0, fontWeight: 600 }}>⚠ {brechasCount} requerimiento{brechasCount !== 1 ? 's' : ''} sin cobertura curricular</p>
+              <p style={{ fontSize: 10, color: '#78350F', margin: '4px 0 0', lineHeight: 1.5 }}>
+                {alignmentRows.filter(r => r.estado === 'brecha').slice(0, 2).map(r => r.skill).join(', ')}
+                {alignmentRows.filter(r => r.estado === 'brecha').length > 2 ? ' y otros' : ''}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Footer sources */}
-      <div style={{ display: 'flex', gap: 24, borderTop: '1px solid #E5E7EB', paddingTop: 8, flexShrink: 0 }}>
-        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente laboral:</strong> ofertas de empleo analizadas del mercado colombiano.</p>
+      {/* Footer */}
+      <div style={{ display: 'flex', gap: 24, borderTop: `1px solid ${C.border}`, paddingTop: 8, flexShrink: 0 }}>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente laboral:</strong> ofertas scrapeadas y normalizadas.</p>
         <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente académica:</strong> microcurrículos del programa.</p>
       </div>
 
@@ -2721,7 +2880,7 @@ export default function ObservatorioStorytelling() {
 
   const viewMap: Record<ViewId, React.ReactNode> = {
     resumen:         <ViewResumen         {...viewProps} />,
-    mercado:         <ViewMercado         {...viewProps} />,
+    mercado:         <ViewPerfiles        {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewCobertura       {...viewProps} />,
     brechas:         <ViewBrechas         {...viewProps} />,
