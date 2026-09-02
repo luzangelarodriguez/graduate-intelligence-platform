@@ -10,17 +10,15 @@ const items = [
 
 export function Sidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-white px-4 py-5 lg:block">
-      <div className="mb-7 border-b border-line pb-5">
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col gap-1">
-            <img src={unirLogo} alt="UNIR La Universidad en Internet" className="w-auto" style={{ maxWidth: 150, height: 'auto' }} />
-            <span className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted">Observatorio</span>
-          </div>
-        </div>
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-[#0B1730] py-5 lg:flex lg:flex-col">
+      <div className="mb-6 border-b border-white/10 pb-4 px-4 flex flex-col items-center gap-1">
+        <img src={unirLogo} alt="UNIR" style={{ maxWidth: 100, height: 'auto' }} />
+        <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B8AAE' }}>
+          OBSERVATORIO
+        </span>
       </div>
 
-      <nav className="space-y-1">
+      <nav className="flex flex-col gap-1 px-3">
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -29,25 +27,19 @@ export function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 [
-                  'flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font800 transition',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-2 transition text-sm font-medium',
                   isActive
-                    ? 'border-brand bg-slate-50 text-ink'
-                    : 'border-transparent text-muted hover:border-line hover:bg-slate-50 hover:text-ink',
+                    ? 'border-brand bg-white/10 text-white'
+                    : 'border-transparent text-[#8B9AC0] hover:border-white/20 hover:bg-white/5 hover:text-white',
                 ].join(' ')
               }
             >
               <Icon size={17} strokeWidth={1.8} />
-              {item.label}
+              <span>{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
-
-      <div className="absolute bottom-5 left-4 right-4 border-t border-line pt-4">
-        <p className="text-[0.68rem] font900 uppercase tracking-[0.1em] text-muted">Inteligencia curricular</p>
-        <p className="mt-2 text-sm font800 leading-5 text-ink">Pertinencia academica y empleabilidad</p>
-        <p className="mt-1 text-xs leading-5 text-muted">Analisis institucional de curriculo, demanda laboral y brechas.</p>
-      </div>
     </aside>
   );
 }

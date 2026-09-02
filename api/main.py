@@ -1725,3 +1725,14 @@ def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
     except Exception as exc:
         logger.exception("generate_deep_analysis failed for program_id=%s", program_id)
         return _UnicodeJSONResponse({"error": str(exc)}, status_code=500)  # type: ignore[name-defined]
+
+
+@app.get("/api/programas/{program_id}/market-filters", tags=["market"])
+def market_filter_options(program_id: int) -> dict:
+    """Return distinct filter option values (periodos, dominios, seniorities) for the market dashboard."""
+    try:
+        from backend.repositories.empleos_repository import fetch_market_filter_options
+        return fetch_market_filter_options()
+    except Exception as exc:
+        logger.warning("market_filter_options failed: %s", exc)
+        return {"periodos": [], "dominios": [], "seniorities": []}
