@@ -61,12 +61,12 @@ def fetch_jobs_basic(*, db_name: str | None = None) -> list[dict[str, Any]]:
 
 
 def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list[str]]:
-    """Return distinct filter option values available in the empleos table."""
+    """Return distinct filter option values from the jobs table."""
     periodos = fetch_all(
         """
-        SELECT DISTINCT TO_CHAR(fecha_publicacion, 'YYYY-MM') AS periodo
-        FROM empleos
-        WHERE fecha_publicacion IS NOT NULL
+        SELECT DISTINCT TO_CHAR(created_at, 'YYYY-MM') AS periodo
+        FROM jobs
+        WHERE created_at IS NOT NULL
         ORDER BY periodo DESC
         LIMIT 36
         """,
@@ -74,17 +74,17 @@ def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list
     )
     dominios = fetch_all(
         """
-        SELECT DISTINCT dominio
-        FROM empleos
-        WHERE dominio IS NOT NULL AND TRIM(dominio) != ''
-        ORDER BY dominio
+        SELECT DISTINCT industry AS dominio
+        FROM jobs
+        WHERE industry IS NOT NULL AND TRIM(industry) != ''
+        ORDER BY industry
         """,
         db_name=db_name,
     )
     seniorities = fetch_all(
         """
         SELECT DISTINCT seniority
-        FROM empleos
+        FROM jobs
         WHERE seniority IS NOT NULL AND TRIM(seniority) != ''
         ORDER BY seniority
         """,
@@ -92,20 +92,20 @@ def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list
     )
     ciudades = fetch_all(
         """
-        SELECT DISTINCT ciudad
-        FROM empleos
-        WHERE ciudad IS NOT NULL AND TRIM(ciudad) != ''
-        ORDER BY ciudad
+        SELECT DISTINCT location AS ciudad
+        FROM jobs
+        WHERE location IS NOT NULL AND TRIM(location) != ''
+        ORDER BY location
         LIMIT 50
         """,
         db_name=db_name,
     )
     portales = fetch_all(
         """
-        SELECT DISTINCT portal
-        FROM empleos
-        WHERE portal IS NOT NULL AND TRIM(portal) != ''
-        ORDER BY portal
+        SELECT DISTINCT source AS portal
+        FROM jobs
+        WHERE source IS NOT NULL AND TRIM(source) != ''
+        ORDER BY source
         """,
         db_name=db_name,
     )
@@ -119,6 +119,7 @@ def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list
 
 
 def fetch_occupational_profiles(
+    especializacion_id: int,
     *,
     periodo: str | None = None,
     dominio: str | None = None,
@@ -127,88 +128,95 @@ def fetch_occupational_profiles(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return top occupational profiles grouped by titulo_normalizado with vacancy counts."""
-    filters = ["titulo_normalizado IS NOT NULL", "TRIM(titulo_normalizado) != ''"]
-    params: list[Any] = []
-
-    if periodo:
-        filters.append("TO_CHAR(fecha_publicacion, 'YYYY-MM') = %s")
-        params.append(periodo)
-    if dominio:
-        filters.append("dominio = %s")
-        params.append(dominio)
-    if ciudad:
-        filters.append("ciudad = %s")
-        params.append(ciudad)
-    if seniority:
-        filters.append("seniority = %s")
-        params.append(seniority)
-    if portal:
-        filters.append("portal = %s")
-        params.append(portal)
-
-    where = " AND ".join(filters)
-    return fetch_all(
-        f"""
-        SELECT
-            titulo_normalizado AS perfil,
-            COUNT(DISTINCT id)::int AS vacantes
-        FROM empleos
-        WHERE {where}
-        GROUP BY titulo_normalizado
-        ORDER BY vacantes DESC
-        LIMIT 10
-        """,
-        params or None,
-        db_name=db_name,
-    )
-
-
-def fetch_profile_skills(
-    titulo_normalizado: str,
-    *,
-    periodo: str | None = None,
-    dominio: str | None = None,
-    ciudad: str | None = None,
-    seniority: str | None = None,
-    portal: str | None = None,
-    db_name: str | None = None,
-) -> list[dict[str, Any]]:
-    """Return skills (with tipo_skill) for all empleos matching a titulo_normalizado."""
+    """Return top occupational profiles (semantic_title_family) for a program via mv_match."""
     job_filters = [
-        "e.titulo_normalizado = %s",
-        "es.skill_normalized IS NOT NULL",
-        "TRIM(es.skill_normalized) != ''",
+        "m.especializacion_id = %s",
+        "j.semantic_title_family IS NOT NULL",
+        "TRIM(j.semantic_title_family) != ''",
     ]
-    params: list[Any] = [titulo_normalizado]
+    params: list[Any] = [especializacion_id]
 
     if periodo:
-        job_filters.append("TO_CHAR(e.fecha_publicacion, 'YYYY-MM') = %s")
+        job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
         params.append(periodo)
     if dominio:
-        job_filters.append("e.dominio = %s")
+        job_filters.append("j.industry = %s")
         params.append(dominio)
     if ciudad:
-        job_filters.append("e.ciudad = %s")
+        job_filters.append("j.location = %s")
         params.append(ciudad)
     if seniority:
-        job_filters.append("e.seniority = %s")
+        job_filters.append("j.seniority = %s")
         params.append(seniority)
     if portal:
-        job_filters.append("e.portal = %s")
+        job_filters.append("j.source = %s")
         params.append(portal)
 
     where = " AND ".join(job_filters)
     return fetch_all(
         f"""
         SELECT
-            es.skill_normalized AS nombre,
-            COALESCE(NULLIF(TRIM(es.tipo_skill), ''), 'Otros') AS tipo_skill,
-            COUNT(DISTINCT e.id)::int AS vacantes
-        FROM empleos e
-        JOIN empleo_skills es ON es.empleo_id = e.id
+            j.semantic_title_family AS perfil,
+            COUNT(DISTINCT j.id)::int AS vacantes
+        FROM jobs j
+        JOIN mv_match_empleo_especializacion m ON m.empleo_id = j.id
         WHERE {where}
-        GROUP BY es.skill_normalized, es.tipo_skill
+        GROUP BY j.semantic_title_family
+        ORDER BY vacantes DESC
+        LIMIT 10
+        """,
+        params,
+        db_name=db_name,
+    )
+
+
+def fetch_profile_skills(
+    titulo_normalizado: str,
+    especializacion_id: int,
+    *,
+    periodo: str | None = None,
+    dominio: str | None = None,
+    ciudad: str | None = None,
+    seniority: str | None = None,
+    portal: str | None = None,
+    db_name: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return skills for jobs matching a semantic_title_family for a given program."""
+    job_filters = [
+        "m.especializacion_id = %s",
+        "j.semantic_title_family = %s",
+        "COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''",
+    ]
+    params: list[Any] = [especializacion_id, titulo_normalizado]
+
+    if periodo:
+        job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
+        params.append(periodo)
+    if dominio:
+        job_filters.append("j.industry = %s")
+        params.append(dominio)
+    if ciudad:
+        job_filters.append("j.location = %s")
+        params.append(ciudad)
+    if seniority:
+        job_filters.append("j.seniority = %s")
+        params.append(seniority)
+    if portal:
+        job_filters.append("j.source = %s")
+        params.append(portal)
+
+    where = " AND ".join(job_filters)
+    return fetch_all(
+        f"""
+        SELECT
+            COALESCE(js.canonical_skill, js.skill_family, js.skill_category) AS nombre,
+            COALESCE(NULLIF(TRIM(js.skill_category), ''), 'Otros') AS tipo_skill,
+            COUNT(DISTINCT j.id)::int AS vacantes
+        FROM jobs j
+        JOIN mv_match_empleo_especializacion m ON m.empleo_id = j.id
+        JOIN job_skills js ON js.job_id = j.id
+        WHERE {where}
+        GROUP BY js.canonical_skill, js.skill_family, js.skill_category
         ORDER BY vacantes DESC
         """,
         params,
@@ -217,6 +225,7 @@ def fetch_profile_skills(
 
 
 def fetch_profile_kpis(
+    especializacion_id: int,
     *,
     periodo: str | None = None,
     dominio: str | None = None,
@@ -225,38 +234,43 @@ def fetch_profile_kpis(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> dict[str, Any]:
-    """Return aggregate KPIs for the perfiles view."""
-    filters = ["titulo_normalizado IS NOT NULL", "TRIM(titulo_normalizado) != ''"]
-    params: list[Any] = []
+    """Return aggregate KPIs for the perfiles view scoped to a program."""
+    job_filters = [
+        "m.especializacion_id = %s",
+        "j.semantic_title_family IS NOT NULL",
+        "TRIM(j.semantic_title_family) != ''",
+    ]
+    params: list[Any] = [especializacion_id]
 
     if periodo:
-        filters.append("TO_CHAR(fecha_publicacion, 'YYYY-MM') = %s")
+        job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
         params.append(periodo)
     if dominio:
-        filters.append("dominio = %s")
+        job_filters.append("j.industry = %s")
         params.append(dominio)
     if ciudad:
-        filters.append("ciudad = %s")
+        job_filters.append("j.location = %s")
         params.append(ciudad)
     if seniority:
-        filters.append("seniority = %s")
+        job_filters.append("j.seniority = %s")
         params.append(seniority)
     if portal:
-        filters.append("portal = %s")
+        job_filters.append("j.source = %s")
         params.append(portal)
 
-    where = " AND ".join(filters)
+    where = " AND ".join(job_filters)
     row = fetch_all(
         f"""
         SELECT
-            COUNT(DISTINCT e.id)::int AS total_ofertas,
-            COUNT(DISTINCT e.titulo_normalizado)::int AS total_perfiles,
-            COUNT(DISTINCT es.skill_normalized)::int AS total_skills
-        FROM empleos e
-        LEFT JOIN empleo_skills es ON es.empleo_id = e.id
+            COUNT(DISTINCT j.id)::int AS total_ofertas,
+            COUNT(DISTINCT j.semantic_title_family)::int AS total_perfiles,
+            COUNT(DISTINCT COALESCE(js.canonical_skill, js.skill_family, js.skill_category))::int AS total_skills
+        FROM jobs j
+        JOIN mv_match_empleo_especializacion m ON m.empleo_id = j.id
+        LEFT JOIN job_skills js ON js.job_id = j.id
         WHERE {where}
         """,
-        params or None,
+        params,
         db_name=db_name,
     )
     if row:
