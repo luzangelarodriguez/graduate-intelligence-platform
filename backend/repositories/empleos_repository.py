@@ -119,7 +119,7 @@ def fetch_market_filter_options(*, db_name: str | None = None) -> dict[str, list
 
 
 def fetch_occupational_profiles(
-    especializacion_id: int,  # noqa: ARG001 — TODO: filtrar por programa una vez resuelto el problema de duplicados en especializaciones (ver PR #63 y notas de sesión 2026-08-29/30)
+    especializacion_id: int,
     *,
     periodo: str | None = None,
     dominio: str | None = None,
@@ -128,12 +128,14 @@ def fetch_occupational_profiles(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return top occupational profiles (semantic_title_family) from the full jobs market."""
+    """Return top occupational profiles (semantic_title_family) for a program via ml_program_job_matches."""
     job_filters = [
+        "m.especializacion_id = %s",
+        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "j.semantic_title_family IS NOT NULL",
         "TRIM(j.semantic_title_family) != ''",
     ]
-    params: list[Any] = []
+    params: list[Any] = [especializacion_id]
 
     if periodo:
         job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
@@ -158,19 +160,20 @@ def fetch_occupational_profiles(
             j.semantic_title_family AS perfil,
             COUNT(DISTINCT j.id)::int AS vacantes
         FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
         WHERE {where}
         GROUP BY j.semantic_title_family
         ORDER BY vacantes DESC
         LIMIT 10
         """,
-        params or None,
+        params,
         db_name=db_name,
     )
 
 
 def fetch_profile_skills(
     titulo_normalizado: str,
-    especializacion_id: int,  # noqa: ARG001 — TODO: filtrar por programa una vez resuelto el problema de duplicados en especializaciones (ver PR #63 y notas de sesión 2026-08-29/30)
+    especializacion_id: int,
     *,
     periodo: str | None = None,
     dominio: str | None = None,
@@ -179,12 +182,14 @@ def fetch_profile_skills(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return skills for jobs matching a semantic_title_family (full market, no program filter)."""
+    """Return skills for jobs matching a semantic_title_family for a given program via ml_program_job_matches."""
     job_filters = [
+        "m.especializacion_id = %s",
+        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "j.semantic_title_family = %s",
         "COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''",
     ]
-    params: list[Any] = [titulo_normalizado]
+    params: list[Any] = [especializacion_id, titulo_normalizado]
 
     if periodo:
         job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
@@ -210,6 +215,7 @@ def fetch_profile_skills(
             COALESCE(NULLIF(TRIM(js.skill_category), ''), 'Otros') AS tipo_skill,
             COUNT(DISTINCT j.id)::int AS vacantes
         FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
         JOIN job_skills js ON js.job_id = j.id
         WHERE {where}
         GROUP BY js.canonical_skill, js.skill_family, js.skill_category
@@ -221,7 +227,7 @@ def fetch_profile_skills(
 
 
 def fetch_profile_kpis(
-    especializacion_id: int,  # noqa: ARG001 — TODO: filtrar por programa una vez resuelto el problema de duplicados en especializaciones (ver PR #63 y notas de sesión 2026-08-29/30)
+    especializacion_id: int,
     *,
     periodo: str | None = None,
     dominio: str | None = None,
@@ -230,12 +236,14 @@ def fetch_profile_kpis(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> dict[str, Any]:
-    """Return aggregate KPIs for the full jobs market (program filter pending duplicate resolution)."""
+    """Return aggregate KPIs for jobs matched to a program via ml_program_job_matches."""
     job_filters = [
+        "m.especializacion_id = %s",
+        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "j.semantic_title_family IS NOT NULL",
         "TRIM(j.semantic_title_family) != ''",
     ]
-    params: list[Any] = []
+    params: list[Any] = [especializacion_id]
 
     if periodo:
         job_filters.append("TO_CHAR(j.created_at, 'YYYY-MM') = %s")
@@ -261,10 +269,11 @@ def fetch_profile_kpis(
             COUNT(DISTINCT j.semantic_title_family)::int AS total_perfiles,
             COUNT(DISTINCT COALESCE(js.canonical_skill, js.skill_family, js.skill_category))::int AS total_skills
         FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
         LEFT JOIN job_skills js ON js.job_id = j.id
         WHERE {where}
         """,
-        params or None,
+        params,
         db_name=db_name,
     )
     if row:
