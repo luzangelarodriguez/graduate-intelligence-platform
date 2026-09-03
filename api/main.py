@@ -1747,11 +1747,11 @@ def get_occupational_profiles(
     seniority: str | None = None,
     portal: str | None = None,
 ) -> list:
-    """Return top occupational profiles (by titulo_normalizado) with vacancy counts."""
+    """Return top occupational profiles (by semantic_title_family) for a program."""
     try:
         from backend.repositories.empleos_repository import fetch_occupational_profiles
         return fetch_occupational_profiles(
-            periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
+            program_id, periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
         )
     except Exception as exc:
         logger.warning("get_occupational_profiles failed: %s", exc)
@@ -1768,11 +1768,11 @@ def get_profile_skills(
     seniority: str | None = None,
     portal: str | None = None,
 ) -> list:
-    """Return skills for empleos matching a titulo_normalizado, grouped by tipo_skill."""
+    """Return skills for jobs matching a semantic_title_family for a given program."""
     try:
         from backend.repositories.empleos_repository import fetch_profile_skills
         return fetch_profile_skills(
-            perfil, periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
+            perfil, program_id, periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
         )
     except Exception as exc:
         logger.warning("get_profile_skills failed: %s", exc)
@@ -1788,11 +1788,11 @@ def get_profile_kpis(
     seniority: str | None = None,
     portal: str | None = None,
 ) -> dict:
-    """Return aggregate KPIs for the perfiles ocupacionales view."""
+    """Return aggregate KPIs for the perfiles ocupacionales view scoped to a program."""
     try:
         from backend.repositories.empleos_repository import fetch_profile_kpis
         return fetch_profile_kpis(
-            periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
+            program_id, periodo=periodo, dominio=dominio, ciudad=ciudad, seniority=seniority, portal=portal
         )
     except Exception as exc:
         logger.warning("get_profile_kpis failed: %s", exc)
