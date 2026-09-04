@@ -1,6 +1,6 @@
 import { BarChart3, GraduationCap, UserRoundCheck } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import unirLogo from '../assets/logos/UNIR_fundacion_blanco.png';
+import unirLogo from '../assets/logos/UNIR_fundacion_vertical_blanco.png';
 
 const items = [
   { to: '/', label: 'Observatorio', icon: BarChart3 },
@@ -12,7 +12,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-[#0B1730] py-5 lg:flex lg:flex-col">
       <div className="mb-6 border-b border-white/10 pb-4 px-4 flex flex-col items-center gap-1">
-        <img src={unirLogo} alt="UNIR – Fundación Universitaria Internacional de La Rioja" style={{ maxWidth: 160, width: '100%', height: 'auto' }} />
+        <img src={unirLogo} alt="UNIR – Fundación Universitaria Internacional de La Rioja" style={{ maxWidth: 100, height: 'auto' }} />
         <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B8AAE' }}>
           OBSERVATORIO
         </span>
