@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import unirLogoPng from '../assets/logos/UNIR_v_blanco.png';
+import unirLogoPng from '../assets/logos/UNIR_fundacion_vertical_blanco.png';
 import { blueGradient } from '../utils/chartColors';
 import {
   Chart as ChartJS,
@@ -2928,7 +2928,7 @@ export default function ObservatorioStorytelling() {
 
         {/* Logo */}
         <div style={{ padding: '20px 16px 14px', flexShrink: 0 }}>
-          <img src={unirLogoPng} alt="UNIR La Universidad en Internet" style={{ maxWidth: 150, height: 'auto', display: 'block', marginBottom: 4 }} />
+          <img src={unirLogoPng} alt="UNIR – Fundación Universitaria Internacional de La Rioja" style={{ maxWidth: 100, height: 'auto', display: 'block', marginBottom: 4 }} />
           <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#7B8AAE', marginBottom: 14 }}>
             Observatorio
           </div>
