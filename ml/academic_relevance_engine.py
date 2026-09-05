@@ -58,11 +58,11 @@ logger = logging.getLogger(__name__)
 
 SEMANTIC_WEIGHT: float = 0.55
 PERTINENCE_WEIGHT: float = 0.45
-PERTINENCE_THRESHOLD: float = 65.0
+PERTINENCE_THRESHOLD: float = 35.0
 
-SCORE_HIGH: float = 75.0
-SCORE_MEDIUM: float = 55.0
-SCORE_LOW: float = 35.0
+SCORE_HIGH: float = 48.0
+SCORE_MEDIUM: float = 40.0
+SCORE_LOW: float = 30.0
 
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 EMBED_DIM = 384
