@@ -132,6 +132,7 @@ def fetch_occupational_profiles(
     job_filters = [
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
+        "m.relevance_label IN ('high', 'medium')",
         "j.semantic_title_family IS NOT NULL",
         "TRIM(j.semantic_title_family) != ''",
     ]
@@ -157,12 +158,12 @@ def fetch_occupational_profiles(
     return fetch_all(
         f"""
         SELECT
-            j.semantic_title_family AS perfil,
+            LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))) AS perfil,
             COUNT(DISTINCT j.id)::int AS vacantes
         FROM jobs j
         JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
         WHERE {where}
-        GROUP BY j.semantic_title_family
+        GROUP BY LOWER(TRIM(COALESCE(j.semantic_title_family, j.title)))
         ORDER BY vacantes DESC
         LIMIT 10
         """,
@@ -186,7 +187,8 @@ def fetch_profile_skills(
     job_filters = [
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "j.semantic_title_family = %s",
+        "m.relevance_label IN ('high', 'medium')",
+        "LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))) = LOWER(TRIM(%s))",
         "COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''",
     ]
     params: list[Any] = [especializacion_id, titulo_normalizado]
@@ -240,8 +242,9 @@ def fetch_profile_kpis(
     job_filters = [
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "j.semantic_title_family IS NOT NULL",
-        "TRIM(j.semantic_title_family) != ''",
+        "m.relevance_label IN ('high', 'medium')",
+        "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
+        "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
     params: list[Any] = [especializacion_id]
 
