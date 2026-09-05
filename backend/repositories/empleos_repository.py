@@ -133,8 +133,8 @@ def fetch_occupational_profiles(
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "m.relevance_label IN ('high', 'medium')",
-        "j.semantic_title_family IS NOT NULL",
-        "TRIM(j.semantic_title_family) != ''",
+        "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
+        "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
     params: list[Any] = [especializacion_id]
 
