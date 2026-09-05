@@ -58,11 +58,11 @@ logger = logging.getLogger(__name__)
 
 SEMANTIC_WEIGHT: float = 0.55
 PERTINENCE_WEIGHT: float = 0.45
-PERTINENCE_THRESHOLD: float = 65.0
+PERTINENCE_THRESHOLD: float = 35.0
 
-SCORE_HIGH: float = 75.0
-SCORE_MEDIUM: float = 55.0
-SCORE_LOW: float = 35.0
+SCORE_HIGH: float = 48.0
+SCORE_MEDIUM: float = 40.0
+SCORE_LOW: float = 30.0
 
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 EMBED_DIM = 384
@@ -1012,19 +1012,21 @@ def run_matching(
             # CAPA 2 — BM25
             bm25_norm = float(bm25_scores[j_idx]) * 100
 
-            # CAPA 3 — pertinence (only meaningful when both sides have skills)
+            # CAPA 3 — pertinence (skill overlap F1)
             has_skills = bool(prog.skills) and bool(job.skills)
             if has_skills:
                 coverage, density, pertinence, gap_pct, common, gap = _pertinence_scores(
                     prog.skills, job.skills
                 )
-                final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
             else:
-                # Fallback: no skill data on one side — use pure semantic score
+                # No skill data on one or both sides — pertinence=0, caps score at SEMANTIC_WEIGHT×100
                 coverage = density = pertinence = gap_pct = 0.0
                 common: List[str] = []
-                gap: List[str] = list(prog.skills)  # all program skills are "missing"
-                final = sem  # full weight on semantic
+                gap: List[str] = list(prog.skills)
+            # Always apply the same weighted formula: a job with no verified skills
+            # tops out at SEMANTIC_WEIGHT×100 (~55) and cannot outscore a job with
+            # real skill overlap that adds PERTINENCE_WEIGHT×pertinence on top.
+            final = sem * SEMANTIC_WEIGHT + pertinence * PERTINENCE_WEIGHT
 
             # One-shot debug for first valid pair
             if not _debug_done and prog.skills and j_idx == 0:
@@ -1371,6 +1373,8 @@ def main(argv: Optional[List[str]] = None) -> None:
                         help="Limitar número de empleos procesados (0 = todos)")
     parser.add_argument("--limit-programs", type=int, default=0,
                         help="Limitar número de programas (0 = todos)")
+    parser.add_argument("--program-id", type=int, default=0,
+                        help="Correr solo para este especializacion_id (0 = todos)")
     parser.add_argument("--batch-size", type=int, default=100,
                         help="Empleos por commit parcial en persist-embeddings (default 100)")
     parser.add_argument("--dataset-version", default="hybrid_v2",
@@ -1391,6 +1395,11 @@ def main(argv: Optional[List[str]] = None) -> None:
     finally:
         conn.close()
 
+    if args.program_id:
+        programs = [p for p in programs if p.especializacion_id == args.program_id]
+        if not programs:
+            logger.error("No se encontró programa con especializacion_id=%d", args.program_id)
+            return 1
     if args.limit_programs:
         programs = programs[: args.limit_programs]
     if args.limit_jobs:
