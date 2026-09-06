@@ -287,7 +287,7 @@ def scrape_jobs(
                     "fecha_publicacion":  None,
                     "url":                full_url,
                     # Key is 'skills' (not 'skills_empleo') so run_acquisition picks it up
-                    "skills":             skills,
+                    "skills":             [match.skill_normalized for match in skills],
                 })
             except Exception as exc:
                 logger.debug("Computrabajo card error: %s", exc)
