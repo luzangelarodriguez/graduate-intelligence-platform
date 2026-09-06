@@ -133,6 +133,7 @@ def fetch_occupational_profiles(
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "m.relevance_label IN ('high', 'medium')",
+        "COALESCE(j.activo, TRUE) = TRUE",
         "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
         "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
@@ -188,6 +189,7 @@ def fetch_profile_skills(
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "m.relevance_label IN ('high', 'medium')",
+        "COALESCE(j.activo, TRUE) = TRUE",
         "LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))) = LOWER(TRIM(%s))",
         "COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''",
     ]
@@ -243,6 +245,7 @@ def fetch_profile_kpis(
         "m.especializacion_id = %s",
         "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
         "m.relevance_label IN ('high', 'medium')",
+        "COALESCE(j.activo, TRUE) = TRUE",
         "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
         "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
