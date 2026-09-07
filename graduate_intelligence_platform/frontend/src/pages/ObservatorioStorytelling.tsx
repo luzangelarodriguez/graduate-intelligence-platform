@@ -796,6 +796,12 @@ const SKILL_COLS = [
 
 function classifyTipoSkill(tipo: string): string {
   const t = (tipo ?? '').toLowerCase();
+  // Fast-path: backend normalized values map directly to column keys
+  if (t === 'herramienta') return 'herramientas';
+  if (t === 'tecnica')     return 'conocimientos';
+  if (t === 'habilidad')   return 'habilidades';
+  if (t === 'competencia') return 'competencias';
+  // Legacy keyword fallback for any raw DB values that weren't cleaned
   for (const col of SKILL_COLS) {
     if (col.kw.some(k => t.includes(k))) return col.key;
   }
@@ -803,28 +809,12 @@ function classifyTipoSkill(tipo: string): string {
 }
 
 function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
-  const [filterOptions, setFilterOptions] = useState<MarketFilterOptions | null>(null);
-  const [filterPeriodo, setFilterPeriodo]     = useState('');
-  const [filterDominio, setFilterDominio]     = useState('');
-  const [filterCiudad, setFilterCiudad]       = useState('');
-  const [filterSeniority, setFilterSeniority] = useState('');
-  const [filterPortal, setFilterPortal]       = useState('');
-
   const [profiles, setProfiles]         = useState<OccupationalProfile[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(true);
   const [selectedPerfil, setSelectedPerfil]   = useState<string | null>(null);
   const [profileSkills, setProfileSkills]     = useState<ProfileSkill[] | null>(null);
   const [kpis, setKpis]                 = useState<ProfileKpis | null>(null);
   const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
-
-  // Filter options
-  useEffect(() => {
-    if (!programaId) return;
-    fetch(`${API}/api/programas/${programaId}/market-filters`)
-      .then(r => r.json())
-      .then((d: MarketFilterOptions) => setFilterOptions(d))
-      .catch(() => setFilterOptions({ periodos: [], dominios: [], seniorities: [], ciudades: [], portales: [] }));
-  }, [programaId]);
 
   // Deep analysis for alignment
   useEffect(() => {
@@ -835,24 +825,13 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
       .catch(() => setDeepAnalysis({}));
   }, [programaId]);
 
-  // Profiles + KPIs when filters change
-  const filterParams = useMemo(() => {
-    const p = new URLSearchParams();
-    if (filterPeriodo)   p.set('periodo', filterPeriodo);
-    if (filterDominio)   p.set('dominio', filterDominio);
-    if (filterCiudad)    p.set('ciudad', filterCiudad);
-    if (filterSeniority) p.set('seniority', filterSeniority);
-    if (filterPortal)    p.set('portal', filterPortal);
-    return p.toString();
-  }, [filterPeriodo, filterDominio, filterCiudad, filterSeniority, filterPortal]);
-
+  // Profiles + KPIs
   useEffect(() => {
     if (!programaId) return;
     setProfilesLoading(true);
-    const qs = filterParams ? `?${filterParams}` : '';
     Promise.all([
-      fetch(`${API}/api/programas/${programaId}/perfiles-ocupacionales${qs}`).then(r => r.json()),
-      fetch(`${API}/api/programas/${programaId}/perfiles-kpis${qs}`).then(r => r.json()),
+      fetch(`${API}/api/programas/${programaId}/perfiles-ocupacionales`).then(r => r.json()),
+      fetch(`${API}/api/programas/${programaId}/perfiles-kpis`).then(r => r.json()),
     ]).then(([profs, kpiData]) => {
       setProfiles(profs);
       setKpis(kpiData);
@@ -862,23 +841,18 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
         return profs[0]?.perfil ?? null;
       });
     }).catch(() => { setProfiles([]); setProfilesLoading(false); });
-  }, [programaId, filterParams]);
+  }, [programaId]);
 
   // Skills for selected profile
   useEffect(() => {
     if (!programaId || !selectedPerfil) return;
     setProfileSkills(null);
     const p = new URLSearchParams({ perfil: selectedPerfil });
-    if (filterPeriodo)   p.set('periodo', filterPeriodo);
-    if (filterDominio)   p.set('dominio', filterDominio);
-    if (filterCiudad)    p.set('ciudad', filterCiudad);
-    if (filterSeniority) p.set('seniority', filterSeniority);
-    if (filterPortal)    p.set('portal', filterPortal);
     fetch(`${API}/api/programas/${programaId}/perfil-skills?${p}`)
       .then(r => r.json())
       .then((d: ProfileSkill[]) => setProfileSkills(d))
       .catch(() => setProfileSkills([]));
-  }, [programaId, selectedPerfil, filterParams]);
+  }, [programaId, selectedPerfil]);
 
   const groupedSkills = useMemo<Record<string, ProfileSkill[]> | null>(() => {
     if (!profileSkills) return null;
@@ -916,32 +890,6 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
       <div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Perfiles ocupacionales y pertinencia curricular</h1>
         <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Qué empleos demanda el mercado, qué requieren y cómo responde el programa</p>
-      </div>
-
-      {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 16px' }}>
-        {([
-          { label: 'Periodo',          value: filterPeriodo,   setter: setFilterPeriodo,   options: filterOptions?.periodos ?? [],   ph: 'Todos los periodos' },
-          { label: 'Perfil de egreso', value: String(programaId), setter: () => {}, options: [], ph: PROGRAMS.find(p => p.id === programaId)?.label ?? '', disabled: true },
-          { label: 'Familia ocup.',    value: filterDominio,   setter: setFilterDominio,   options: filterOptions?.dominios ?? [],   ph: 'Todas las familias' },
-          { label: 'Ciudad',           value: filterCiudad,    setter: setFilterCiudad,    options: filterOptions?.ciudades ?? [],   ph: 'Todas las ciudades' },
-          { label: 'Nivel del cargo',  value: filterSeniority, setter: setFilterSeniority, options: filterOptions?.seniorities ?? [], ph: 'Todos los niveles' },
-          { label: 'Fuente laboral',   value: filterPortal,    setter: setFilterPortal,    options: filterOptions?.portales ?? [],   ph: 'Todas las fuentes' },
-        ] as { label: string; value: string; setter: (v: string) => void; options: string[]; ph: string; disabled?: boolean }[]).map(f => (
-          <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <label style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</label>
-            <select
-              value={f.value}
-              onChange={e => f.setter(e.target.value)}
-              disabled={f.disabled}
-              style={{ fontSize: 12, color: C.navy, border: `1px solid ${C.border}`, borderRadius: 6, padding: '5px 10px', background: '#fff', cursor: f.disabled ? 'default' : 'pointer', minWidth: 155 }}>
-              {!f.disabled && <option value="">{f.ph}</option>}
-              {f.disabled
-                ? PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)
-                : f.options.map(o => <option key={o} value={o}>{o}</option>)}
-            </select>
-          </div>
-        ))}
       </div>
 
       {/* KPIs */}
