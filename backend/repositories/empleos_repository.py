@@ -1,8 +1,31 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from backend.repositories.base import fetch_all, fetch_one
+
+_SKILL_REPR_RE = re.compile(r"SkillMatch\([^)]*skill_normalized='([^']+)'[^)]*\)")
+
+_ACRONYMS = {
+    "sql", "bi", "kpi", "kpis", "pmbok", "pmi", "pmp", "erp", "crm", "etl",
+    "api", "r", "sap", "aws", "gcp", "nlp", "ml", "ai", "hr", "rpa", "dax",
+    "vba", "css", "html", "php", "c", "c++", "c#",
+}
+
+
+def _clean_skill_name(raw: str | None) -> str:
+    """Return a display-ready skill name from a potentially contaminated canonical_skill value."""
+    if not raw:
+        return ""
+    s = raw.strip()
+    m = _SKILL_REPR_RE.search(s)
+    if m:
+        s = m.group(1)
+    lower = s.lower()
+    if lower in _ACRONYMS:
+        return s.upper()
+    return s.capitalize()
 
 
 def fetch_job_metadata(empleo_id: str | int, *, db_name: str | None = None) -> dict[str, Any] | None:
@@ -212,7 +235,7 @@ def fetch_profile_skills(
         params.append(portal)
 
     where = " AND ".join(job_filters)
-    return fetch_all(
+    rows = fetch_all(
         f"""
         SELECT
             COALESCE(js.canonical_skill, js.skill_family, js.skill_category) AS nombre,
@@ -228,6 +251,15 @@ def fetch_profile_skills(
         params,
         db_name=db_name,
     )
+    cleaned: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in rows:
+        nombre = _clean_skill_name(row.get("nombre"))
+        if not nombre or nombre in seen:
+            continue
+        seen.add(nombre)
+        cleaned.append({**row, "nombre": nombre})
+    return cleaned
 
 
 def fetch_profile_kpis(
