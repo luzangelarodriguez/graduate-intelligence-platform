@@ -50,7 +50,7 @@ interface Summary {
   programas: Programa[]; top_matches: TopMatch[]; skill_matches: TopMatch[];
   totales: { matches: number; alta: number; media: number; baja: number; empleos_compatibles: number };
 }
-interface SkillMercado  { skill: string; frecuencia: number }
+interface SkillMercado  { skill: string; frecuencia: number; tipo_skill?: string }
 interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string[] }
 interface Brecha        { skill: string; frecuencia_mercado: number }
 interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number }
@@ -646,103 +646,295 @@ interface ViewProps {
   onClearRedesign: () => void;
 }
 
+// ─── Tipo-skill color palette for market bar chart ────────────────────────────
+const TIPO_COLORS: Record<string, string> = {
+  herramienta: '#3B82F6',
+  tecnica:     '#8B5CF6',
+  habilidad:   '#F59E0B',
+  competencia: '#10B981',
+};
+
+function tipoColor(tipo: string | undefined): string {
+  return TIPO_COLORS[tipo ?? ''] ?? '#94A3B8';
+}
+
 function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
   const topBrechas = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
+  const maxMarket  = topMarket[0]?.frecuencia ?? 1;
+  const maxBrecha  = topBrechas[0]?.frecuencia_mercado ?? 1;
 
-  // Curriculum composition counts
-  const compCount: Record<string, number> = { Herramientas: 0, Competencias: 0, Habilidades: 0, Otros: 0 };
-  if (skills) {
-    for (const s of skills.skills_programa) {
-      const cat = CAT_META[classifySkill(s.skill)].label;
-      compCount[cat] = (compCount[cat] ?? 0) + 1;
+  // Per-category coverage from skills_programa vs skills (brechas/fortalezas)
+  type CovCat = { label: string; color: string; cubiertos: number; total: number; pct: number };
+  const covCategories: CovCat[] = (() => {
+    if (!skills) return [];
+    const catMap: Record<string, { label: string; color: string; cubiertos: number; brechas: number }> = {
+      herramienta: { label: 'Herramientas técnicas', color: '#3B82F6', cubiertos: 0, brechas: 0 },
+      tecnica:     { label: 'Competencias técnicas', color: '#8B5CF6', cubiertos: 0, brechas: 0 },
+      habilidad:   { label: 'Habilidades blandas',   color: '#F59E0B', cubiertos: 0, brechas: 0 },
+      competencia: { label: 'Gestión y negocio',     color: '#10B981', cubiertos: 0, brechas: 0 },
+    };
+    // Map classifySkill categories to our 4-category keys
+    const catKeyFor = (skill: string): string => {
+      const c = classifySkill(skill);
+      if (c === 'herramienta') return 'herramienta';
+      if (c === 'habilidad')   return 'habilidad';
+      if (c === 'competencia') return 'competencia';
+      return 'tecnica';
+    };
+    for (const f of skills.fortalezas) {
+      const cat = catKeyFor(f.skill);
+      if (catMap[cat]) catMap[cat].cubiertos += 1;
     }
-  }
+    for (const b of skills.brechas) {
+      const cat = catKeyFor(b.skill);
+      if (catMap[cat]) catMap[cat].brechas += 1;
+    }
+    return Object.entries(catMap).map(([, v]) => {
+      const total = v.cubiertos + v.brechas;
+      return { label: v.label, color: v.color, cubiertos: v.cubiertos, total, pct: total === 0 ? 0 : Math.round((v.cubiertos / total) * 100) };
+    });
+  })();
+
+  const highBrechasCount = topBrechas.length;
+  const totalBrechas = skills?.brechas.length ?? 0;
+
+  // Cobertura fraction display
+  const fracDivisor = coberturaPct > 0 ? Math.round(100 / coberturaPct) : 0;
+
+  // Referencia competitiva: top 5 by matriculados
+  const topUniv = univ?.competitors
+    ? [...univ.competitors].sort((a, b) => (b.matriculados ?? 0) - (a.matriculados ?? 0)).slice(0, 5)
+    : [];
+
+  // Recommended actions based on data
+  const brechaNames = topBrechas.slice(0, 2).map(b => displaySkill(b.skill));
+  const actions: string[] = [
+    brechaNames.length > 0
+      ? `Incorporar módulos de ${brechaNames.join(' y ')} en el plan de estudios.`
+      : 'Revisar y actualizar el plan de estudios con habilidades emergentes.',
+    `Fortalecer la cobertura curricular del ${coberturaPct}% actual hacia el 70%+ recomendado.`,
+    topUniv.length > 0
+      ? `Alinear la propuesta de valor frente a competidores como ${topUniv[0].nombre_ies}.`
+      : 'Desarrollar diferenciadores frente a la oferta competidora del mercado.',
+  ];
 
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 flex-shrink-0">
-        <div>
-          <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: 0, lineHeight: 1.2 }}>{meta.nombre}</h1>
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0' }}>
-            {totales.matches} vacantes analizadas · Run #{summary.run_id} · {summary.fecha}
-          </p>
-        </div>
-        <span style={{ fontSize: 9, fontWeight: 800, border: '1px solid #D1D5DB', color: '#9CA3AF', borderRadius: 20, padding: '3px 10px', letterSpacing: '0.1em', textTransform: 'uppercase', flexShrink: 0 }}>
-          {prog?.labels?.high ?? 0}↑ · {prog?.labels?.medium ?? 0}→ · {prog?.labels?.low ?? 0}↓
-        </span>
+    <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <div className="flex-shrink-0">
+        <h1 style={{ fontSize: 18, fontWeight: 800, color: C.navy, margin: 0, lineHeight: 1.2 }}>Brechas curriculares</h1>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: '4px 0 0' }}>
+          {meta.nombre} · <span style={{ fontWeight: 600 }}>{totales.matches} vacantes analizadas</span> · Corte: {summary.fecha}
+        </p>
       </div>
 
-      {/* 4 KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 flex-shrink-0">
-        <MetricCard label="Pertinencia" value={`${score.toFixed(0)}/100`} badge={nivel.label} color={nivel.color} />
-        <MetricCard label="Cobertura curricular" value={`${coberturaPct}%`} color="#2563EB" />
-        <MetricCard label="Empleos compatibles" value={empCompatibles} color="#059669" />
-        <MetricCard label="Brechas detectadas" value={skills?.brechas.length ?? '—'} color="#DC2626" />
+      {/* ── 4 KPI cards ────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 flex-shrink-0">
+        {/* Pertinencia */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 6px' }}>Pertinencia</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: nivel.color, margin: '0 0 4px', lineHeight: 1 }}>{score.toFixed(0)}<span style={{ fontSize: 14, fontWeight: 600, color: '#9CA3AF' }}>/100</span></p>
+          <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 9px', background: nivel.bg, color: nivel.color }}>{nivel.label}</span>
+        </div>
+        {/* Cobertura */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 6px' }}>Cobertura curricular</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: '#2563EB', margin: '0 0 4px', lineHeight: 1 }}>{coberturaPct}<span style={{ fontSize: 14, fontWeight: 600, color: '#9CA3AF' }}>%</span></p>
+          {fracDivisor > 1 && <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>1 de cada {fracDivisor} requisitos</p>}
+        </div>
+        {/* Empleos compatibles */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 6px' }}>Empleos compatibles</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: '#059669', margin: '0 0 4px', lineHeight: 1 }}>{empCompatibles}</p>
+          <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>perfiles con alta afinidad</p>
+        </div>
+        {/* Brechas */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 6px' }}>Brechas detectadas</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: '#DC2626', margin: '0 0 4px', lineHeight: 1 }}>{totalBrechas}</p>
+          {highBrechasCount > 0 && <p style={{ fontSize: 10, color: '#DC2626', margin: 0, fontWeight: 600 }}>{highBrechasCount} prioritarias</p>}
+        </div>
       </div>
 
       {dataPobre ? (
         <ExplorandoMsg />
       ) : (
         <>
-          {/* Row 2: market skills + curriculum donut */}
-          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2.5 flex-shrink-0">
-            <DashPanel title="Top Skills del Mercado">
-              <div style={{ height: 190 }}>
-                {topMarket.length > 0
-                  ? <HorizBarChart labels={topMarket.map(s => displaySkill(s.skill))} values={topMarket.map(s => s.frecuencia)} />
-                  : <Spinner />}
-              </div>
-            </DashPanel>
-            <DashPanel title="Composición Curricular">
-              <div style={{ height: 190 }}>
-                {skills
-                  ? <DonutChart
-                      labels={['Herramientas', 'Competencias', 'Habilidades', 'Otros']}
-                      values={[compCount.Herramientas, compCount.Competencias, compCount.Habilidades, compCount.Otros]}
-                      colors={blueGradient(4)}
-                    />
-                  : <Spinner />}
-              </div>
-            </DashPanel>
+          {/* ── Two-column: market bar chart + category coverage ─────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-shrink-0">
+
+            {/* Left: Lo que más exige el mercado */}
+            <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>Lo que más exige el mercado</p>
+              {topMarket.length === 0 ? <Spinner /> : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {topMarket.map((s, i) => {
+                    const pct = Math.round((s.frecuencia / maxMarket) * 100);
+                    const col = tipoColor(s.tipo_skill);
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 11, color: '#374151', minWidth: 110, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
+                        <div style={{ flex: 1, height: 10, background: '#F3F4F6', borderRadius: 6, overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: col, borderRadius: 6 }} />
+                        </div>
+                        <span style={{ fontSize: 10, color: '#6B7280', minWidth: 28, textAlign: 'right' }}>{s.frecuencia}</span>
+                      </div>
+                    );
+                  })}
+                  {/* Legend */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 6 }}>
+                    {Object.entries(TIPO_COLORS).map(([tipo, col]) => (
+                      <span key={tipo} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#6B7280' }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 2, background: col, display: 'inline-block' }} />
+                        {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Cobertura del programa por categoría */}
+            <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>Cobertura del programa por categoría</p>
+              {covCategories.length === 0 ? <Spinner /> : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {covCategories.map((cat, i) => {
+                    const badge = cat.pct >= 70
+                      ? { label: 'Cubierto', bg: '#D1FAE5', color: '#065F46' }
+                      : cat.pct >= 40
+                      ? { label: 'Parcial',  bg: '#FEF3C7', color: '#92400E' }
+                      : { label: 'Brecha',   bg: '#FEE2E2', color: '#991B1B' };
+                    return (
+                      <div key={i}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                          <span style={{ fontSize: 11, color: '#374151', fontWeight: 600 }}>{cat.label}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: cat.color }}>{cat.pct}%</span>
+                            <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '1px 7px', background: badge.bg, color: badge.color }}>{badge.label}</span>
+                          </div>
+                        </div>
+                        <div style={{ height: 6, background: '#F3F4F6', borderRadius: 4, overflow: 'hidden' }}>
+                          <div style={{ width: `${cat.pct}%`, height: '100%', background: cat.color, borderRadius: 4 }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Callout: weakest category */}
+                  {(() => {
+                    const weakest = [...covCategories].sort((a, b) => a.pct - b.pct)[0];
+                    if (!weakest || weakest.pct >= 70) return null;
+                    return (
+                      <div style={{ marginTop: 4, background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 8, padding: '8px 10px', fontSize: 10, color: '#92400E' }}>
+                        Área más débil: <strong>{weakest.label}</strong> con {weakest.pct}% de cobertura.
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Row 3: priority gaps + SNIES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 flex-shrink-0">
-            <DashPanel title="Brechas Prioritarias">
-              <div style={{ height: 160 }}>
-                {topBrechas.length > 0
-                  ? <HorizBarChart labels={topBrechas.map(b => displaySkill(b.skill))} values={topBrechas.map(b => b.frecuencia_mercado ?? 0)} color="#EF4444" />
-                  : <p style={{ fontSize: 12, color: '#6B7280', textAlign: 'center', paddingTop: 20 }}>Sin brechas críticas identificadas ✓</p>}
+          {/* ── Brechas prioritarias table ───────────────────────────────────── */}
+          <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px', flexShrink: 0 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Brechas prioritarias</p>
+            {topBrechas.length === 0 ? (
+              <p style={{ fontSize: 12, color: '#6B7280', textAlign: 'center', paddingTop: 8 }}>Sin brechas críticas identificadas ✓</p>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                      <th style={{ textAlign: 'left', padding: '4px 8px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Habilidad</th>
+                      <th style={{ textAlign: 'center', padding: '4px 8px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', minWidth: 80 }}>Vacantes</th>
+                      <th style={{ textAlign: 'center', padding: '4px 8px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Prioridad</th>
+                      <th style={{ textAlign: 'left', padding: '4px 8px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Diagnóstico</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topBrechas.map((b, i) => {
+                      const pct = Math.round(((b.frecuencia_mercado ?? 0) / maxBrecha) * 100);
+                      const prioridad = i < 2
+                        ? { label: 'Alta',  bg: '#FEE2E2', color: '#991B1B' }
+                        : { label: 'Media', bg: '#FEF3C7', color: '#92400E' };
+                      return (
+                        <tr key={i} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                          <td style={{ padding: '7px 8px', fontWeight: 600, color: '#111827' }}>{displaySkill(b.skill)}</td>
+                          <td style={{ padding: '7px 8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <div style={{ flex: 1, height: 6, background: '#F3F4F6', borderRadius: 4 }}>
+                                <div style={{ width: `${pct}%`, height: '100%', background: '#EF4444', borderRadius: 4 }} />
+                              </div>
+                              <span style={{ fontSize: 10, color: '#6B7280', minWidth: 24, textAlign: 'right' }}>{b.frecuencia_mercado ?? 0}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '7px 8px', textAlign: 'center' }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: prioridad.bg, color: prioridad.color }}>{prioridad.label}</span>
+                          </td>
+                          <td style={{ padding: '7px 8px', fontSize: 10, color: '#6B7280' }}>Alta demanda + baja evidencia curricular</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </DashPanel>
-            <DashPanel title="Benchmark SNIES">
-              {!univ || univ.competitors.length === 0 ? (
+            )}
+          </div>
+
+          {/* ── Decisión recomendada + Referencia competitiva ───────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-shrink-0">
+
+            {/* Decisión recomendada */}
+            <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Decisión recomendada</p>
+              <ol style={{ paddingLeft: 18, margin: '0 0 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {actions.map((a, i) => (
+                  <li key={i} style={{ fontSize: 11, color: '#374151', lineHeight: 1.6 }}>{a}</li>
+                ))}
+              </ol>
+              <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 8, padding: '8px 12px' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#92400E', margin: '0 0 3px' }}>Lectura ejecutiva</p>
+                <p style={{ fontSize: 10, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
+                  Con una pertinencia de <strong>{score.toFixed(0)}/100</strong> y una cobertura de <strong>{coberturaPct}%</strong>, el programa requiere actualización estratégica para mantener su relevancia en el mercado laboral actual.
+                </p>
+              </div>
+            </div>
+
+            {/* Referencia competitiva */}
+            <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Referencia competitiva</p>
+              {topUniv.length === 0 ? (
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Sin programas similares en SNIES.</p>
               ) : (
-                <div style={{ overflowY: 'auto', overflowX: 'auto', maxHeight: 160 }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, minWidth: 280 }}>
+                <>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                     <thead>
-                      <tr>
-                        <th style={{ textAlign: 'left', padding: '3px 6px', color: '#9CA3AF', fontWeight: 600, fontSize: 9, textTransform: 'uppercase' }}>Universidad</th>
-                        <th style={{ textAlign: 'right', padding: '3px 6px', color: '#9CA3AF', fontWeight: 600, fontSize: 9 }}>Matr.</th>
-                        <th style={{ textAlign: 'right', padding: '3px 6px', color: '#9CA3AF', fontWeight: 600, fontSize: 9 }}>Grad.</th>
+                      <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                        <th style={{ textAlign: 'left', padding: '3px 6px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase' }}>Universidad</th>
+                        <th style={{ textAlign: 'right', padding: '3px 6px', fontSize: 9, fontWeight: 700, color: '#9CA3AF' }}>Matr.</th>
+                        <th style={{ textAlign: 'right', padding: '3px 6px', fontSize: 9, fontWeight: 700, color: '#9CA3AF' }}>Grad.</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {univ.competitors.slice(0, 6).map((c, i) => (
-                        <tr key={i} style={{ borderTop: '1px solid #F3F4F6' }}>
-                          <td style={{ padding: '5px 6px', color: '#374151', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nombre_ies}</td>
+                      {topUniv.map((c, i) => (
+                        <tr key={i} style={{ borderTop: '1px solid #F9FAFB' }}>
+                          <td style={{ padding: '5px 6px', color: '#374151', maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nombre_ies}</td>
                           <td style={{ padding: '5px 6px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{(c.matriculados ?? 0).toLocaleString('es-CO')}</td>
                           <td style={{ padding: '5px 6px', textAlign: 'right', color: '#6B7280' }}>{(c.graduados ?? 0).toLocaleString('es-CO')}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
+                  {topUniv.length > 0 && (
+                    <p style={{ fontSize: 10, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.6 }}>
+                      {topUniv[0].nombre_ies} lidera en matrícula con {(topUniv[0].matriculados ?? 0).toLocaleString('es-CO')} estudiantes, representando un referente de posicionamiento en el mercado.
+                    </p>
+                  )}
+                </>
               )}
-            </DashPanel>
+            </div>
           </div>
         </>
       )}
