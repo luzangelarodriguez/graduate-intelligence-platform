@@ -436,7 +436,25 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             run_row = {"id": fallback_row["id"], "created_at": None}
 
         run_id: int = int(run_row["id"])
-        fecha: str = run_row["created_at"].strftime("%Y-%m-%d") if run_row.get("created_at") else ""
+
+        # Use MAX(updated_at) from the matches for this run as the "Corte" date.
+        # updated_at is set to now() on every ON CONFLICT DO UPDATE (migration 029),
+        # reflecting when scores were last recalculated — unlike ml_training_runs.created_at
+        # which is fixed at the run's original creation date.
+        try:
+            corte_row = fetch_one(
+                "SELECT MAX(updated_at) AS corte "
+                "FROM ml_program_job_matches WHERE run_id = %s",
+                (run_id,),
+            )
+        except Exception:
+            corte_row = None  # column doesn't exist yet (pre-migration 029)
+        if corte_row and corte_row.get("corte"):
+            fecha: str = corte_row["corte"].strftime("%Y-%m-%d")
+        elif run_row.get("created_at"):
+            fecha = run_row["created_at"].strftime("%Y-%m-%d")
+        else:
+            fecha = ""
 
         # Use literal interpolation for the optional filter to avoid param-count mismatches
         pid_filter = f"AND m.especializacion_id = {int(program_id)}" if program_id else ""
