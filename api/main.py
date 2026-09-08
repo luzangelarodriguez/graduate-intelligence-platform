@@ -792,6 +792,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
                       SELECT MAX(run_id) FROM ml_program_job_matches
                       WHERE especializacion_id = %s
                   )
+                  AND relevance_label = 'high'
                   AND skills_empleo IS NOT NULL
                   AND skills_empleo != '[]'::jsonb
                   AND jsonb_typeof(skills_empleo) = 'array'
