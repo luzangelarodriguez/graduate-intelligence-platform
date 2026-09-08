@@ -840,7 +840,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             {/* Left: Requisitos más solicitados por el mercado */}
             <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>Requisitos más solicitados por el mercado</p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De todas las vacantes analizadas con afinidad al programa</p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con alta afinidad al programa</p>
               {topMarket.length === 0 ? <Spinner /> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {topMarket.map((s, i) => {
