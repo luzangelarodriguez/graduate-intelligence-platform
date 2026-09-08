@@ -13,6 +13,67 @@ _ACRONYMS = {
     "vba", "css", "html", "php", "c", "c++", "c#",
 }
 
+# Maps raw skill_category values from the DB to the 4 UI categories.
+# Keys are lowercased for case-insensitive lookup.
+_TIPO_MAP: dict[str, str] = {
+    # Herramienta
+    "bi & visualization":           "herramienta",
+    "bi and visualization":         "herramienta",
+    "databases":                    "herramienta",
+    "cloud analytics":              "herramienta",
+    "cloud":                        "herramienta",
+    "cloud platforms":              "herramienta",
+    "data visualization":           "herramienta",
+    "visualization":                "herramienta",
+    "tools":                        "herramienta",
+    "herramienta":                  "herramienta",
+    "herramientas":                 "herramienta",
+    # Tecnica / Conocimiento
+    "programming / analytics":      "tecnica",
+    "programming/analytics":        "tecnica",
+    "programming":                  "tecnica",
+    "analytics":                    "tecnica",
+    "data engineering":             "tecnica",
+    "ai analytics":                 "tecnica",
+    "ai & analytics":               "tecnica",
+    "machine learning":             "tecnica",
+    "statistics":                   "tecnica",
+    "data science":                 "tecnica",
+    "tecnica":                      "tecnica",
+    "técnica":                      "tecnica",
+    "conocimiento":                 "tecnica",
+    # Habilidad
+    "soft skills":                  "habilidad",
+    "soft skill":                   "habilidad",
+    "communication":                "habilidad",
+    "leadership":                   "habilidad",
+    "habilidad":                    "habilidad",
+    "habilidades":                  "habilidad",
+    # Competencia / Gestión
+    "governance":                   "competencia",
+    "methodologies":                "competencia",
+    "methodology":                  "competencia",
+    "risk & security":              "competencia",
+    "risk and security":            "competencia",
+    "security":                     "competencia",
+    "project management":           "competencia",
+    "management":                   "competencia",
+    "business":                     "competencia",
+    "strategy":                     "competencia",
+    "competencia":                  "competencia",
+    "competencias":                 "competencia",
+    "gestión":                      "competencia",
+    "gestion":                      "competencia",
+}
+
+
+def _clean_tipo_skill(_self: object, raw: str | None) -> str:
+    """Normalize a raw skill_category DB value to one of: herramienta/tecnica/habilidad/competencia."""
+    if not raw:
+        return "competencia"
+    key = raw.strip().lower()
+    return _TIPO_MAP.get(key, "competencia")
+
 
 def _clean_skill_name(raw: str | None) -> str:
     """Return a display-ready skill name from a potentially contaminated canonical_skill value."""
