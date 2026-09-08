@@ -793,7 +793,8 @@ def save_matches(cur, run_id: int, matches: list[dict[str, Any]]) -> None:
             skills_empleo = EXCLUDED.skills_empleo,
             explanation = EXCLUDED.explanation,
             content_hash = EXCLUDED.content_hash,
-            raw_features = EXCLUDED.raw_features
+            raw_features = EXCLUDED.raw_features,
+            updated_at   = now()
         """,
         rows,
     )

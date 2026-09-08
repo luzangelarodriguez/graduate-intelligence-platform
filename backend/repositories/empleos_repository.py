@@ -5,7 +5,8 @@ from typing import Any
 
 from backend.repositories.base import fetch_all, fetch_one
 
-_SKILL_REPR_RE = re.compile(r"SkillMatch\([^)]*skill_normalized='([^']+)'[^)]*\)")
+_SKILL_REPR_RE      = re.compile(r"SkillMatch\([^)]*skill_normalized='([^']+)'[^)]*\)")
+_SKILL_TIPO_REPR_RE = re.compile(r"SkillMatch\([^)]*tipo_skill='([^']+)'[^)]*\)")
 
 _ACRONYMS = {
     "sql", "bi", "kpi", "kpis", "pmbok", "pmi", "pmp", "erp", "crm", "etl",
@@ -13,8 +14,7 @@ _ACRONYMS = {
     "vba", "css", "html", "php", "c", "c++", "c#",
 }
 
-# Maps raw skill_category values from the DB to the 4 UI categories.
-# Keys are lowercased for case-insensitive lookup.
+# Exact match for real DB skill_category values (fast path).
 _TIPO_MAP: dict[str, str] = {
     # Herramienta
     "bi & visualization":           "herramienta",
@@ -66,13 +66,13 @@ _TIPO_MAP: dict[str, str] = {
     "gestion":                      "competencia",
 }
 
-
-def _clean_tipo_skill(_self: object, raw: str | None) -> str:
-    """Normalize a raw skill_category DB value to one of: herramienta/tecnica/habilidad/competencia."""
-    if not raw:
-        return "competencia"
-    key = raw.strip().lower()
-    return _TIPO_MAP.get(key, "competencia")
+# Substring fallback for SkillMatch repr values and unknown DB categories.
+_TIPO_CATEGORY_MAP: list[tuple[list[str], str]] = [
+    (["tool", "herramient", "software", "platform", "tecnolog", "programming_language", "database", "informatic"], "herramienta"),
+    (["tecnic", "technical_skill", "metodolog", "conocimient", "framework", "estandar", "standard", "ciencia", "science"], "tecnica"),
+    (["habilidad", "blanda", "soft", "transvers", "interpersonal", "comunic", "liderazg", "transversal_skill"], "habilidad"),
+    (["competenci", "gestion", "gestión", "analisis", "análisis", "proceso", "management", "negocio"], "competencia"),
+]
 
 
 def _clean_skill_name(raw: str | None) -> str:
@@ -87,6 +87,28 @@ def _clean_skill_name(raw: str | None) -> str:
     if lower in _ACRONYMS:
         return s.upper()
     return s.capitalize()
+
+
+def _clean_tipo_skill(raw_nombre: str | None, raw_tipo: str | None) -> str:
+    """Return a normalized tipo_skill category.
+
+    If raw_nombre looks like a SkillMatch repr, extract tipo_skill from it.
+    Otherwise use raw_tipo from the DB. Tries exact match in _TIPO_MAP first,
+    then substring fallback via _TIPO_CATEGORY_MAP.
+    Maps to one of: herramienta, tecnica, competencia, habilidad.
+    """
+    tipo = raw_tipo or ""
+    if raw_nombre and _SKILL_REPR_RE.search(raw_nombre):
+        m = _SKILL_TIPO_REPR_RE.search(raw_nombre)
+        if m:
+            tipo = m.group(1)
+    t = tipo.strip().lower()
+    if t in _TIPO_MAP:
+        return _TIPO_MAP[t]
+    for keywords, category in _TIPO_CATEGORY_MAP:
+        if any(k in t for k in keywords):
+            return category
+    return "competencia"
 
 
 def fetch_job_metadata(empleo_id: str | int, *, db_name: str | None = None) -> dict[str, Any] | None:
@@ -315,11 +337,13 @@ def fetch_profile_skills(
     cleaned: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in rows:
-        nombre = _clean_skill_name(row.get("nombre"))
+        raw_nombre = row.get("nombre")
+        nombre = _clean_skill_name(raw_nombre)
         if not nombre or nombre in seen:
             continue
         seen.add(nombre)
-        cleaned.append({**row, "nombre": nombre})
+        tipo_skill = _clean_tipo_skill(raw_nombre, row.get("tipo_skill"))
+        cleaned.append({**row, "nombre": nombre, "tipo_skill": tipo_skill})
     return cleaned
 
 
