@@ -651,7 +651,7 @@ const TIPO_META: Record<string, { bar: string; label: string; badgeBg: string; b
   herramienta: { bar: '#3B82F6', label: 'Herramienta', badgeBg: '#DBEAFE', badgeColor: '#1D4ED8' },
   tecnica:     { bar: '#059669', label: 'Conocimiento', badgeBg: '#D1FAE5', badgeColor: '#065F46' },
   habilidad:   { bar: '#F59E0B', label: 'Habilidad',   badgeBg: '#FEF3C7', badgeColor: '#92400E' },
-  competencia: { bar: '#14B8A6', label: 'Gestión',     badgeBg: '#CCFBF1', badgeColor: '#0F766E' },
+  competencia: { bar: '#14B8A6', label: 'Competencia',  badgeBg: '#CCFBF1', badgeColor: '#0F766E' },
 };
 function tipoMeta(tipo: string | undefined) {
   return TIPO_META[tipo ?? ''] ?? { bar: '#94A3B8', label: 'Otro', badgeBg: '#F1F5F9', badgeColor: '#475569' };
