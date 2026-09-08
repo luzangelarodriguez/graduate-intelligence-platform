@@ -786,8 +786,8 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
         {/* 1. Afinidad ocupacional */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Afinidad ocupacional</p>
-          <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadPct}<span style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF' }}>%</span></p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>{afinidadCount} de {totales.matches} vacantes con alta alineación al perfil de egreso</p>
+          <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadCount}</p>
+          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con alta alineación al perfil de egreso</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: afinidadBadge.bg, color: afinidadBadge.color }}>{afinidadBadge.label}</span>
         </div>
         {/* 2. Cobertura curricular */}
@@ -848,7 +848,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
                     const tm   = tipoMeta(s.tipo_skill);
                     return (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span title={displaySkill(s.skill)} style={{ fontSize: 11, color: '#374151', minWidth: 140, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
+                        <span title={displaySkill(s.skill)} style={{ fontSize: 11, color: '#374151', width: 160, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.3 }}>{displaySkill(s.skill)}</span>
                         <div style={{ flex: 1, height: 9, background: '#F3F4F6', borderRadius: 5, overflow: 'hidden' }}>
                           <div style={{ width: `${pct}%`, height: '100%', background: tm.bar, borderRadius: 5 }} />
                         </div>
