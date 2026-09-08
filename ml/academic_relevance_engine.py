@@ -1320,7 +1320,8 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     skills_empleo       = EXCLUDED.skills_empleo,
                     explanation         = EXCLUDED.explanation,
                     content_hash        = EXCLUDED.content_hash,
-                    raw_features        = EXCLUDED.raw_features
+                    raw_features        = EXCLUDED.raw_features,
+                    updated_at          = now()
             """, {
                 "run_id": run_id,
                 "prog_doc_id": prog_doc_id,
