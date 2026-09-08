@@ -14,11 +14,59 @@ _ACRONYMS = {
     "vba", "css", "html", "php", "c", "c++", "c#",
 }
 
-# Map raw tipo_skill values (from SkillMatch or DB) to the 4 display categories.
-# tool / herramienta / software / platform / tecnolog / programming_language / database → herramienta
-# tecnica / technical_skill / methodolog / conocimient / framework / standard → tecnica
-# competenci / gestion / analisis / proceso / management → competencia
-# transversal_skill / habilidad / blanda / soft / interpersonal / comunicac / liderazg → habilidad
+# Exact match for real DB skill_category values (fast path).
+_TIPO_MAP: dict[str, str] = {
+    # Herramienta
+    "bi & visualization":           "herramienta",
+    "bi and visualization":         "herramienta",
+    "databases":                    "herramienta",
+    "cloud analytics":              "herramienta",
+    "cloud":                        "herramienta",
+    "cloud platforms":              "herramienta",
+    "data visualization":           "herramienta",
+    "visualization":                "herramienta",
+    "tools":                        "herramienta",
+    "herramienta":                  "herramienta",
+    "herramientas":                 "herramienta",
+    # Tecnica / Conocimiento
+    "programming / analytics":      "tecnica",
+    "programming/analytics":        "tecnica",
+    "programming":                  "tecnica",
+    "analytics":                    "tecnica",
+    "data engineering":             "tecnica",
+    "ai analytics":                 "tecnica",
+    "ai & analytics":               "tecnica",
+    "machine learning":             "tecnica",
+    "statistics":                   "tecnica",
+    "data science":                 "tecnica",
+    "tecnica":                      "tecnica",
+    "técnica":                      "tecnica",
+    "conocimiento":                 "tecnica",
+    # Habilidad
+    "soft skills":                  "habilidad",
+    "soft skill":                   "habilidad",
+    "communication":                "habilidad",
+    "leadership":                   "habilidad",
+    "habilidad":                    "habilidad",
+    "habilidades":                  "habilidad",
+    # Competencia / Gestión
+    "governance":                   "competencia",
+    "methodologies":                "competencia",
+    "methodology":                  "competencia",
+    "risk & security":              "competencia",
+    "risk and security":            "competencia",
+    "security":                     "competencia",
+    "project management":           "competencia",
+    "management":                   "competencia",
+    "business":                     "competencia",
+    "strategy":                     "competencia",
+    "competencia":                  "competencia",
+    "competencias":                 "competencia",
+    "gestión":                      "competencia",
+    "gestion":                      "competencia",
+}
+
+# Substring fallback for SkillMatch repr values and unknown DB categories.
 _TIPO_CATEGORY_MAP: list[tuple[list[str], str]] = [
     (["tool", "herramient", "software", "platform", "tecnolog", "programming_language", "database", "informatic"], "herramienta"),
     (["tecnic", "technical_skill", "metodolog", "conocimient", "framework", "estandar", "standard", "ciencia", "science"], "tecnica"),
@@ -45,19 +93,22 @@ def _clean_tipo_skill(raw_nombre: str | None, raw_tipo: str | None) -> str:
     """Return a normalized tipo_skill category.
 
     If raw_nombre looks like a SkillMatch repr, extract tipo_skill from it.
-    Otherwise use raw_tipo from the DB. Map to one of: herramienta, tecnica,
-    competencia, habilidad.
+    Otherwise use raw_tipo from the DB. Tries exact match in _TIPO_MAP first,
+    then substring fallback via _TIPO_CATEGORY_MAP.
+    Maps to one of: herramienta, tecnica, competencia, habilidad.
     """
     tipo = raw_tipo or ""
     if raw_nombre and _SKILL_REPR_RE.search(raw_nombre):
         m = _SKILL_TIPO_REPR_RE.search(raw_nombre)
         if m:
             tipo = m.group(1)
-    t = tipo.lower()
+    t = tipo.strip().lower()
+    if t in _TIPO_MAP:
+        return _TIPO_MAP[t]
     for keywords, category in _TIPO_CATEGORY_MAP:
         if any(k in t for k in keywords):
             return category
-    return "competencia"  # sensible fallback
+    return "competencia"
 
 
 def fetch_job_metadata(empleo_id: str | int, *, db_name: str | None = None) -> dict[str, Any] | None:

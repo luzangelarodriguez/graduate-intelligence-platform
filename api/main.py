@@ -806,10 +806,49 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             """,
             (program_id, program_id),
         )
-        skills_mercado = [
+        skills_mercado_raw = [
             {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
             for r in market_rows
             if r["skill"]
+        ]
+
+        # 1b. Tipo-skill lookup: for each market skill, get the most common
+        # normalized tipo_skill from job_skills (joined via ml_program_job_matches).
+        # Uses MODE() to pick the most frequent category per skill key.
+        tipo_rows = fetch_all(
+            """
+            SELECT
+                LOWER(TRIM(COALESCE(js.canonical_skill, js.skill_family, js.skill_category, ''))) AS skill_key,
+                MODE() WITHIN GROUP (ORDER BY COALESCE(NULLIF(TRIM(js.skill_category), ''), 'Unknown')) AS tipo_skill_raw
+            FROM job_skills js
+            JOIN ml_program_job_matches m ON m.empleo_id = js.job_id::text
+            WHERE m.especializacion_id = %s
+              AND m.run_id = (SELECT MAX(run_id) FROM ml_program_job_matches WHERE especializacion_id = %s)
+              AND COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''
+            GROUP BY 1
+            """,
+            (program_id, program_id),
+        )
+        # Import the cleaning helper; it normalizes tipo_skill to one of:
+        # herramienta / tecnica / habilidad / competencia
+        from backend.repositories.empleos_repository import _clean_tipo_skill
+        tipo_lookup: dict[str, str] = {}
+        for row in tipo_rows:
+            key = (row["skill_key"] or "").strip()
+            if key:
+                tipo_lookup[key] = _clean_tipo_skill(None, row["tipo_skill_raw"])
+
+        def _tipo_for(skill: str) -> str:
+            """Return normalized tipo_skill for a market skill name."""
+            norm = "".join(
+                c for c in _ud.normalize("NFD", skill.lower())
+                if _ud.category(c) != "Mn"
+            ).strip()
+            return tipo_lookup.get(norm, tipo_lookup.get(skill.lower().strip(), "competencia"))
+
+        skills_mercado = [
+            {"skill": s["skill"], "frecuencia": s["frecuencia"], "tipo_skill": _tipo_for(s["skill"])}
+            for s in skills_mercado_raw
         ]
 
         # 2. Skills from program curriculum (microcurriculo)
