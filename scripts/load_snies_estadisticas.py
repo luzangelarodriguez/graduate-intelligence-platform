@@ -31,6 +31,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -62,7 +63,7 @@ def _find_xlsx_url(soup: BeautifulSoup, keyword: str, anio: int) -> str | None:
             if pat.search(text):
                 href = tag["href"]
                 if not href.startswith("http"):
-                    href = BASE_URL + href
+                    href = urljoin(BASES_PAGE, href)
                 log.info("Found '%s' → %s", text, href)
                 return href
     return None
