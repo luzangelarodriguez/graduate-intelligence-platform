@@ -44,6 +44,10 @@ log = logging.getLogger(__name__)
 
 BASE_URL = "https://snies.mineducacion.gov.co"
 BASES_PAGE = f"{BASE_URL}/portal/ESTADISTICAS/Bases-consolidadas/"
+# All downloadable files on this CMS are served under /1778/ regardless of the
+# page they are linked from (e.g. hrefs are bare filenames like
+# "articles-430149_recurso.xlsx" without any path prefix).
+CMS_FILE_BASE = f"{BASE_URL}/1778/"
 
 # Column indices in the data sheet (0-based, confirmed with 2025 matriculados file)
 COL_CODIGO_SNIES = 13
@@ -64,7 +68,7 @@ def _find_xlsx_url(soup: BeautifulSoup, keyword: str, anio: int) -> str | None:
                 href = tag["href"]
                 log.info("RAW href para '%s': %r", text, href)
                 if not href.startswith("http"):
-                    href = urljoin(BASES_PAGE, href)
+                    href = CMS_FILE_BASE + href
                 log.info("Found '%s' → %s", text, href)
                 return href
     return None
