@@ -651,7 +651,7 @@ const TIPO_META: Record<string, { bar: string; label: string; badgeBg: string; b
   herramienta: { bar: '#3B82F6', label: 'Herramienta', badgeBg: '#DBEAFE', badgeColor: '#1D4ED8' },
   tecnica:     { bar: '#059669', label: 'Conocimiento', badgeBg: '#D1FAE5', badgeColor: '#065F46' },
   habilidad:   { bar: '#F59E0B', label: 'Habilidad',   badgeBg: '#FEF3C7', badgeColor: '#92400E' },
-  competencia: { bar: '#14B8A6', label: 'Gestión',     badgeBg: '#CCFBF1', badgeColor: '#0F766E' },
+  competencia: { bar: '#14B8A6', label: 'Competencia',  badgeBg: '#CCFBF1', badgeColor: '#0F766E' },
 };
 function tipoMeta(tipo: string | undefined) {
   return TIPO_META[tipo ?? ''] ?? { bar: '#94A3B8', label: 'Otro', badgeBg: '#F1F5F9', badgeColor: '#475569' };
@@ -786,8 +786,8 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
         {/* 1. Afinidad ocupacional */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Afinidad ocupacional</p>
-          <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadPct}<span style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF' }}>%</span></p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>{afinidadCount} de {totales.matches} vacantes con alta alineación al perfil de egreso</p>
+          <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadCount}</p>
+          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con alta alineación al perfil de egreso</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: afinidadBadge.bg, color: afinidadBadge.color }}>{afinidadBadge.label}</span>
         </div>
         {/* 2. Cobertura curricular */}
@@ -840,7 +840,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             {/* Left: Requisitos más solicitados por el mercado */}
             <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>Requisitos más solicitados por el mercado</p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De todas las vacantes analizadas con afinidad al programa</p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con alta afinidad al programa</p>
               {topMarket.length === 0 ? <Spinner /> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {topMarket.map((s, i) => {
@@ -848,7 +848,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
                     const tm   = tipoMeta(s.tipo_skill);
                     return (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span title={displaySkill(s.skill)} style={{ fontSize: 11, color: '#374151', minWidth: 140, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displaySkill(s.skill)}</span>
+                        <span title={displaySkill(s.skill)} style={{ fontSize: 11, color: '#374151', width: 160, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.3 }}>{displaySkill(s.skill)}</span>
                         <div style={{ flex: 1, height: 9, background: '#F3F4F6', borderRadius: 5, overflow: 'hidden' }}>
                           <div style={{ width: `${pct}%`, height: '100%', background: tm.bar, borderRadius: 5 }} />
                         </div>
