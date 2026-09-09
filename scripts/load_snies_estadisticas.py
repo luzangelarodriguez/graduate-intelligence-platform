@@ -56,22 +56,40 @@ COL_VALUE        = 40  # MATRICULADOS or GRADUADOS — both files use the last c
 
 
 def _find_xlsx_url(soup: BeautifulSoup, keyword: str, anio: int) -> str | None:
-    """Return the first href whose link text matches keyword and anio (case-insensitive)."""
-    patterns = [
-        re.compile(rf"{re.escape(keyword)}.*{anio}", re.I),
-        re.compile(rf"{anio}.*{re.escape(keyword)}", re.I),
-    ]
+    """Return the href for the exact 'Estudiantes {keyword} {anio}' dataset.
+
+    The SNIES portal lists multiple variants per keyword, e.g.:
+      - "Estudiantes Matriculados 2025"           ← the total dataset we want
+      - "Estudiantes Matriculados en primer curso 2025"  ← a subset, do NOT use
+
+    We require the keyword to appear as a full word sequence WITHOUT the
+    "en primer curso" qualifier.  The pattern anchors to word boundaries and
+    explicitly excludes the "en primer curso" variant.
+    """
+    # Matches "Matriculados {anio}" (with optional "Estudiantes " prefix) but
+    # NOT "Matriculados en primer curso {anio}".
+    exact_pat = re.compile(
+        rf"\b{re.escape(keyword)}\b(?!\s+en\s+primer\s+curso).*\b{anio}\b",
+        re.I,
+    )
+    candidates = []
     for tag in soup.find_all("a", href=True):
         text = tag.get_text(strip=True)
-        for pat in patterns:
-            if pat.search(text):
-                href = tag["href"]
-                log.info("RAW href para '%s': %r", text, href)
-                if not href.startswith("http"):
-                    href = CMS_FILE_BASE + href
-                log.info("Found '%s' → %s", text, href)
-                return href
-    return None
+        if exact_pat.search(text):
+            href = tag["href"]
+            log.info("RAW href para '%s': %r", text, href)
+            if not href.startswith("http"):
+                href = CMS_FILE_BASE + href
+            candidates.append((text, href))
+
+    if not candidates:
+        return None
+
+    # Prefer the shortest text match (fewest qualifiers = most general dataset)
+    candidates.sort(key=lambda x: len(x[0]))
+    text, href = candidates[0]
+    log.info("Selected '%s' → %s", text, href)
+    return href
 
 
 def _fetch_urls(anio: int) -> dict[str, str]:
@@ -141,7 +159,7 @@ def _parse_xlsx(data: bytes, anio: int) -> dict[int, int]:
 
 
 def _upsert(
-    conn,
+    conn,  # None when dry_run=True
     anio: int,
     matriculados: dict[int, int],
     graduados: dict[int, int],
@@ -204,18 +222,28 @@ def run(anio: int, dry_run: bool) -> None:
     mat_url  = urls["matriculados"]
     grad_url = urls.get("graduados")
 
-    mat_data  = _download_xlsx(mat_url)
+    log.info("Descargando Matriculados …")
+    mat_data = _download_xlsx(mat_url)
+    log.info("Parseando Matriculados …")
     matriculados = _parse_xlsx(mat_data, anio)
 
     graduados: dict[int, int] = {}
     if grad_url:
+        log.info("Descargando Graduados …")
         grad_data = _download_xlsx(grad_url)
+        log.info("Parseando Graduados …")
         graduados = _parse_xlsx(grad_data, anio)
     else:
-        log.warning("Graduados no disponibles para %d — se cargará matriculados=0 para graduados.", anio)
+        log.warning("Graduados no disponibles para %d — se cargará graduados=0.", anio)
 
+    if dry_run:
+        n = _upsert(None, anio, matriculados, graduados, mat_url, grad_url, dry_run=True)
+        log.info("Listo (dry-run). %d programas listos para anio=%d.", n, anio)
+        return
+
+    log.info("Conectando a DB …")
     with _get_connection() as conn:
-        n = _upsert(conn, anio, matriculados, graduados, mat_url, grad_url, dry_run)
+        n = _upsert(conn, anio, matriculados, graduados, mat_url, grad_url, dry_run=False)
     log.info("Listo. %d programas cargados para anio=%d.", n, anio)
 
 
