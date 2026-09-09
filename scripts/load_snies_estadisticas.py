@@ -62,6 +62,7 @@ def _find_xlsx_url(soup: BeautifulSoup, keyword: str, anio: int) -> str | None:
         for pat in patterns:
             if pat.search(text):
                 href = tag["href"]
+                log.info("RAW href para '%s': %r", text, href)
                 if not href.startswith("http"):
                     href = urljoin(BASES_PAGE, href)
                 log.info("Found '%s' → %s", text, href)
