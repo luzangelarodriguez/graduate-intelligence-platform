@@ -1855,3 +1855,37 @@ def get_profile_kpis(
     except Exception as exc:
         logger.warning("get_profile_kpis failed: %s", exc)
         return {"total_ofertas": 0, "total_perfiles": 0, "total_skills": 0}
+
+
+@app.get("/api/programas/{program_id}/sectores", tags=["market"])
+def get_sectores(program_id: int) -> list:
+    """Return sector distribution for jobs matched to a program."""
+    try:
+        from backend.repositories.empleos_repository import fetch_sectores
+        return fetch_sectores(program_id)
+    except Exception as exc:
+        logger.warning("get_sectores failed: %s", exc)
+        return []
+
+
+@app.get("/api/programas/{program_id}/ciudades", tags=["market"])
+def get_ciudades(program_id: int) -> list:
+    """Return city distribution for jobs matched to a program."""
+    try:
+        from backend.repositories.empleos_repository import fetch_ciudades
+        return fetch_ciudades(program_id)
+    except Exception as exc:
+        logger.warning("get_ciudades failed: %s", exc)
+        return []
+
+
+@app.get("/api/programas/{program_id}/tendencia-mensual", tags=["market"])
+def get_tendencia_mensual(program_id: int) -> list:
+    """Return monthly job counts for jobs matched to a program."""
+    try:
+        from backend.repositories.empleos_repository import fetch_tendencia_mensual
+        return fetch_tendencia_mensual(program_id)
+    except Exception as exc:
+        logger.warning("get_tendencia_mensual failed: %s", exc)
+        return []
+

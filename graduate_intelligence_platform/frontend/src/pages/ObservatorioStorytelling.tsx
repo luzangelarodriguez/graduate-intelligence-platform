@@ -1053,6 +1053,9 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
 interface OccupationalProfile { perfil: string; vacantes: number }
 interface ProfileSkill { nombre: string; tipo_skill: string; vacantes: number }
 interface ProfileKpis { total_ofertas: number; total_perfiles: number; total_skills: number }
+interface SectorItem { sector: string; vacantes: number }
+interface CiudadItem { ciudad: string; vacantes: number }
+interface TendenciaItem { mes: string; vacantes: number }
 
 const SKILL_COLS = [
   { key: 'herramientas', label: 'Herramientas', icon: '🔧', kw: ['herramient', 'tool', 'software', 'plataform', 'tecnolog'] },
@@ -1075,15 +1078,43 @@ function classifyTipoSkill(tipo: string): string {
   return 'competencias';
 }
 
+function MiniTrendChart({ data }: { data: TendenciaItem[] }) {
+  if (data.length < 2) return <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: 0 }}>Sin datos de tendencia</p>;
+  const W = 400, H = 90, PAD = { t: 8, r: 12, b: 28, l: 36 };
+  const xs = data.map((_, i) => PAD.l + (i / (data.length - 1)) * (W - PAD.l - PAD.r));
+  const vals = data.map(d => d.vacantes);
+  const maxV = Math.max(...vals) || 1;
+  const ys = vals.map(v => PAD.t + (1 - v / maxV) * (H - PAD.t - PAD.b));
+  const line = xs.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${ys[i].toFixed(1)}`).join(' ');
+  const fill = `${line} L ${xs[xs.length - 1].toFixed(1)} ${(H - PAD.b).toFixed(1)} L ${xs[0].toFixed(1)} ${(H - PAD.b).toFixed(1)} Z`;
+  const labelStep = Math.ceil(data.length / 5);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 90 }}>
+      <path d={fill} fill="#EEF2FB" opacity="0.7" />
+      <path d={line} fill="none" stroke={C.navy} strokeWidth="2" strokeLinejoin="round" />
+      {xs.map((x, i) => (
+        <circle key={i} cx={x} cy={ys[i]} r="3" fill={C.navy} />
+      ))}
+      {data.map((d, i) => i % labelStep === 0 && (
+        <text key={i} x={xs[i]} y={H - 6} textAnchor="middle" fontSize="8" fill="#9CA3AF">{d.mes.slice(5)}/{d.mes.slice(2, 4)}</text>
+      ))}
+      <text x={PAD.l - 4} y={PAD.t + 4} textAnchor="end" fontSize="8" fill="#9CA3AF">{maxV}</text>
+      <text x={PAD.l - 4} y={H - PAD.b} textAnchor="end" fontSize="8" fill="#9CA3AF">0</text>
+    </svg>
+  );
+}
+
 function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   const [profiles, setProfiles]         = useState<OccupationalProfile[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(true);
   const [selectedPerfil, setSelectedPerfil]   = useState<string | null>(null);
   const [profileSkills, setProfileSkills]     = useState<ProfileSkill[] | null>(null);
   const [kpis, setKpis]                 = useState<ProfileKpis | null>(null);
+  const [sectores, setSectores]         = useState<SectorItem[]>([]);
+  const [ciudades, setCiudades]         = useState<CiudadItem[]>([]);
+  const [tendencia, setTendencia]       = useState<TendenciaItem[]>([]);
   const [deepAnalysis, setDeepAnalysis] = useState<DeepAnalysisData | null>(null);
 
-  // Deep analysis for alignment
   useEffect(() => {
     if (!programaId) return;
     fetch(`${API}/api/programs/${programaId}/deep-analysis`)
@@ -1092,16 +1123,21 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
       .catch(() => setDeepAnalysis({}));
   }, [programaId]);
 
-  // Profiles + KPIs
   useEffect(() => {
     if (!programaId) return;
     setProfilesLoading(true);
     Promise.all([
       fetch(`${API}/api/programas/${programaId}/perfiles-ocupacionales`).then(r => r.json()),
       fetch(`${API}/api/programas/${programaId}/perfiles-kpis`).then(r => r.json()),
-    ]).then(([profs, kpiData]) => {
+      fetch(`${API}/api/programas/${programaId}/sectores`).then(r => r.json()),
+      fetch(`${API}/api/programas/${programaId}/ciudades`).then(r => r.json()),
+      fetch(`${API}/api/programas/${programaId}/tendencia-mensual`).then(r => r.json()),
+    ]).then(([profs, kpiData, secs, cities, trend]) => {
       setProfiles(profs);
       setKpis(kpiData);
+      setSectores(secs);
+      setCiudades(cities);
+      setTendencia(trend);
       setProfilesLoading(false);
       setSelectedPerfil(prev => {
         if (prev && profs.some((p: OccupationalProfile) => p.perfil === prev)) return prev;
@@ -1110,7 +1146,6 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
     }).catch(() => { setProfiles([]); setProfilesLoading(false); });
   }, [programaId]);
 
-  // Skills for selected profile
   useEffect(() => {
     if (!programaId || !selectedPerfil) return;
     setProfileSkills(null);
@@ -1143,6 +1178,8 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   const alinCount  = deepAnalysis === null ? null : alignmentRows.filter(r => r.estado === 'alineada').length;
   const brechasCount = deepAnalysis === null ? null : alignmentRows.filter(r => r.estado !== 'alineada').length;
   const maxVac = profiles[0]?.vacantes ?? 1;
+  const maxSec = sectores[0]?.vacantes ?? 1;
+  const maxCiu = ciudades[0]?.vacantes ?? 1;
 
   const ESTADO_STYLE: Record<string, { bg: string; color: string; label: string; action: string; actionColor: string }> = {
     alineada: { bg: '#D1FAE5', color: '#065F46', label: 'Alineada',     action: 'Mantener',    actionColor: '#065F46' },
@@ -1153,13 +1190,13 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   return (
     <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, height: '100%', overflowY: 'auto', background: C.bg }}>
 
-      {/* Header */}
+      {/* 1 — Header */}
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Perfiles ocupacionales y pertinencia curricular</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: C.navy, margin: '0 0 3px' }}>Mercado laboral pertinente</h1>
         <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>Qué empleos demanda el mercado, qué requieren y cómo responde el programa</p>
       </div>
 
-      {/* KPIs */}
+      {/* 2 — KPIs */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {([
           { icon: '💼', value: kpis?.total_ofertas ?? '…',   label: 'Ofertas\npertinentes' },
@@ -1170,7 +1207,7 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
         ] as { icon: string | null; value: number | string; label: string; isCircle?: boolean }[]).map((kpi, i) => (
           <div key={i} style={{ flex: 1, minWidth: 130, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             {kpi.isCircle
-              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, borderTopColor: C.border, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
+              ? <div style={{ width: 38, height: 38, borderRadius: '50%', border: `3px solid ${C.navy}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: C.navy, flexShrink: 0 }}>{kpi.value}</div>
               : <div style={{ width: 38, height: 38, borderRadius: '50%', background: C.navy, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>{kpi.icon}</div>
             }
             <div>
@@ -1181,28 +1218,22 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
         ))}
       </div>
 
-      {/* Two-column: profiles list + skill columns */}
+      {/* 3 — Perfiles + Requisitos */}
       <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 12 }}>
-
-        {/* Left: ranked profiles */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Perfiles ocupacionales demandados</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>3 · Perfiles demandados</h3>
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
           {profilesLoading
             ? <Spinner />
             : profiles.length === 0
-              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos para los filtros seleccionados</p>
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
               : profiles.map((p, i) => {
                   const isSelected = selectedPerfil === p.perfil;
                   return (
-                    <button
-                      key={p.perfil}
-                      onClick={() => setSelectedPerfil(p.perfil)}
-                      style={{
-                        width: '100%', textAlign: 'left', background: isSelected ? '#EEF2FB' : 'transparent',
+                    <button key={p.perfil} onClick={() => setSelectedPerfil(p.perfil)}
+                      style={{ width: '100%', textAlign: 'left', background: isSelected ? '#EEF2FB' : 'transparent',
                         border: `1px solid ${isSelected ? C.navy : 'transparent'}`, borderRadius: 7,
-                        padding: '8px 10px', marginBottom: 4, cursor: 'pointer',
-                      }}>
+                        padding: '8px 10px', marginBottom: 4, cursor: 'pointer' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
                         <span style={{ fontSize: 11, fontWeight: isSelected ? 700 : 500, color: C.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
                           <span style={{ color: '#9CA3AF', marginRight: 6, fontSize: 10 }}>{i + 1}</span>
@@ -1219,11 +1250,10 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
           }
         </div>
 
-        {/* Right: 4 skill columns */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
-            Requisitos del perfil seleccionado:{' '}
-            <span style={{ color: '#F0A500' }}>{selectedPerfil ?? '—'}</span>
+            4 · Requisitos —{' '}
+            <span style={{ color: '#F0A500' }}>{selectedPerfil ?? 'selecciona un perfil'}</span>
           </h3>
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
           {!selectedPerfil
@@ -1265,13 +1295,11 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
         </div>
       </div>
 
-      {/* Bottom: alignment table + callout */}
+      {/* 5 — Alineación curricular */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 12 }}>
-
-        {/* Alignment table */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16, overflowX: 'auto' }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>
-            Respuesta del programa frente al perfil:{' '}
+            5 · Respuesta curricular —{' '}
             <span style={{ color: '#F0A500' }}>{selectedPerfil ?? '—'}</span>
           </h3>
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
@@ -1327,7 +1355,6 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
           }
         </div>
 
-        {/* Lectura ejecutiva */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>Lectura ejecutiva</h3>
           <div style={{ width: 28, height: 2, background: '#F0A500' }} />
@@ -1346,6 +1373,65 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* 6 — Contexto de mercado: sector, ciudad, tendencia */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+
+        {/* Sectores */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>6a · Sectores que demandan</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {profilesLoading
+            ? <Spinner />
+            : sectores.length === 0
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+              : sectores.slice(0, 7).map((s, i) => (
+                  <div key={s.sector} style={{ marginBottom: 8 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                      <span style={{ fontSize: 10, color: C.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 150 }}>
+                        <span style={{ color: '#9CA3AF', marginRight: 4, fontSize: 9 }}>{i + 1}</span>{s.sector}
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: C.navy, flexShrink: 0, marginLeft: 4 }}>{s.vacantes}</span>
+                    </div>
+                    <div style={{ width: '100%', height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: `${(s.vacantes / maxSec) * 100}%`, height: '100%', background: '#6B7FD4', borderRadius: 2 }} />
+                    </div>
+                  </div>
+                ))
+          }
+        </div>
+
+        {/* Ciudades */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>6b · Ciudades con mayor demanda</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {profilesLoading
+            ? <Spinner />
+            : ciudades.length === 0
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+              : ciudades.slice(0, 7).map((c, i) => (
+                  <div key={c.ciudad} style={{ marginBottom: 8 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                      <span style={{ fontSize: 10, color: C.navy, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 150 }}>
+                        <span style={{ color: '#9CA3AF', marginRight: 4, fontSize: 9 }}>{i + 1}</span>{c.ciudad}
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: C.navy, flexShrink: 0, marginLeft: 4 }}>{c.vacantes}</span>
+                    </div>
+                    <div style={{ width: '100%', height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: `${(c.vacantes / maxCiu) * 100}%`, height: '100%', background: '#F0A500', borderRadius: 2 }} />
+                    </div>
+                  </div>
+                ))
+          }
+        </div>
+
+        {/* Tendencia mensual */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>6c · Tendencia de vacantes</h3>
+          <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
+          {profilesLoading ? <Spinner /> : <MiniTrendChart data={tendencia} />}
         </div>
       </div>
 
