@@ -11,15 +11,25 @@ Workflow:
      and "Estudiantes Graduados {anio}".
   2. Download each .xlsx (stream, ~19 MB each).
   3. Parse: skip 6 header rows, aggregate SUM(value) GROUP BY codigo_snies_programa.
-  4. UPSERT into snies_estadisticas_programa (codigo_snies, anio, matriculados, graduados).
+  4. UPSERT into snies_estadisticas_programa.
 
-Excel structure (confirmed with 2025 file):
+Excel structure (confirmed with 2025 matriculados file):
   - Data sheet: first sheet whose name starts with a digit (e.g. "1.")
   - Rows 1-6: metadata/headers; row 7+ = data
-  - Col 13 (0-based): CÓDIGO SNIES DEL PROGRAMA
+  - Col  1 (0-based): INSTITUCIÓN DE EDUCACIÓN SUPERIOR
+  - Col 13: CÓDIGO SNIES DEL PROGRAMA
+  - Col 14: PROGRAMA ACADÉMICO
+  - Col 16: METODOLOGÍA (presencial / virtual / a distancia)
+  - Col 26: NIVEL DE FORMACIÓN
   - Col 38: AÑO
   - Col 40: MATRICULADOS (or GRADUADOS in the graduados file)
-  Data is disaggregated by semester and sex — loader sums all rows per codigo_snies.
+  Data is disaggregated by semester and sex — loader sums value per codigo_snies
+  and takes the first non-null text fields (IES, programa, modalidad, nivel).
+
+Target table schema (snies_estadisticas_programa):
+  codigo_snies, nombre_ies, nombre_programa, modalidad, nivel_formacion,
+  anio, matriculados, graduados, inscritos, admitidos, created_at
+  (inscritos and admitidos default to 0 — loaded from separate SNIES files not yet integrated)
 """
 from __future__ import annotations
 
@@ -30,8 +40,6 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any
-from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -50,9 +58,13 @@ BASES_PAGE = f"{BASE_URL}/portal/ESTADISTICAS/Bases-consolidadas/"
 CMS_FILE_BASE = f"{BASE_URL}/1778/"
 
 # Column indices in the data sheet (0-based, confirmed with 2025 matriculados file)
-COL_CODIGO_SNIES = 13
-COL_ANIO         = 38
-COL_VALUE        = 40  # MATRICULADOS or GRADUADOS — both files use the last column
+COL_IES          =  1   # INSTITUCIÓN DE EDUCACIÓN SUPERIOR
+COL_CODIGO_SNIES = 13   # CÓDIGO SNIES DEL PROGRAMA
+COL_PROGRAMA     = 14   # PROGRAMA ACADÉMICO
+COL_MODALIDAD    = 16   # METODOLOGÍA
+COL_NIVEL        = 26   # NIVEL DE FORMACIÓN
+COL_ANIO         = 38   # AÑO
+COL_VALUE        = 40   # MATRICULADOS or GRADUADOS — both files use the same last column
 
 
 def _find_xlsx_url(soup: BeautifulSoup, keyword: str, anio: int) -> str | None:
@@ -123,8 +135,11 @@ def _download_xlsx(url: str) -> bytes:
         return b"".join(chunks)
 
 
-def _parse_xlsx(data: bytes, anio: int) -> dict[int, int]:
-    """Return {codigo_snies: total_value} summing all rows for the given anio."""
+def _parse_xlsx(data: bytes, anio: int) -> dict[int, dict]:
+    """Return {codigo_snies: {value, nombre_ies, nombre_programa, modalidad, nivel_formacion}}
+    summing value across all rows (disaggregated by semester+sex) per codigo_snies.
+    Text fields (IES, programa, modalidad, nivel) are taken from the first non-null row.
+    """
     log.info("Parseando Excel (%d bytes) …", len(data))
     wb = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
 
@@ -133,7 +148,7 @@ def _parse_xlsx(data: bytes, anio: int) -> dict[int, int]:
     ws = wb[sheet_name]
     log.info("Hoja de datos: '%s'", sheet_name)
 
-    totals: dict[int, int] = {}
+    programs: dict[int, dict] = {}
     skipped = 0
     processed = 0
 
@@ -148,53 +163,79 @@ def _parse_xlsx(data: bytes, anio: int) -> dict[int, int]:
                 continue
             codigo = int(codigo_raw)
             value  = int(value_raw)
-            totals[codigo] = totals.get(codigo, 0) + value
+
+            if codigo not in programs:
+                programs[codigo] = {
+                    "value":          0,
+                    "nombre_ies":     str(row[COL_IES] or "").strip(),
+                    "nombre_programa": str(row[COL_PROGRAMA] or "").strip(),
+                    "modalidad":      str(row[COL_MODALIDAD] or "").strip(),
+                    "nivel_formacion": str(row[COL_NIVEL] or "").strip(),
+                }
+            programs[codigo]["value"] += value
             processed += 1
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, IndexError):
             skipped += 1
 
-    log.info("Filas procesadas: %d | omitidas: %d | programas únicos: %d", processed, skipped, len(totals))
+    log.info(
+        "Filas procesadas: %d | omitidas: %d | programas únicos: %d",
+        processed, skipped, len(programs),
+    )
     wb.close()
-    return totals
+    return programs
 
 
 def _upsert(
-    conn,  # None when dry_run=True
+    conn,           # None when dry_run=True
     anio: int,
-    matriculados: dict[int, int],
-    graduados: dict[int, int],
-    mat_url: str,
-    grad_url: str | None,
+    matriculados: dict[int, dict],
+    graduados: dict[int, dict],
     dry_run: bool,
 ) -> int:
     """UPSERT into snies_estadisticas_programa. Returns number of rows written."""
     all_codigos = set(matriculados) | set(graduados)
-    rows = [
-        (
+
+    rows = []
+    for codigo in all_codigos:
+        mat = matriculados.get(codigo, {})
+        grad = graduados.get(codigo, {})
+        # Prefer metadata from matriculados file; fall back to graduados if absent
+        meta = mat if mat else grad
+        rows.append((
             codigo,
+            meta.get("nombre_ies", ""),
+            meta.get("nombre_programa", ""),
+            meta.get("modalidad", ""),
+            meta.get("nivel_formacion", ""),
             anio,
-            matriculados.get(codigo, 0),
-            graduados.get(codigo, 0),
-        )
-        for codigo in all_codigos
-    ]
+            mat.get("value", 0),
+            grad.get("value", 0),
+            0,   # inscritos — loaded from a separate SNIES file, not yet integrated
+            0,   # admitidos — same
+        ))
 
     if dry_run:
         log.info("DRY RUN — %d filas listas para UPSERT (no se escribió nada).", len(rows))
         if rows:
-            sample = rows[:5]
-            for r in sample:
-                log.info("  sample: codigo=%s anio=%s matriculados=%s graduados=%s", r[0], r[1], r[2], r[3])
+            for r in rows[:5]:
+                log.info(
+                    "  sample: codigo=%s ies=%r programa=%r anio=%s mat=%s grad=%s",
+                    r[0], r[1], r[2], r[5], r[6], r[7],
+                )
         return len(rows)
 
     sql = """
         INSERT INTO snies_estadisticas_programa
-            (codigo_snies, anio, matriculados, graduados)
-        VALUES (%s, %s, %s, %s)
+            (codigo_snies, nombre_ies, nombre_programa, modalidad, nivel_formacion,
+             anio, matriculados, graduados, inscritos, admitidos)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (codigo_snies, anio) DO UPDATE SET
-            matriculados = EXCLUDED.matriculados,
-            graduados    = EXCLUDED.graduados,
-            loaded_at    = now()
+            nombre_ies      = EXCLUDED.nombre_ies,
+            nombre_programa = EXCLUDED.nombre_programa,
+            modalidad       = EXCLUDED.modalidad,
+            nivel_formacion = EXCLUDED.nivel_formacion,
+            matriculados    = EXCLUDED.matriculados,
+            graduados       = EXCLUDED.graduados
     """
     with conn.cursor() as cur:
         cur.executemany(sql, rows)
@@ -225,7 +266,7 @@ def run(anio: int, dry_run: bool) -> None:
     log.info("Parseando Matriculados …")
     matriculados = _parse_xlsx(mat_data, anio)
 
-    graduados: dict[int, int] = {}
+    graduados: dict[int, dict] = {}
     if grad_url:
         log.info("Descargando Graduados …")
         grad_data = _download_xlsx(grad_url)
@@ -235,13 +276,13 @@ def run(anio: int, dry_run: bool) -> None:
         log.warning("Graduados no disponibles para %d — se cargará graduados=0.", anio)
 
     if dry_run:
-        n = _upsert(None, anio, matriculados, graduados, mat_url, grad_url, dry_run=True)
+        n = _upsert(None, anio, matriculados, graduados, dry_run=True)
         log.info("Listo (dry-run). %d programas listos para anio=%d.", n, anio)
         return
 
     log.info("Conectando a DB …")
     with _get_connection() as conn:
-        n = _upsert(conn, anio, matriculados, graduados, mat_url, grad_url, dry_run=False)
+        n = _upsert(conn, anio, matriculados, graduados, dry_run=False)
     log.info("Listo. %d programas cargados para anio=%d.", n, anio)
 
 
