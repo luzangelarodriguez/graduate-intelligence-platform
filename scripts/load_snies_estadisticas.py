@@ -253,6 +253,9 @@ def _get_connection():
         url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
         if not url:
             raise RuntimeError("Set RAILWAY_DATABASE_URL or DATABASE_URL")
+        # Railway's proxy hostname has intermittent DNS resolution issues locally;
+        # replace with its direct IP (same workaround used across all local scripts).
+        url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
         return psycopg2.connect(url)
 
 
