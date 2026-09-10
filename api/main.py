@@ -610,7 +610,7 @@ def related_universities(program_id: int) -> dict[str, Any]:
         JOIN_TEMPLATE = """
             LEFT JOIN snies_estadisticas_programa s
               ON s.codigo_snies = m.codigo_snies_programa::INTEGER
-             AND s.anio = 2024
+             AND s.anio = (SELECT MAX(anio) FROM snies_estadisticas_programa)
         """
         BASE_SELECT = """SELECT m.nombre_ies, m.nombre_programa, m.municipio, m.modalidad,
                                 m.nivel_academico, m.creditos, m.duracion, m.periodicidad_admision,
