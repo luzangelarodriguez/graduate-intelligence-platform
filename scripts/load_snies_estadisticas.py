@@ -237,11 +237,18 @@ def _upsert(
             matriculados    = EXCLUDED.matriculados,
             graduados       = EXCLUDED.graduados
     """
+    total = len(rows)
+    inserted = 0
+    batch_size = 200
     with conn.cursor() as cur:
-        cur.executemany(sql, rows)
-    conn.commit()
-    log.info("UPSERT completado: %d filas en snies_estadisticas_programa.", len(rows))
-    return len(rows)
+        for start in range(0, total, batch_size):
+            batch = rows[start : start + batch_size]
+            cur.executemany(sql, batch)
+            conn.commit()
+            inserted += len(batch)
+            log.info("Progreso: %d/%d filas insertadas…", inserted, total)
+    log.info("UPSERT completado: %d filas en snies_estadisticas_programa.", inserted)
+    return inserted
 
 
 def _get_connection():
