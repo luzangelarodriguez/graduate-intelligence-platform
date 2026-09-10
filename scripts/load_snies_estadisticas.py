@@ -245,18 +245,15 @@ def _upsert(
 
 
 def _get_connection():
-    try:
-        from api.database import connection as _conn_cm
-        return _conn_cm()
-    except Exception:
-        import psycopg2
-        url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
-        if not url:
-            raise RuntimeError("Set RAILWAY_DATABASE_URL or DATABASE_URL")
-        # Railway's proxy hostname has intermittent DNS resolution issues locally;
-        # replace with its direct IP (same workaround used across all local scripts).
-        url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
-        return psycopg2.connect(url)
+    import psycopg2
+    url = os.environ.get("RAILWAY_DATABASE_URL") or os.environ.get("DATABASE_URL")
+    if not url:
+        raise RuntimeError("Set RAILWAY_DATABASE_URL or DATABASE_URL")
+    # Railway's proxy hostname has intermittent DNS resolution issues locally;
+    # replace with its direct IP (same workaround used across all local scripts).
+    url = url.replace("ballast.proxy.rlwy.net", "66.33.22.248")
+    log.info("Conectando a: %s", url[:60] + "…")
+    return psycopg2.connect(url)
 
 
 def run(anio: int, dry_run: bool) -> None:
