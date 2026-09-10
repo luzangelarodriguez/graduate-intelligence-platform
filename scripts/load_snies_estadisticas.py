@@ -175,7 +175,6 @@ def _upsert(
             anio,
             matriculados.get(codigo, 0),
             graduados.get(codigo, 0),
-            mat_url,
         )
         for codigo in all_codigos
     ]
@@ -190,12 +189,11 @@ def _upsert(
 
     sql = """
         INSERT INTO snies_estadisticas_programa
-            (codigo_snies, anio, matriculados, graduados, fuente_url)
-        VALUES (%s, %s, %s, %s, %s)
+            (codigo_snies, anio, matriculados, graduados)
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT (codigo_snies, anio) DO UPDATE SET
             matriculados = EXCLUDED.matriculados,
             graduados    = EXCLUDED.graduados,
-            fuente_url   = EXCLUDED.fuente_url,
             loaded_at    = now()
     """
     with conn.cursor() as cur:

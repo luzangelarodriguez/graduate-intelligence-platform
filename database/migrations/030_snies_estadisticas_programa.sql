@@ -15,3 +15,7 @@ CREATE TABLE IF NOT EXISTS public.snies_estadisticas_programa (
 
 CREATE INDEX IF NOT EXISTS idx_snies_stats_codigo ON public.snies_estadisticas_programa(codigo_snies);
 CREATE INDEX IF NOT EXISTS idx_snies_stats_anio   ON public.snies_estadisticas_programa(anio DESC);
+
+-- Add fuente_url if the table was created before this column was defined.
+ALTER TABLE public.snies_estadisticas_programa
+    ADD COLUMN IF NOT EXISTS fuente_url TEXT;
