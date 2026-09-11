@@ -15,16 +15,27 @@ CONFIG = SourceConfig(
         "[class*='vacancy'] a[href*='/co/empleos/']",
         "a[href*='/co/empleos/']",
     ),
-    # Prioritize specific job-title selectors before the generic h1 to avoid
-    # capturing "¡Ten cuidado con el fraude!" fraud-warning banners
+    # Magneto renders the job title as plain text (NOT a heading element).
+    # The fraud-warning banner IS an h1/h2, so any h1-based selector reliably
+    # captures the banner instead of the title. Strategy:
+    #
+    # 1. aria-current="page" — the breadcrumb item for the current page is always
+    #    the job title (e.g. "/ empleos / Diseñador(a) Creativa"). This ARIA
+    #    attribute is standard and CSS-class-independent, making it resilient to
+    #    CSS-in-JS hashed class names. Appears high in the DOM, before the banner.
+    # 2. Breadcrumb container fallbacks — for breadcrumb implementations that
+    #    don't set aria-current but use class-based active states.
+    # 3. h1 last resort — kept for safety but the fraud guard in base.py
+    #    first_text() will skip it if it returns the banner prefix.
     title_selectors=(
-        "h1[class*='title']",
-        "h1[class*='job']",
-        "h1[class*='cargo']",
-        "[data-testid*='title']",
-        "[data-testid*='job']",
-        ".job-title",
-        ".cargo",
+        "[aria-current='page']",
+        "[aria-current]",
+        "nav [class*='active']",
+        "nav li:last-child span",
+        "nav li:last-child",
+        "[class*='breadcrumb'] *:last-child",
+        "[class*='breadcrumb'] li:last-child",
+        "[data-testid*='breadcrumb'] *:last-child",
         "h1",
     ),
     company_selectors=(
