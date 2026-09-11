@@ -810,7 +810,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         skills_mercado_raw = [
             {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
             for r in market_rows
-            if r["skill"]
+            if r["skill"] and "skillmatch" not in r["skill"].lower()
         ]
 
         # 1b. Tipo-skill lookup: for each market skill, get the most common
