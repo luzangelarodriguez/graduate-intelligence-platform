@@ -1048,6 +1048,556 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
 }
 
 
+// ─── ViewMercadoLaboral — Pertinencia frente al mercado (6 secciones) ────────
+
+function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, skillsMercadoDeduped, univ, totales, programaId }: ViewProps) {
+  const [secTab, setSecTab] = useState<string>('perfiles');
+  const [perfiles, setPerfiles] = useState<OccupationalProfile[]>([]);
+  const [kpis, setKpis] = useState<{ total_ofertas: number; total_perfiles: number; total_skills: number } | null>(null);
+  const [sectores, setSectores] = useState<SectorItem[]>([]);
+  const [ciudades, setCiudades] = useState<CiudadItem[]>([]);
+  const [tendencia, setTendencia] = useState<TendenciaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!programaId) return;
+    setLoading(true);
+    const safeArr = (url: string) =>
+      fetch(url).then(r => r.ok ? r.json() : []).then(d => Array.isArray(d) ? d : []).catch(() => []);
+    const safeObj = (url: string, fb: object) =>
+      fetch(url).then(r => r.ok ? r.json() : fb).then(d => (d && typeof d === 'object' && !Array.isArray(d)) ? d : fb).catch(() => fb);
+    Promise.all([
+      safeArr(`${API}/api/programas/${programaId}/perfiles-ocupacionales`),
+      safeObj(`${API}/api/programas/${programaId}/perfiles-kpis`, { total_ofertas: 0, total_perfiles: 0, total_skills: 0 }),
+      safeArr(`${API}/api/programas/${programaId}/sectores`),
+      safeArr(`${API}/api/programas/${programaId}/ciudades`),
+      safeArr(`${API}/api/programas/${programaId}/tendencia-mensual`),
+    ]).then(([profs, kpiData, secs, cities, trend]) => {
+      setPerfiles(profs as OccupationalProfile[]);
+      setKpis(kpiData as typeof kpis);
+      setSectores(secs as SectorItem[]);
+      setCiudades(cities as CiudadItem[]);
+      setTendencia(trend as TendenciaItem[]);
+      setLoading(false);
+    });
+  }, [programaId]);
+
+  const topMarket  = skillsMercadoDeduped.slice(0, 8);
+  const topBrechas = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 8);
+  const totalRequisitos = skillsMercadoDeduped.length;
+  const totalBrechas    = skills?.brechas.length ?? 0;
+
+  const afinidadPct = Math.round(((prog?.labels?.high ?? 0) / Math.max(totales.matches, 1)) * 100);
+  const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
+  const pertColor   = coberturaPct >= 60 ? '#059669' : coberturaPct >= 35 ? '#D97706' : '#DC2626';
+  const pertBg      = coberturaPct >= 60 ? '#D1FAE5' : coberturaPct >= 35 ? '#FEF3C7' : '#FEE2E2';
+  const pertDesc    = coberturaPct >= 60
+    ? 'Existe demanda, el programa está alineado con el mercado y presenta oportunidades de mejora.'
+    : coberturaPct >= 35
+    ? 'El programa responde parcialmente. Se recomienda fortalecer las brechas identificadas.'
+    : 'Brecha significativa entre el currículo y las competencias del mercado.';
+
+  const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
+  const perfilesTotal = kpis?.total_perfiles ?? perfiles.length;
+  const maxPerf = perfiles[0]?.vacantes ?? 1;
+  const maxSec  = sectores[0]?.vacantes ?? 1;
+  const maxCiu  = ciudades[0]?.vacantes ?? 1;
+
+  // Skills by category for tabs
+  const byCategoria = useMemo(() => {
+    const cats: Record<string, { skill: string; vacantes: number; tipo: string }[]> = {
+      herramientas: [], conocimientos: [], competencias: [], habilidades: [],
+    };
+    for (const s of topMarket) {
+      const cat = classifyTipoSkill(s.tipo_skill ?? '');
+      if (cats[cat]) cats[cat].push({ skill: displaySkill(s.skill), vacantes: s.frecuencia ?? 0, tipo: cat });
+    }
+    return cats;
+  }, [topMarket]);
+
+  const brechaAccion = (skill: string): string => {
+    const c = classifySkill(skill);
+    if (c === 'herramienta') return 'Incluir como tecnología del perfil';
+    if (c === 'habilidad')   return 'Incorporar en actividades colaborativas';
+    if (c === 'competencia') return 'Integrar gestión aplicada al currículo';
+    return 'Fortalecer en asignaturas troncales';
+  };
+
+  const brechaActions = [
+    topBrechas.slice(0, 2).length > 0
+      ? `Fortalecer ${topBrechas.slice(0, 2).map(b => displaySkill(b.skill)).join(' y ')} en asignaturas troncales.`
+      : 'Revisar y actualizar el plan de estudios con habilidades emergentes.',
+    `Elevar la cobertura curricular del ${coberturaPct}% hacia una meta institucional definida por el comité.`,
+    `Integrar proyectos empresariales con ${topMarket.slice(0, 3).map(s => displaySkill(s.skill)).join(', ')}.`,
+    totalBrechas > 4 ? 'Priorizar un plan de rediseño curricular con enfoque en empleabilidad.' : 'Mantener actualización continua del plan de estudios.',
+  ];
+
+  const TH_ML = { padding: '5px 8px', fontSize: 9, fontWeight: 700 as const, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}`, textAlign: 'left' as const };
+
+  // Breadcrumb sections for reference
+  const BREAD = [
+    { id: '1', label: '¿Es pertinente?' },
+    { id: '2', label: '¿Qué demanda el mercado?' },
+    { id: '3', label: '¿Qué tanto responde el programa?' },
+    { id: '4', label: '¿Dónde están las brechas?' },
+    { id: '5', label: '¿Qué decisiones tomar?' },
+    { id: '6', label: '¿La tendencia es favorable?' },
+  ];
+
+  const SEC_TABS = [
+    { id: 'perfiles',       label: 'Perfiles ocupacionales' },
+    { id: 'herramientas',   label: 'Herramientas' },
+    { id: 'conocimientos',  label: 'Conocimientos' },
+    { id: 'competencias',   label: 'Competencias' },
+    { id: 'habilidades',    label: 'Habilidades' },
+    { id: 'sectores',       label: 'Sectores' },
+    { id: 'ubicacion',      label: 'Ubicación geográfica' },
+  ];
+
+  return (
+    <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 18, height: '100%', overflowY: 'auto', background: C.bg }}>
+
+      {/* ── Header ─────────────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Pertinencia del programa frente al mercado laboral</h1>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>Evidencia para decisiones de renovación, fortalecimiento y actualización curricular</p>
+        </div>
+        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0, textAlign: 'right', flexShrink: 0 }}>Corte: {new Date().toLocaleDateString('es-CO')}</p>
+      </div>
+
+      {/* ── Breadcrumb navigation ───────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 0', borderBottom: `1px solid ${C.border}` }}>
+        {BREAD.map((b, i) => (
+          <span key={b.id} style={{ fontSize: 10, color: i === 0 ? C.navy : '#9CA3AF', fontWeight: i === 0 ? 700 : 500 }}>
+            <span style={{ color: C.navy, fontWeight: 700, marginRight: 3 }}>{b.id}</span>{b.label}
+            {i < BREAD.length - 1 && <span style={{ margin: '0 6px', color: '#D1D5DB' }}>›</span>}
+          </span>
+        ))}
+      </div>
+
+      {/* ── SECCIÓN 1 — Lectura ejecutiva ─────────────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>1</span>
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 800, color: C.navy, margin: 0 }}>Lectura ejecutiva — ¿Es pertinente?</p>
+            <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Indicadores clave para la toma de decisiones</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
+          {[
+            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes analizadas', sub: `${meta.nombre}` },
+            { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
+            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
+            { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
+            { icon: '⚠️', value: totalBrechas, label: 'Brechas prioritarias', sub: 'De alta demanda' },
+          ].map((kpi, i) => (
+            <div key={i} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span style={{ fontSize: 20 }}>{kpi.icon}</span>
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: C.navy, lineHeight: 1 }}>{kpi.value}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#374151', margin: '4px 0 2px' }}>{kpi.label}</div>
+              <div style={{ fontSize: 9, color: '#9CA3AF' }}>{kpi.sub}</div>
+            </div>
+          ))}
+          {/* Pertinencia laboral badge */}
+          <div style={{ background: pertBg, border: `1px solid ${pertColor}33`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: pertColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>PERTINENCIA LABORAL</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: pertColor, lineHeight: 1, marginBottom: 6 }}>{pertLabel}</div>
+            <div style={{ fontSize: 9, color: '#374151', lineHeight: 1.5 }}>{pertDesc}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── SECCIÓN 2 — ¿Qué demanda el mercado? ─────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>2</span>
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué está pidiendo el mercado?</p>
+            <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Perfiles, requisitos y sectores con mayor demanda</p>
+          </div>
+        </div>
+
+        {/* Sub-tabs */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 0, flexWrap: 'wrap' }}>
+          {SEC_TABS.map(t => (
+            <button key={t.id} onClick={() => setSecTab(t.id)}
+              style={{ padding: '6px 12px', fontSize: 11, fontWeight: secTab === t.id ? 700 : 500, color: secTab === t.id ? '#fff' : C.navy, background: secTab === t.id ? C.navy : 'transparent', border: 'none', borderRadius: '6px 6px 0 0', cursor: 'pointer', marginBottom: -1 }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        {secTab === 'perfiles' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            {/* Perfiles table */}
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Perfiles ocupacionales más demandados</p>
+              {loading ? <Spinner /> : perfiles.length === 0
+                ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos de perfiles</p>
+                : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                    <thead><tr>
+                      <th style={TH_ML}>#</th>
+                      <th style={TH_ML}>Perfil ocupacional</th>
+                      <th style={{ ...TH_ML, textAlign: 'right' }}>Vacantes</th>
+                      <th style={{ ...TH_ML, textAlign: 'right' }}>% del total</th>
+                    </tr></thead>
+                    <tbody>
+                      {perfiles.slice(0, 8).map((p, i) => (
+                        <tr key={p.perfil} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                          <td style={{ padding: '6px 8px', color: '#9CA3AF', fontWeight: 600, width: 24 }}>{i + 1}</td>
+                          <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ flex: 1 }}>{p.perfil}</span>
+                              <div style={{ width: 60, height: 4, background: '#E5E7EB', borderRadius: 2, flexShrink: 0 }}>
+                                <div style={{ width: `${(p.vacantes / maxPerf) * 100}%`, height: '100%', background: C.navy, borderRadius: 2 }} />
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{p.vacantes}</td>
+                          <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round((p.vacantes / Math.max(vacantesTotal, 1)) * 100)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )
+              }
+            </div>
+
+            {/* Market skills (herramientas / todos) */}
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Herramientas y competencias más demandadas</p>
+              {topMarket.length === 0
+                ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+                : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                    <thead><tr>
+                      <th style={TH_ML}>Requisito</th>
+                      <th style={{ ...TH_ML, textAlign: 'right' }}>Vacantes</th>
+                      <th style={{ ...TH_ML, textAlign: 'right' }}>% del total</th>
+                    </tr></thead>
+                    <tbody>
+                      {topMarket.map(s => {
+                        const tm = tipoMeta(s.tipo_skill);
+                        return (
+                          <tr key={s.skill} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                            <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <span style={{ fontSize: 8, fontWeight: 700, background: tm.badgeBg, color: tm.badgeColor, borderRadius: 3, padding: '1px 5px', whiteSpace: 'nowrap', flexShrink: 0 }}>{tm.label}</span>
+                                {displaySkill(s.skill)}
+                              </div>
+                            </td>
+                            <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{s.frecuencia ?? 0}</td>
+                            <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round(((s.frecuencia ?? 0) / Math.max(vacantesTotal, 1)) * 100)}%</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )
+              }
+            </div>
+          </div>
+        )}
+
+        {['herramientas', 'conocimientos', 'competencias', 'habilidades'].includes(secTab) && (
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>
+              {SEC_TABS.find(t => t.id === secTab)?.label} más demandadas
+            </p>
+            {(() => {
+              const catKey = secTab === 'conocimientos' ? 'conocimientos' : secTab;
+              const items = byCategoria[catKey] ?? [];
+              const maxV = items[0]?.vacantes ?? 1;
+              return items.length === 0
+                ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos para esta categoría</p>
+                : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
+                    {items.map((item, i) => (
+                      <div key={item.skill} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 10, color: '#9CA3AF', width: 16, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                            <span style={{ fontSize: 11, color: C.navy }}>{item.skill}</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: C.navy }}>{item.vacantes}</span>
+                          </div>
+                          <div style={{ height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ width: `${(item.vacantes / maxV) * 100}%`, height: '100%', background: tipoMeta(item.tipo).bar, borderRadius: 2 }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+            })()}
+          </div>
+        )}
+
+        {secTab === 'sectores' && (
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>Sectores que más demandan el perfil</p>
+            {loading ? <Spinner /> : sectores.reduce((a, s) => a + s.vacantes, 0) < 5
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes de sector para este programa</p>
+              : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'center' }}>
+                  <div>
+                    {sectores.slice(0, 7).map((s, i) => (
+                      <div key={s.sector} style={{ marginBottom: 8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                          <span style={{ fontSize: 10, color: C.navy }}><span style={{ color: '#9CA3AF', marginRight: 4 }}>{i + 1}</span>{s.sector}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: C.navy }}>{s.vacantes}</span>
+                        </div>
+                        <div style={{ height: 5, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ width: `${(s.vacantes / maxSec) * 100}%`, height: '100%', background: C.navy, borderRadius: 2 }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ height: 180 }}><SectorDonut sectors={sectores} /></div>
+                </div>
+              )
+            }
+          </div>
+        )}
+
+        {secTab === 'ubicacion' && (
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 12px' }}>Ciudades con mayor demanda</p>
+            {loading ? <Spinner /> : ciudades.reduce((a, c) => a + c.vacantes, 0) < 5
+              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos suficientes de ciudad para este programa</p>
+              : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
+                  {ciudades.slice(0, 10).map((c, i) => (
+                    <div key={c.ciudad} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 10, color: '#9CA3AF', width: 16, textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                          <span style={{ fontSize: 11, color: C.navy }}>{c.ciudad}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: C.navy }}>{c.vacantes}</span>
+                        </div>
+                        <div style={{ height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ width: `${(c.vacantes / maxCiu) * 100}%`, height: '100%', background: '#F0A500', borderRadius: 2 }} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+          </div>
+        )}
+      </div>
+
+      {/* ── SECCIÓN 3 + 4 — Mapa de pertinencia + Brechas ───────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+
+        {/* 3 — Scatter */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>3</span>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué tanto responde el programa?</p>
+              <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Análisis de alineación entre demanda del mercado y cobertura curricular</p>
+            </div>
+          </div>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Mapa de pertinencia: Demanda vs. Cobertura curricular</p>
+          <div style={{ height: 220 }}>
+            <SkillScatter matriz={skills?.matriz_completa ?? []} />
+          </div>
+        </div>
+
+        {/* 4 — Brechas table */}
+        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Dónde están las brechas?</p>
+              <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Requisitos clave y nivel de cobertura curricular</p>
+            </div>
+          </div>
+          {topBrechas.length === 0
+            ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin brechas detectadas para este programa</p>
+            : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
+                  <thead><tr>
+                    {['Requisito', 'Tipo', 'Vacantes', 'Cobertura', 'Brecha', 'Prioridad'].map(h => (
+                      <th key={h} style={{ ...TH_ML, whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {topBrechas.map((b, i) => {
+                      const cat = classifySkill(b.skill);
+                      const tm  = tipoMeta(cat);
+                      const freq = b.frecuencia_mercado ?? 0;
+                      const pctDem = Math.round((freq / Math.max(vacantesTotal, 1)) * 100);
+                      const prioColor = i < 3 ? '#DC2626' : i < 5 ? '#D97706' : '#059669';
+                      const prioLabel = i < 3 ? 'Crítica' : i < 5 ? 'Alta' : 'Media';
+                      return (
+                        <tr key={b.skill} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                          <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{ fontSize: 12 }}>{cat === 'herramienta' ? '🔧' : cat === 'habilidad' ? '👥' : cat === 'competencia' ? '📊' : '📚'}</span>
+                              {displaySkill(b.skill)}
+                            </div>
+                          </td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <span style={{ fontSize: 8, fontWeight: 700, background: tm.badgeBg, color: tm.badgeColor, borderRadius: 3, padding: '1px 5px', whiteSpace: 'nowrap' }}>{tm.label}</span>
+                          </td>
+                          <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{freq}</td>
+                          <td style={{ padding: '6px 8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <div style={{ width: 36, height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ width: `${pctDem}%`, height: '100%', background: '#EF4444', borderRadius: 2 }} />
+                              </div>
+                              <span style={{ fontSize: 9, color: '#9CA3AF' }}>{pctDem}%</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '6px 8px', textAlign: 'center' }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: '#DC2626', background: '#FEE2E2', borderRadius: 4, padding: '1px 6px' }}>Sí</span>
+                          </td>
+                          <td style={{ padding: '6px 8px', textAlign: 'center' }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: prioColor, background: `${prioColor}22`, borderRadius: 4, padding: '1px 6px' }}>{prioLabel}</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '8px 0 0' }}>Ver todos los requisitos ({totalBrechas}) ›</p>
+              </div>
+            )
+          }
+        </div>
+      </div>
+
+      {/* ── SECCIÓN 5 — Decisiones ───────────────────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>5</span>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué decisiones tomar?</p>
+            <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Síntesis y recomendaciones</p>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 1fr', gap: 16 }}>
+          {/* Pertinencia badge */}
+          <div style={{ background: pertBg, borderRadius: 10, padding: '14px 16px', border: `1px solid ${pertColor}33` }}>
+            <p style={{ fontSize: 9, fontWeight: 700, color: pertColor, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px' }}>Pertinencia laboral:</p>
+            <p style={{ fontSize: 26, fontWeight: 900, color: pertColor, margin: '0 0 6px', lineHeight: 1 }}>{pertLabel}</p>
+            <p style={{ fontSize: 10, color: '#374151', lineHeight: 1.5, margin: 0 }}>{pertDesc}</p>
+          </div>
+          {/* Hallazgos */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Hallazgos principales</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>👤</span>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{afinidadPct}%</strong> de los perfiles laborales coinciden con el perfil de egreso.</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes analizadas en el período.</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{totalBrechas}</strong> competencias críticas no cubiertas en el currículo.</p>
+              </div>
+            </div>
+          </div>
+          {/* Recomendaciones */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Recomendaciones estratégicas</p>
+            <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {brechaActions.map((a, i) => (
+                <li key={i} style={{ fontSize: 11, color: '#374151', lineHeight: 1.5 }}>{a}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      {/* ── SECCIÓN 6 — Tendencia ────────────────────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>6</span>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿La tendencia es favorable?</p>
+            <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Evolución y contexto del mercado laboral</p>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Evolución de vacantes relacionadas</p>
+            {loading ? <Spinner /> : <MiniTrendChart data={tendencia} />}
+          </div>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Perspectiva del mercado</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { icon: '📈', text: `Demanda activa en el período analizado con ${vacantesTotal.toLocaleString('es-CO')} vacantes.` },
+                { icon: '🌐', text: 'Mayor crecimiento en sectores de tecnología, servicios profesionales y finanzas.' },
+                { icon: '🤖', text: 'Aumento en la adopción de IA y analítica avanzada como competencia transversal.' },
+                { icon: '🎯', text: `Oportunidad para perfiles con habilidades digitales y ${topMarket[0] ? displaySkill(topMarket[0].skill) : 'gestión de datos'}.` },
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                  <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}>{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ display: 'flex', gap: 24, borderTop: `1px solid ${C.border}`, paddingTop: 8 }}>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente laboral:</strong> portales de empleo scrapeados y normalizados.</p>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>Fuente académica:</strong> microcurrículos del programa.</p>
+        <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0 }}><strong>SNIES:</strong> datos de matrícula y graduados 2025.</p>
+      </div>
+
+    </div>
+  );
+}
+
+// ─── Helper: donut for sectors ─────────────────────────────────────────────────
+function SectorDonut({ sectors }: { sectors: SectorItem[] }) {
+  const total = sectors.reduce((a, s) => a + s.vacantes, 0) || 1;
+  const COLORS = ['#1E3A5F', '#2563EB', '#059669', '#D97706', '#DC2626', '#7C3AED', '#9CA3AF'];
+  let cumAngle = -Math.PI / 2;
+  const R = 60, cx = 80, cy = 70;
+  const slices = sectors.slice(0, 7).map((s, i) => {
+    const angle = (s.vacantes / total) * 2 * Math.PI;
+    const x1 = cx + R * Math.cos(cumAngle);
+    const y1 = cy + R * Math.sin(cumAngle);
+    cumAngle += angle;
+    const x2 = cx + R * Math.cos(cumAngle);
+    const y2 = cy + R * Math.sin(cumAngle);
+    const large = angle > Math.PI ? 1 : 0;
+    return { d: `M ${cx} ${cy} L ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z`, color: COLORS[i % COLORS.length], sector: s.sector, pct: Math.round((s.vacantes / total) * 100) };
+  });
+  return (
+    <svg viewBox="0 0 200 140" style={{ width: '100%', height: '100%' }}>
+      {slices.map((s, i) => <path key={i} d={s.d} fill={s.color} stroke="#fff" strokeWidth="2" />)}
+      <text x={cx} y={cy - 8} textAnchor="middle" fontSize="14" fontWeight="800" fill={C.navy}>{total.toLocaleString('es-CO')}</text>
+      <text x={cx} y={cy + 6} textAnchor="middle" fontSize="7" fill="#9CA3AF">vacantes</text>
+      {slices.map((s, i) => (
+        <g key={i}>
+          <rect x={130} y={8 + i * 18} width={8} height={8} rx="2" fill={s.color} />
+          <text x={142} y={17 + i * 18} fontSize="7" fill="#374151">{s.sector.slice(0, 22)} {s.pct}%</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 // ─── ViewPerfiles — occupational profiles + curricular alignment ─────────────
 
 interface OccupationalProfile { perfil: string; vacantes: number }
@@ -3201,7 +3751,7 @@ export default function ObservatorioStorytelling() {
 
   const viewMap: Record<ViewId, React.ReactNode> = {
     resumen:         <ViewResumen         {...viewProps} />,
-    mercado:         <ViewResumen         {...viewProps} />,
+    mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewCobertura       {...viewProps} />,
     brechas:         <ViewBrechas         {...viewProps} />,
