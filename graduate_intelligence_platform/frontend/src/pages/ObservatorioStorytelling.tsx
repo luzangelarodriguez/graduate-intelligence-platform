@@ -1126,18 +1126,28 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
   useEffect(() => {
     if (!programaId) return;
     setProfilesLoading(true);
+    const safeArray = (url: string) =>
+      fetch(url)
+        .then(r => { if (!r.ok) return []; return r.json(); })
+        .then(d => Array.isArray(d) ? d : [])
+        .catch(() => []);
+    const safeObj = (url: string, fallback: object) =>
+      fetch(url)
+        .then(r => { if (!r.ok) return fallback; return r.json(); })
+        .then(d => (d && typeof d === 'object' && !Array.isArray(d)) ? d : fallback)
+        .catch(() => fallback);
     Promise.all([
-      fetch(`${API}/api/programas/${programaId}/perfiles-ocupacionales`).then(r => r.json()),
-      fetch(`${API}/api/programas/${programaId}/perfiles-kpis`).then(r => r.json()),
-      fetch(`${API}/api/programas/${programaId}/sectores`).then(r => r.json()),
-      fetch(`${API}/api/programas/${programaId}/ciudades`).then(r => r.json()),
-      fetch(`${API}/api/programas/${programaId}/tendencia-mensual`).then(r => r.json()),
+      safeArray(`${API}/api/programas/${programaId}/perfiles-ocupacionales`),
+      safeObj(`${API}/api/programas/${programaId}/perfiles-kpis`, { total_ofertas: 0, total_perfiles: 0, total_skills: 0 }),
+      safeArray(`${API}/api/programas/${programaId}/sectores`),
+      safeArray(`${API}/api/programas/${programaId}/ciudades`),
+      safeArray(`${API}/api/programas/${programaId}/tendencia-mensual`),
     ]).then(([profs, kpiData, secs, cities, trend]) => {
-      setProfiles(profs);
-      setKpis(kpiData);
-      setSectores(secs);
-      setCiudades(cities);
-      setTendencia(trend);
+      setProfiles(profs as OccupationalProfile[]);
+      setKpis(kpiData as ProfileKpis);
+      setSectores(secs as SectorItem[]);
+      setCiudades(cities as CiudadItem[]);
+      setTendencia(trend as TendenciaItem[]);
       setProfilesLoading(false);
       setSelectedPerfil(prev => {
         if (prev && profs.some((p: OccupationalProfile) => p.perfil === prev)) return prev;
