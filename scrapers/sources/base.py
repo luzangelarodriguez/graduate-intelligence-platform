@@ -284,14 +284,20 @@ async def safe_wait_for_results(
     return WaitResult(selector="", elapsed_ms=elapsed_ms, attempts=retries + 1, runtime=runtime, status="timeout")
 
 
+# Exact prefix of Magneto's fraud-warning banner. Long enough to be unambiguous;
+# does not match legitimate job titles like "Analista de Prevención de Fraude".
+_FRAUD_BANNER_PREFIX = "ten cuidado con el fraude"
+
+
 async def first_text(page: Page, selectors: tuple[str, ...]) -> str:
     for selector in selectors:
         try:
             locator = page.locator(selector).first
             if await locator.count():
                 text = (await locator.inner_text(timeout=1500)).strip()
-                if text:
-                    return re.sub(r"\s+", " ", text)
+                text = re.sub(r"\s+", " ", text)
+                if text and not text.casefold().startswith(_FRAUD_BANNER_PREFIX):
+                    return text
         except Exception:
             continue
     return ""
@@ -317,18 +323,28 @@ async def extract_card_links(page: Page, config: SourceConfig) -> list[str]:
     return list(dict.fromkeys(links))
 
 
-_NON_JOB_TITLES = frozenset({
-    "inicio", "home", "buscar empleo", "registro de vacantes",
-    "ten cuidado con el fraude", "¡ten cuidado con el fraude!",
-    "cuidado con el fraude", "aviso de seguridad",
-})
+# Prefix-based check replaces the old frozenset of exact strings, which never
+# matched the real banner text because the full phrase is much longer than any
+# entry in the set.
+_NON_JOB_TITLE_PREFIXES = (
+    "ten cuidado con el fraude",
+    "¡ten cuidado con el fraude",
+    "cuidado con el fraude",
+    "aviso de seguridad",
+    "inicio",
+    "home",
+    "buscar empleo",
+    "registro de vacantes",
+)
 
 
 def looks_like_non_job_page(title: str, description: str, url: str) -> bool:
     title_norm = re.sub(r"\s+", " ", title or "").strip().casefold()
     description_norm = re.sub(r"\s+", " ", description or "").strip().casefold()
     url_norm = (url or "").casefold()
-    if title_norm in _NON_JOB_TITLES:
+    if not title_norm:
+        return True
+    if any(title_norm.startswith(p) for p in _NON_JOB_TITLE_PREFIXES):
         return True
     nav_terms = ("transparencia", "atencion a la ciudadania", "participa", "normativa", "prensa")
     if sum(1 for term in nav_terms if term in description_norm) >= 3:
