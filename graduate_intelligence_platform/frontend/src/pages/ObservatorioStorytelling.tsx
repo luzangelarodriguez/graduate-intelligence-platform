@@ -662,8 +662,8 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
   const topBrechas = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
   const maxMarket  = topMarket[0]?.frecuencia ?? 1;
 
-  // Afinidad ocupacional: high-match vacantes / total
-  const afinidadCount = prog?.labels?.high ?? 0;
+  // Afinidad ocupacional: (high + medium) vacantes / total
+  const afinidadCount = (prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0);
   const afinidadPct   = Math.round((afinidadCount / Math.max(totales.matches, 1)) * 100);
   const afinidadBadge = afinidadPct >= 70
     ? { label: 'Alta oportunidad', bg: '#D1FAE5', color: '#065F46' }
@@ -1087,7 +1087,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   const totalRequisitos = skillsMercadoDeduped.length;
   const totalBrechas    = skills?.brechas.length ?? 0;
 
-  const afinidadPct = Math.round(((prog?.labels?.high ?? 0) / Math.max(totales.matches, 1)) * 100);
+  const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
   const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
   const pertColor   = coberturaPct >= 60 ? '#059669' : coberturaPct >= 35 ? '#D97706' : '#DC2626';
   const pertBg      = coberturaPct >= 60 ? '#D1FAE5' : coberturaPct >= 35 ? '#FEF3C7' : '#FEE2E2';
