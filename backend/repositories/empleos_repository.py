@@ -402,3 +402,89 @@ def fetch_profile_kpis(
     if row:
         return row[0]
     return {"total_ofertas": 0, "total_perfiles": 0, "total_skills": 0}
+
+
+def _base_job_filters(especializacion_id: int) -> tuple[list[str], list[Any]]:
+    filters = [
+        "m.especializacion_id = %s",
+        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
+        "m.relevance_label IN ('high', 'medium')",
+        "COALESCE(j.activo, TRUE) = TRUE",
+    ]
+    return filters, [especializacion_id]
+
+
+def fetch_sectores(
+    especializacion_id: int,
+    *,
+    db_name: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return sector distribution for jobs matched to a program."""
+    filters, params = _base_job_filters(especializacion_id)
+    filters.append("COALESCE(TRIM(j.industry), '') != ''")
+    where = " AND ".join(filters)
+    return fetch_all(
+        f"""
+        SELECT
+            j.industry AS sector,
+            COUNT(DISTINCT j.id)::int AS vacantes
+        FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        WHERE {where}
+        GROUP BY j.industry
+        ORDER BY vacantes DESC
+        LIMIT 10
+        """,
+        params,
+        db_name=db_name,
+    )
+
+
+def fetch_ciudades(
+    especializacion_id: int,
+    *,
+    db_name: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return city distribution for jobs matched to a program."""
+    filters, params = _base_job_filters(especializacion_id)
+    filters.append("COALESCE(TRIM(j.location), '') != ''")
+    where = " AND ".join(filters)
+    return fetch_all(
+        f"""
+        SELECT
+            j.location AS ciudad,
+            COUNT(DISTINCT j.id)::int AS vacantes
+        FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        WHERE {where}
+        GROUP BY j.location
+        ORDER BY vacantes DESC
+        LIMIT 10
+        """,
+        params,
+        db_name=db_name,
+    )
+
+
+def fetch_tendencia_mensual(
+    especializacion_id: int,
+    *,
+    db_name: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return monthly job counts for jobs matched to a program."""
+    filters, params = _base_job_filters(especializacion_id)
+    where = " AND ".join(filters)
+    return fetch_all(
+        f"""
+        SELECT
+            TO_CHAR(DATE_TRUNC('month', j.created_at), 'YYYY-MM') AS mes,
+            COUNT(DISTINCT j.id)::int AS vacantes
+        FROM jobs j
+        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        WHERE {where}
+        GROUP BY DATE_TRUNC('month', j.created_at)
+        ORDER BY DATE_TRUNC('month', j.created_at)
+        """,
+        params,
+        db_name=db_name,
+    )
