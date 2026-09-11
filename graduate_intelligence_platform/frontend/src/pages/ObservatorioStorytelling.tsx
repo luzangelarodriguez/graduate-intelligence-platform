@@ -1385,8 +1385,13 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
           {profilesLoading
             ? <Spinner />
-            : sectores.length === 0
-              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+            : sectores.reduce((acc, s) => acc + s.vacantes, 0) < 5
+              ? (
+                <div style={{ padding: '12px 0' }}>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: '0 0 6px' }}>Sin datos suficientes de sector para este programa</p>
+                  <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0, lineHeight: 1.5 }}>Los portales de empleo no clasifican por sector la mayoría de las vacantes en esta cohorte.</p>
+                </div>
+              )
               : sectores.slice(0, 7).map((s, i) => (
                   <div key={s.sector} style={{ marginBottom: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
@@ -1409,8 +1414,13 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
           <div style={{ width: 28, height: 2, background: '#F0A500', marginBottom: 12 }} />
           {profilesLoading
             ? <Spinner />
-            : ciudades.length === 0
-              ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos</p>
+            : ciudades.reduce((acc, c) => acc + c.vacantes, 0) < 5
+              ? (
+                <div style={{ padding: '12px 0' }}>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic', margin: '0 0 6px' }}>Sin datos suficientes de ciudad para este programa</p>
+                  <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0, lineHeight: 1.5 }}>Los portales de empleo no clasifican por ciudad la mayoría de las vacantes en esta cohorte.</p>
+                </div>
+              )
               : ciudades.slice(0, 7).map((c, i) => (
                   <div key={c.ciudad} style={{ marginBottom: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
