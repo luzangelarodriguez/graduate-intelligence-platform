@@ -3201,7 +3201,7 @@ export default function ObservatorioStorytelling() {
 
   const viewMap: Record<ViewId, React.ReactNode> = {
     resumen:         <ViewResumen         {...viewProps} />,
-    mercado:         <ViewPerfiles        {...viewProps} />,
+    mercado:         <ViewResumen         {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewCobertura       {...viewProps} />,
     brechas:         <ViewBrechas         {...viewProps} />,
