@@ -389,7 +389,7 @@ def fetch_profile_kpis(
         f"""
         SELECT
             COUNT(DISTINCT j.id)::int AS total_ofertas,
-            COUNT(DISTINCT j.semantic_title_family)::int AS total_perfiles,
+            COUNT(DISTINCT LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))))::int AS total_perfiles,
             COUNT(DISTINCT COALESCE(js.canonical_skill, js.skill_family, js.skill_category))::int AS total_skills
         FROM jobs j
         JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
