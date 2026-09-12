@@ -12,6 +12,7 @@ jobs:
     env:
       PYTHONUNBUFFERED: "1"
       PLAYWRIGHT_HEADLESS: "true"
+      RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
