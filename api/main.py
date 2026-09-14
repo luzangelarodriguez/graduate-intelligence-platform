@@ -625,12 +625,12 @@ def related_universities(program_id: int) -> dict[str, Any]:
                      ORDER BY COALESCE(s.matriculados, 0) DESC LIMIT 50"""
 
         PROGRAM_WHERE = {
-            94: """WHERE (m.nombre_programa ILIKE '%analytic%'
+            13: """WHERE (m.nombre_programa ILIKE '%analytic%'
                       OR m.nombre_programa ILIKE '%datos%'
                       OR m.nombre_programa ILIKE '%big data%'
                       OR m.nombre_programa ILIKE '%inteligencia de negocio%'
                       OR m.nombre_programa ILIKE '%business intelligence%')""",
-            92: """WHERE (m.nombre_programa ILIKE '%inteligencia artificial%'
+            11: """WHERE (m.nombre_programa ILIKE '%inteligencia artificial%'
                       OR m.nombre_programa ILIKE '%machine learning%'
                       OR m.nombre_programa ILIKE '%ciencia de datos%'
                       OR m.nombre_programa ILIKE '%data science%')""",
@@ -700,7 +700,7 @@ def related_universities(program_id: int) -> dict[str, Any]:
 
 
 @app.get("/api/dashboard/compare-programs", tags=["dashboard"])
-def compare_programs(ids: str = Query(default="94,92,108,20")) -> list[dict]:
+def compare_programs(ids: str = Query(default="13,11,108,20")) -> list[dict]:
     """Compare key metrics across multiple programs for the dashboard Comparativa view."""
     try:
         from api.database import fetch_all
