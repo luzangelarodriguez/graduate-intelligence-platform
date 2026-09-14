@@ -9,7 +9,7 @@ scripts/clean_microcurriculo_skills.py
    - Normaliza términos en inglés a su equivalente técnico en español.
    - Agrega skills técnicos del microcurrículo que no están en la tabla.
 
-3. Inteligencia Artificial (especializacion_id=92):
+3. Inteligencia Artificial (especializacion_id=11):
    - Agrega skills técnicos del docx que no están en la tabla.
 
 Uso:
@@ -321,9 +321,9 @@ def main() -> None:
         preview_inserts("2b", crimi_to_add)
 
         # ------------------------------------------------------------------
-        # PASO 3 — Inteligencia Artificial (id=92)
+        # PASO 3 — Inteligencia Artificial (id=11)
         # ------------------------------------------------------------------
-        ia_mc_ids = get_microcurriculo_ids(cur, 92)
+        ia_mc_ids = get_microcurriculo_ids(cur, 11)
         print(f"\n  IA microcurriculo_ids: {ia_mc_ids}")
         existing_ia = get_existing_skills(cur, ia_mc_ids)
         ia_to_add = [
