@@ -323,8 +323,11 @@ async def extract_card_links(page: Page, config: SourceConfig) -> list[str]:
                     href = await card.locator("a[href]").first.get_attribute("href", timeout=1000) or ""
                 if href:
                     full = href if href.startswith("http") else f"{config.base_url.rstrip('/')}/{href.lstrip('/')}"
-                    if config.card_href_pattern and not config.card_href_pattern.search(full):
-                        continue
+                    if config.card_href_pattern:
+                        from urllib.parse import urlparse as _urlparse
+                        _p = _urlparse(full)
+                        if not config.card_href_pattern.search(f"{_p.netloc}{_p.path}"):
+                            continue
                     links.append(full)
         except Exception:
             continue

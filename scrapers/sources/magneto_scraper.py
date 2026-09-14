@@ -9,7 +9,7 @@ from scrapers.sources.base import PlaywrightJobSource, SourceConfig, run_async_s
 # structure at the Python level, since CSS attribute selectors cannot verify
 # that a hyphen is in the slug segment rather than elsewhere in the href (e.g.
 # query strings like ?search=project-manager also contain hyphens).
-_MAGNETO_JOB_HREF_RE = re.compile(r"/co/empleos/[a-zA-Z0-9][a-zA-Z0-9%-]+")
+_MAGNETO_JOB_HREF_RE = re.compile(r"magneto365\.com/co/empleos/[a-zA-Z0-9][a-zA-Z0-9%-]+")
 
 CONFIG = SourceConfig(
     portal="magneto",
