@@ -335,6 +335,19 @@ _NON_JOB_TITLE_PREFIXES = (
     "home",
     "buscar empleo",
     "registro de vacantes",
+    # Pagination / navigation UI text that can be captured when a listing-page
+    # URL is mistakenly scraped as a job detail page.
+    "ver todos",
+    "ver todas",
+    "ver más",
+    "ver mas",
+    "cargar más",
+    "cargar mas",
+    "más resultados",
+    "mas resultados",
+    "siguiente",
+    "empleos",
+    "vacantes",
 )
 
 

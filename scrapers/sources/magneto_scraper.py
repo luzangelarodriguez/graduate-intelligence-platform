@@ -13,7 +13,11 @@ CONFIG = SourceConfig(
         "[class*='card'] a[href*='/co/empleos/']",
         "[class*='job'] a[href*='/co/empleos/']",
         "[class*='vacancy'] a[href*='/co/empleos/']",
-        "a[href*='/co/empleos/']",
+        # Broad fallback: require a hyphen in the path to match job slugs
+        # (e.g. /co/empleos/diseñadora-creativa-123) and exclude the bare
+        # listing page (/co/empleos or /co/empleos/) and search pages
+        # (/co/empleos?search=...) which triggered nav-link scraping.
+        "a[href*='/co/empleos/'][href*='-']",
     ),
     # Magneto renders the job title as plain text (NOT a heading element).
     # The fraud-warning banner IS an h1/h2, so any h1-based selector reliably
