@@ -1,13 +1,22 @@
 from __future__ import annotations
 
+import re
+
 from scrapers.sources.base import PlaywrightJobSource, SourceConfig, run_async_scraper
 
+# Magneto job detail URLs follow /co/empleos/{slug} where the slug is a
+# non-empty path segment (letters, digits, hyphens). This regex confirms that
+# structure at the Python level, since CSS attribute selectors cannot verify
+# that a hyphen is in the slug segment rather than elsewhere in the href (e.g.
+# query strings like ?search=project-manager also contain hyphens).
+_MAGNETO_JOB_HREF_RE = re.compile(r"magneto365\.com/co/empleos/[a-zA-Z0-9][a-zA-Z0-9%-]+")
 
 CONFIG = SourceConfig(
     portal="magneto",
     base_url="https://www.magneto365.com",
     search_url_template="https://www.magneto365.com/co/empleos?search={query}",
-    # Job cards link to /co/empleos/{slug} — exclude bare /empleos/ to avoid nav links
+    # Job cards link to /co/empleos/{slug} — the broad CSS fallback is kept
+    # simple; slug validation happens via card_href_pattern below.
     card_selectors=(
         "article a[href*='/co/empleos/']",
         "[class*='card'] a[href*='/co/empleos/']",
@@ -15,6 +24,10 @@ CONFIG = SourceConfig(
         "[class*='vacancy'] a[href*='/co/empleos/']",
         "a[href*='/co/empleos/']",
     ),
+    # Require a non-empty slug after /co/empleos/ — rejects bare listing/search
+    # page URLs (/co/empleos, /co/empleos/, /co/empleos?search=...) even when
+    # the query string contains hyphens.
+    card_href_pattern=_MAGNETO_JOB_HREF_RE,
     # Magneto renders the job title as plain text (NOT a heading element).
     # The fraud-warning banner IS an h1/h2, so any h1-based selector reliably
     # captures the banner instead of the title. Strategy:

@@ -73,6 +73,11 @@ class SourceConfig:
     headless_override: bool | None = None
     cookie_accept_selector: str | None = None
     reuse_page_for_details: bool = False
+    # Optional regex applied to each collected card href AFTER CSS selection.
+    # The href must match for the link to be kept. Use to enforce that a path
+    # segment has the expected slug structure (e.g. non-empty, contains hyphen
+    # at the right position), which CSS attribute selectors cannot express.
+    card_href_pattern: re.Pattern | None = None
 
 
 # Section-header keywords used to split a job description into named fields.
@@ -317,7 +322,13 @@ async def extract_card_links(page: Page, config: SourceConfig) -> list[str]:
                 if not href:
                     href = await card.locator("a[href]").first.get_attribute("href", timeout=1000) or ""
                 if href:
-                    links.append(href if href.startswith("http") else f"{config.base_url.rstrip('/')}/{href.lstrip('/')}")
+                    full = href if href.startswith("http") else f"{config.base_url.rstrip('/')}/{href.lstrip('/')}"
+                    if config.card_href_pattern:
+                        from urllib.parse import urlparse as _urlparse
+                        _p = _urlparse(full)
+                        if not config.card_href_pattern.search(f"{_p.netloc}{_p.path}"):
+                            continue
+                    links.append(full)
         except Exception:
             continue
     return list(dict.fromkeys(links))
@@ -335,6 +346,19 @@ _NON_JOB_TITLE_PREFIXES = (
     "home",
     "buscar empleo",
     "registro de vacantes",
+    # Pagination / navigation UI text that can be captured when a listing-page
+    # URL is mistakenly scraped as a job detail page.
+    "ver todos",
+    "ver todas",
+    "ver más",
+    "ver mas",
+    "cargar más",
+    "cargar mas",
+    "más resultados",
+    "mas resultados",
+    "siguiente",
+    "empleos",
+    "vacantes",
 )
 
 
