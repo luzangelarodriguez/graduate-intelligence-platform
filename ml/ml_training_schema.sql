@@ -264,8 +264,8 @@ CREATE TABLE IF NOT EXISTS ml_program_job_matches (
     program_name TEXT NOT NULL,
     job_title TEXT NOT NULL,
     company TEXT,
-    match_method TEXT NOT NULL DEFAULT 'rules_v1',
-    model_name TEXT NOT NULL DEFAULT 'local_rules_v1',
+    match_method TEXT NOT NULL DEFAULT 'hybrid_v2',
+    model_name TEXT NOT NULL DEFAULT 'all-MiniLM-L6-v2+BM25',
     score_match NUMERIC(5, 2) NOT NULL
         CHECK (score_match >= 0 AND score_match <= 100),
     relevance_label TEXT NOT NULL DEFAULT 'low'
@@ -284,7 +284,10 @@ CREATE TABLE IF NOT EXISTS ml_program_job_matches (
     content_hash TEXT NOT NULL,
     raw_features JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (run_id, program_document_id, job_document_id, match_method)
+    -- Stable business-key: one canonical row per program–job–method triple.
+    -- run_id / program_document_id / job_document_id are retained for audit
+    -- but do not participate in deduplication (see migration 031).
+    CONSTRAINT uq_match_business_key UNIQUE (especializacion_id, empleo_id, match_method)
 );
 
 CREATE INDEX IF NOT EXISTS ix_ml_program_job_matches_run_id
