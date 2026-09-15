@@ -64,6 +64,16 @@ _TIPO_MAP: dict[str, str] = {
     "competencias":                 "competencia",
     "gestión":                      "competencia",
     "gestion":                      "competencia",
+    # Criminology / forensics domain categories
+    "criminology":                  "competencia",
+    "forensics":                    "tecnica",
+    "public safety":                "competencia",
+    "criminal intelligence":        "competencia",
+    "financial crime":              "competencia",
+    "cybercrime":                   "competencia",
+    # GenAI (explicit, not left to substring fallback)
+    "genai analytics":              "tecnica",
+    "genai":                        "tecnica",
 }
 
 # Substring fallback for SkillMatch repr values and unknown DB categories.

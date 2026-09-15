@@ -833,10 +833,21 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         # Import the cleaning helper; it normalizes tipo_skill to one of:
         # herramienta / tecnica / habilidad / competencia
         from backend.repositories.empleos_repository import _clean_tipo_skill
+        from crawlers.storage.postgres_warehouse import canonicalize_skill
+
+        _UNCLASSIFIED = {"unknown", "unclassified", ""}
+
         tipo_lookup: dict[str, str] = {}
         for row in tipo_rows:
             key = (row["skill_key"] or "").strip()
-            if key:
+            if not key:
+                continue
+            raw_cat = (row["tipo_skill_raw"] or "").strip().lower()
+            if raw_cat in _UNCLASSIFIED:
+                # skill_category is Unknown/Unclassified — backfill from taxonomy by name
+                taxonomy_cat = canonicalize_skill(key).category
+                tipo_lookup[key] = _clean_tipo_skill(None, taxonomy_cat)
+            else:
                 tipo_lookup[key] = _clean_tipo_skill(None, row["tipo_skill_raw"])
 
         def _tipo_for(skill: str) -> str:
@@ -845,7 +856,14 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
                 c for c in _ud.normalize("NFD", skill.lower())
                 if _ud.category(c) != "Mn"
             ).strip()
-            return tipo_lookup.get(norm, tipo_lookup.get(skill.lower().strip(), "competencia"))
+            result = tipo_lookup.get(norm, tipo_lookup.get(skill.lower().strip()))
+            if result is not None:
+                return result
+            # Last-resort taxonomy lookup for skills not in tipo_lookup at all
+            taxonomy_cat = canonicalize_skill(skill).category
+            if taxonomy_cat.lower() not in _UNCLASSIFIED:
+                return _clean_tipo_skill(None, taxonomy_cat)
+            return "competencia"
 
         skills_mercado = [
             {"skill": s["skill"], "frecuencia": s["frecuencia"], "tipo_skill": _tipo_for(s["skill"])}
