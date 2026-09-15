@@ -89,8 +89,8 @@ interface RediseniJob {
 
 // ─── Static program metadata ──────────────────────────────────────────────────
 const PROGRAMS = [
-  { id: 94,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
-  { id: 92,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  { id: 13,  label: 'Visual Analytics & Big Data',    nombre: 'Especialización en Visual Analytics y Big Data', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
+  { id: 11,  label: 'Inteligencia Artificial',        nombre: 'Especialización en Inteligencia Artificial',     creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
   { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 9,   label: 'Dirección y Gestión de Proyectos', nombre: 'Especialización en Dirección y Gestión de Proyectos', creditos: 24, duracion: '2', periodicidad: 'Semestral' },
@@ -130,8 +130,8 @@ const FALLBACK: Summary = {
 };
 
 const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
-  94: {
-    program_id: 94, cobertura_pct: 54,
+  13: {
+    program_id: 13, cobertura_pct: 54,
     skills_mercado:  [
       { skill: 'Python', frecuencia: 28 }, { skill: 'Power BI', frecuencia: 24 },
       { skill: 'SQL', frecuencia: 22 },    { skill: 'Tableau', frecuencia: 18 },
@@ -154,8 +154,8 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
     ],
     exclusivas_programa: [{ skill: 'R', cobertura: 3 }, { skill: 'Estadística', cobertura: 3 }],
   },
-  92: {
-    program_id: 92, cobertura_pct: 61,
+  11: {
+    program_id: 11, cobertura_pct: 61,
     skills_mercado:  [
       { skill: 'Python', frecuencia: 31 }, { skill: 'TensorFlow', frecuencia: 22 },
       { skill: 'Machine Learning', frecuencia: 20 }, { skill: 'PyTorch', frecuencia: 18 },
@@ -3594,7 +3594,7 @@ export default function ObservatorioStorytelling() {
   const [univ, setUniv]                     = useState<UniversityData | null>(null);
   const [loading, setLoading]               = useState(true);
   const [isFallback, setIsFallback]         = useState(false);
-  const [programaId, setProgramaId]         = useState(94);
+  const [programaId, setProgramaId]         = useState(13);
   const [activeView, setActiveView]         = useState<ViewId>('resumen');
   const [pipelineLogOpen, setPipelineLogOpen] = useState(false);
   const [pipelineStatus, setPipelineStatus]   = useState<string>('idle');
