@@ -1305,10 +1305,17 @@ def save_matches(results: List[MatchResult], run_id: int, conn) -> int:
                     %(skills_programa)s::jsonb, %(skills_empleo)s::jsonb,
                     %(explanation)s, %(content_hash)s, %(raw_features)s::jsonb
                 )
-                ON CONFLICT (run_id, program_document_id, job_document_id, match_method)
+                ON CONFLICT (especializacion_id, empleo_id, match_method)
                 DO UPDATE SET
-                    especializacion_id  = EXCLUDED.especializacion_id,
-                    empleo_id           = EXCLUDED.empleo_id,
+                    -- audit columns: track which run produced the latest score
+                    run_id              = EXCLUDED.run_id,
+                    program_document_id = EXCLUDED.program_document_id,
+                    job_document_id     = EXCLUDED.job_document_id,
+                    -- always refresh everything from the current run
+                    program_name        = EXCLUDED.program_name,
+                    job_title           = EXCLUDED.job_title,
+                    company             = EXCLUDED.company,
+                    model_name          = EXCLUDED.model_name,
                     score_match         = EXCLUDED.score_match,
                     relevance_label     = EXCLUDED.relevance_label,
                     role_alignment      = EXCLUDED.role_alignment,
