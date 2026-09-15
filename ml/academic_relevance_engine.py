@@ -870,10 +870,52 @@ def _pertinence_scores(
 # Relevance label
 # ---------------------------------------------------------------------------
 
-def _label(score: float, n_common: int, *, skills_match: bool = True) -> str:
+# Generic / transversal skills that appear across virtually every job posting
+# and therefore provide no domain-specific evidence of curriculum alignment.
+# A match whose common skills consist entirely of these terms is driven by
+# generic semantic similarity, not by real program–job overlap.
+_GENERIC_SKILLS: frozenset = frozenset({
+    "comunicacion",
+    "gestion",
+    "liderazgo",
+    "trabajo en equipo",
+    "toma de decisiones",
+    "orientacion a resultados",
+    "pensamiento critico",
+    "resolucion de problemas",
+    "pensamiento analitico",
+    "calidad",
+    "servicio",
+    "atencion",
+    "experiencia",
+    "manejo",
+    "office",
+})
+
+# Minimum number of domain-specific (non-generic) common skills required to
+# award 'medium' or 'high' relevance_label.  Matches below this threshold are
+# capped at 'low' even if their composite score is high enough for medium/high.
+_DOMAIN_SKILL_GATE = 2
+
+
+def _count_domain_skills(common_skills: List[str]) -> int:
+    """Return the number of common skills that are NOT generic/transversal."""
+    return sum(
+        1 for s in common_skills
+        if s.lower() not in _GENERIC_SKILLS
+    )
+
+
+def _label(score: float, n_common: int, *, skills_match: bool = True,
+           common_skills: Optional[List[str]] = None) -> str:
     """
     skills_match=True  → standard F1-based labels (high/medium/low/no_match)
     skills_match=False → semantic-only fallback labels (high_semantic/…)
+
+    Gate (Option B): 'medium' and 'high' require at least _DOMAIN_SKILL_GATE
+    domain-specific (non-generic) skills in common.  Matches that only share
+    generic transversal skills (comunicacion, liderazgo, etc.) are capped at
+    'low' regardless of the composite score.
     """
     if not skills_match:
         # Semantic-only path: no skill overlap available
@@ -884,9 +926,12 @@ def _label(score: float, n_common: int, *, skills_match: bool = True) -> str:
         if score >= 45.0:
             return "low_semantic"
         return "no_match"
-    if score >= SCORE_HIGH and n_common >= 2:
+    # Domain-skill gate: count non-generic skills in the common set.
+    n_domain = _count_domain_skills(common_skills or [])
+    gate_ok = n_domain >= _DOMAIN_SKILL_GATE
+    if score >= SCORE_HIGH and n_common >= 2 and gate_ok:
         return "high"
-    if score >= SCORE_MEDIUM and n_common >= 1:
+    if score >= SCORE_MEDIUM and n_common >= 1 and gate_ok:
         return "medium"
     if score >= SCORE_LOW and n_common >= 1:
         return "low"
@@ -1042,7 +1087,7 @@ def run_matching(
                             has_skills, coverage, density, pertinence, sem, final)
                 _debug_done = True
 
-            label = _label(final, len(common), skills_match=has_skills)
+            label = _label(final, len(common), skills_match=has_skills, common_skills=common)
             if final < min_score and label == "no_match":
                 continue
 
