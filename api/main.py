@@ -463,18 +463,18 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         prog_rows = fetch_all(
             f"""
             SELECT
-                m.especializacion_id                          AS id,
-                COALESCE(e.nombre, m.program_name)            AS nombre,
-                COUNT(*)                                      AS matches_total,
-                ROUND(AVG(m.score_match)::numeric, 1)        AS score_promedio,
-                ROUND(MAX(m.score_match)::numeric, 1)        AS score_maximo,
-                COUNT(*) FILTER (WHERE m.relevance_label = 'high')   AS lbl_high,
-                COUNT(*) FILTER (WHERE m.relevance_label = 'medium') AS lbl_medium,
-                COUNT(*) FILTER (WHERE m.relevance_label = 'low')    AS lbl_low
+                m.especializacion_id                                    AS id,
+                COALESCE(e.nombre, MAX(m.program_name))                 AS nombre,
+                COUNT(*)                                                AS matches_total,
+                ROUND(AVG(m.score_match)::numeric, 1)                  AS score_promedio,
+                ROUND(MAX(m.score_match)::numeric, 1)                  AS score_maximo,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'high')     AS lbl_high,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'medium')   AS lbl_medium,
+                COUNT(*) FILTER (WHERE m.relevance_label = 'low')      AS lbl_low
             FROM ml_program_job_matches m
             LEFT JOIN especializaciones e ON e.id = m.especializacion_id
             WHERE m.run_id = {run_id} {pid_filter}
-            GROUP BY m.especializacion_id, e.nombre, m.program_name
+            GROUP BY m.especializacion_id, e.nombre
             ORDER BY score_maximo DESC
             """,
         )
