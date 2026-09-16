@@ -86,7 +86,7 @@ PROGRAM_DOMAIN_MAPPING_SEED_ROWS = (
     (86, "business_management", "Business Management"),
     (98, "legal_compliance", "Legal & Compliance"),
     (91, "data_analytics", "Data & Analytics"),
-    (92, "artificial_intelligence", "Artificial Intelligence"),
+    (11, "artificial_intelligence", "Artificial Intelligence"),
     (85, "data_analytics", "Data & Analytics"),
     (87, "marketing_commercial", "Marketing & Commercial"),
     (101, "education", "Education"),
@@ -94,7 +94,7 @@ PROGRAM_DOMAIN_MAPPING_SEED_ROWS = (
     (89, "finance_accounting", "Finance & Accounting"),
     (93, "cybersecurity", "Cybersecurity"),
     (103, "education", "Education"),
-    (94, "data_analytics", "Data & Analytics"),
+    (13, "data_analytics", "Data & Analytics"),
 )
 
 PROGRAM_DOMAIN_MAPPING_SEED_VALUES_SQL = ",\n        ".join(
