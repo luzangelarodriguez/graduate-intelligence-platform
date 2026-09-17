@@ -498,15 +498,18 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         top_rows = fetch_all(
             f"""
             SELECT
-                COALESCE(e.nombre, m.program_name) AS programa,
-                m.job_title                        AS empleo,
-                COALESCE(m.company, '')            AS empresa,
-                ROUND(m.score_match::numeric, 1)   AS score,
-                m.relevance_label                  AS label,
-                m.skills_en_comun                  AS skills_en_comun,
-                m.skills_faltantes                 AS skills_faltantes
+                COALESCE(e.nombre, m.program_name)  AS programa,
+                m.job_title                         AS empleo,
+                COALESCE(m.company, '')             AS empresa,
+                COALESCE(j.source, '')              AS fuente,
+                COALESCE(j.semantic_title_family, '') AS familia,
+                ROUND(m.score_match::numeric, 1)    AS score,
+                m.relevance_label                   AS label,
+                m.skills_en_comun                   AS skills_en_comun,
+                m.skills_faltantes                  AS skills_faltantes
             FROM ml_program_job_matches m
             LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            LEFT JOIN jobs j ON j.id::text = m.empleo_id
             WHERE m.run_id = {run_id} {pid_filter}
             ORDER BY m.score_match DESC
             LIMIT 30
@@ -518,6 +521,8 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
                 "programa":        r["programa"] or "",
                 "empleo":          r["empleo"] or "",
                 "empresa":         r["empresa"],
+                "fuente":          r["fuente"],
+                "familia":         r["familia"],
                 "score":           float(r["score"] or 0),
                 "label":           r["label"],
                 "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
@@ -550,15 +555,18 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
         skill_match_rows = fetch_all(
             f"""
             SELECT
-                COALESCE(e.nombre, m.program_name) AS programa,
-                m.job_title                        AS empleo,
-                COALESCE(m.company, '')             AS empresa,
-                m.score_match                      AS score,
-                m.relevance_label                  AS label,
-                m.skills_en_comun                  AS skills_en_comun,
-                m.skills_faltantes                 AS skills_faltantes
+                COALESCE(e.nombre, m.program_name)  AS programa,
+                m.job_title                         AS empleo,
+                COALESCE(m.company, '')              AS empresa,
+                COALESCE(j.source, '')              AS fuente,
+                COALESCE(j.semantic_title_family, '') AS familia,
+                m.score_match                       AS score,
+                m.relevance_label                   AS label,
+                m.skills_en_comun                   AS skills_en_comun,
+                m.skills_faltantes                  AS skills_faltantes
             FROM ml_program_job_matches m
             LEFT JOIN especializaciones e ON e.id = m.especializacion_id
+            LEFT JOIN jobs j ON j.id::text = m.empleo_id
             WHERE m.run_id = {run_id} {pid_filter}
               AND m.skills_en_comun IS NOT NULL
               AND m.skills_en_comun != '[]'::jsonb
@@ -572,6 +580,8 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
                 "programa":         r["programa"] or "",
                 "empleo":           r["empleo"] or "",
                 "empresa":          r["empresa"],
+                "fuente":           r["fuente"],
+                "familia":          r["familia"],
                 "score":            float(r["score"] or 0),
                 "label":            r["label"],
                 "skills_en_comun":  r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
@@ -1906,4 +1916,42 @@ def get_tendencia_mensual(program_id: int) -> list:
     except Exception as exc:
         logger.warning("get_tendencia_mensual failed: %s", exc)
         return []
+
+
+@app.get("/api/programas/{program_id}/vacantes-filtros", tags=["market"])
+def get_vacantes_filtros(program_id: int) -> dict:
+    """Return distinct filter values (familia, cargo, empresa) for the Empleos view."""
+    try:
+        from backend.repositories.empleos_repository import fetch_vacantes_filtros
+        return fetch_vacantes_filtros(program_id)
+    except Exception as exc:
+        logger.warning("get_vacantes_filtros failed: %s", exc)
+        return {"familias": [], "cargos": [], "empresas": []}
+
+
+@app.get("/api/programas/{program_id}/top-vacantes", tags=["market"])
+def get_top_vacantes(
+    program_id: int,
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=10, ge=1, le=50),
+    familia: str | None = None,
+    cargo: str | None = None,
+    empresa: str | None = None,
+    nivel: str | None = None,
+) -> dict:
+    """Return a paginated list of top job matches for a program with optional filters."""
+    try:
+        from backend.repositories.empleos_repository import fetch_top_vacantes
+        return fetch_top_vacantes(
+            program_id,
+            page=page,
+            per_page=per_page,
+            familia=familia,
+            cargo=cargo,
+            empresa=empresa,
+            nivel=nivel,
+        )
+    except Exception as exc:
+        logger.warning("get_top_vacantes failed: %s", exc)
+        return {"total": 0, "page": page, "per_page": per_page, "items": []}
 

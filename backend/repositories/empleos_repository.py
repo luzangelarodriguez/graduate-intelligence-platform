@@ -498,3 +498,162 @@ def fetch_tendencia_mensual(
         params,
         db_name=db_name,
     )
+
+
+def fetch_vacantes_filtros(
+    especializacion_id: int,
+    *,
+    db_name: str | None = None,
+) -> dict[str, list[str]]:
+    """Return distinct filter values (familia, cargo, empresa) for the Empleos view.
+
+    Scoped to the most recent ml run for the given program so dropdowns only show
+    values that actually appear in current matches.
+    """
+    run_row = fetch_one(
+        "SELECT MAX(run_id) AS run_id FROM ml_program_job_matches WHERE especializacion_id = %s",
+        (especializacion_id,),
+        db_name=db_name,
+    )
+    run_id = run_row["run_id"] if run_row and run_row.get("run_id") else None
+    if not run_id:
+        return {"familias": [], "cargos": [], "empresas": []}
+
+    familias = fetch_all(
+        """
+        SELECT DISTINCT COALESCE(j.semantic_title_family, '') AS familia
+        FROM ml_program_job_matches m
+        LEFT JOIN jobs j ON j.id::text = m.empleo_id
+        WHERE m.run_id = %s AND m.especializacion_id = %s
+          AND j.semantic_title_family IS NOT NULL AND TRIM(j.semantic_title_family) != ''
+        ORDER BY familia
+        LIMIT 50
+        """,
+        (run_id, especializacion_id),
+        db_name=db_name,
+    )
+    cargos = fetch_all(
+        """
+        SELECT DISTINCT m.job_title AS cargo
+        FROM ml_program_job_matches m
+        WHERE m.run_id = %s AND m.especializacion_id = %s
+          AND m.job_title IS NOT NULL AND TRIM(m.job_title) != ''
+        ORDER BY cargo
+        LIMIT 100
+        """,
+        (run_id, especializacion_id),
+        db_name=db_name,
+    )
+    empresas = fetch_all(
+        """
+        SELECT DISTINCT m.company AS empresa
+        FROM ml_program_job_matches m
+        WHERE m.run_id = %s AND m.especializacion_id = %s
+          AND m.company IS NOT NULL AND TRIM(m.company) != ''
+        ORDER BY empresa
+        LIMIT 100
+        """,
+        (run_id, especializacion_id),
+        db_name=db_name,
+    )
+    return {
+        "familias": [r["familia"] for r in familias],
+        "cargos":   [r["cargo"] for r in cargos],
+        "empresas": [r["empresa"] for r in empresas],
+    }
+
+
+def fetch_top_vacantes(
+    especializacion_id: int,
+    *,
+    page: int = 1,
+    per_page: int = 10,
+    familia: str | None = None,
+    cargo: str | None = None,
+    empresa: str | None = None,
+    nivel: str | None = None,
+    db_name: str | None = None,
+) -> dict[str, Any]:
+    """Return a paginated list of top job matches for a program (Empleos view table).
+
+    Each row includes job_title, familia (semantic_title_family), empresa, fuente
+    (source portal) and score_match. Supports optional filters.
+    """
+    run_row = fetch_one(
+        "SELECT MAX(run_id) AS run_id FROM ml_program_job_matches WHERE especializacion_id = %s",
+        (especializacion_id,),
+        db_name=db_name,
+    )
+    run_id = run_row["run_id"] if run_row and run_row.get("run_id") else None
+    if not run_id:
+        return {"total": 0, "page": page, "per_page": per_page, "items": []}
+
+    conditions = [
+        "m.run_id = %s",
+        "m.especializacion_id = %s",
+    ]
+    params: list[Any] = [run_id, especializacion_id]
+
+    if familia:
+        conditions.append("j.semantic_title_family = %s")
+        params.append(familia)
+    if cargo:
+        conditions.append("m.job_title = %s")
+        params.append(cargo)
+    if empresa:
+        conditions.append("m.company = %s")
+        params.append(empresa)
+    if nivel:
+        conditions.append("m.relevance_label = %s")
+        params.append(nivel)
+
+    where = " AND ".join(conditions)
+    offset = (max(page, 1) - 1) * per_page
+
+    count_row = fetch_one(
+        f"""
+        SELECT COUNT(*) AS total
+        FROM ml_program_job_matches m
+        LEFT JOIN jobs j ON j.id::text = m.empleo_id
+        WHERE {where}
+        """,
+        params,
+        db_name=db_name,
+    )
+    total = int(count_row["total"]) if count_row else 0
+
+    rows = fetch_all(
+        f"""
+        SELECT
+            m.job_title                           AS cargo,
+            COALESCE(j.semantic_title_family, '') AS familia,
+            COALESCE(m.company, '')               AS empresa,
+            COALESCE(j.source, '')                AS fuente,
+            ROUND(m.score_match::numeric, 1)      AS score,
+            m.relevance_label                     AS nivel
+        FROM ml_program_job_matches m
+        LEFT JOIN jobs j ON j.id::text = m.empleo_id
+        WHERE {where}
+        ORDER BY m.score_match DESC
+        LIMIT %s OFFSET %s
+        """,
+        [*params, per_page, offset],
+        db_name=db_name,
+    )
+
+    return {
+        "total":    total,
+        "page":     page,
+        "per_page": per_page,
+        "items": [
+            {
+                "cargo":   r["cargo"] or "",
+                "familia": r["familia"],
+                "empresa": r["empresa"],
+                "fuente":  r["fuente"],
+                "score":   float(r["score"] or 0),
+                "nivel":   r["nivel"],
+            }
+            for r in rows
+        ],
+    }
