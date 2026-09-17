@@ -2969,11 +2969,11 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
   const ofertasAnonimas   = top10.filter(m => !m.empresa || isAnonima(m.empresa)).length;
 
   // ── Familia ocupacional — cobertura ──────────────────────────────────────
-  const conFamilia    = top_matches.filter(m => m.familia && m.familia.trim() !== '').length;
-  const pctFamilia    = top_matches.length > 0 ? Math.round((conFamilia / top_matches.length) * 100) : 0;
+  const conFamilia    = top10.filter(m => m.familia && m.familia.trim() !== '').length;
+  const pctFamilia    = top10.length > 0 ? Math.round((conFamilia / top10.length) * 100) : 0;
   const familiaRows   = (() => {
     const counts: Record<string, number> = {};
-    top_matches.forEach(m => {
+    top10.forEach(m => {
       const f = (m.familia ?? '').trim();
       if (f) counts[f] = (counts[f] ?? 0) + 1;
     });
