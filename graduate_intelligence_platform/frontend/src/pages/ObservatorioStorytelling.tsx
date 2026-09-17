@@ -2946,7 +2946,16 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
   const promedioTop10       = top10.length > 0
     ? Math.round((top10.reduce((s, m) => s + m.score, 0) / top10.length) * 10) / 10
     : 0;
-  const empresasTop10       = new Set(top10.map(m => m.empresa).filter(Boolean)).size;
+  const EMPRESA_ANONIMA = new Set([
+    'importante empresa del sector',
+    'sin empresa',
+    '(sin empresa)',
+    'confidencial',
+    'empresa confidencial',
+  ]);
+  const isAnonima = (e: string) => EMPRESA_ANONIMA.has(e.trim().toLowerCase());
+  const empresasTop10     = new Set(top10.map(m => m.empresa).filter(e => e && !isAnonima(e))).size;
+  const ofertasAnonimas   = top10.filter(m => !m.empresa || isAnonima(m.empresa)).length;
 
   // ── Date formatting ──────────────────────────────────────────────────────
   const corteLabel = (() => {
@@ -2992,7 +3001,9 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
       icon: <IconBuilding size={26} />,
       value: empresasTop10,
       label: 'Empresas / Fuentes Top 10',
-      desc: 'Organizaciones o fuentes diferentes',
+      desc: ofertasAnonimas > 0
+        ? `Empresas identificadas + ${ofertasAnonimas} de empleador no revelado`
+        : 'Organizaciones o fuentes diferentes',
       accent: '#065F46',
       accentBg: '#D1FAE5',
     },
