@@ -511,6 +511,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             LEFT JOIN especializaciones e ON e.id = m.especializacion_id
             LEFT JOIN jobs j ON j.id::text = m.empleo_id
             WHERE m.run_id = {run_id} {pid_filter}
+              AND m.relevance_label IN ('high', 'medium')
             ORDER BY m.score_match DESC
             LIMIT 30
             """,

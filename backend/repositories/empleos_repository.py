@@ -594,6 +594,13 @@ def fetch_top_vacantes(
     ]
     params: list[Any] = [run_id, especializacion_id]
 
+    # Always restrict to relevant matches; nivel filter narrows further within that set.
+    if nivel in ("high", "medium"):
+        conditions.append("m.relevance_label = %s")
+        params.append(nivel)
+    else:
+        conditions.append("m.relevance_label IN ('high', 'medium')")
+
     if familia:
         conditions.append("j.semantic_title_family = %s")
         params.append(familia)
@@ -603,9 +610,6 @@ def fetch_top_vacantes(
     if empresa:
         conditions.append("m.company = %s")
         params.append(empresa)
-    if nivel:
-        conditions.append("m.relevance_label = %s")
-        params.append(nivel)
 
     where = " AND ".join(conditions)
     offset = (max(page, 1) - 1) * per_page
