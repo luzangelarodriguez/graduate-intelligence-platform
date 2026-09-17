@@ -548,7 +548,8 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             f"WHERE run_id = {run_id} {pid_filter_bare} "
             f"  AND skills_en_comun IS NOT NULL "
             f"  AND skills_en_comun != '[]'::jsonb "
-            f"  AND jsonb_array_length(skills_en_comun) > 0",
+            f"  AND jsonb_array_length(skills_en_comun) > 0 "
+            f"  AND relevance_label IN ('high', 'medium')",
         )
         empleos_compatibles: int = int(emp_row["cnt"]) if emp_row else 0
 
