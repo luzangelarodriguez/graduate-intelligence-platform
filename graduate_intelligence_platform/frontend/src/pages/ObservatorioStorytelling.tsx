@@ -2936,6 +2936,17 @@ const EMPLEO_STEPS = [
   { n: 5, Icon: IconFileDescription, title: 'Detalle de la oferta',       sub: 'Revisar cada vacante'            },
 ];
 
+// ── Score legend tiers ───────────────────────────────────────────────────────
+const SCORE_TIERS = [
+  { label: 'Alta',     min: 70, max: 100, color: '#059669', bg: '#D1FAE5', textColor: '#065F46' },
+  { label: 'Moderada', min: 40, max: 69,  color: '#D97706', bg: '#FEF3C7', textColor: '#92400E' },
+  { label: 'Baja',     min: 0,  max: 39,  color: '#DC2626', bg: '#FEE2E2', textColor: '#991B1B' },
+] as const;
+
+function scoreTier(score: number) {
+  return SCORE_TIERS.find(t => score >= t.min && score <= t.max) ?? SCORE_TIERS[1];
+}
+
 function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
   const top10 = top_matches.slice(0, 10);
 
@@ -2956,6 +2967,55 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
   const isAnonima = (e: string) => EMPRESA_ANONIMA.has(e.trim().toLowerCase());
   const empresasTop10     = new Set(top10.map(m => m.empresa).filter(e => e && !isAnonima(e))).size;
   const ofertasAnonimas   = top10.filter(m => !m.empresa || isAnonima(m.empresa)).length;
+
+  // ── Familia ocupacional — cobertura ──────────────────────────────────────
+  const conFamilia    = top10.filter(m => m.familia && m.familia.trim() !== '').length;
+  const pctFamilia    = top10.length > 0 ? Math.round((conFamilia / top10.length) * 100) : 0;
+  const familiaRows   = (() => {
+    const counts: Record<string, number> = {};
+    top10.forEach(m => {
+      const f = (m.familia ?? '').trim();
+      if (f) counts[f] = (counts[f] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+  })();
+  const familiaMax = familiaRows.length > 0 ? familiaRows[0][1] : 1;
+
+  // ── Score distribution — buckets of 5 pts ────────────────────────────────
+  const scoreBuckets = (() => {
+    if (top10.length === 0) return [] as { label: string; count: number; color: string }[];
+    const counts: Record<number, number> = {};
+    top10.forEach(m => {
+      const bucket = Math.floor(m.score / 5) * 5;
+      counts[bucket] = (counts[bucket] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([b, cnt]) => {
+        const lo = Number(b);
+        const tier = scoreTier(lo + 2);
+        return { label: `${lo}–${lo + 4} pts`, count: cnt, color: tier.color };
+      })
+      .sort((a, b) => {
+        const loA = parseInt(a.label);
+        const loB = parseInt(b.label);
+        return loB - loA;
+      });
+  })();
+  const scoreMax = scoreBuckets.length > 0 ? Math.max(...scoreBuckets.map(b => b.count)) : 1;
+
+  // ── Nota de contexto dinámica ─────────────────────────────────────────────
+  const contextNote = (() => {
+    if (top10.length === 0) return null;
+    const tiers = top10.map(m => scoreTier(m.score).label);
+    const unique = new Set(tiers);
+    if (unique.size === 1) {
+      const tier = scoreTier(top10[0].score);
+      return `Todas las ofertas priorizadas presentan coincidencia ${tier.label.toLowerCase()}; ninguna supera ${mayorCoincidencia}/100.`;
+    }
+    return null;
+  })();
 
   // ── Date formatting ──────────────────────────────────────────────────────
   const corteLabel = (() => {
@@ -3009,6 +3069,9 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
     },
   ];
 
+  // ── Estado 0: sin matches ─────────────────────────────────────────────────
+  const emptyState = top_matches.length === 0;
+
   return (
     <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
 
@@ -3059,51 +3122,173 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
         ))}
       </div>
 
-      {/* ── KPI cards ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, flexShrink: 0 }}>
-        {kpis.map(kpi => (
-          <div key={kpi.label} style={{
-            background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`,
-            padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8,
+      {/* ── Estado 0: sin datos analizados ─────────────────────────────────── */}
+      {emptyState ? (
+        <div style={{
+          background: '#F9FAFB', borderRadius: 12, border: `1px solid ${C.border}`,
+          padding: '32px 24px', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', gap: 12, flexShrink: 0,
+        }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: '50%', background: '#E5E7EB',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF',
           }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 10, background: kpi.accentBg,
-              color: kpi.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {kpi.icon}
+            <IconBriefcase size={26} />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#374151', margin: '0 0 4px' }}>
+              Aún no hay vacantes analizadas para este programa
+            </p>
+            <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>
+              El análisis de compatibilidad laboral estará disponible cuando se procese el microcurrículo.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ── KPI cards ──────────────────────────────────────────────────── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, flexShrink: 0 }}>
+            {kpis.map(kpi => (
+              <div key={kpi.label} style={{
+                background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`,
+                padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8,
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10, background: kpi.accentBg,
+                  color: kpi.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {kpi.icon}
+                </div>
+                <div>
+                  <p style={{ fontSize: 28, fontWeight: 800, color: kpi.accent, margin: 0, lineHeight: 1 }}>
+                    {kpi.value}
+                  </p>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#374151', margin: '4px 0 2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {kpi.label}
+                  </p>
+                  <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
+                    {kpi.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Explanation box ─────────────────────────────────────────────── */}
+          <div style={{
+            background: '#EEF2FF', borderRadius: 12, border: `1px solid #C7D2FE`,
+            padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0,
+          }}>
+            <div style={{ color: '#4F46E5', flexShrink: 0, paddingTop: 1 }}>
+              <IconBulb size={18} />
             </div>
             <div>
-              <p style={{ fontSize: 28, fontWeight: 800, color: kpi.accent, margin: 0, lineHeight: 1 }}>
-                {kpi.value}
-              </p>
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#374151', margin: '4px 0 2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {kpi.label}
-              </p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
-                {kpi.desc}
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', margin: '0 0 3px' }}>¿Qué muestran estas cifras?</p>
+              <p style={{ fontSize: 11, color: '#4338CA', margin: 0, lineHeight: 1.5 }}>
+                Las <strong>{vacantesCompatibles}</strong> vacantes representan el universo de oportunidades relacionadas con el perfil.
+                El ranking permite reconocer qué cargos, empresas y familias ocupacionales presentan mayor afinidad.{' '}
+                <strong>El puntaje mide coincidencia de requisitos; no representa probabilidad de conseguir empleo.</strong>
               </p>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* ── Explanation box ─────────────────────────────────────────────────── */}
-      <div style={{
-        background: '#EEF2FF', borderRadius: 12, border: `1px solid #C7D2FE`,
-        padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0,
-      }}>
-        <div style={{ color: '#4F46E5', flexShrink: 0, paddingTop: 1 }}>
-          <IconBulb size={18} />
-        </div>
-        <div>
-          <p style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', margin: '0 0 3px' }}>¿Qué muestran estas cifras?</p>
-          <p style={{ fontSize: 11, color: '#4338CA', margin: 0, lineHeight: 1.5 }}>
-            Las <strong>{vacantesCompatibles}</strong> vacantes representan el universo de oportunidades relacionadas con el perfil.
-            El ranking permite reconocer qué cargos, empresas y familias ocupacionales presentan mayor afinidad.{' '}
-            <strong>El puntaje mide coincidencia de requisitos; no representa probabilidad de conseguir empleo.</strong>
-          </p>
-        </div>
-      </div>
+          {/* ── Gráficos — fila de 2 columnas ──────────────────────────────── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flexShrink: 0 }}>
+
+            {/* Gráfico 1 — Familia ocupacional */}
+            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
+                Vacantes por familia ocupacional
+              </p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 14px' }}>Top 10 · vacantes con match high/medium</p>
+
+              {pctFamilia < 20 ? (
+                <div style={{
+                  background: '#F9FAFB', borderRadius: 8, border: `1px dashed #D1D5DB`,
+                  padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start',
+                }}>
+                  <div style={{ color: '#9CA3AF', flexShrink: 0, paddingTop: 1 }}>
+                    <IconSearch size={16} />
+                  </div>
+                  <p style={{ fontSize: 11, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                    Clasificación ocupacional no disponible para este programa —{' '}
+                    <strong>{pctFamilia}%</strong> de vacantes con familia asignada.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {familiaRows.map(([familia, cnt]) => (
+                    <div key={familia}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                        <span style={{ fontSize: 10, color: '#374151', fontWeight: 500 }}>{familia}</span>
+                        <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{cnt}</span>
+                      </div>
+                      <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${Math.round((cnt / familiaMax) * 100)}%`,
+                          background: C.navy,
+                          borderRadius: 3,
+                        }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Gráfico 2 — Distribución de score */}
+            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>
+                  Distribución del nivel de coincidencia
+                </p>
+                {/* Leyenda */}
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  {SCORE_TIERS.map(t => (
+                    <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color }} />
+                      <span style={{ fontSize: 9, color: '#6B7280' }}>{t.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 14px' }}>Top 10 · buckets de 5 puntos</p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {scoreBuckets.map(bucket => (
+                  <div key={bucket.label}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ fontSize: 10, color: '#374151', fontWeight: 500 }}>{bucket.label}</span>
+                      <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{bucket.count} vacante{bucket.count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${Math.round((bucket.count / scoreMax) * 100)}%`,
+                        background: bucket.color,
+                        borderRadius: 3,
+                      }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Nota de contexto dinámica */}
+              {contextNote && (
+                <div style={{
+                  marginTop: 14, padding: '8px 10px',
+                  background: '#F9FAFB', borderRadius: 8, border: `1px solid #E5E7EB`,
+                }}>
+                  <p style={{ fontSize: 10, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                    {contextNote}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
     </div>
   );
