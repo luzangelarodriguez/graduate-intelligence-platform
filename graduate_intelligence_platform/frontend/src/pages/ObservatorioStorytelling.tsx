@@ -15,6 +15,7 @@ import {
   IconTool, IconBrain, IconBolt, IconUser,
   IconCalendar, IconCoin, IconShield, IconAward,
   IconBulb, IconMessage, IconUsers, IconCheck,
+  IconBuilding, IconSearch, IconFileDescription, IconTrophy,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -44,6 +45,7 @@ interface Programa {
 interface TopMatch {
   programa: string; empleo: string; empresa: string; score: number; label: string;
   skills_en_comun: string[]; skills_faltantes: string[];
+  fuente?: string; familia?: string;
 }
 interface Summary {
   run_id: number | null; fecha: string;
@@ -2925,72 +2927,184 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
 }
 
 
-function ViewEmpleos({ skill_matches, empCompatibles }: ViewProps) {
-  // skill_matches comes from the backend pre-filtered (skills_en_comun non-empty), ordered by score DESC.
-  const empleos = skill_matches.slice(0, 10);
+// ─── Empleos wizard steps ────────────────────────────────────────────────────
+const EMPLEO_STEPS = [
+  { n: 1, Icon: IconSearch,          title: 'Total de oportunidades',     sub: 'Ver el universo de vacantes'     },
+  { n: 2, Icon: IconUsers,           title: 'Familias ocupacionales',     sub: 'Conocer su distribución'         },
+  { n: 3, Icon: IconBuilding,        title: 'Cargos y empresas',          sub: 'Explorar las principales opciones' },
+  { n: 4, Icon: IconListCheck,       title: 'Requisitos de las vacantes', sub: 'Identificar lo más solicitado'   },
+  { n: 5, Icon: IconFileDescription, title: 'Detalle de la oferta',       sub: 'Revisar cada vacante'            },
+];
 
-  if (empleos.length === 0) return (
-    <div style={{ padding: 24 }}>
-      <div style={{ background: '#F3F4F6', borderRadius: 12, padding: 32, textAlign: 'center' }}>
-        <p style={{ fontSize: 14, color: '#6B7280' }}>Sin empleos con solapamiento de skills para este programa.</p>
-      </div>
-    </div>
-  );
+function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
+  const top10 = top_matches.slice(0, 10);
+
+  // ── KPI derivations ──────────────────────────────────────────────────────
+  const vacantesCompatibles = totales.empleos_compatibles;
+  const vacantesPriorizadas = top10.length;
+  const mayorCoincidencia   = top10.length > 0 ? Math.round(Math.max(...top10.map(m => m.score))) : 0;
+  const promedioTop10       = top10.length > 0
+    ? Math.round((top10.reduce((s, m) => s + m.score, 0) / top10.length) * 10) / 10
+    : 0;
+  const EMPRESA_ANONIMA = new Set([
+    'importante empresa del sector',
+    'sin empresa',
+    '(sin empresa)',
+    'confidencial',
+    'empresa confidencial',
+  ]);
+  const isAnonima = (e: string) => EMPRESA_ANONIMA.has(e.trim().toLowerCase());
+  const empresasTop10     = new Set(top10.map(m => m.empresa).filter(e => e && !isAnonima(e))).size;
+  const ofertasAnonimas   = top10.filter(m => !m.empresa || isAnonima(m.empresa)).length;
+
+  // ── Date formatting ──────────────────────────────────────────────────────
+  const corteLabel = (() => {
+    if (!summary.fecha) return '';
+    const d = new Date(summary.fecha + 'T00:00:00');
+    return d.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+  })();
+
+  const kpis = [
+    {
+      icon: <IconBriefcase size={26} />,
+      value: vacantesCompatibles,
+      label: 'Vacantes compatibles',
+      desc: 'Ofertas relacionadas con el perfil',
+      accent: C.navy,
+      accentBg: '#EEF2FF',
+    },
+    {
+      icon: <IconTrophy size={26} />,
+      value: vacantesPriorizadas,
+      label: 'Vacantes priorizadas',
+      desc: 'Ofertas con mayor coincidencia',
+      accent: '#7C3AED',
+      accentBg: '#F5F3FF',
+    },
+    {
+      icon: <IconTarget size={26} />,
+      value: `${mayorCoincidencia}/100`,
+      label: 'Mayor coincidencia',
+      desc: 'Mejor resultado entre vacante y perfil',
+      accent: '#D97706',
+      accentBg: '#FEF3C7',
+    },
+    {
+      icon: <IconChartBar size={26} />,
+      value: `${promedioTop10}/100`,
+      label: 'Promedio Top 10',
+      desc: 'Coincidencia promedio del ranking',
+      accent: '#D97706',
+      accentBg: '#FEF3C7',
+    },
+    {
+      icon: <IconBuilding size={26} />,
+      value: empresasTop10,
+      label: 'Empresas / Fuentes Top 10',
+      desc: ofertasAnonimas > 0
+        ? `Empresas identificadas + ${ofertasAnonimas} de empleador no revelado`
+        : 'Organizaciones o fuentes diferentes',
+      accent: '#065F46',
+      accentBg: '#D1FAE5',
+    },
+  ];
 
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+    <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Empleos Compatibles</h1>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{empCompatibles} vacantes con solapamiento de skills</p>
+        <h1 style={{ fontSize: 18, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>
+          Desglose de vacantes compatibles
+        </h1>
+        <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 4px' }}>
+          Composición de la demanda laboral relacionada con el perfil de egreso
+        </p>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+          <span style={{ fontWeight: 600, color: C.navy }}>{vacantesCompatibles}</span> vacantes con solapamiento de habilidades
+          {corteLabel && <> · Corte: <span style={{ fontWeight: 600 }}>{corteLabel}</span></>}
+        </p>
       </div>
 
-      <DashPanel title={`Top ${empleos.length} vacantes más compatibles`}>
-        {/* TODO(verificación visual pendiente): con datos reales de vacantes en producción,
-            verificar layout de las columnas "Skills en común" y "Gaps" con tags reales en 375px. */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 640 }}>
-            <thead>
-              <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-                {['#', 'Empleo', 'Empresa', 'Score', 'Cobertura', 'Skills en común', 'Gaps'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '4px 8px', color: '#9CA3AF', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {empleos.map((m, i) => {
-                const total    = m.skills_en_comun.length + m.skills_faltantes.length;
-                const coverPct = total ? Math.round((m.skills_en_comun.length / total) * 100) : 0;
-                return (
-                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                    <td style={{ padding: '8px', color: '#9CA3AF', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>{i + 1}</td>
-                    <td style={{ padding: '8px', color: C.navy, fontWeight: 600, whiteSpace: 'nowrap' }}>{m.empleo}</td>
-                    <td style={{ padding: '8px', color: '#6B7280', whiteSpace: 'nowrap' }}>{m.empresa}</td>
-                    <td style={{ padding: '8px', fontWeight: 700, whiteSpace: 'nowrap', color: m.score >= 70 ? '#059669' : m.score >= 50 ? '#2563EB' : '#D97706' }}>{m.score.toFixed(0)}</td>
-                    <td style={{ padding: '8px', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 56, height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${coverPct}%`, background: coverPct >= 60 ? '#10B981' : '#F59E0B', borderRadius: 3 }} />
-                        </div>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: coverPct >= 60 ? '#059669' : '#D97706' }}>{coverPct}%</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '8px', minWidth: 120 }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                        {m.skills_en_comun.slice(0, 3).map(s => <SkillTag key={s} skill={s} variant="match" />)}
-                      </div>
-                    </td>
-                    <td style={{ padding: '8px', minWidth: 100 }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                        {m.skills_faltantes.slice(0, 2).map(s => <SkillTag key={s} skill={s} variant="gap" />)}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* ── Wizard navigation ──────────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', gap: 0, background: '#fff',
+        border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', flexShrink: 0,
+      }}>
+        {EMPLEO_STEPS.map((step, idx) => (
+          <div key={step.n} style={{
+            flex: 1, display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 14px',
+            borderRight: idx < EMPLEO_STEPS.length - 1 ? `1px solid ${C.border}` : 'none',
+            background: step.n === 1 ? '#EEF2FF' : '#fff',
+          }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+              background: step.n === 1 ? C.navy : '#E5E7EB',
+              color: step.n === 1 ? '#fff' : '#6B7280',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 13, fontWeight: 800,
+            }}>
+              {step.n}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: step.n === 1 ? C.navy : '#374151', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {step.title}
+              </p>
+              <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {step.sub}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── KPI cards ──────────────────────────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, flexShrink: 0 }}>
+        {kpis.map(kpi => (
+          <div key={kpi.label} style={{
+            background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`,
+            padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 10, background: kpi.accentBg,
+              color: kpi.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {kpi.icon}
+            </div>
+            <div>
+              <p style={{ fontSize: 28, fontWeight: 800, color: kpi.accent, margin: 0, lineHeight: 1 }}>
+                {kpi.value}
+              </p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#374151', margin: '4px 0 2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {kpi.label}
+              </p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
+                {kpi.desc}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Explanation box ─────────────────────────────────────────────────── */}
+      <div style={{
+        background: '#EEF2FF', borderRadius: 12, border: `1px solid #C7D2FE`,
+        padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0,
+      }}>
+        <div style={{ color: '#4F46E5', flexShrink: 0, paddingTop: 1 }}>
+          <IconBulb size={18} />
         </div>
-      </DashPanel>
+        <div>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', margin: '0 0 3px' }}>¿Qué muestran estas cifras?</p>
+          <p style={{ fontSize: 11, color: '#4338CA', margin: 0, lineHeight: 1.5 }}>
+            Las <strong>{vacantesCompatibles}</strong> vacantes representan el universo de oportunidades relacionadas con el perfil.
+            El ranking permite reconocer qué cargos, empresas y familias ocupacionales presentan mayor afinidad.{' '}
+            <strong>El puntaje mide coincidencia de requisitos; no representa probabilidad de conseguir empleo.</strong>
+          </p>
+        </div>
+      </div>
+
     </div>
   );
 }
