@@ -3287,6 +3287,120 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
               )}
             </div>
           </div>
+          {/* ── Fase D: Tabla de cargos + Gráfico de empresas ─────────────── */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flexShrink: 0 }}>
+
+            {/* Tabla de cargos */}
+            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
+                Cargos con mayor coincidencia
+              </p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>Top 10 · ordenados por puntaje</p>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                      {['Cargo', 'Familia', 'Empresa / Fuente', 'Puntaje'].map(h => (
+                        <th key={h} style={{
+                          padding: '4px 8px', textAlign: 'left', fontWeight: 700,
+                          color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em',
+                          whiteSpace: 'nowrap',
+                        }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {top10.map((m, i) => {
+                      const empresaLabel = (m.empresa && !isAnonima(m.empresa))
+                        ? m.empresa
+                        : (m.fuente && m.fuente.trim() !== '' ? m.fuente : '—');
+                      const tier = scoreTier(m.score);
+                      return (
+                        <tr key={i} style={{ borderBottom: `1px solid #F3F4F6` }}>
+                          <td style={{ padding: '6px 8px', color: '#111827', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {m.empleo || '—'}
+                          </td>
+                          <td style={{ padding: '6px 8px', color: '#6B7280', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {(m.familia && m.familia.trim() !== '') ? m.familia : '—'}
+                          </td>
+                          <td style={{ padding: '6px 8px', color: '#6B7280', maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {empresaLabel}
+                          </td>
+                          <td style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                              display: 'inline-block', padding: '2px 6px',
+                              borderRadius: 4, fontSize: 10, fontWeight: 700,
+                              background: tier.bg, color: tier.textColor,
+                            }}>
+                              {Math.round(m.score)}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Gráfico de empresas */}
+            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
+                Empresas y fuentes del Top 10
+              </p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 14px' }}>Empleadores identificados · confidenciales excluidos del ranking</p>
+
+              {empresasTop10 === 0 ? (
+                <div style={{
+                  background: '#F9FAFB', borderRadius: 8, border: `1px dashed #D1D5DB`,
+                  padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start',
+                }}>
+                  <div style={{ color: '#9CA3AF', flexShrink: 0, paddingTop: 1 }}>
+                    <IconBuilding size={16} />
+                  </div>
+                  <p style={{ fontSize: 11, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                    Todas las ofertas priorizadas son de empleador confidencial.
+                  </p>
+                </div>
+              ) : (() => {
+                const empresasCounts: Record<string, number> = {};
+                top10.forEach(m => {
+                  const key = (m.empresa && !isAnonima(m.empresa))
+                    ? m.empresa.trim()
+                    : (m.fuente && m.fuente.trim() !== '' ? m.fuente.trim() : null);
+                  if (key) empresasCounts[key] = (empresasCounts[key] ?? 0) + 1;
+                });
+                const rows = Object.entries(empresasCounts).sort((a, b) => b[1] - a[1]);
+                const maxVal = rows.length > 0 ? rows[0][1] : 1;
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {rows.map(([emp, cnt]) => (
+                      <div key={emp}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                          <span style={{ fontSize: 10, color: '#374151', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80%' }}>{emp}</span>
+                          <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600, flexShrink: 0 }}>{cnt}</span>
+                        </div>
+                        <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%',
+                            width: `${Math.round((cnt / maxVal) * 100)}%`,
+                            background: '#7C3AED',
+                            borderRadius: 3,
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                    {ofertasAnonimas > 0 && (
+                      <p style={{ fontSize: 10, color: '#9CA3AF', margin: '6px 0 0', fontStyle: 'italic' }}>
+                        + {ofertasAnonimas} oferta{ofertasAnonimas !== 1 ? 's' : ''} de empleador no revelado (no incluida{ofertasAnonimas !== 1 ? 's' : ''} en el ranking)
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
         </>
       )}
 
