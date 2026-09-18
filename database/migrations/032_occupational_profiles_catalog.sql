@@ -189,3 +189,50 @@ INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
 SELECT id, '%market intelligence%', 0.860
 FROM public.occupational_profiles WHERE nombre = 'Analista de Inteligencia de Negocios'
 ON CONFLICT (patron) DO NOTHING;
+
+-- ── Additional profiles: IA y Automatización + Liderazgo de Datos ────────────
+-- Validated against real job titles (B.0.3 queries, 2026-09-18).
+-- Coverage contribution: ~11 additional jobs → total ~39.9% of high/medium matches.
+
+INSERT INTO public.occupational_profiles (nombre, familia, descripcion) VALUES
+    ('Especialista en Inteligencia Artificial',
+     'IA y Automatización',
+     'Diseña, desarrolla e implementa soluciones basadas en IA, ML y automatización'),
+    ('Director de Datos',
+     'Liderazgo de Datos',
+     'Dirige estrategias de datos, analítica e inteligencia artificial a nivel organizacional')
+ON CONFLICT (nombre) DO NOTHING;
+
+-- Encoding-fix patterns for "científico de datos" (DB stores titles without accent marks)
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%cientifico%datos%', 0.940
+FROM public.occupational_profiles WHERE nombre = 'Científico de Datos'
+ON CONFLICT (patron) DO NOTHING;
+
+-- "data science" covers "data science analyst" and similar English variants
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%data science%', 0.930
+FROM public.occupational_profiles WHERE nombre = 'Científico de Datos'
+ON CONFLICT (patron) DO NOTHING;
+
+-- IA patterns — space before "ia" ensures word boundary (excludes "industrial", etc.)
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%inteligencia artificial%', 0.950
+FROM public.occupational_profiles WHERE nombre = 'Especialista en Inteligencia Artificial'
+ON CONFLICT (patron) DO NOTHING;
+
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%ingeniero% ia%', 0.920
+FROM public.occupational_profiles WHERE nombre = 'Especialista en Inteligencia Artificial'
+ON CONFLICT (patron) DO NOTHING;
+
+-- Liderazgo de Datos patterns
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%director%datos%', 0.930
+FROM public.occupational_profiles WHERE nombre = 'Director de Datos'
+ON CONFLICT (patron) DO NOTHING;
+
+INSERT INTO public.job_profile_mappings (perfil_id, patron, confianza)
+SELECT id, '%transformaci%n digital%', 0.820
+FROM public.occupational_profiles WHERE nombre = 'Director de Datos'
+ON CONFLICT (patron) DO NOTHING;
