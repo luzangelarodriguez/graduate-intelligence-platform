@@ -1954,6 +1954,7 @@ def get_perfiles_homologados(program_id: int) -> dict:
             LEFT JOIN occupational_profiles op ON op.id = j.perfil_id
             WHERE m.especializacion_id = %(pid)s
               AND m.relevance_label IN ('high', 'medium')
+              AND m.empleo_id ~ '^[0-9]+$'
               AND j.activo = TRUE
         ),
         total_cte AS (
@@ -1990,6 +1991,7 @@ def get_perfiles_homologados(program_id: int) -> dict:
             LEFT JOIN occupational_profiles op ON op.id = j.perfil_id
             WHERE m.especializacion_id = %(pid)s
               AND m.relevance_label IN ('high', 'medium')
+              AND m.empleo_id ~ '^[0-9]+$'
               AND j.activo = TRUE
         )
         SELECT
