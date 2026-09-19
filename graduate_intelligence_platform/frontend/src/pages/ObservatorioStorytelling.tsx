@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import unirLogoPng from '../assets/logos/UNIR_fundacion_vertical_blanco.png';
 import { blueGradient } from '../utils/chartColors';
 import {
@@ -1289,7 +1289,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
                           const famExpanded = expandedFamilias.has(fam.familia);
                           const isSinClasificar = fam.familia === 'Sin clasificar';
                           return (
-                            <React.Fragment key={fam.familia}>
+                            <Fragment key={fam.familia}>
                               {/* Fila de familia */}
                               <tr
                                 style={{ background: isSinClasificar ? '#F9FAFB' : '#EEF2FF', cursor: 'pointer' }}
@@ -1311,7 +1311,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
                                 const perfKey = `${fam.familia}::${perf.perfil}`;
                                 const perfExpanded = expandedPerfiles.has(perfKey);
                                 return (
-                                  <React.Fragment key={perfKey}>
+                                  <Fragment key={perfKey}>
                                     <tr
                                       style={{ borderBottom: `1px solid #F3F4F6`, cursor: perf.titulos.length > 0 ? 'pointer' : 'default' }}
                                       onClick={() => {
@@ -1339,10 +1339,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
                                         </td>
                                       </tr>
                                     ))}
-                                  </React.Fragment>
+                                  </Fragment>
                                 );
                               })}
-                            </React.Fragment>
+                            </Fragment>
                           );
                         })}
                       </tbody>
