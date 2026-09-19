@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import unirLogoPng from '../assets/logos/UNIR_fundacion_vertical_blanco.png';
 import { blueGradient } from '../utils/chartColors';
 import {
@@ -1059,6 +1059,9 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   const [sectores, setSectores] = useState<SectorItem[]>([]);
   const [ciudades, setCiudades] = useState<CiudadItem[]>([]);
   const [tendencia, setTendencia] = useState<TendenciaItem[]>([]);
+  const [homologado, setHomologado] = useState<HomologadoData | null>(null);
+  const [expandedFamilias, setExpandedFamilias] = useState<Set<string>>(new Set());
+  const [expandedPerfiles, setExpandedPerfiles] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -1074,12 +1077,14 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
       safeArr(`${API}/api/programas/${programaId}/sectores`),
       safeArr(`${API}/api/programas/${programaId}/ciudades`),
       safeArr(`${API}/api/programas/${programaId}/tendencia-mensual`),
-    ]).then(([profs, kpiData, secs, cities, trend]) => {
+      safeObj(`${API}/api/programas/${programaId}/perfiles-homologados`, { kpis: null, familias: [] }),
+    ]).then(([profs, kpiData, secs, cities, trend, homData]) => {
       setPerfiles(profs as OccupationalProfile[]);
       setKpis(kpiData as typeof kpis);
       setSectores(secs as SectorItem[]);
       setCiudades(cities as CiudadItem[]);
       setTendencia(trend as TendenciaItem[]);
+      setHomologado(homData as HomologadoData);
       setLoading(false);
     });
   }, [programaId]);
@@ -1237,39 +1242,114 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         {/* Tab content */}
         {secTab === 'perfiles' && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            {/* Perfiles table */}
+            {/* ── Familias y perfiles homologados ─────────────────────────── */}
             <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Perfiles ocupacionales más demandados</p>
-              {loading ? <Spinner /> : perfiles.length === 0
-                ? <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos de perfiles</p>
-                : (
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
-                    <thead><tr>
-                      <th style={TH_ML}>#</th>
-                      <th style={TH_ML}>Perfil ocupacional</th>
-                      <th style={{ ...TH_ML, textAlign: 'right' }}>Vacantes</th>
-                      <th style={{ ...TH_ML, textAlign: 'right' }}>% del total</th>
-                    </tr></thead>
-                    <tbody>
-                      {perfiles.slice(0, 8).map((p, i) => (
-                        <tr key={p.perfil} style={{ borderBottom: `1px solid #F9FAFB` }}>
-                          <td style={{ padding: '6px 8px', color: '#9CA3AF', fontWeight: 600, width: 24 }}>{i + 1}</td>
-                          <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <span style={{ flex: 1 }}>{p.perfil}</span>
-                              <div style={{ width: 60, height: 4, background: '#E5E7EB', borderRadius: 2, flexShrink: 0 }}>
-                                <div style={{ width: `${(p.vacantes / maxPerf) * 100}%`, height: '100%', background: C.navy, borderRadius: 2 }} />
-                              </div>
-                            </div>
-                          </td>
-                          <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{p.vacantes}</td>
-                          <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round((p.vacantes / Math.max(vacantesTotal, 1)) * 100)}%</td>
-                        </tr>
+              <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Familias y perfiles ocupacionales más demandados</p>
+              {loading ? <Spinner /> : (() => {
+                const hk = homologado?.kpis;
+                const hf = homologado?.familias ?? [];
+                if (!hk || hk.total_vacantes === 0) return (
+                  <p style={{ fontSize: 11, color: '#9CA3AF', fontStyle: 'italic' }}>Sin datos de vacantes para este programa</p>
+                );
+                // 6 KPI cards
+                const KPI_CARDS = [
+                  { label: 'Total vacantes',         value: hk.total_vacantes,        color: C.navy },
+                  { label: 'Familias identificadas', value: hk.familias_identificadas, color: '#7C3AED' },
+                  { label: 'Perfiles homologados',   value: hk.perfiles_homologados,   color: '#059669' },
+                  { label: 'Títulos originales',     value: hk.titulos_distintos,      color: '#D97706' },
+                  { label: '% homologadas',          value: `${hk.pct_homologadas}%`,  color: hk.pct_homologadas >= 50 ? '#059669' : hk.pct_homologadas >= 25 ? '#D97706' : '#DC2626' },
+                  { label: 'Familia líder',          value: hk.familia_top ?? '—',     color: '#6B7280', small: true },
+                ];
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {/* KPI row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                      {KPI_CARDS.map(kc => (
+                        <div key={kc.label} style={{ background: '#F9FAFB', border: `1px solid ${C.border}`, borderRadius: 6, padding: '6px 8px' }}>
+                          <div style={{ fontSize: kc.small ? 9 : 15, fontWeight: 800, color: kc.color, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kc.value}</div>
+                          <div style={{ fontSize: 9, color: '#9CA3AF', marginTop: 1 }}>{kc.label}</div>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
-                )
-              }
+                    </div>
+                    {/* Cobertura note */}
+                    {hk.vacantes_sin_homologar > 0 && (
+                      <p style={{ fontSize: 10, color: '#6B7280', margin: 0, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '4px 8px' }}>
+                        <strong>{hk.vacantes_sin_homologar}</strong> vacante{hk.vacantes_sin_homologar !== 1 ? 's' : ''} sin clasificar — el catálogo de patrones se amplía progresivamente.
+                      </p>
+                    )}
+                    {/* Jerarquía expandible */}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                      <thead><tr>
+                        <th style={TH_ML}>Familia / Perfil</th>
+                        <th style={{ ...TH_ML, textAlign: 'right' }}>Vacantes</th>
+                        <th style={{ ...TH_ML, textAlign: 'right' }}>% total</th>
+                      </tr></thead>
+                      <tbody>
+                        {hf.map(fam => {
+                          const famExpanded = expandedFamilias.has(fam.familia);
+                          const isSinClasificar = fam.familia === 'Sin clasificar';
+                          return (
+                            <Fragment key={fam.familia}>
+                              {/* Fila de familia */}
+                              <tr
+                                style={{ background: isSinClasificar ? '#F9FAFB' : '#EEF2FF', cursor: 'pointer' }}
+                                onClick={() => setExpandedFamilias(prev => {
+                                  const s = new Set(prev);
+                                  s.has(fam.familia) ? s.delete(fam.familia) : s.add(fam.familia);
+                                  return s;
+                                })}
+                              >
+                                <td style={{ padding: '6px 8px', fontWeight: 700, color: isSinClasificar ? '#9CA3AF' : '#4338CA', fontSize: 11 }}>
+                                  <span style={{ marginRight: 5 }}>{famExpanded ? '▾' : '▸'}</span>
+                                  {fam.familia}
+                                </td>
+                                <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: isSinClasificar ? '#9CA3AF' : '#4338CA' }}>{fam.vacantes}</td>
+                                <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round(fam.vacantes / hk.total_vacantes * 100)}%</td>
+                              </tr>
+                              {/* Filas de perfiles (colapsables) */}
+                              {famExpanded && fam.perfiles.map(perf => {
+                                const perfKey = `${fam.familia}::${perf.perfil}`;
+                                const perfExpanded = expandedPerfiles.has(perfKey);
+                                return (
+                                  <Fragment key={perfKey}>
+                                    <tr
+                                      style={{ borderBottom: `1px solid #F3F4F6`, cursor: perf.titulos.length > 0 ? 'pointer' : 'default' }}
+                                      onClick={() => {
+                                        if (perf.titulos.length === 0) return;
+                                        setExpandedPerfiles(prev => {
+                                          const s = new Set(prev);
+                                          s.has(perfKey) ? s.delete(perfKey) : s.add(perfKey);
+                                          return s;
+                                        });
+                                      }}
+                                    >
+                                      <td style={{ padding: '5px 8px 5px 24px', color: C.navy, fontWeight: 500 }}>
+                                        {perf.titulos.length > 0 && <span style={{ marginRight: 5, color: '#9CA3AF', fontSize: 10 }}>{perfExpanded ? '▾' : '▸'}</span>}
+                                        {perf.perfil}
+                                        <span style={{ marginLeft: 6, fontSize: 9, color: '#9CA3AF' }}>{perf.titulos_distintos} título{perf.titulos_distintos !== 1 ? 's' : ''}</span>
+                                      </td>
+                                      <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: 600, color: C.navy }}>{perf.vacantes}</td>
+                                      <td style={{ padding: '5px 8px', textAlign: 'right', color: '#6B7280' }}>{perf.pct_total}%</td>
+                                    </tr>
+                                    {/* Títulos originales (segundo nivel de expansión) */}
+                                    {perfExpanded && perf.titulos.map(tit => (
+                                      <tr key={tit} style={{ background: '#FAFAFA' }}>
+                                        <td style={{ padding: '3px 8px 3px 40px', color: '#6B7280', fontSize: 10, fontStyle: 'italic' }} colSpan={3}>
+                                          · {tit}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </Fragment>
+                                );
+                              })}
+                            </Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Market skills (herramientas / todos) */}
@@ -1605,6 +1685,35 @@ function SectorDonut({ sectors }: { sectors: SectorItem[] }) {
 interface OccupationalProfile { perfil: string; vacantes: number }
 interface ProfileSkill { nombre: string; tipo_skill: string; vacantes: number }
 interface ProfileKpis { total_ofertas: number; total_perfiles: number; total_skills: number }
+
+// Homologated profiles hierarchy (Fase C)
+interface HomologadoPerfil {
+  perfil_id: number | null;
+  perfil: string;
+  vacantes: number;
+  titulos_distintos: number;
+  titulos: string[];
+  pct_total: number;
+}
+interface HomologadoFamilia {
+  familia: string;
+  vacantes: number;
+  perfiles: HomologadoPerfil[];
+}
+interface HomologadoKpis {
+  total_vacantes: number;
+  familias_identificadas: number;
+  perfiles_homologados: number;
+  titulos_distintos: number;
+  vacantes_homologadas: number;
+  vacantes_sin_homologar: number;
+  pct_homologadas: number;
+  familia_top: string | null;
+}
+interface HomologadoData {
+  kpis: HomologadoKpis;
+  familias: HomologadoFamilia[];
+}
 interface SectorItem { sector: string; vacantes: number }
 interface CiudadItem { ciudad: string; vacantes: number }
 interface TendenciaItem { mes: string; vacantes: number }

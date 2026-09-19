@@ -1931,6 +1931,144 @@ def get_vacantes_filtros(program_id: int) -> dict:
         return {"familias": [], "cargos": [], "empresas": []}
 
 
+@app.get("/api/programas/{program_id}/perfiles-homologados", tags=["market"])
+def get_perfiles_homologados(program_id: int) -> dict:
+    """Return occupational profile hierarchy (familia → perfiles → vacantes) for a program.
+
+    Uses jobs.perfil_id populated by the homologation engine (Fase B).
+    Jobs without a perfil_id are grouped under familia=null / perfil=null ('Sin clasificar').
+    Only counts high/medium relevance matches, deduped by empleo_id.
+    """
+    SQL_FAMILIAS = """
+        WITH vacantes AS (
+            SELECT DISTINCT
+                m.empleo_id::bigint          AS job_id,
+                j.title                      AS titulo_original,
+                j.perfil_id,
+                j.homologacion_estado,
+                j.homologacion_confianza,
+                op.nombre                    AS perfil_nombre,
+                op.familia
+            FROM ml_program_job_matches m
+            JOIN jobs j ON j.id::text = m.empleo_id::text
+            LEFT JOIN occupational_profiles op ON op.id = j.perfil_id
+            WHERE m.especializacion_id = %(pid)s
+              AND m.relevance_label IN ('high', 'medium')
+              AND m.empleo_id ~ '^[0-9]+$'
+              AND j.activo = TRUE
+        ),
+        total_cte AS (
+            SELECT COUNT(DISTINCT job_id) AS total FROM vacantes
+        ),
+        por_familia AS (
+            SELECT
+                familia,
+                perfil_id,
+                perfil_nombre,
+                COUNT(DISTINCT job_id)               AS vacantes,
+                COUNT(DISTINCT titulo_original)       AS titulos_distintos,
+                ARRAY_AGG(DISTINCT titulo_original
+                          ORDER BY titulo_original)   AS titulos
+            FROM vacantes
+            GROUP BY familia, perfil_id, perfil_nombre
+        )
+        SELECT
+            pf.*,
+            t.total AS total_vacantes
+        FROM por_familia pf, total_cte t
+        ORDER BY pf.familia NULLS LAST, pf.vacantes DESC
+    """
+    SQL_KPIS = """
+        WITH vacantes AS (
+            SELECT DISTINCT
+                m.empleo_id::bigint          AS job_id,
+                j.title                      AS titulo_original,
+                j.perfil_id,
+                j.homologacion_estado,
+                op.familia
+            FROM ml_program_job_matches m
+            JOIN jobs j ON j.id::text = m.empleo_id::text
+            LEFT JOIN occupational_profiles op ON op.id = j.perfil_id
+            WHERE m.especializacion_id = %(pid)s
+              AND m.relevance_label IN ('high', 'medium')
+              AND m.empleo_id ~ '^[0-9]+$'
+              AND j.activo = TRUE
+        )
+        SELECT
+            COUNT(DISTINCT job_id)                                               AS total_vacantes,
+            COUNT(DISTINCT familia)  FILTER (WHERE familia IS NOT NULL)          AS familias_identificadas,
+            COUNT(DISTINCT perfil_id) FILTER (WHERE perfil_id IS NOT NULL)       AS perfiles_homologados,
+            COUNT(DISTINCT titulo_original)                                       AS titulos_distintos,
+            COUNT(DISTINCT job_id)   FILTER (WHERE homologacion_estado = 'auto') AS vacantes_homologadas,
+            COUNT(DISTINCT job_id)   FILTER (WHERE homologacion_estado != 'auto'
+                                                OR homologacion_estado IS NULL)  AS vacantes_sin_homologar,
+            ROUND(
+                100.0 * COUNT(DISTINCT job_id) FILTER (WHERE homologacion_estado = 'auto')
+                / NULLIF(COUNT(DISTINCT job_id), 0), 1
+            )                                                                    AS pct_homologadas,
+            (
+                SELECT familia
+                FROM (
+                    SELECT familia, COUNT(DISTINCT job_id) AS cnt
+                    FROM vacantes
+                    WHERE familia IS NOT NULL
+                    GROUP BY familia
+                    ORDER BY cnt DESC
+                    LIMIT 1
+                ) sub
+            )                                                                    AS familia_top
+        FROM vacantes
+    """
+    try:
+        rows = fetch_all(SQL_FAMILIAS, {"pid": program_id})
+        kpi_row = fetch_one(SQL_KPIS, {"pid": program_id})
+
+        total = int(kpi_row["total_vacantes"]) if kpi_row else 0
+
+        # Build familia → perfiles hierarchy
+        familias: dict = {}
+        for r in rows:
+            fam_key = r["familia"] or "__sin_clasificar__"
+            fam_label = r["familia"] or "Sin clasificar"
+            if fam_key not in familias:
+                familias[fam_key] = {"familia": fam_label, "vacantes": 0, "perfiles": []}
+            familias[fam_key]["vacantes"] += int(r["vacantes"])
+            familias[fam_key]["perfiles"].append({
+                "perfil_id":        r["perfil_id"],
+                "perfil":           r["perfil_nombre"] or "Sin clasificar",
+                "vacantes":         int(r["vacantes"]),
+                "titulos_distintos": int(r["titulos_distintos"]),
+                "titulos":          list(r["titulos"] or [])[:20],
+                "pct_total":        round(int(r["vacantes"]) / total * 100, 1) if total else 0,
+            })
+
+        familias_list = sorted(
+            familias.values(),
+            key=lambda f: (f["familia"] == "Sin clasificar", -f["vacantes"])
+        )
+
+        kpis = {
+            "total_vacantes":        int(kpi_row["total_vacantes"])        if kpi_row else 0,
+            "familias_identificadas": int(kpi_row["familias_identificadas"]) if kpi_row else 0,
+            "perfiles_homologados":  int(kpi_row["perfiles_homologados"])  if kpi_row else 0,
+            "titulos_distintos":     int(kpi_row["titulos_distintos"])     if kpi_row else 0,
+            "vacantes_homologadas":  int(kpi_row["vacantes_homologadas"])  if kpi_row else 0,
+            "vacantes_sin_homologar": int(kpi_row["vacantes_sin_homologar"]) if kpi_row else 0,
+            "pct_homologadas":       float(kpi_row["pct_homologadas"] or 0) if kpi_row else 0.0,
+            "familia_top":           kpi_row["familia_top"]                if kpi_row else None,
+        }
+
+        return {"kpis": kpis, "familias": familias_list}
+
+    except Exception as exc:
+        logger.warning("get_perfiles_homologados failed: %s", exc)
+        return {"kpis": {
+            "total_vacantes": 0, "familias_identificadas": 0, "perfiles_homologados": 0,
+            "titulos_distintos": 0, "vacantes_homologadas": 0, "vacantes_sin_homologar": 0,
+            "pct_homologadas": 0.0, "familia_top": None,
+        }, "familias": []}
+
+
 @app.get("/api/programas/{program_id}/top-vacantes", tags=["market"])
 def get_top_vacantes(
     program_id: int,
