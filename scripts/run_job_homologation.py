@@ -12,19 +12,20 @@ Comportamiento:
   - Si un job matchea múltiples patrones, gana el de mayor confianza.
   - Jobs sin match quedan en 'pending' sin modificación.
   - Con --rerun también reprocesa jobs ya en estado 'auto'.
-  - Con --dry-run muestra el plan sin tocar la base de datos.
+  - Con --dry-run muestra el plan sin tocar la base de datos ni pedir confirmación.
 
 Uso:
-    python scripts/run_job_homologation.py
     python scripts/run_job_homologation.py --dry-run
-    python scripts/run_job_homologation.py --dry-run --limit 100
+    python scripts/run_job_homologation.py
     python scripts/run_job_homologation.py --rerun
+    python scripts/run_job_homologation.py --dry-run --limit 100
 """
 from __future__ import annotations
 
 import argparse
 import logging
 import sys
+from datetime import datetime
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -37,16 +38,36 @@ try:
 except ImportError:
     pass
 
-from ml.academic_relevance_engine import connect  # reusa la conexión centralizada
+import psycopg2
+import psycopg2.extras
+from backend.database_config import get_connection_parameters
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Conexión (psycopg2 directo, sin cargar el motor de embeddings)
+# ---------------------------------------------------------------------------
+
+def _connect() -> psycopg2.extensions.connection:
+    cfg = get_connection_parameters()
+    return psycopg2.connect(
+        host=str(cfg["host"]),
+        port=int(cfg["port"]),
+        dbname=str(cfg["database"]),
+        user=str(cfg["user"]),
+        password=str(cfg["password"]),
+        sslmode=str(cfg["sslmode"]),
+        connect_timeout=int(cfg["connect_timeout"]),
+        cursor_factory=psycopg2.extras.RealDictCursor,
+    )
+
 
 # ---------------------------------------------------------------------------
 # SQL
 # ---------------------------------------------------------------------------
 
-# Para cada job en scope, elige el patrón de mayor confianza que matchea su título.
-# CTE candidatos → todos los matches; best → el de mayor confianza por job_id.
+# Simula el mejor match por job: mayor confianza, desempate por jpm.id menor.
 _SIMULATE_SQL = """
 WITH candidatos AS (
     SELECT
@@ -69,16 +90,19 @@ WITH candidatos AS (
       AND j.activo = TRUE
       {limit_clause}
 )
-SELECT
-    job_id,
-    title,
-    perfil_id,
-    confianza
+SELECT job_id, title, perfil_id, confianza
 FROM candidatos
 WHERE rn = 1
 ORDER BY job_id
 """
 
+# Backup de solo las filas que serán modificadas.
+_BACKUP_SQL = """
+CREATE TABLE IF NOT EXISTS public.{backup_table} AS
+SELECT * FROM public.jobs WHERE id = ANY(%(ids)s)
+"""
+
+# UPDATE real: DISTINCT ON garantiza un solo registro por job_id.
 _UPDATE_SQL = """
 UPDATE public.jobs AS j
 SET
@@ -114,15 +138,22 @@ RETURNING j.id
 
 def run(*, dry_run: bool, rerun: bool, limit: int | None) -> None:
     estados = ["pending", "auto"] if rerun else ["pending"]
-    limit_clause = f"AND j2.id IN (SELECT id FROM public.jobs WHERE homologacion_estado = ANY(%(estados)s) AND activo = TRUE ORDER BY id LIMIT {limit})" if limit else ""
-    limit_clause_sim = f"AND j.id IN (SELECT id FROM public.jobs WHERE homologacion_estado = ANY(%(estados)s) AND activo = TRUE ORDER BY id LIMIT {limit})" if limit else ""
+    limit_subquery = (
+        f"AND j.id IN ("
+        f"  SELECT id FROM public.jobs"
+        f"  WHERE homologacion_estado = ANY(%(estados)s) AND activo = TRUE"
+        f"  ORDER BY id LIMIT {limit}"
+        f")"
+        if limit else ""
+    )
+    limit_subquery_upd = limit_subquery.replace("j.id IN", "j2.id IN", 1) if limit else ""
 
-    conn = connect()
+    conn = _connect()
     try:
         with conn.cursor() as cur:
-            # -- preview siempre visible --
+            # ── 1. Simulación (siempre, incluido dry-run) ──────────────────
             cur.execute(
-                _SIMULATE_SQL.format(limit_clause=limit_clause_sim),
+                _SIMULATE_SQL.format(limit_clause=limit_subquery),
                 {"estados": estados},
             )
             rows = cur.fetchall()
@@ -132,13 +163,12 @@ def run(*, dry_run: bool, rerun: bool, limit: int | None) -> None:
                 logger.info("No hay jobs pendientes que matcheen algún patrón. Nada que hacer.")
                 return
 
+            job_ids = [r["job_id"] for r in rows]
+
             # Resumen por perfil
             from collections import Counter
-            perfil_counts: Counter = Counter()
-            for r in rows:
-                perfil_counts[r["perfil_id"]] += 1
+            perfil_counts: Counter = Counter(r["perfil_id"] for r in rows)
 
-            # Nombres de perfiles
             cur.execute(
                 "SELECT id, nombre FROM public.occupational_profiles WHERE id = ANY(%s)",
                 (list(perfil_counts.keys()),),
@@ -146,23 +176,47 @@ def run(*, dry_run: bool, rerun: bool, limit: int | None) -> None:
             nombres = {r["id"]: r["nombre"] for r in cur.fetchall()}
 
             logger.info("── Plan de homologación ─────────────────────────────")
-            logger.info("  Jobs a actualizar: %d", total)
+            logger.info("  Jobs a actualizar : %d", total)
             for pid, cnt in sorted(perfil_counts.items(), key=lambda x: -x[1]):
                 logger.info("  %-45s  %d jobs", nombres.get(pid, f"id={pid}"), cnt)
             logger.info("─────────────────────────────────────────────────────")
 
             if dry_run:
-                logger.info("DRY-RUN: no se aplicó ningún cambio.")
+                logger.info("DRY-RUN activo — no se aplica ningún cambio ni se pide confirmación.")
                 return
 
-            # -- UPDATE real --
+            # ── 2. Confirmación interactiva ────────────────────────────────
+            respuesta = input(
+                f"\n¿Confirmas actualizar {total} jobs en producción? "
+                "Escribe 'si' para continuar: "
+            ).strip().lower()
+            if respuesta != "si":
+                logger.info("Operación cancelada por el usuario.")
+                conn.rollback()
+                return
+
+            # ── 3. Backup de filas afectadas ───────────────────────────────
+            fecha = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_table = f"backup_homologacion_{fecha}"
             cur.execute(
-                _UPDATE_SQL.format(limit_clause=limit_clause),
+                _BACKUP_SQL.format(backup_table=backup_table),
+                {"ids": job_ids},
+            )
+            logger.info("Backup creado: public.%s (%d filas)", backup_table, total)
+
+            # ── 4. UPDATE real ─────────────────────────────────────────────
+            cur.execute(
+                _UPDATE_SQL.format(limit_clause=limit_subquery_upd),
                 {"estados": estados},
             )
             updated_ids = [r["id"] for r in cur.fetchall()]
             conn.commit()
-            logger.info("✓ %d jobs actualizados a homologacion_estado='auto'.", len(updated_ids))
+            logger.info(
+                "✓ %d jobs actualizados a homologacion_estado='auto'. "
+                "Backup en public.%s",
+                len(updated_ids),
+                backup_table,
+            )
 
     except Exception:
         conn.rollback()
@@ -185,12 +239,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--dry-run",
         action="store_true",
-        help="Muestra el plan sin modificar la base de datos.",
+        help="Muestra el plan sin modificar la base de datos ni pedir confirmación.",
     )
     p.add_argument(
         "--rerun",
         action="store_true",
-        help="Reprocesa también jobs con estado 'auto' (útil tras agregar nuevos patrones).",
+        help="Reprocesa también jobs con estado 'auto' (útil tras ampliar el catálogo).",
     )
     p.add_argument(
         "--limit",
