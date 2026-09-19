@@ -2020,6 +2020,7 @@ def get_perfiles_homologados(program_id: int) -> dict:
         FROM vacantes
     """
     try:
+        from api.database import fetch_all, fetch_one
         rows = fetch_all(SQL_FAMILIAS, {"pid": program_id})
         kpi_row = fetch_one(SQL_KPIS, {"pid": program_id})
 
