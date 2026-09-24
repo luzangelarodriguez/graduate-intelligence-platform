@@ -86,9 +86,29 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
         "scrum master",
         "agile coach",
     ],
+    "software": [
+        "desarrollador de software",
+        "desarrollador web",
+        "analista de sistemas",
+        "programador de aplicaciones",
+        "administrador de bases de datos",
+        "administrador de sistemas",
+        "profesional en redes",
+        "ingeniero de telecomunicaciones",
+    ],
+    "software_engineering": [
+        "desarrollador de software",
+        "desarrollador web",
+        "analista de sistemas",
+        "programador de aplicaciones",
+        "administrador de bases de datos",
+        "administrador de sistemas",
+        "profesional en redes",
+        "ingeniero de telecomunicaciones",
+    ],
 }
 
-DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education", "project_management"]
+DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education", "project_management", "software", "software_engineering"]
 
 
 # ---------------------------------------------------------------------------
