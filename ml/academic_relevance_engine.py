@@ -678,19 +678,6 @@ def load_programs(conn) -> List[ProgramProfile]:
         ]))[:1000]
         skill_tokens = _tokenize(" ".join(skills))
         _domain_result = _infer_domain(text, program_name=row["program_name"] or "")
-        if row["especializacion_id"] == 109:
-            logger.info(
-                "[DIAG-109] text[:500]=%r",
-                text[:500],
-            )
-            logger.info(
-                "[DIAG-109] _infer_domain -> %r",
-                _domain_result,
-            )
-            _n109 = _normalize(text)
-            for _dom, _kws in _DOMAIN_BUCKETS.items():
-                _hits = [kw for kw in _kws if kw in _n109]
-                logger.info("[DIAG-109-BUCKETS] %-20s %d hits: %s", _dom, len(_hits), _hits)
         profiles.append(ProgramProfile(
             especializacion_id=row["especializacion_id"],
             program_name=row["program_name"] or "",
