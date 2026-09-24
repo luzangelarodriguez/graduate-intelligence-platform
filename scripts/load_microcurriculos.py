@@ -544,13 +544,28 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
         if desc_match:
             desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
 
+        # Resultados de aprendizaje: text after "RESULTADO(S) DE APRENDIZAJE" label
+        resultados: list[str] = []
+        ra_match = re.search(
+            r"RESULTADO[S]?\s+DE\s+APRENDIZAJE\s*([\s\S]*?)(?="
+            r"CONTENIDO[S]?\s+TEM[AÁ]TICO|ACTIVIDADES?\s+FORMATIVAS?|"
+            r"EVALUACI[OÓ]N|BIBLIOGRAF|METODOLOG|RECURSOS?|$)",
+            block, re.IGNORECASE,
+        )
+        if ra_match:
+            for line in ra_match.group(1).splitlines():
+                line = line.strip().lstrip("-•·▪*").strip().rstrip('"')
+                if len(line) > 20 and re.match(r"^[A-ZÁÉÍÓÚÑ]", line):
+                    if not re.match(r"^(Tema|Contenido|Nota|Bibliograf|\*)", line, re.I):
+                        resultados.append(line)
+
         skills = extract_skills(block)
 
         results.append({
             "programa": programa,
             "asignatura": asig_name,
             "descripcion": desc or block[:500],
-            "resultados_aprendizaje": [],
+            "resultados_aprendizaje": resultados[:15],
             "contenido_tematico": [f"Semestre {semestre}" if semestre else ""],
             "herramientas_recursos": "",
             "skills": skills,
