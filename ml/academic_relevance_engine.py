@@ -677,11 +677,21 @@ def load_programs(conn) -> List[ProgramProfile]:
             " ".join(raw_skills),
         ]))[:1000]
         skill_tokens = _tokenize(" ".join(skills))
+        _domain_result = _infer_domain(text, program_name=row["program_name"] or "")
+        if row["especializacion_id"] == 109:
+            logger.info(
+                "[DIAG-109] text[:500]=%r",
+                text[:500],
+            )
+            logger.info(
+                "[DIAG-109] _infer_domain -> %r",
+                _domain_result,
+            )
         profiles.append(ProgramProfile(
             especializacion_id=row["especializacion_id"],
             program_name=row["program_name"] or "",
             skills=skills,
-            domain=_infer_domain(text, program_name=row["program_name"] or ""),
+            domain=_domain_result,
             text=text,
             skill_tokens=skill_tokens,
         ))
