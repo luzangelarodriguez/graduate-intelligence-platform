@@ -687,6 +687,10 @@ def load_programs(conn) -> List[ProgramProfile]:
                 "[DIAG-109] _infer_domain -> %r",
                 _domain_result,
             )
+            _n109 = _normalize(text)
+            for _dom, _kws in _DOMAIN_BUCKETS.items():
+                _hits = [kw for kw in _kws if kw in _n109]
+                logger.info("[DIAG-109-BUCKETS] %-20s %d hits: %s", _dom, len(_hits), _hits)
         profiles.append(ProgramProfile(
             especializacion_id=row["especializacion_id"],
             program_name=row["program_name"] or "",
