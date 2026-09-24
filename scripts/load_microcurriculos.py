@@ -705,7 +705,7 @@ def _has_column(conn, table: str, column: str) -> bool:
         return cur.fetchone() is not None
 
 
-def insert_record(conn, rec: dict, esp_id: int | None) -> int:
+def insert_record(conn, rec: dict, esp_id: int | None, esp_nombre: str | None = None) -> int:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -734,7 +734,7 @@ def insert_record(conn, rec: dict, esp_id: int | None) -> int:
                     "domain_key": rec["domain_key"],
                 }),
                 esp_id,
-                rec["programa"] if esp_id else None,
+                esp_nombre if esp_id else None,
             ),
         )
         row = cur.fetchone()
@@ -1017,7 +1017,8 @@ def main() -> None:
         try:
             for rec in new_records:
                 esp_id = match_esp_id(rec["programa"], esps)
-                micro_id = insert_record(conn, rec, esp_id)
+                esp_nombre = next((e["nombre"] for e in esps if e["id"] == esp_id), None)
+                micro_id = insert_record(conn, rec, esp_id, esp_nombre)
                 n_skills = insert_skills(conn, micro_id, rec)
                 if esp_id:
                     upsert_domain_mapping(conn, esp_id, rec["programa"], rec["domain_key"])
