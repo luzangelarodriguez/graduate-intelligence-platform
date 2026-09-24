@@ -653,6 +653,8 @@ _EXPLICIT_ESP_MAP: dict[str, int] = {
     # Administración de Empresas → id=82 (Alta Gerencia)
     "administracion de empresas": 82,
     "alta gerencia": 82,
+    # Ingeniería Informática (Pregrado) → id=109
+    "pregrado": 109,
 }
 
 
