@@ -75,7 +75,8 @@ _RE_TOOLS = re.compile(
     r"\b(Power\s*BI|Tableau|Looker|QlikSense|QlikView|Excel|KNIME|"
     r"RStudio|Jupyter|VS\s*Code|PyCharm|SPSS|SAS|Minitab|"
     r"Docker|Kubernetes|Git|GitHub|GitLab|Jenkins|dbt|"
-    r"Pentaho|Talend|SSIS|Informatica|MicroStrategy|SAP)\b",
+    r"Pentaho|Talend|SSIS|Informatica|MicroStrategy|SAP|"
+    r"Wireshark|Packet\s*Tracer|VirtualBox|VMware)\b",
     re.IGNORECASE,
 )
 
@@ -88,7 +89,17 @@ _RE_TECH = re.compile(
     r"Inteligencia\s*Artificial|Aprendizaje\s*Autom[aá]tico|"
     r"Regresi[oó]n|Clasificaci[oó]n|Clustering|Random\s*Forest|"
     r"Dashboard|Reporting|API\s*REST|Microservicios|"
-    r"Visualizaci[oó]n\s*de\s*datos|An[aá]lisis\s*de\s*datos)\b",
+    r"Visualizaci[oó]n\s*de\s*datos|An[aá]lisis\s*de\s*datos|"
+    r"TCP[/\-]?IP|DNS|DHCP|VPN|firewall|router|switch|LAN|WAN|WiFi|"
+    r"protocolo\s*HTTP|redes\s*de\s*computadores|"
+    r"Linux|Unix|Windows\s*Server|kernel|bash|shell\s*scripting|"
+    r"proceso\s+inform[aá]tico|hilo\s+de\s+ejecuci[oó]n|"
+    r"memoria\s*virtual|gesti[oó]n\s*de\s*memoria|"
+    r"ensamblador|microprocesador|arquitectura\s*de\s*computadores|"
+    r"virtualizaci[oó]n|circuito\s*digital|"
+    r"comercio\s*electr[oó]nico|e[\-\s]?commerce|"
+    r"ciberseguridad|seguridad\s*inform[aá]tica|criptograf[ií]a|"
+    r"cifrado|SSL|TLS|autenticaci[oó]n)\b",
     re.IGNORECASE,
 )
 
@@ -112,7 +123,8 @@ _RE_METHODS = re.compile(
     r"An[aá]lisis\s+factorial|Series\s+de\s+tiempo|"
     r"Validaci[oó]n\s+cruzada|Hiperpar[aá]metros|"
     r"An[aá]lisis\s+de\s+componentes\s+principales|PCA|"
-    r"Balanceo\s+de\s+clases|Overfitting|Underfitting)\b",
+    r"Balanceo\s+de\s+clases|Overfitting|Underfitting|"
+    r"subnetting|criptograf[ií]a)\b",
     re.IGNORECASE,
 )
 
