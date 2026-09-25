@@ -96,6 +96,7 @@ const PROGRAMS = [
   { id: 108, label: 'Especialización en Criminología', nombre: 'Especialización en Criminología',               creditos: 24, duracion: '2', periodicidad: 'Semestral' },
   { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 9,   label: 'Dirección y Gestión de Proyectos', nombre: 'Especialización en Dirección y Gestión de Proyectos', creditos: 24, duracion: '2', periodicidad: 'Semestral' },
+  { id: 109, label: 'Ingeniería Informática',           nombre: 'Ingeniería Informática',                             creditos: null, duracion: '4', periodicidad: 'Semestral' },
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
