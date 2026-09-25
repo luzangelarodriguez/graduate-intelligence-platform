@@ -276,7 +276,7 @@ def inspect_headers(anio: int) -> None:
     for i, row in enumerate(ws.iter_rows(values_only=True)):
         if i >= 8:
             break
-        print(f"Fila {i:2d}: {[row[c] for c in range(20)]}")
+        print(f"Fila {i:2d}: {[row[c] for c in range(45)]}")
     wb.close()
 
 
