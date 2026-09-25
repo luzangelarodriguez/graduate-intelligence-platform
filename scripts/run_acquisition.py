@@ -89,7 +89,7 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     "software": [
         "desarrollador de software",
         "desarrollador web",
-        "analista de sistemas",
+        "ingeniero de software",
         "programador de aplicaciones",
         "administrador de bases de datos",
         "administrador de sistemas",
@@ -99,7 +99,7 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
     "software_engineering": [
         "desarrollador de software",
         "desarrollador web",
-        "analista de sistemas",
+        "ingeniero de software",
         "programador de aplicaciones",
         "administrador de bases de datos",
         "administrador de sistemas",
