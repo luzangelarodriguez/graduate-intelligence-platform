@@ -4,6 +4,7 @@ Loader for SNIES estadístico — Matriculados and Graduados by programa.
 
 Usage:
     python scripts/load_snies_estadisticas.py [--anio 2025] [--dry-run]
+    python scripts/load_snies_estadisticas.py [--anio 2025] [--inspect-headers]
 
 Workflow:
   1. Fetch https://snies.mineducacion.gov.co/portal/ESTADISTICAS/Bases-consolidadas/
@@ -13,18 +14,50 @@ Workflow:
   3. Parse: skip 6 header rows, aggregate SUM(value) GROUP BY codigo_snies_programa.
   4. UPSERT into snies_estadisticas_programa.
 
-Excel structure (confirmed with 2025 matriculados file):
-  - Data sheet: first sheet whose name starts with a digit (e.g. "1.")
-  - Rows 1-6: metadata/headers; row 7+ = data
-  - Col  1 (0-based): INSTITUCIÓN DE EDUCACIÓN SUPERIOR
-  - Col 13: CÓDIGO SNIES DEL PROGRAMA
-  - Col 14: PROGRAMA ACADÉMICO
-  - Col 16: METODOLOGÍA (presencial / virtual / a distancia)
-  - Col 26: NIVEL DE FORMACIÓN
-  - Col 38: AÑO
-  - Col 40: MATRICULADOS (or GRADUADOS in the graduados file)
-  Data is disaggregated by semester and sex — loader sums value per codigo_snies
-  and takes the first non-null text fields (IES, programa, modalidad, nivel).
+Excel structure — VERIFIED 2025-09-25 with inspect_headers on the 2025 matriculados file
+  (42 columns total, 0-indexed):
+  Col  0: CÓDIGO DE LA INSTITUCIÓN       ← numeric IES code (e.g. 9926)
+  Col  1: (unknown — NOT the IES name)   ← CURRENT BUG: COL_IES=1 reads this, wrong
+  Col  2: INSTITUCIÓN DE EDUCACIÓN SUPERIOR (IES name, text) ← CORRECT column for IES name
+  Col 13: CÓDIGO SNIES DEL PROGRAMA      ← unique program code per IES (e.g. 107416)
+  Col 14: PROGRAMA ACADÉMICO             ← program name text (confirmed correct)
+  Col 16: ID NIVEL ACADÉMICO             ← 1=Pregrado, 2=Posgrado (currently stored as "modalidad" — BUG)
+  Col 17: NIVEL ACADÉMICO                ← text: "Pregrado" / "Posgrado"
+  Col 18: ID NIVEL DE FORMACIÓN          ← 6=Universitario (currently stored as "nivel_formacion" — partially correct concept)
+  Col 19: NIVEL DE FORMACIÓN             ← text: "Universitario" / "Técnico" / etc.
+  Col 21: METODOLOGÍA (modalidad text)   ← "Presencial" / "Virtual" / "A Distancia" — the real modalidad
+  Col 38: AÑO
+  Col 39: SEMESTRE                       ← 1 or 2 — rows are disaggregated by semester AND sex
+  Col 40: MATRICULADOS (or GRADUADOS)    ← value per (programa, semestre, sexo) combination
+
+  ⚠️  KNOWN BUGS — DO NOT USE LOADED DATA AS-IS, FIX BEFORE RELYING ON IT:
+
+  BUG 1 — COL_IES is wrong:
+    COL_IES=1 reads an unknown/wrong column. The IES name is at col 2.
+    Result: nombre_ies in DB contains garbage values (e.g. "9926" for Ingeniería Informática).
+    Fix: change COL_IES = 1 → COL_IES = 2.
+    Also consider adding COL_CODIGO_IES = 0 if the numeric IES code is useful.
+
+  BUG 2 — COL_MODALIDAD reads ID NIVEL ACADÉMICO, not the methodology:
+    COL_MODALIDAD=16 is "ID NIVEL ACADÉMICO" (1=Pregrado). The real methodology
+    (Presencial/Virtual/Distancia) is at col 21.
+    Fix: change COL_MODALIDAD = 16 → COL_MODALIDAD = 21.
+    Consider also capturing col 17 (NIVEL ACADÉMICO text) as a new field.
+
+  BUG 3 — UPSERT discards all but the last row per (codigo_snies, anio):
+    The Excel has one row per (programa, semestre, sexo) combination — verified
+    with 2025 data: codigo_snies=107416 appears in fila 6 (SEMESTRE=1, MAT=500)
+    and fila 7 (SEMESTRE=2, MAT=488). The current _parse_xlsx sums `value` per
+    codigo_snies WITHIN the parser, but then _upsert uses ON CONFLICT DO UPDATE
+    which replaces the entire row — so if the parser is called twice (mat + grad),
+    the second call's aggregated sum overwrites the first. More critically, if the
+    data contains rows for both semesters, the parser accumulates them correctly,
+    but the stored total may still be wrong because text fields (nombre_ies,
+    modalidad, etc.) come from the first encountered row regardless of semester.
+    Fix needed: verify that _parse_xlsx correctly sums BOTH semesters AND both sexes
+    for the total annual figure, then confirm the upsert stores that annual total.
+    Also re-run the full load after fixing BUG 1 and BUG 2 so all 15,134 programs
+    get correct nombre_ies, modalidad, and nivel values.
 
 Target table schema (snies_estadisticas_programa):
   codigo_snies, nombre_ies, nombre_programa, modalidad, nivel_formacion,
