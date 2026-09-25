@@ -90,12 +90,15 @@ BASES_PAGE = f"{BASE_URL}/portal/ESTADISTICAS/Bases-consolidadas/"
 # "articles-430149_recurso.xlsx" without any path prefix).
 CMS_FILE_BASE = f"{BASE_URL}/1778/"
 
-# Column indices in the data sheet (0-based, confirmed with 2025 matriculados file)
-COL_IES          =  1   # INSTITUCIÓN DE EDUCACIÓN SUPERIOR
+# Column indices in the data sheet (0-based, verified 2025-09-25 with inspect_headers)
+COL_CODIGO_IES   =  0   # CÓDIGO DE LA INSTITUCIÓN (numeric)
+COL_IES          =  2   # INSTITUCIÓN DE EDUCACIÓN SUPERIOR (name text) — was 1 (bug)
 COL_CODIGO_SNIES = 13   # CÓDIGO SNIES DEL PROGRAMA
 COL_PROGRAMA     = 14   # PROGRAMA ACADÉMICO
-COL_MODALIDAD    = 16   # METODOLOGÍA
-COL_NIVEL        = 26   # NIVEL DE FORMACIÓN
+COL_NIVEL_ACAD_ID = 16  # ID NIVEL ACADÉMICO (1=Pregrado, 2=Posgrado)
+COL_NIVEL_ACAD   = 17   # NIVEL ACADÉMICO text ("Pregrado" / "Posgrado")
+COL_MODALIDAD    = 21   # METODOLOGÍA text ("Presencial"/"Virtual"/"A Distancia") — was 16 (bug)
+COL_NIVEL        = 19   # NIVEL DE FORMACIÓN text ("Universitario"/"Técnico"/etc.)
 COL_ANIO         = 38   # AÑO
 COL_VALUE        = 40   # MATRICULADOS or GRADUADOS — both files use the same last column
 
@@ -199,11 +202,12 @@ def _parse_xlsx(data: bytes, anio: int) -> dict[int, dict]:
 
             if codigo not in programs:
                 programs[codigo] = {
-                    "value":          0,
-                    "nombre_ies":     str(row[COL_IES] or "").strip(),
+                    "value":           0,
+                    "nombre_ies":      str(row[COL_IES] or "").strip(),
                     "nombre_programa": str(row[COL_PROGRAMA] or "").strip(),
-                    "modalidad":      str(row[COL_MODALIDAD] or "").strip(),
+                    "modalidad":       str(row[COL_MODALIDAD] or "").strip(),
                     "nivel_formacion": str(row[COL_NIVEL] or "").strip(),
+                    "nivel_academico": str(row[COL_NIVEL_ACAD] or "").strip(),
                 }
             programs[codigo]["value"] += value
             processed += 1
@@ -240,6 +244,7 @@ def _upsert(
             meta.get("nombre_programa", ""),
             meta.get("modalidad", ""),
             meta.get("nivel_formacion", ""),
+            meta.get("nivel_academico", ""),
             anio,
             mat.get("value", 0),
             grad.get("value", 0),
@@ -252,21 +257,31 @@ def _upsert(
         if rows:
             for r in rows[:5]:
                 log.info(
-                    "  sample: codigo=%s ies=%r programa=%r anio=%s mat=%s grad=%s",
-                    r[0], r[1], r[2], r[5], r[6], r[7],
+                    "  sample: codigo=%s ies=%r programa=%r nivel_acad=%r anio=%s mat=%s grad=%s",
+                    r[0], r[1], r[2], r[5], r[6], r[7], r[8],
                 )
+        # Always print the specific program we're verifying
+        target = next((r for r in rows if r[0] == 107416), None)
+        if target:
+            log.info(
+                "  VERIFICACIÓN 107416: ies=%r programa=%r modalidad=%r nivel_acad=%r mat=%s grad=%s",
+                target[1], target[2], target[3], target[5], target[7], target[8],
+            )
+        else:
+            log.warning("  VERIFICACIÓN 107416: no encontrado en este archivo.")
         return len(rows)
 
     sql = """
         INSERT INTO snies_estadisticas_programa
             (codigo_snies, nombre_ies, nombre_programa, modalidad, nivel_formacion,
-             anio, matriculados, graduados, inscritos, admitidos)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             nivel_academico, anio, matriculados, graduados, inscritos, admitidos)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (codigo_snies, anio) DO UPDATE SET
             nombre_ies      = EXCLUDED.nombre_ies,
             nombre_programa = EXCLUDED.nombre_programa,
             modalidad       = EXCLUDED.modalidad,
             nivel_formacion = EXCLUDED.nivel_formacion,
+            nivel_academico = EXCLUDED.nivel_academico,
             matriculados    = EXCLUDED.matriculados,
             graduados       = EXCLUDED.graduados
     """
