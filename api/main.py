@@ -630,10 +630,21 @@ def related_universities(program_id: int) -> dict[str, Any]:
                                 COALESCE(s.graduados, 0)    AS graduados,
                                 COALESCE(s.inscritos, 0)    AS inscritos
                          FROM mineducacion_programas_virtuales m"""
-        FILTERS = """AND m.estado_programa ILIKE '%activo%'
+        # Fetch the real nivel for this program to avoid hardcoding 'Posgrado'
+        from api.database import fetch_one
+        prog_meta = fetch_one(
+            "SELECT nivel FROM especializaciones WHERE id = %s", (program_id,)
+        )
+        prog_nivel = (prog_meta or {}).get("nivel") or "Posgrado"
+        # Map internal nivel values to SNIES/mineducacion vocabulary
+        nivel_filter = "Pregrado" if "pregrado" in prog_nivel.lower() else "Posgrado"
+        # For pregrado, drop the '%especializ%' constraint (only meaningful for posgrado names)
+        nombre_filter = "" if nivel_filter == "Pregrado" else "AND m.nombre_programa ILIKE '%especializ%'"
+
+        FILTERS = f"""AND m.estado_programa ILIKE '%activo%'
                      AND m.modalidad ILIKE '%virtual%'
-                     AND m.nivel_academico = 'Posgrado'
-                     AND m.nombre_programa ILIKE '%especializ%'
+                     AND m.nivel_academico = '{nivel_filter}'
+                     {nombre_filter}
                      ORDER BY COALESCE(s.matriculados, 0) DESC LIMIT 50"""
 
         PROGRAM_WHERE = {
@@ -677,6 +688,13 @@ def related_universities(program_id: int) -> dict[str, Any]:
                AND m.nombre_programa NOT ILIKE '%inform_tica%'
                AND m.nombre_programa NOT ILIKE '%inteligencia de negocio%'
                AND m.nombre_programa NOT ILIKE '%desarrollo%'""",
+            109: """WHERE (m.nombre_programa ILIKE '%ingenier_a inform_tica%'
+                       OR m.nombre_programa ILIKE '%ingenier_a de sistemas%'
+                       OR m.nombre_programa ILIKE '%tecnolog_a en sistemas%'
+                       OR m.nombre_programa ILIKE '%ingenier_a en computaci_n%'
+                       OR m.nombre_programa ILIKE '%tecnolog_a inform_tica%'
+                       OR m.nombre_programa ILIKE '%ciencias de la computaci_n%'
+                    )""",
         }
         where = PROGRAM_WHERE.get(program_id)
         if not where:
