@@ -264,7 +264,7 @@ def _get_connection():
 
 
 def inspect_headers(anio: int) -> None:
-    """Download only the matriculados file and print the first 8 rows (cols 0-19)."""
+    """Download only the matriculados file and print the first 8 rows (all columns)."""
     urls = _fetch_urls(anio)
     mat_url = urls["matriculados"]
     log.info("Descargando Matriculados para inspección de encabezados …")
@@ -272,11 +272,13 @@ def inspect_headers(anio: int) -> None:
     wb = openpyxl.load_workbook(io.BytesIO(mat_data), read_only=True, data_only=True)
     sheet_name = next((n for n in wb.sheetnames if n[:1].isdigit()), wb.sheetnames[0])
     ws = wb[sheet_name]
-    print(f"\n=== Hoja: '{sheet_name}' — primeras 8 filas, columnas 0-19 ===")
+    n_cols = ws.max_column or 0
+    print(f"\n=== Hoja: '{sheet_name}' — {n_cols} columnas totales, primeras 8 filas ===")
     for i, row in enumerate(ws.iter_rows(values_only=True)):
         if i >= 8:
             break
-        print(f"Fila {i:2d}: {[row[c] for c in range(45)]}")
+        row_vals = [row[c] if c < len(row) else None for c in range(n_cols)]
+        print(f"Fila {i:2d} ({len(row)} cols): {row_vals}")
     wb.close()
 
 
