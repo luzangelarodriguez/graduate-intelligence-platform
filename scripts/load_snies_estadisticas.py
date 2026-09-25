@@ -263,6 +263,23 @@ def _get_connection():
     return psycopg2.connect(url)
 
 
+def inspect_headers(anio: int) -> None:
+    """Download only the matriculados file and print the first 8 rows (cols 0-19)."""
+    urls = _fetch_urls(anio)
+    mat_url = urls["matriculados"]
+    log.info("Descargando Matriculados para inspección de encabezados …")
+    mat_data = _download_xlsx(mat_url)
+    wb = openpyxl.load_workbook(io.BytesIO(mat_data), read_only=True, data_only=True)
+    sheet_name = next((n for n in wb.sheetnames if n[:1].isdigit()), wb.sheetnames[0])
+    ws = wb[sheet_name]
+    print(f"\n=== Hoja: '{sheet_name}' — primeras 8 filas, columnas 0-19 ===")
+    for i, row in enumerate(ws.iter_rows(values_only=True)):
+        if i >= 8:
+            break
+        print(f"Fila {i:2d}: {[row[c] for c in range(20)]}")
+    wb.close()
+
+
 def run(anio: int, dry_run: bool) -> None:
     urls = _fetch_urls(anio)
     mat_url  = urls["matriculados"]
@@ -297,5 +314,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Carga estadísticas SNIES a PostgreSQL")
     ap.add_argument("--anio", type=int, default=2025, help="Año a procesar (default: 2025)")
     ap.add_argument("--dry-run", action="store_true", help="Parsea pero no escribe en DB")
+    ap.add_argument("--inspect-headers", action="store_true", help="Imprime encabezados del Excel y sale")
     args = ap.parse_args()
-    run(args.anio, args.dry_run)
+    if args.inspect_headers:
+        inspect_headers(args.anio)
+    else:
+        run(args.anio, args.dry_run)
