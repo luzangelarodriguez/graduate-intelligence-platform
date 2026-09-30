@@ -2601,7 +2601,15 @@ function ViewPrograma({ programaId }: ViewProps) {
   );
 }
 
-function ViewOfertaDemanda({ ofertaDemanda, programaId, meta }: ViewProps & { ofertaDemanda: OfertaDemandaData | null }) {
+function ViewOfertaDemanda({ ofertaDemanda, ofertaDemandaError, programaId, meta }: ViewProps & { ofertaDemanda: OfertaDemandaData | null; ofertaDemandaError?: boolean }) {
+  if (ofertaDemandaError) {
+    return (
+      <div style={{ padding: 24, textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: '#DC2626', margin: '0 0 8px' }}>Error al cargar datos SNIES.</p>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Verifica que el backend esté disponible e intenta recargar la página.</p>
+      </div>
+    );
+  }
   if (!ofertaDemanda) {
     return (
       <div style={{ padding: 24 }}>
@@ -4270,6 +4278,7 @@ export default function ObservatorioStorytelling() {
   const [skills, setSkills]                 = useState<SkillsAnalysis | null>(null);
   const [univ, setUniv]                     = useState<UniversityData | null>(null);
   const [ofertaDemanda, setOfertaDemanda]   = useState<OfertaDemandaData | null>(null);
+  const [ofertaDemandaError, setOfertaDemandaError] = useState(false);
   const [loading, setLoading]               = useState(true);
   const [isFallback, setIsFallback]         = useState(false);
   const [programaId, setProgramaId]         = useState(13);
@@ -4318,10 +4327,11 @@ export default function ObservatorioStorytelling() {
   // Fetch oferta y demanda
   useEffect(() => {
     setOfertaDemanda(null);
+    setOfertaDemandaError(false);
     fetch(`${API}/api/programs/oferta-demanda/${programaId}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: OfertaDemandaData) => setOfertaDemanda(d))
-      .catch(() => setOfertaDemanda(null));
+      .catch(() => { setOfertaDemanda(null); setOfertaDemandaError(true); });
   }, [programaId]);
 
   // Reset redesign on program change
@@ -4440,7 +4450,7 @@ export default function ObservatorioStorytelling() {
     resumen:         <ViewResumen         {...viewProps} />,
     mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
-    cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} />,
+    cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} ofertaDemandaError={ofertaDemandaError} />,
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
