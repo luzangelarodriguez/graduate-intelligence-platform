@@ -2601,7 +2601,15 @@ function ViewPrograma({ programaId }: ViewProps) {
   );
 }
 
-function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDemanda: OfertaDemandaData | null }) {
+function ViewOfertaDemanda({ ofertaDemanda, ofertaDemandaError, programaId, meta }: ViewProps & { ofertaDemanda: OfertaDemandaData | null; ofertaDemandaError?: boolean }) {
+  if (ofertaDemandaError) {
+    return (
+      <div style={{ padding: 24, textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: '#DC2626', margin: '0 0 8px' }}>Error al cargar datos SNIES.</p>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Verifica que el backend esté disponible e intenta recargar la página.</p>
+      </div>
+    );
+  }
   if (!ofertaDemanda) {
     return (
       <div style={{ padding: 24 }}>
@@ -2617,31 +2625,114 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDe
   const aniosLabels = serie_matriculados.map(r => String(r.anio));
   const hasHistorico = anios_disponibles.length >= 2;
 
+  // UNIR own stats: use latest year from serie
+  const unirMatr = serie_matriculados.length > 0
+    ? serie_matriculados[serie_matriculados.length - 1].valor : null;
+  const unirGrad = serie_graduados.length > 0
+    ? serie_graduados[serie_graduados.length - 1].valor : null;
+
+  // Participation %
+  const pctMatr = (unirMatr != null && mercado && mercado.matriculados_total > 0)
+    ? ((unirMatr / mercado.matriculados_total) * 100).toFixed(1) : null;
+  const pctGrad = (unirGrad != null && mercado && mercado.graduados_total > 0)
+    ? ((unirGrad / mercado.graduados_total) * 100).toFixed(1) : null;
+
+  const nombrePrograma = meta?.nombre ?? `Programa ${programaId}`;
+
+  // Participation % per benchmark row for table
+  const totalMatrMercado = mercado?.matriculados_total ?? 0;
+  const totalGradMercado = mercado?.graduados_total ?? 0;
+
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+
       {/* Header */}
       <div style={{ flexShrink: 0 }}>
         <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Oferta y Demanda Académica</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-          Datos SNIES · Universo de programas comparables activos en modalidad virtual
+          Oferta, demanda y posición de UNIR en el sistema de educación superior (SNIES)
         </p>
       </div>
 
-      {/* KPIs del mercado comparable */}
-      {mercado ? (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5" style={{ flexShrink: 0 }}>
-          <MetricCard label="Programas similares" value={mercado.programas_similares.toLocaleString('es-CO')} color={C.navy} />
-          <MetricCard label="Instituciones"        value={mercado.instituciones.toLocaleString('es-CO')}        color="#2563EB" />
-          <MetricCard label="Matriculados totales" value={mercado.matriculados_total.toLocaleString('es-CO')}   color="#059669" />
-          <MetricCard label="Graduados totales"    value={mercado.graduados_total.toLocaleString('es-CO')}      color="#7C3AED" />
+      {/* ── Doble bloque KPI ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ flexShrink: 0 }}>
+
+        {/* Mercado académico */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <IconSchool size={16} color="#2563EB" />
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Mercado Académico (SNIES)
+            </span>
+          </div>
+          {mercado ? (
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: 'Programas similares',  value: mercado.programas_similares.toLocaleString('es-CO'), color: C.navy },
+                { label: 'Instituciones',        value: mercado.instituciones.toLocaleString('es-CO'),        color: '#2563EB' },
+                { label: 'Matriculados totales', value: mercado.matriculados_total.toLocaleString('es-CO'),   color: '#059669' },
+                { label: 'Graduados totales',    value: mercado.graduados_total.toLocaleString('es-CO'),      color: '#7C3AED' },
+              ].map(({ label, value, color }) => (
+                <div key={label} style={{ textAlign: 'center', padding: '8px 4px' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Sin datos de mercado comparable.</p>
+          )}
+          {/* Chip modalidad */}
+          <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.border}`, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <span style={{
+              display: 'inline-block', background: '#EFF6FF', color: '#1D4ED8',
+              fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
+              whiteSpace: 'nowrap', flexShrink: 0,
+            }}>
+              100% Virtual
+            </span>
+            <span style={{ fontSize: 10, color: '#9CA3AF', lineHeight: 1.4 }}>
+              Este universo comparable está filtrado a programas virtuales activos; no refleja ausencia de oferta presencial en el mercado.
+            </span>
+          </div>
         </div>
-      ) : (
-        <div style={{ background: '#F3F4F6', borderRadius: 8, padding: '12px 16px' }}>
-          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>
-            Sin datos de mercado comparable para este programa.
-          </p>
+
+        {/* UNIR */}
+        <div style={{ background: C.navy, borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <IconAward size={16} color="#93C5FD" />
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#93C5FD', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              UNIR — {nombrePrograma}
+            </span>
+          </div>
+          {snies_vinculado && unirMatr != null ? (
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: 'Matriculados',              value: unirMatr.toLocaleString('es-CO'), color: '#60A5FA' },
+                { label: 'Graduados',                 value: unirGrad != null ? unirGrad.toLocaleString('es-CO') : '—', color: '#34D399' },
+                { label: 'Part. en matrícula',        value: pctMatr != null ? `${pctMatr}%` : '—', color: '#FCD34D' },
+                { label: 'Part. en graduados',        value: pctGrad != null ? `${pctGrad}%` : '—', color: '#F9A8D4' },
+              ].map(({ label, value, color }) => (
+                <div key={label} style={{ textAlign: 'center', padding: '8px 4px' }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 10, color: '#93C5FD', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: '#93C5FD', margin: 0, fontStyle: 'italic' }}>
+              {snies_vinculado ? 'Sin datos de matrícula propios aún.' : 'Programa no vinculado a SNIES todavía.'}
+            </p>
+          )}
+          {anios_disponibles.length > 0 && (
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+              <span style={{ fontSize: 10, color: '#93C5FD' }}>
+                {nota_cobertura ?? `Año${anios_disponibles.length > 1 ? 's' : ''} disponible${anios_disponibles.length > 1 ? 's' : ''}: ${anios_disponibles.join(', ')}`}
+              </span>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Serie histórica del programa propio */}
       <DashPanel title={
@@ -2661,18 +2752,8 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDe
               data={{
                 labels: aniosLabels,
                 datasets: [
-                  {
-                    label: 'Matriculados',
-                    data: serie_matriculados.map(r => r.valor),
-                    backgroundColor: '#3B82F6',
-                    borderRadius: 4,
-                  },
-                  {
-                    label: 'Graduados',
-                    data: serie_graduados.map(r => r.valor),
-                    backgroundColor: '#10B981',
-                    borderRadius: 4,
-                  },
+                  { label: 'Matriculados', data: serie_matriculados.map(r => r.valor), backgroundColor: '#3B82F6', borderRadius: 4 },
+                  { label: 'Graduados',    data: serie_graduados.map(r => r.valor),    backgroundColor: '#10B981', borderRadius: 4 },
                 ],
               }}
               options={{
@@ -2694,17 +2775,17 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDe
       </DashPanel>
 
       {/* Benchmark de instituciones */}
-      <DashPanel title={benchmark.length > 0 ? `Benchmark instituciones (top ${benchmark.length})` : 'Benchmark instituciones'}>
+      <DashPanel title={benchmark.length > 0 ? `Principales universidades por matrícula (SNIES) — top ${benchmark.length}` : 'Benchmark instituciones'}>
         {benchmark.length === 0 ? (
           <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Sin datos de benchmark disponibles.</p>
         ) : (
-          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 220 }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 380 }}>
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 240 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 420 }}>
               <thead>
                 <tr style={{ borderBottom: `2px solid ${C.border}` }}>
-                  {['Institución', 'Matr.', 'Grad.'].map(h => (
+                  {['#', 'Institución', 'Matr.', 'Grad.', 'Part. Matr.', 'Part. Grad.'].map(h => (
                     <th key={h} style={{
-                      textAlign: h === 'Institución' ? 'left' : 'right',
+                      textAlign: h === 'Institución' || h === '#' ? 'left' : 'right',
                       padding: '4px 8px', color: '#9CA3AF', fontWeight: 600,
                       fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap',
                     }}>{h}</th>
@@ -2712,22 +2793,33 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDe
                 </tr>
               </thead>
               <tbody>
-                {benchmark.map((b, i) => (
-                  <tr key={i} style={{
-                    borderBottom: `1px solid ${C.border}`,
-                    background: b.es_unir ? '#EEF2FF' : (i % 2 === 0 ? '#fff' : '#FAFAFA'),
-                  }}>
-                    <td style={{ padding: '6px 8px', color: b.es_unir ? C.navy : '#374151', fontWeight: b.es_unir ? 700 : 400, whiteSpace: 'nowrap' }}>
-                      {b.es_unir ? '★ ' : ''}{b.institucion}
-                    </td>
-                    <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy, whiteSpace: 'nowrap' }}>
-                      {b.matriculados.toLocaleString('es-CO')}
-                    </td>
-                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280', whiteSpace: 'nowrap' }}>
-                      {b.graduados.toLocaleString('es-CO')}
-                    </td>
-                  </tr>
-                ))}
+                {benchmark.map((b, i) => {
+                  const pm = totalMatrMercado > 0 ? ((b.matriculados / totalMatrMercado) * 100).toFixed(1) : '—';
+                  const pg = totalGradMercado > 0 ? ((b.graduados    / totalGradMercado)  * 100).toFixed(1) : '—';
+                  return (
+                    <tr key={i} style={{
+                      borderBottom: `1px solid ${C.border}`,
+                      background: b.es_unir ? '#EEF2FF' : (i % 2 === 0 ? '#fff' : '#FAFAFA'),
+                    }}>
+                      <td style={{ padding: '6px 8px', color: '#9CA3AF', fontSize: 11 }}>{i + 1}</td>
+                      <td style={{ padding: '6px 8px', color: b.es_unir ? C.navy : '#374151', fontWeight: b.es_unir ? 700 : 400, whiteSpace: 'nowrap' }}>
+                        {b.es_unir ? '★ ' : ''}{b.institucion}
+                      </td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy, whiteSpace: 'nowrap' }}>
+                        {b.matriculados.toLocaleString('es-CO')}
+                      </td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280', whiteSpace: 'nowrap' }}>
+                        {b.graduados.toLocaleString('es-CO')}
+                      </td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', color: '#059669', fontSize: 11, whiteSpace: 'nowrap' }}>
+                        {pm !== '—' ? `${pm}%` : '—'}
+                      </td>
+                      <td style={{ padding: '6px 8px', textAlign: 'right', color: '#7C3AED', fontSize: 11, whiteSpace: 'nowrap' }}>
+                        {pg !== '—' ? `${pg}%` : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -2736,7 +2828,7 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDe
 
       {/* Distribución geográfica */}
       {oferta_geografica.length > 0 && (
-        <DashPanel title="Distribución geográfica de la oferta">
+        <DashPanel title="Distribución geográfica de la oferta (SNIES)">
           <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 200 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 280 }}>
               <thead>
@@ -4186,6 +4278,7 @@ export default function ObservatorioStorytelling() {
   const [skills, setSkills]                 = useState<SkillsAnalysis | null>(null);
   const [univ, setUniv]                     = useState<UniversityData | null>(null);
   const [ofertaDemanda, setOfertaDemanda]   = useState<OfertaDemandaData | null>(null);
+  const [ofertaDemandaError, setOfertaDemandaError] = useState(false);
   const [loading, setLoading]               = useState(true);
   const [isFallback, setIsFallback]         = useState(false);
   const [programaId, setProgramaId]         = useState(13);
@@ -4234,10 +4327,11 @@ export default function ObservatorioStorytelling() {
   // Fetch oferta y demanda
   useEffect(() => {
     setOfertaDemanda(null);
+    setOfertaDemandaError(false);
     fetch(`${API}/api/programs/oferta-demanda/${programaId}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: OfertaDemandaData) => setOfertaDemanda(d))
-      .catch(() => setOfertaDemanda(null));
+      .catch(() => { setOfertaDemanda(null); setOfertaDemandaError(true); });
   }, [programaId]);
 
   // Reset redesign on program change
@@ -4356,7 +4450,7 @@ export default function ObservatorioStorytelling() {
     resumen:         <ViewResumen         {...viewProps} />,
     mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
-    cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} />,
+    cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} ofertaDemandaError={ofertaDemandaError} />,
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
