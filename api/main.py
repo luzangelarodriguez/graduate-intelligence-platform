@@ -729,6 +729,196 @@ def related_universities(program_id: int) -> dict[str, Any]:
         return {"program_id": program_id, "competitors": [], "total": 0, "error": str(e)}
 
 
+@app.get("/api/programs/oferta-demanda/{program_id}", tags=["programs"])
+def oferta_demanda(program_id: int) -> dict[str, Any]:
+    """Oferta y Demanda Académica: datos SNIES del programa propio + universo comparable."""
+    _EMPTY = {
+        "program_id": program_id,
+        "snies_vinculado": False,
+        "anios_disponibles": [],
+        "serie_matriculados": [],
+        "serie_graduados": [],
+        "nota_cobertura": None,
+        "mercado": None,
+        "benchmark": [],
+        "oferta_geografica": [],
+    }
+    try:
+        from api.database import connection, fetch_all, fetch_one
+
+        PROGRAM_WHERE: dict[int, str] = {
+            13: """WHERE (m.nombre_programa ILIKE '%analytic%'
+                      OR m.nombre_programa ILIKE '%datos%'
+                      OR m.nombre_programa ILIKE '%big data%'
+                      OR m.nombre_programa ILIKE '%inteligencia de negocio%'
+                      OR m.nombre_programa ILIKE '%business intelligence%')""",
+            11: """WHERE (m.nombre_programa ILIKE '%inteligencia artificial%'
+                      OR m.nombre_programa ILIKE '%machine learning%'
+                      OR m.nombre_programa ILIKE '%ciencia de datos%'
+                      OR m.nombre_programa ILIKE '%data science%')""",
+            108: """WHERE (m.nombre_programa ILIKE '%criminolog%'
+                       OR m.nombre_programa ILIKE '%forense%'
+                       OR m.nombre_programa ILIKE '%criminalistica%'
+                       OR m.nombre_programa ILIKE '%seguridad ciudadana%')""",
+            9: """WHERE (
+                    m.nombre_programa ILIKE '%gerencia de proyecto%'
+                 OR m.nombre_programa ILIKE '%gesti_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%direcci_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%direcci_n y gesti_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%formulaci_n y evaluaci_n de proyecto%'
+                 OR m.nombre_programa ILIKE '%evaluaci_n y gerencia de proyecto%'
+                 OR m.nombre_programa ILIKE '%project management%'
+                 OR m.nombre_programa ILIKE '%pmo%'
+                 OR m.nombre_programa ILIKE '%scrum%'
+               )
+               AND m.nombre_programa NOT ILIKE '%construcci_n%'
+               AND m.nombre_programa NOT ILIKE '%agropecuari%'
+               AND m.nombre_programa NOT ILIKE '%telecomunicaciones%'
+               AND m.nombre_programa NOT ILIKE '%ambiental%'
+               AND m.nombre_programa NOT ILIKE '%socio%'
+               AND m.nombre_programa NOT ILIKE '%multimedial%'
+               AND m.nombre_programa NOT ILIKE '%audiovisual%'
+               AND m.nombre_programa NOT ILIKE '%bim%'
+               AND m.nombre_programa NOT ILIKE '%tur_stic%'
+               AND m.nombre_programa NOT ILIKE '%creativ%'
+               AND m.nombre_programa NOT ILIKE '%ingenier_a%'
+               AND m.nombre_programa NOT ILIKE '%cooperaci_n internacional%'
+               AND m.nombre_programa NOT ILIKE '%estatal%'
+               AND m.nombre_programa NOT ILIKE '%inform_tica%'
+               AND m.nombre_programa NOT ILIKE '%inteligencia de negocio%'
+               AND m.nombre_programa NOT ILIKE '%desarrollo%'""",
+            109: """WHERE (m.nombre_programa ILIKE '%ingenier_a inform_tica%'
+                       OR m.nombre_programa ILIKE '%ingenier_a de sistemas%'
+                       OR m.nombre_programa ILIKE '%tecnolog_a en sistemas%'
+                       OR m.nombre_programa ILIKE '%ingenier_a en computaci_n%'
+                       OR m.nombre_programa ILIKE '%tecnolog_a inform_tica%'
+                       OR m.nombre_programa ILIKE '%ciencias de la computaci_n%'
+                    )""",
+        }
+
+        where = PROGRAM_WHERE.get(program_id)
+        if not where:
+            return _EMPTY
+
+        # ── 1. Serie histórica del programa propio (via snies_estadisticas_programa) ──
+        snies_row = fetch_one(
+            "SELECT codigo_snies FROM snies_estadisticas_programa WHERE specialization_id = %s LIMIT 1",
+            (program_id,),
+        )
+        snies_vinculado = snies_row is not None
+        serie_matriculados: list[dict] = []
+        serie_graduados: list[dict] = []
+        anios_disponibles: list[int] = []
+        if snies_vinculado:
+            codigo_snies = snies_row["codigo_snies"]
+            rows_serie = fetch_all(
+                """SELECT anio, COALESCE(matriculados, 0) AS matriculados,
+                          COALESCE(graduados, 0) AS graduados
+                   FROM snies_estadisticas_programa
+                   WHERE codigo_snies = %s
+                   ORDER BY anio""",
+                (codigo_snies,),
+            )
+            for r in rows_serie:
+                anio = int(r["anio"])
+                anios_disponibles.append(anio)
+                serie_matriculados.append({"anio": anio, "valor": int(r["matriculados"])})
+                serie_graduados.append({"anio": anio, "valor": int(r["graduados"])})
+
+        nota_cobertura: str | None = None
+        if len(anios_disponibles) == 1:
+            nota_cobertura = f"Solo {anios_disponibles[0]} disponible"
+        elif len(anios_disponibles) >= 2:
+            nota_cobertura = f"{len(anios_disponibles)} años disponibles ({anios_disponibles[0]}–{anios_disponibles[-1]})"
+
+        # ── 2. Mercado comparable: COUNT, sumas, benchmark desde mineducacion + snies ──
+        latest_anio_row = fetch_one("SELECT MAX(anio) AS anio FROM snies_estadisticas_programa")
+        latest_anio = int(latest_anio_row["anio"]) if latest_anio_row and latest_anio_row["anio"] else None
+
+        JOIN_SNIES = ""
+        if latest_anio:
+            JOIN_SNIES = f"""LEFT JOIN snies_estadisticas_programa s
+                               ON s.codigo_snies = m.codigo_snies_programa::INTEGER
+                              AND s.anio = {latest_anio}"""
+
+        base_query = f"""
+            FROM mineducacion_programas_virtuales m
+            {JOIN_SNIES}
+            {where}
+            AND m.estado_programa ILIKE '%activo%'
+            AND m.modalidad ILIKE '%virtual%'
+        """
+
+        mercado_row = fetch_one(
+            f"""SELECT COUNT(*) AS programas_similares,
+                       COUNT(DISTINCT m.nombre_ies) AS instituciones,
+                       COALESCE(SUM(s.matriculados), 0) AS matriculados_total,
+                       COALESCE(SUM(s.graduados), 0)    AS graduados_total
+                {base_query}"""
+        )
+        mercado: dict | None = None
+        if mercado_row:
+            mercado = {
+                "programas_similares": int(mercado_row["programas_similares"] or 0),
+                "instituciones":       int(mercado_row["instituciones"] or 0),
+                "matriculados_total":  int(mercado_row["matriculados_total"] or 0),
+                "graduados_total":     int(mercado_row["graduados_total"] or 0),
+            }
+
+        benchmark_rows = fetch_all(
+            f"""SELECT m.nombre_ies,
+                       COALESCE(s.matriculados, 0) AS matriculados,
+                       COALESCE(s.graduados, 0)    AS graduados
+                {base_query}
+                ORDER BY COALESCE(s.matriculados, 0) DESC
+                LIMIT 20"""
+        )
+        benchmark = [
+            {
+                "institucion": str(r["nombre_ies"] or ""),
+                "matriculados": int(r["matriculados"]),
+                "graduados":    int(r["graduados"]),
+                "es_unir":      "unir" in str(r["nombre_ies"] or "").lower(),
+            }
+            for r in (benchmark_rows or [])
+        ]
+
+        # ── 3. Distribución geográfica desde mineducacion ──
+        geo_rows = fetch_all(
+            f"""SELECT m.departamento, m.municipio, COUNT(*) AS universidades
+                FROM mineducacion_programas_virtuales m
+                {where}
+                AND m.estado_programa ILIKE '%activo%'
+                AND m.modalidad ILIKE '%virtual%'
+                GROUP BY m.departamento, m.municipio
+                ORDER BY universidades DESC
+                LIMIT 30"""
+        )
+        oferta_geografica = [
+            {
+                "departamento": str(r["departamento"] or ""),
+                "municipio":    str(r["municipio"] or ""),
+                "universidades": int(r["universidades"]),
+            }
+            for r in (geo_rows or [])
+        ]
+
+        return {
+            "program_id":        program_id,
+            "snies_vinculado":   snies_vinculado,
+            "anios_disponibles": anios_disponibles,
+            "serie_matriculados": serie_matriculados,
+            "serie_graduados":    serie_graduados,
+            "nota_cobertura":     nota_cobertura,
+            "mercado":            mercado,
+            "benchmark":          benchmark,
+            "oferta_geografica":  oferta_geografica,
+        }
+    except Exception as e:
+        logger.error("oferta_demanda error program_id=%s: %s", program_id, e)
+        return {**_EMPTY, "error": str(e)}
+
+
 @app.get("/api/dashboard/compare-programs", tags=["dashboard"])
 def compare_programs(ids: str = Query(default="13,11,108,20")) -> list[dict]:
     """Compare key metrics across multiple programs for the dashboard Comparativa view."""

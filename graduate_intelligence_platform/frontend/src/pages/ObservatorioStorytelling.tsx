@@ -72,6 +72,24 @@ interface Competitor {
   periodicidad_admision: string; matriculados: number; graduados: number; inscritos: number;
 }
 interface UniversityData { program_id: number; competitors: Competitor[]; total: number }
+interface OfertaDemandaMercado {
+  programas_similares: number; instituciones: number;
+  matriculados_total: number; graduados_total: number;
+}
+interface OfertaDemandaBenchmark {
+  institucion: string; matriculados: number; graduados: number; es_unir: boolean;
+}
+interface OfertaDemandaGeo { departamento: string; municipio: string; universidades: number }
+interface OfertaDemandaData {
+  program_id: number; snies_vinculado: boolean;
+  anios_disponibles: number[];
+  serie_matriculados: { anio: number; valor: number }[];
+  serie_graduados: { anio: number; valor: number }[];
+  nota_cobertura: string | null;
+  mercado: OfertaDemandaMercado | null;
+  benchmark: OfertaDemandaBenchmark[];
+  oferta_geografica: OfertaDemandaGeo[];
+}
 interface RAPropuesto {
   codigo: string; texto: string; tipo: 'nuevo' | 'modificado'; skills_incorporadas: string[];
 }
@@ -106,7 +124,7 @@ const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<Ic
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
   { id: 'mercado',         label: 'Mercado',          Icon: IconChartBar      },
   { id: 'programa',        label: 'Programa',         Icon: IconSchool        },
-  { id: 'cobertura',       label: 'Cobertura',        Icon: IconTarget        },
+  { id: 'cobertura',       label: 'Oferta y Demanda', Icon: IconTarget        },
   { id: 'brechas',         label: 'Brechas',          Icon: IconAlertTriangle },
   { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
@@ -2583,6 +2601,172 @@ function ViewPrograma({ programaId }: ViewProps) {
   );
 }
 
+function ViewOfertaDemanda({ ofertaDemanda, programaId }: ViewProps & { ofertaDemanda: OfertaDemandaData | null }) {
+  if (!ofertaDemanda) {
+    return (
+      <div style={{ padding: 24 }}>
+        <div className="mx-auto w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-900 animate-spin" style={{ marginBottom: 12 }} />
+        <p style={{ fontSize: 13, color: '#6B7280', textAlign: 'center' }}>Cargando datos SNIES…</p>
+      </div>
+    );
+  }
+
+  const { snies_vinculado, serie_matriculados, serie_graduados, anios_disponibles,
+          nota_cobertura, mercado, benchmark, oferta_geografica } = ofertaDemanda;
+
+  const aniosLabels = serie_matriculados.map(r => String(r.anio));
+  const hasHistorico = anios_disponibles.length >= 2;
+
+  return (
+    <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
+      {/* Header */}
+      <div style={{ flexShrink: 0 }}>
+        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Oferta y Demanda Académica</h1>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+          Datos SNIES · Universo de programas comparables activos en modalidad virtual
+        </p>
+      </div>
+
+      {/* KPIs del mercado comparable */}
+      {mercado ? (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5" style={{ flexShrink: 0 }}>
+          <MetricCard label="Programas similares" value={mercado.programas_similares.toLocaleString('es-CO')} color={C.navy} />
+          <MetricCard label="Instituciones"        value={mercado.instituciones.toLocaleString('es-CO')}        color="#2563EB" />
+          <MetricCard label="Matriculados totales" value={mercado.matriculados_total.toLocaleString('es-CO')}   color="#059669" />
+          <MetricCard label="Graduados totales"    value={mercado.graduados_total.toLocaleString('es-CO')}      color="#7C3AED" />
+        </div>
+      ) : (
+        <div style={{ background: '#F3F4F6', borderRadius: 8, padding: '12px 16px' }}>
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>
+            Sin datos de mercado comparable para este programa.
+          </p>
+        </div>
+      )}
+
+      {/* Serie histórica del programa propio */}
+      <DashPanel title={
+        snies_vinculado
+          ? `Evolución del programa (SNIES)${nota_cobertura ? ` — ${nota_cobertura}` : ''}`
+          : 'Evolución del programa (SNIES)'
+      }>
+        {!snies_vinculado ? (
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>
+            Este programa no tiene datos SNIES vinculados todavía.
+          </p>
+        ) : anios_disponibles.length === 0 ? (
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Sin datos de series.</p>
+        ) : (
+          <div style={{ height: 180 }}>
+            <Bar
+              data={{
+                labels: aniosLabels,
+                datasets: [
+                  {
+                    label: 'Matriculados',
+                    data: serie_matriculados.map(r => r.valor),
+                    backgroundColor: '#3B82F6',
+                    borderRadius: 4,
+                  },
+                  {
+                    label: 'Graduados',
+                    data: serie_graduados.map(r => r.valor),
+                    backgroundColor: '#10B981',
+                    borderRadius: 4,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+                scales: {
+                  x: { ticks: { font: { size: 11 } } },
+                  y: { ticks: { font: { size: 11 } }, beginAtZero: true },
+                },
+              }}
+            />
+          </div>
+        )}
+        {!hasHistorico && snies_vinculado && (
+          <p style={{ fontSize: 10, color: '#9CA3AF', margin: '6px 0 0', fontStyle: 'italic' }}>
+            Solo disponible el año {anios_disponibles[0] ?? ''}. Se mostrará tendencia cuando haya más de un año.
+          </p>
+        )}
+      </DashPanel>
+
+      {/* Benchmark de instituciones */}
+      <DashPanel title={benchmark.length > 0 ? `Benchmark instituciones (top ${benchmark.length})` : 'Benchmark instituciones'}>
+        {benchmark.length === 0 ? (
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>Sin datos de benchmark disponibles.</p>
+        ) : (
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 220 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 380 }}>
+              <thead>
+                <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                  {['Institución', 'Matr.', 'Grad.'].map(h => (
+                    <th key={h} style={{
+                      textAlign: h === 'Institución' ? 'left' : 'right',
+                      padding: '4px 8px', color: '#9CA3AF', fontWeight: 600,
+                      fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {benchmark.map((b, i) => (
+                  <tr key={i} style={{
+                    borderBottom: `1px solid ${C.border}`,
+                    background: b.es_unir ? '#EEF2FF' : (i % 2 === 0 ? '#fff' : '#FAFAFA'),
+                  }}>
+                    <td style={{ padding: '6px 8px', color: b.es_unir ? C.navy : '#374151', fontWeight: b.es_unir ? 700 : 400, whiteSpace: 'nowrap' }}>
+                      {b.es_unir ? '★ ' : ''}{b.institucion}
+                    </td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy, whiteSpace: 'nowrap' }}>
+                      {b.matriculados.toLocaleString('es-CO')}
+                    </td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280', whiteSpace: 'nowrap' }}>
+                      {b.graduados.toLocaleString('es-CO')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </DashPanel>
+
+      {/* Distribución geográfica */}
+      {oferta_geografica.length > 0 && (
+        <DashPanel title="Distribución geográfica de la oferta">
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 200 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 280 }}>
+              <thead>
+                <tr style={{ borderBottom: `2px solid ${C.border}` }}>
+                  {['Departamento', 'Municipio', 'Programas'].map(h => (
+                    <th key={h} style={{
+                      textAlign: h === 'Programas' ? 'right' : 'left',
+                      padding: '4px 8px', color: '#9CA3AF', fontWeight: 600,
+                      fontSize: 10, textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {oferta_geografica.map((g, i) => (
+                  <tr key={i} style={{ borderBottom: `1px solid ${C.border}`, background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
+                    <td style={{ padding: '6px 8px', color: '#374151', whiteSpace: 'nowrap' }}>{g.departamento}</td>
+                    <td style={{ padding: '6px 8px', color: '#6B7280', whiteSpace: 'nowrap' }}>{g.municipio}</td>
+                    <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy, whiteSpace: 'nowrap' }}>{g.universidades}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DashPanel>
+      )}
+    </div>
+  );
+}
+
 function ViewCobertura({ coberturaPct, skills, univ, dataPobre }: ViewProps) {
   if (dataPobre) return <div style={{ padding: 24 }}><ExplorandoMsg /></div>;
   if (!skills)   return <div style={{ padding: 24 }}><Spinner /></div>;
@@ -4001,6 +4185,7 @@ export default function ObservatorioStorytelling() {
   const [summary, setSummary]               = useState<Summary | null>(null);
   const [skills, setSkills]                 = useState<SkillsAnalysis | null>(null);
   const [univ, setUniv]                     = useState<UniversityData | null>(null);
+  const [ofertaDemanda, setOfertaDemanda]   = useState<OfertaDemandaData | null>(null);
   const [loading, setLoading]               = useState(true);
   const [isFallback, setIsFallback]         = useState(false);
   const [programaId, setProgramaId]         = useState(13);
@@ -4044,6 +4229,15 @@ export default function ObservatorioStorytelling() {
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: UniversityData) => setUniv(d))
       .catch(() => setUniv(null));
+  }, [programaId]);
+
+  // Fetch oferta y demanda
+  useEffect(() => {
+    setOfertaDemanda(null);
+    fetch(`${API}/api/programs/oferta-demanda/${programaId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((d: OfertaDemandaData) => setOfertaDemanda(d))
+      .catch(() => setOfertaDemanda(null));
   }, [programaId]);
 
   // Reset redesign on program change
@@ -4162,7 +4356,7 @@ export default function ObservatorioStorytelling() {
     resumen:         <ViewResumen         {...viewProps} />,
     mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
-    cobertura:       <ViewCobertura       {...viewProps} />,
+    cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} />,
     brechas:         <ViewBrechas         {...viewProps} />,
     empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
