@@ -49,14 +49,14 @@ def connection():
 def fetch_all(sql: str, params: tuple[Any, ...] = (), *, db_name: str | None = None) -> list[dict[str, Any]]:
     with connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(sql, params)
+            cur.execute(sql, params or None)
             return list(cur.fetchall())
 
 
 def fetch_one(sql: str, params: tuple[Any, ...] = (), *, db_name: str | None = None) -> dict[str, Any] | None:
     with connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(sql, params)
+            cur.execute(sql, params or None)
             return cur.fetchone()
 
 
