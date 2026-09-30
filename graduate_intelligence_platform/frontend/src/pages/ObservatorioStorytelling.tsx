@@ -2640,7 +2640,7 @@ function ViewOfertaDemanda({ ofertaDemanda, programaId, meta }: ViewProps & { of
 
       {/* Header */}
       <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Cobertura Académica</h1>
+        <h1 style={{ fontSize: 17, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>Oferta y Demanda Académica</h1>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
           Oferta, demanda y posición de UNIR en el sistema de educación superior (SNIES)
         </p>
