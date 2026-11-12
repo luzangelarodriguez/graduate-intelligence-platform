@@ -290,6 +290,12 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
                             "kanban", "pmbok", "pmp", "planificacion", "gestion de proyectos",
                             "prince2", "ipma", "iso 21500", "valor ganado", "riesgo proyecto",
                             "presupuesto proyecto", "cronograma", "ms project"],
+    "marketing_commercial": ["marketing", "seo", "sem", "google ads", "meta ads",
+                              "google analytics", "crm", "embudo de conversion", "email marketing",
+                              "automatizacion", "redes sociales", "branding", "content marketing",
+                              "analitica web", "copywriting", "growth", "community manager",
+                              "e-commerce", "ecommerce", "digital marketing", "paid media",
+                              "conversion", "campana digital", "estrategia digital"],
 }
 
 
@@ -307,6 +313,10 @@ def _infer_domain(text: str, program_name: str = "") -> str:
     _PM_OVERRIDE = ("proyecto", "project manager", "pmo", "scrum master", "agile coach")
     if any(kw in name_n for kw in _PM_OVERRIDE):
         return "project_management"
+    _MKT_OVERRIDE = ("marketing digital", "marketing comercial", "mercadeo digital",
+                     "mercadeo y publicidad", "marketing y publicidad")
+    if any(kw in name_n for kw in _MKT_OVERRIDE):
+        return "marketing_commercial"
     n = _normalize(text)
     # Also check full text for override keywords
     if any(kw in n for kw in _EDUCATION_OVERRIDE):
@@ -334,6 +344,7 @@ _COMPATIBLE_DOMAINS: Dict[str, set] = {
     "education":    {"education"},
     "finanzas": {"finanzas"},
     "project_management": {"project_management", "gestion"},
+    "marketing_commercial": {"marketing_commercial", "general"},
     "general":  {"general"},   # no longer a wildcard
 }
 

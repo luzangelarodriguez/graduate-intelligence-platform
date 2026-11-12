@@ -115,6 +115,8 @@ const PROGRAMS = [
   { id: 20,  label: 'Neuropsicología y Educación',    nombre: 'Especialización en Neuropsicología y Educación', creditos: 30, duracion: '2', periodicidad: 'Semestral' },
   { id: 9,   label: 'Dirección y Gestión de Proyectos', nombre: 'Especialización en Dirección y Gestión de Proyectos', creditos: 24, duracion: '2', periodicidad: 'Semestral' },
   { id: 109, label: 'Ingeniería Informática',           nombre: 'Ingeniería Informática',                             creditos: null, duracion: '4', periodicidad: 'Semestral' },
+  // TODO: replace id with real especializacion_id after running load_microcurriculos.py --execute
+  { id: 0,   label: 'Marketing Digital',               nombre: 'Especialización en Marketing Digital',               creditos: 24,   duracion: '2', periodicidad: 'Semestral' },
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────

@@ -106,9 +106,20 @@ FALLBACK_QUERIES: dict[str, list[str]] = {
         "profesional en redes",
         "ingeniero de telecomunicaciones",
     ],
+    "marketing_commercial": [
+        "community manager",
+        "especialista SEO",
+        "marketing digital",
+        "analista de marketing",
+        "gerente de marca",
+        "e-commerce",
+        "paid media",
+        "analista de redes sociales",
+        "gestor de contenidos digitales",
+    ],
 }
 
-DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education", "project_management", "software", "software_engineering"]
+DEFAULT_DOMAINS = ["data_analytics", "artificial_intelligence", "criminology", "cybersecurity", "education", "project_management", "software", "software_engineering", "marketing_commercial"]
 
 
 # ---------------------------------------------------------------------------
@@ -125,7 +136,7 @@ def content_hash(job: dict[str, Any]) -> str:
 def _get_search_terms_for_domain(domain: str, crawler_plans: dict[str, Any] | None) -> list[str]:
     """Extract Spanish search terms from the intelligence plans, falling back to hardcoded list."""
     # Always use hardcoded terms for domains not covered by the AI planner
-    if domain in ("education", "cybersecurity"):
+    if domain in ("education", "cybersecurity", "marketing_commercial"):
         return FALLBACK_QUERIES.get(domain, [])
     if crawler_plans:
         # Try elempleo plan first (Colombian portal with search_terms)
@@ -555,7 +566,7 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Scraper to use (default: elempleo). "
             "Available: elempleo, magneto, magneto_api, computrabajo, indeed_co, "
-            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship, bebee"
+            "occ, torre, ticjob, hirelatam, getonbrd, tecnoempleo, spe, remoterocketship, bebee, simo_cnsc"
         ),
     )
     parser.add_argument(
