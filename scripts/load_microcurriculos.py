@@ -122,24 +122,28 @@ _RE_METHODS = re.compile(
 )
 
 # Skills específicos de Marketing y Publicidad (complementan los buckets genéricos)
+# Regla de inclusión: términos inequívocamente ligados a marketing/publicidad digital.
+# Excluidos deliberadamente: "Growth" (genérico), "Conversión" (genérico en español),
+# "Funnel" (muy corto, aparece en contextos no-marketing), "X" (Twitter/X — colisiona
+# con variables matemáticas).  Usar "Embudo de Conversión" o "Growth Hacking" en su lugar.
 _RE_MARKETING = re.compile(
     r"\b(SEO|SEM|Google\s*Ads|Meta\s*Ads|Facebook\s*Ads|Google\s*Analytics|"
     r"CRM|Salesforce|HubSpot|Mailchimp|Branding|Rebranding|Copywriting|"
     r"Social\s*Media|Community\s*Manager|Content\s*Marketing|Inbound\s*Marketing|"
-    r"E.?commerce|Marketplace|Growth\s*Hacking|Growth|Email\s*Marketing|"
+    r"E.?commerce|Marketplace|Growth\s*Hacking|Email\s*Marketing|"
     r"Analítica\s*Web|Analítica\s*Digital|Neuromarketing|Shopper\s*Marketing|"
     r"Trade\s*Marketing|Marketing\s*Mix|Publicidad\s*Digital|Paid\s*Media|"
     r"Display\s*Advertising|Programática|RTB|Influencer\s*Marketing|"
     r"Marketing\s*de\s*Contenidos|Marketing\s*de\s*Afiliados|"
-    r"Embudo\s*de\s*Conversión|Funnel|Customer\s*Journey|Buyer\s*Persona|"
-    r"KPI|ROI|ROAS|CPM|CPC|CTR|Conversión|Retargeting|Remarketing|"
+    r"Embudo\s*de\s*Conversi[oó]n|Customer\s*Journey|Buyer\s*Persona|"
+    r"KPI\b|ROI\b|ROAS\b|CPM\b|CPC\b|CTR\b|Retargeting|Remarketing|"
     r"Posicionamiento\s*de\s*Marca|Brand\s*Equity|Brand\s*Awareness|"
-    r"Investigación\s*de\s*Mercados|Comportamiento\s*del\s*Consumidor|"
-    r"Segmentación\s*de\s*Mercados|Mezcla\s*de\s*Mercadeo|"
+    r"Investigaci[oó]n\s*de\s*Mercados|Comportamiento\s*del\s*Consumidor|"
+    r"Segmentaci[oó]n\s*de\s*Mercados|Mezcla\s*de\s*Mercadeo|"
     r"Publicidad\s*ATL|Publicidad\s*BTL|Publicidad\s*TTL|"
-    r"Producción\s*Audiovisual|Diseño\s*Gráfico|Identidad\s*Visual|"
+    r"Producci[oó]n\s*Audiovisual|Dise[nñ]o\s*Gr[aá]fico|Identidad\s*Visual|"
     r"WordPress|Shopify|WooCommerce|Meta\s*Business|"
-    r"Instagram|TikTok|LinkedIn|YouTube|Pinterest|Twitter|X\b)\b",
+    r"Instagram|TikTok|LinkedIn|YouTube|Pinterest|Twitter)\b",
     re.IGNORECASE,
 )
 
@@ -758,7 +762,13 @@ def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
         if ra_match:
             ra_text = ra_match.group(1)
             for line in ra_text.splitlines():
-                line = line.strip().lstrip("•·▪*-–—0123456789.").strip().rstrip('"')
+                original = line.strip()
+                # Numbered topic lines (1. texto, 1.1 subtema) belong to contenido
+                # temático, not to RAs. Skip them even when CONTENIDO TEMÁTICO
+                # is absent/mis-detected and the regex captures past the section break.
+                if re.match(r"^\d", original):
+                    continue
+                line = original.lstrip("•·▪*-–—").strip().rstrip('"')
                 if len(line) < 15:
                     continue
                 if _MYP_NOISE_RA.match(line):
@@ -908,9 +918,13 @@ _EXPLICIT_ESP_MAP: dict[str, int] = {
     # Administración de Empresas → id=82 (Alta Gerencia)
     "administracion de empresas": 82,
     "alta gerencia": 82,
-    # Ingeniería Informática (Pregrado) → id=109 — match by full program name only,
-    # NOT by bare "pregrado" to avoid colliding with other undergraduate programs.
+    # Ingeniería Informática (Pregrado) → id=109.
+    # Also catches "Especialización en Pregrado" (the UI label for that program)
+    # without colliding with "Pregrado en Marketing y Publicidad" because the
+    # fragment "especializacion en pregrado" is NOT a substring of "pregrado en
+    # marketing y publicidad".
     "ingenieria informatica": 109,
+    "especializacion en pregrado": 109,
     # Pregrado en Marketing y Publicidad — ID assigned after --execute; leave as None
     # so fuzzy matching finds the real row in especializaciones.
     # "marketing y publicidad": <ID_REAL>,  ← fill after insert
@@ -1037,6 +1051,53 @@ def insert_skills(conn, micro_id: int, rec: dict) -> int:
     return rows_inserted
 
 
+def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
+    """
+    Idempotent: find or create a row in especializaciones for 'programa'.
+    Returns the id of the existing or newly created row.
+    Only called when match_esp_id returns None (program not in DB yet).
+    """
+    # Infer nivel from program name
+    prog_lower = programa.lower()
+    if "pregrado" in prog_lower or "licenciatura" in prog_lower or "tecnología" in prog_lower:
+        nivel = "pregrado"
+    elif "maestría" in prog_lower or "maestria" in prog_lower:
+        nivel = "maestria"
+    elif "doctorado" in prog_lower:
+        nivel = "doctorado"
+    else:
+        nivel = "especializacion"
+
+    with conn.cursor() as cur:
+        # Try to find existing row by exact nombre match
+        cur.execute(
+            "SELECT id FROM especializaciones WHERE nombre = %s LIMIT 1",
+            (programa,),
+        )
+        row = cur.fetchone()
+        if row:
+            return row[0]
+
+        # Insert new row — only sets columns we know exist; ignores unknown ones
+        cur.execute(
+            """
+            INSERT INTO especializaciones (nombre, nivel_formacion, estado)
+            VALUES (%s, %s, 'activo')
+            RETURNING id
+            """,
+            (programa, nivel),
+        )
+        new_id = cur.fetchone()[0]
+
+        # Also set detected_domain if the column exists
+        if _has_column(conn, "especializaciones", "detected_domain"):
+            cur.execute(
+                "UPDATE especializaciones SET detected_domain = %s WHERE id = %s",
+                (domain_key, new_id),
+            )
+        return new_id
+
+
 def upsert_domain_mapping(conn, esp_id: int, programa: str, domain_key: str) -> None:
     """Update detected_domain on especializaciones if column exists."""
     if not _has_column(conn, "especializaciones", "detected_domain"):
@@ -1077,18 +1138,35 @@ def print_preview(records: list[dict], existing_keys: set[str], esps: list[dict]
     print(f"  A insertar              : {len(new_records)}")
     print()
 
+    # Asignaturas whose skills will be printed in full for validation
+    _VERBOSE_SKILLS = {
+        _normalize_text(n) for n in (
+            "Métricas y analíticas Digitales",
+            "Metricas y analiticas Digitales",
+            "Creatividad e Innovación",
+            "Social Media Marketing",
+        )
+    }
+
     for prog, recs in sorted(by_prog.items()):
         esp_id = match_esp_id(prog, esps)
         domain = recs[0]["domain_key"]
+        esp_note = ""
+        if esp_id is None:
+            esp_note = "  ⚠️  NUEVO — se creará en especializaciones al ejecutar --execute"
         print(f"  📚 {prog}")
-        print(f"     especializacion_id = {esp_id}   domain_key = {domain}")
+        print(f"     especializacion_id = {esp_id}   domain_key = {domain}{esp_note}")
         for r in recs:
             key = _normalize_text(f"{r['programa']}|{r['asignatura']}")
             status = "✓ ya existe" if key in existing_keys else "+ NUEVO"
             n_skills = sum(len(v) for v in r["skills"].values())
             n_ra = len(r["resultados_aprendizaje"])
             print(f"     [{status}]  {r['asignatura']}")
-            print(f"              RA={n_ra}  skills={n_skills}  src={r['source_document'][:50]}")
+            print(f"              RA={n_ra}  skills={n_skills}  cuatrimestre={r.get('semestre_num','')}  src={r['source_document'][:50]}")
+            # Detailed skills dump for validation asignaturas
+            if _normalize_text(r["asignatura"]) in _VERBOSE_SKILLS:
+                for tipo, skill_list in sorted(r["skills"].items()):
+                    print(f"              skills[{tipo}]: {skill_list}")
         print()
 
 
@@ -1273,9 +1351,23 @@ def main() -> None:
             sys.exit(0)
 
         inserted = []
+        # Keep a local cache of program → esp_id resolved this run so that
+        # upsert_especializacion is called only once per new program, not once
+        # per asignatura.
+        esp_id_cache: dict[str, int | None] = {}
         try:
             for rec in new_records:
-                esp_id = match_esp_id(rec["programa"], esps)
+                prog = rec["programa"]
+                if prog not in esp_id_cache:
+                    eid = match_esp_id(prog, esps)
+                    if eid is None:
+                        # Program not yet in especializaciones — create it now
+                        eid = upsert_especializacion(conn, prog, rec["domain_key"])
+                        print(f"  ✚ Created especializacion: '{prog}' → id={eid}")
+                        # Add to in-memory list so subsequent asignaturas resolve
+                        esps.append({"id": eid, "nombre": prog})
+                    esp_id_cache[prog] = eid
+                esp_id = esp_id_cache[prog]
                 esp_nombre = next((e["nombre"] for e in esps if e["id"] == esp_id), None)
                 micro_id = insert_record(conn, rec, esp_id, esp_nombre)
                 n_skills = insert_skills(conn, micro_id, rec)
