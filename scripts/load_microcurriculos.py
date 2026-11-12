@@ -49,6 +49,7 @@ DOMAIN_MAP: dict[str, str] = {
     "direccion": "business",
     "marketing digital": "marketing_commercial",
     "marketing comercial": "marketing_commercial",
+    "marketing y publicidad": "marketing_commercial",
     "mercadeo digital": "marketing_commercial",
     "mercadeo y publicidad": "marketing_commercial",
     "derecho": "law",
@@ -120,6 +121,28 @@ _RE_METHODS = re.compile(
     re.IGNORECASE,
 )
 
+# Skills específicos de Marketing y Publicidad (complementan los buckets genéricos)
+_RE_MARKETING = re.compile(
+    r"\b(SEO|SEM|Google\s*Ads|Meta\s*Ads|Facebook\s*Ads|Google\s*Analytics|"
+    r"CRM|Salesforce|HubSpot|Mailchimp|Branding|Rebranding|Copywriting|"
+    r"Social\s*Media|Community\s*Manager|Content\s*Marketing|Inbound\s*Marketing|"
+    r"E.?commerce|Marketplace|Growth\s*Hacking|Growth|Email\s*Marketing|"
+    r"Analítica\s*Web|Analítica\s*Digital|Neuromarketing|Shopper\s*Marketing|"
+    r"Trade\s*Marketing|Marketing\s*Mix|Publicidad\s*Digital|Paid\s*Media|"
+    r"Display\s*Advertising|Programática|RTB|Influencer\s*Marketing|"
+    r"Marketing\s*de\s*Contenidos|Marketing\s*de\s*Afiliados|"
+    r"Embudo\s*de\s*Conversión|Funnel|Customer\s*Journey|Buyer\s*Persona|"
+    r"KPI|ROI|ROAS|CPM|CPC|CTR|Conversión|Retargeting|Remarketing|"
+    r"Posicionamiento\s*de\s*Marca|Brand\s*Equity|Brand\s*Awareness|"
+    r"Investigación\s*de\s*Mercados|Comportamiento\s*del\s*Consumidor|"
+    r"Segmentación\s*de\s*Mercados|Mezcla\s*de\s*Mercadeo|"
+    r"Publicidad\s*ATL|Publicidad\s*BTL|Publicidad\s*TTL|"
+    r"Producción\s*Audiovisual|Diseño\s*Gráfico|Identidad\s*Visual|"
+    r"WordPress|Shopify|WooCommerce|Meta\s*Business|"
+    r"Instagram|TikTok|LinkedIn|YouTube|Pinterest|Twitter|X\b)\b",
+    re.IGNORECASE,
+)
+
 
 def _normalize_text(text: str) -> str:
     nfkd = unicodedata.normalize("NFKD", text.lower())
@@ -130,7 +153,7 @@ def _title(s: str) -> str:
     return re.sub(r"\s+", " ", s.strip()).title()
 
 
-def extract_skills(text: str) -> dict[str, list[str]]:
+def extract_skills(text: str, include_marketing: bool = False) -> dict[str, list[str]]:
     buckets: dict[str, list[str]] = {
         "tecnologia": [],
         "skill_tecnica": [],
@@ -139,6 +162,8 @@ def extract_skills(text: str) -> dict[str, list[str]]:
         "skill_transversal": [],
         "metodologia": [],
     }
+    if include_marketing:
+        buckets["marketing"] = []
     seen: set[str] = set()
 
     def _add(bucket: str, raw: str) -> None:
@@ -161,6 +186,9 @@ def extract_skills(text: str) -> dict[str, list[str]]:
         _add("skill_transversal", m.group(0))
     for m in _RE_METHODS.finditer(text):
         _add("metodologia", m.group(0))
+    if include_marketing:
+        for m in _RE_MARKETING.finditer(text):
+            _add("marketing", m.group(0))
 
     return {k: v for k, v in buckets.items() if v}
 
@@ -584,6 +612,208 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
     return results
 
 
+# ── parse Marketing y Publicidad consolidated PDF ─────────────────────────────
+
+# Lines that are page headers / footers in this specific PDF — must be stripped
+# before splitting into blocks so they don't corrupt the asignatura name detection.
+_MYP_HEADER_RE = re.compile(
+    r"(MICROCURR[IÍ]CULOS?\s+DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"P[aá]gina\s+\d+\s+de\s+\d+|"
+    r"Página\s+\d+\s+de\s+307|"
+    r"PROGRAMA\s+ACAD[EÉ]MICO\s*/?\s*Pregrado)",
+    re.IGNORECASE,
+)
+
+# Section header labels that must NOT be treated as asignatura names or RA content
+_MYP_SECTION_LABELS = re.compile(
+    r"^(DENOMINACI[OÓ]N\s+DE\s+LA\s+ASIGNATURA|"
+    r"COMPONENTE\s+FORMATIVO|"
+    r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA|"
+    r"RESULTADO[S]?\s+DE\s+APRENDIZAJE\s+DE\s+LA\s+ASIGNATURA|"
+    r"RESULTADO[S]?\s+DE\s+APRENDIZAJE|"
+    r"CONTENIDO[S]?\s+TEM[AÁ]TICO|"
+    r"CUATRIMESTRE|CUATRIMESTRES?|"
+    r"N[OÚ]MERO\s+DE\s+CR[EÉ]DITOS|CR[EÉ]DITOS?|HORAS?|"
+    r"COMPONENTE|L[IÍ]NEA|"
+    r"PROGRAMA\s+ACAD[EÉ]MICO|PREGRADO|"
+    r"Marketing\s+y\s+Publicidad$)$",  # bare program name as a header cell
+    re.IGNORECASE,
+)
+
+# Noise lines that are clearly not RA content
+_MYP_NOISE_RA = re.compile(
+    r"^(Resultado[s]?\s+de\s+Aprendizaje(\s+de\s+la\s+Asignatura)?[:\s]*$|"
+    r"RA\s*\d*\s*[-:]?\s*$|"
+    r"Componente\s+formativo|"
+    r"L[ií]nea\s+de\s+formaci[oó]n|"
+    r"Pregrado\s+en\s+Marketing|"
+    r"P[aá]gina\s+\d+)",
+    re.IGNORECASE,
+)
+
+
+def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
+    """
+    Parse the consolidated 307-page PDF for 'Pregrado en Marketing y Publicidad'.
+
+    Document structure per asignatura block (after splitting on
+    "DENOMINACIÓN DE LA ASIGNATURA"):
+        <name line>
+        CUATRIMESTRE / CRÉDITOS / HORAS table rows
+        COMPONENTE FORMATIVO DE LA ASIGNATURA
+        <componente> / <línea>
+        DESCRIPCIÓN DE LA ASIGNATURA
+        <texto libre>
+        RESULTADOS DE APRENDIZAJE DE LA ASIGNATURA
+        <RA list — numbered or bulleted>
+        CONTENIDO TEMÁTICO
+        1. <tema>
+          1.1 <subtema>
+
+    Duplicates by name (e.g. "Práctica Profesional", "Inglés Básico") are kept
+    as separate records; they get a sequential suffix in document_hash to avoid
+    ON CONFLICT collisions while still being distinct rows.
+    """
+    full_text = _extract_pdf_text(path)
+    doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
+    programa = "Pregrado en Marketing y Publicidad"
+    domain_key = "marketing_commercial"
+
+    # Strip page-header/footer lines before processing
+    cleaned_lines: list[str] = []
+    for line in full_text.splitlines():
+        if _MYP_HEADER_RE.search(line.strip()):
+            continue
+        cleaned_lines.append(line)
+    cleaned_text = "\n".join(cleaned_lines)
+
+    # Split on DENOMINACIÓN DE LA ASIGNATURA
+    _DENOM_RE = re.compile(r"DENOMINACI[OÓ]N\s+DE\s+LA\s+ASIGNATURA", re.IGNORECASE)
+    blocks = _DENOM_RE.split(cleaned_text)
+    # blocks[0] = preamble, blocks[1:] = one per asignatura
+
+    results: list[dict[str, Any]] = []
+    # Track name occurrences to generate unique hashes for legitimate duplicates
+    name_occurrence: dict[str, int] = {}
+
+    for i, block in enumerate(blocks[1:], start=1):
+        lines = [ln.strip() for ln in block.splitlines()]
+
+        # ── Asignatura name: first non-empty, non-label, non-noise line ──────
+        asig_name = ""
+        for ln in lines:
+            if not ln:
+                continue
+            if _MYP_SECTION_LABELS.match(ln):
+                continue
+            if len(ln) < 3:
+                continue
+            # Skip pure numeric lines (page numbers, credit counts)
+            if re.fullmatch(r"[\d\s/]+", ln):
+                continue
+            # Skip lines that are only punctuation/symbols
+            if re.fullmatch(r"[^a-záéíóúñA-ZÁÉÍÓÚÑ]+", ln):
+                continue
+            asig_name = ln
+            break
+
+        if not asig_name:
+            continue
+
+        # ── Cuatrimestre / créditos ───────────────────────────────────────────
+        cuatrimestre = ""
+        creditos = ""
+        cuatri_match = re.search(r"cuatrimestre\s*[:\-]?\s*(\d+)", block, re.IGNORECASE)
+        if cuatri_match:
+            cuatrimestre = cuatri_match.group(1)
+        # Also accept bare "X" after CUATRIMESTRE header in table
+        if not cuatrimestre:
+            cuatri_table = re.search(
+                r"CUATRIMESTRE[^\n]*\n\s*(\d+)", block, re.IGNORECASE
+            )
+            if cuatri_table:
+                cuatrimestre = cuatri_table.group(1)
+        cred_match = re.search(r"cr[eé]ditos?\s*[:\-]?\s*(\d+)", block, re.IGNORECASE)
+        if cred_match:
+            creditos = cred_match.group(1)
+
+        # ── Descripción ───────────────────────────────────────────────────────
+        desc = ""
+        desc_match = re.search(
+            r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA\s*([\s\S]*?)"
+            r"(?=RESULTADO[S]?\s+DE\s+APRENDIZAJE|CONTENIDO[S]?\s+TEM[AÁ]TICO|$)",
+            block, re.IGNORECASE,
+        )
+        if desc_match:
+            desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
+
+        # ── Resultados de Aprendizaje ─────────────────────────────────────────
+        resultados: list[str] = []
+        ra_match = re.search(
+            r"RESULTADO[S]?\s+DE\s+APRENDIZAJE(?:\s+DE\s+LA\s+ASIGNATURA)?\s*"
+            r"([\s\S]*?)"
+            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|DENOMINACI[OÓ]N|$)",
+            block, re.IGNORECASE,
+        )
+        if ra_match:
+            ra_text = ra_match.group(1)
+            for line in ra_text.splitlines():
+                line = line.strip().lstrip("•·▪*-–—0123456789.").strip().rstrip('"')
+                if len(line) < 15:
+                    continue
+                if _MYP_NOISE_RA.match(line):
+                    continue
+                if _MYP_SECTION_LABELS.match(line):
+                    continue
+                # Must start with uppercase (Spanish RA verbs: Identificar, Aplicar…)
+                if not re.match(r"^[A-ZÁÉÍÓÚÑ]", line):
+                    continue
+                resultados.append(line)
+
+        # ── Contenido temático ────────────────────────────────────────────────
+        temas: list[str] = []
+        ct_match = re.search(
+            r"CONTENIDO[S]?\s+TEM[AÁ]TICO\s*([\s\S]*?)$",
+            block, re.IGNORECASE,
+        )
+        if ct_match:
+            for line in ct_match.group(1).splitlines():
+                line = line.strip()
+                # Keep numbered topic lines: "1. ...", "1.1 ..."
+                if re.match(r"^\d+[\.\d]*\s+\S", line) and len(line) > 5:
+                    temas.append(line[:200])
+
+        # ── Skills ────────────────────────────────────────────────────────────
+        skill_text = " ".join(filter(None, [asig_name, desc, ra_match.group(1) if ra_match else "", ct_match.group(1) if ct_match else ""]))
+        skills = extract_skills(skill_text, include_marketing=True)
+
+        # ── Unique hash — keep duplicates as separate rows ────────────────────
+        name_key = _normalize_text(asig_name)
+        occ = name_occurrence.get(name_key, 0) + 1
+        name_occurrence[name_key] = occ
+        # Suffix only on 2nd+ occurrence (Práctica Profesional I vs II)
+        hash_suffix = f":{occ}" if occ > 1 else ""
+
+        results.append({
+            "programa": programa,
+            "asignatura": asig_name,
+            "descripcion": desc or block[:500],
+            "resultados_aprendizaje": resultados[:15],
+            "contenido_tematico": temas[:20] or ([f"Cuatrimestre {cuatrimestre}"] if cuatrimestre else []),
+            "resultados_text_raw": ra_match.group(1) if ra_match else "",
+            "herramientas_recursos": "",
+            "skills": skills,
+            "semestre_num": cuatrimestre,
+            "creditos_num": creditos,
+            "source_document": path.name,
+            "source_path": str(path.relative_to(REPO_ROOT)),
+            "document_hash": f"{doc_hash}:{i}:{name_key[:20]}{hash_suffix}",
+            "domain_key": domain_key,
+        })
+
+    return results
+
+
 # ── discover all docx + pdf ───────────────────────────────────────────────────
 
 def discover_all() -> list[dict[str, Any]]:
@@ -599,7 +829,13 @@ def discover_all() -> list[dict[str, Any]]:
                     records.append(parsed)
         elif path.suffix.lower() == ".pdf":
             try:
-                records.extend(parse_pdf_microcurriculum(path))
+                # Route the Marketing y Publicidad consolidated PDF to its
+                # dedicated parser; all other PDFs use the generic UNIR parser.
+                name_lower = path.name.lower()
+                if "marketing" in name_lower and "publicidad" in name_lower:
+                    records.extend(parse_marketing_publicidad_pdf(path))
+                else:
+                    records.extend(parse_pdf_microcurriculum(path))
             except ImportError as exc:
                 print(f"  WARNING: skipping {path.name} — {exc}")
             except Exception as exc:
@@ -672,8 +908,12 @@ _EXPLICIT_ESP_MAP: dict[str, int] = {
     # Administración de Empresas → id=82 (Alta Gerencia)
     "administracion de empresas": 82,
     "alta gerencia": 82,
-    # Ingeniería Informática (Pregrado) → id=109
-    "pregrado": 109,
+    # Ingeniería Informática (Pregrado) → id=109 — match by full program name only,
+    # NOT by bare "pregrado" to avoid colliding with other undergraduate programs.
+    "ingenieria informatica": 109,
+    # Pregrado en Marketing y Publicidad — ID assigned after --execute; leave as None
+    # so fuzzy matching finds the real row in especializaciones.
+    # "marketing y publicidad": <ID_REAL>,  ← fill after insert
 }
 
 
