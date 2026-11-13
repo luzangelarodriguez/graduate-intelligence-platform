@@ -85,7 +85,7 @@ _RE_TOOLS = re.compile(
 )
 
 _RE_TECH = re.compile(
-    r"\b(Python|R\b|SQL|NoSQL|Spark|Hadoop|Kafka|Flink|"
+    r"\b(Python|SQL|NoSQL|Spark|Hadoop|Kafka|Flink|"
     r"TensorFlow|PyTorch|Keras|Scikit.?learn|XGBoost|LightGBM|"
     r"MongoDB|PostgreSQL|MySQL|SQLite|Cassandra|Redis|Elasticsearch|"
     r"OLAP|OLTP|ETL|ELT|Data\s*Warehouse|Data\s*Lake|Data\s*Mart|"
@@ -101,15 +101,15 @@ _RE_TRANSVERSAL = re.compile(
     r"\b(Liderazgo|Comunicaci[oó]n\s+efectiva|Comunicaci[oó]n|"
     r"Trabajo\s+en\s+equipo|Pensamiento\s+cr[ií]tico|"
     r"Resoluci[oó]n\s+de\s+problemas|Toma\s+de\s+decisiones|"
-    r"Gesti[oó]n\s+del\s+cambio|Gesti[oó]n|Planeaci[oó]n|"
+    r"Gesti[oó]n\s+del\s+cambio|Planeaci[oó]n|"
     r"Emprendimiento|Innovaci[oó]n|[EÉ]tica\s+profesional|[EÉ]tica|"
-    r"Responsabilidad\s+social|Responsabilidad|Adaptabilidad|"
-    r"Creatividad|Negociaci[oó]n|Presentaci[oó]n)\b",
+    r"Responsabilidad\s+social\s+empresarial|Responsabilidad\s+social|"
+    r"Adaptabilidad|Creatividad|Negociaci[oó]n)\b",
     re.IGNORECASE,
 )
 
 _RE_METHODS = re.compile(
-    r"\b(Scrum|Agile|CRISP.?DM|Design\s*Thinking|Lean|Six\s*Sigma|"
+    r"\b(Scrum|Agile|CRISP.?DM|Design\s*Thinking|Lean\s+Six\s+Sigma|Six\s*Sigma|"
     r"PMBOK|PRINCE2|IPMA|PMI|PMP|ISO\s*21500|Kanban|DevOps|DataOps|MLOps|"
     r"Valor\s+Ganado|Gesti[oó]n\s+de\s+Riesgos|Gesti[oó]n\s+de\s+Proyectos|"
     r"Planificaci[oó]n\s+de\s+Proyectos|MS\s*Project|"
@@ -153,8 +153,24 @@ def _normalize_text(text: str) -> str:
     return "".join(c for c in nfkd if not unicodedata.combining(c)).strip()
 
 
+# Canonical forms that must override .title() — acronyms stay uppercase,
+# variant spellings of the same concept collapse to one form.
+_CANONICAL_SKILLS: dict[str, str] = {
+    "seo": "SEO", "sem": "SEM", "roi": "ROI", "kpi": "KPI", "ctr": "CTR",
+    "crm": "CRM", "roas": "ROAS", "cpm": "CPM", "cpc": "CPC", "rtb": "RTB",
+    "nlp": "NLP", "olap": "OLAP", "oltp": "OLTP", "etl": "ETL", "elt": "ELT",
+    "pca": "PCA", "aws": "AWS", "gcp": "GCP",
+    "power bi": "Power BI",
+    "e-commerce": "E-Commerce", "ecommerce": "E-Commerce", "e commerce": "E-Commerce",
+}
+
+
 def _title(s: str) -> str:
-    return re.sub(r"\s+", " ", s.strip()).title()
+    s = re.sub(r"\s+", " ", s.strip())
+    norm = s.lower()
+    if norm in _CANONICAL_SKILLS:
+        return _CANONICAL_SKILLS[norm]
+    return s.title()
 
 
 def extract_skills(text: str, include_marketing: bool = False) -> dict[str, list[str]]:
@@ -752,33 +768,54 @@ def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
             desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
 
         # ── Resultados de Aprendizaje ─────────────────────────────────────────
+        # Stop the RA section at: CONTENIDO TEMÁTICO, BLOQUE N (Comercio
+        # Electrónico uses BLOQUE 1 instead of CONTENIDO TEMÁTICO), Tema N.
+        # (numbered topic lines starting a thematic block), next block header,
+        # or page markers. This prevents topic-line bleed even when CONTENIDO
+        # TEMÁTICO is missing.
         resultados: list[str] = []
         ra_match = re.search(
             r"RESULTADO[S]?\s+DE\s+APRENDIZAJE(?:\s+DE\s+LA\s+ASIGNATURA)?\s*"
             r"([\s\S]*?)"
-            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|DENOMINACI[OÓ]N|$)",
+            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|BLOQUE\s+\d|Tema\s+\d\.|"
+            r"DENOMINACI[OÓ]N|P[aá]gina\s+\d+\s+de|MICROCURR|$)",
             block, re.IGNORECASE,
         )
         if ra_match:
             ra_text = ra_match.group(1)
+            # Build RAs with line-continuation joining.
+            # Numbered prefixes ("1. ", "2. ", "1.1 ") are stripped — they mark
+            # numbered RAs (e.g. Plan de Marketing Digital), NOT topic lines
+            # (topic lines are now excluded by the tighter stop pattern above).
+            current_ra: str | None = None
+
+            def _flush_ra(buf: str | None, out: list[str]) -> None:
+                if buf and len(buf) >= 15:
+                    out.append(buf)
+
             for line in ra_text.splitlines():
                 original = line.strip()
-                # Numbered topic lines (1. texto, 1.1 subtema) belong to contenido
-                # temático, not to RAs. Skip them even when CONTENIDO TEMÁTICO
-                # is absent/mis-detected and the regex captures past the section break.
-                if re.match(r"^\d", original):
+                if not original:
+                    _flush_ra(current_ra, resultados)
+                    current_ra = None
                     continue
-                line = original.lstrip("•·▪*-–—").strip().rstrip('"')
-                if len(line) < 15:
+                if _MYP_NOISE_RA.match(original) or _MYP_SECTION_LABELS.match(original):
+                    _flush_ra(current_ra, resultados)
+                    current_ra = None
                     continue
-                if _MYP_NOISE_RA.match(line):
+                # Strip leading number prefix ("1. ", "2. ", "1.1 ")
+                cleaned = re.sub(r"^\d+[\.\d]*[\.\)]\s+", "", original)
+                cleaned = cleaned.lstrip("•·▪*-–—").strip().rstrip('"')
+                if not cleaned:
                     continue
-                if _MYP_SECTION_LABELS.match(line):
-                    continue
-                # Must start with uppercase (Spanish RA verbs: Identificar, Aplicar…)
-                if not re.match(r"^[A-ZÁÉÍÓÚÑ]", line):
-                    continue
-                resultados.append(line)
+                # Starts with uppercase → new RA
+                if re.match(r"^[A-ZÁÉÍÓÚÑ]", cleaned):
+                    _flush_ra(current_ra, resultados)
+                    current_ra = cleaned
+                elif current_ra:
+                    # Continuation of previous RA
+                    current_ra = current_ra + " " + cleaned
+            _flush_ra(current_ra, resultados)
 
         # ── Contenido temático ────────────────────────────────────────────────
         temas: list[str] = []
@@ -1144,7 +1181,10 @@ def print_preview(records: list[dict], existing_keys: set[str], esps: list[dict]
             "Métricas y analíticas Digitales",
             "Metricas y analiticas Digitales",
             "Creatividad e Innovación",
+            "Creatividad e Innovacion",
             "Social Media Marketing",
+            "Comercio Electrónico",
+            "Comercio Electronico",
         )
     }
 
