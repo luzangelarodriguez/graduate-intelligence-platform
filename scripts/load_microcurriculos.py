@@ -1172,32 +1172,39 @@ def insert_record(conn, rec: dict, esp_id: int | None, esp_nombre: str | None = 
 
 
 def insert_skills(conn, micro_id: int, rec: dict) -> int:
+    # Deduplicate in Python using the same key the DB UNIQUE index uses:
+    # (microcurriculo_id, skill_normalized, tipo_skill).
+    # This prevents the transaction from entering an aborted state on UNIQUE
+    # violations, which would kill subsequent INSERTs in the same transaction.
+    seen: set[tuple[str, str]] = set()
+    rows_to_insert: list[tuple] = []
+    for tipo, skills in rec["skills"].items():
+        for skill in skills:
+            norm = _normalize_text(skill)
+            key = (norm, tipo)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows_to_insert.append((micro_id, skill, norm, rec["domain_key"], tipo, 0.70, rec["source_document"]))
+
     rows_inserted = 0
+    skipped = 0
     with conn.cursor() as cur:
-        for tipo, skills in rec["skills"].items():
-            for skill in skills:
-                try:
-                    cur.execute(
-                        """
-                        INSERT INTO microcurriculo_skills
-                            (microcurriculo_id, skill_original, skill_normalized,
-                             skill_domain, tipo_skill, confidence_score, source_document)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (microcurriculo_id, skill_normalized, tipo_skill) DO NOTHING
-                        """,
-                        (
-                            micro_id,
-                            skill,
-                            skill,
-                            rec["domain_key"],
-                            tipo,
-                            0.70,
-                            rec["source_document"],
-                        ),
-                    )
-                    rows_inserted += cur.rowcount
-                except Exception:
-                    pass  # ignore individual skill conflicts
+        for row in rows_to_insert:
+            cur.execute(
+                """
+                INSERT INTO microcurriculo_skills
+                    (microcurriculo_id, skill_original, skill_normalized,
+                     skill_domain, tipo_skill, confidence_score, source_document)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (microcurriculo_id, skill_normalized, tipo_skill) DO NOTHING
+                """,
+                row,
+            )
+            if cur.rowcount:
+                rows_inserted += 1
+            else:
+                skipped += 1
     return rows_inserted
 
 
@@ -1300,6 +1307,63 @@ def dry_run_upsert_especializacion(conn, programa: str, domain_key: str) -> None
     finally:
         with conn.cursor() as cur:
             cur.execute("ROLLBACK TO SAVEPOINT dry_run_upsert")
+
+
+def dry_run_insert_all(conn, records: list[dict], esps: list[dict]) -> None:
+    """
+    Runs the full insert loop (upsert_especializacion + insert_record + insert_skills)
+    inside a single SAVEPOINT, then rolls back — nothing is persisted.
+    Reports per-asignatura skill counts and collisions for pre-flight validation.
+    """
+    with conn.cursor() as _c:
+        _c.execute("SAVEPOINT dry_run_all")
+    esp_id_cache: dict[str, int | None] = {}
+    esps_copy = list(esps)
+    ok: list[str] = []
+    skipped: list[str] = []
+    print("\n[DRY-RUN] Insert simulation (will rollback):")
+    try:
+        for rec in records:
+            prog = rec["programa"]
+            if prog not in esp_id_cache:
+                eid = match_esp_id(prog, esps_copy)
+                if eid is None:
+                    eid = upsert_especializacion(conn, prog, rec["domain_key"])
+                    esps_copy.append({"id": eid, "nombre": prog})
+                esp_id_cache[prog] = eid
+            esp_id = esp_id_cache[prog]
+            esp_nombre = next((e["nombre"] for e in esps_copy if e["id"] == esp_id), None)
+
+            sp = f"sp_dry_{rec['asignatura'][:20].replace(' ', '_')}"
+            with conn.cursor() as _c:
+                _c.execute(f"SAVEPOINT {sp!r}")
+            try:
+                micro_id = insert_record(conn, rec, esp_id, esp_nombre)
+                n_skills = insert_skills(conn, micro_id, rec)
+                # Count how many unique (norm, tipo) pairs were deduped in Python
+                seen_py: set[tuple[str, str]] = set()
+                collisions = 0
+                for tipo, skills in rec["skills"].items():
+                    for skill in skills:
+                        key = (_normalize_text(skill), tipo)
+                        if key in seen_py:
+                            collisions += 1
+                        seen_py.add(key)
+                ok.append(rec["asignatura"])
+                print(
+                    f"  ✓ '{rec['asignatura']}'  skills_to_insert={n_skills}  py_dupes={collisions}"
+                )
+                with conn.cursor() as _c:
+                    _c.execute(f"RELEASE SAVEPOINT {sp!r}")
+            except Exception as exc:
+                with conn.cursor() as _c:
+                    _c.execute(f"ROLLBACK TO SAVEPOINT {sp!r}")
+                skipped.append(rec["asignatura"])
+                print(f"  ✗ '{rec['asignatura']}' — {type(exc).__name__}: {exc}")
+    finally:
+        with conn.cursor() as _c:
+            _c.execute("ROLLBACK TO SAVEPOINT dry_run_all")
+    print(f"\n[DRY-RUN] {len(ok)} would insert, {len(skipped)} would fail.")
 
 
 def upsert_domain_mapping(conn, esp_id: int, programa: str, domain_key: str) -> None:
@@ -1562,28 +1626,46 @@ def main() -> None:
         # upsert_especializacion is called only once per new program, not once
         # per asignatura.
         esp_id_cache: dict[str, int | None] = {}
+        failed = []
         try:
             for rec in new_records:
                 prog = rec["programa"]
                 if prog not in esp_id_cache:
                     eid = match_esp_id(prog, esps)
                     if eid is None:
-                        # Program not yet in especializaciones — create it now
                         eid = upsert_especializacion(conn, prog, rec["domain_key"])
                         print(f"  ✚ Created especializacion: '{prog}' → id={eid}")
-                        # Add to in-memory list so subsequent asignaturas resolve
                         esps.append({"id": eid, "nombre": prog})
                     esp_id_cache[prog] = eid
                 esp_id = esp_id_cache[prog]
                 esp_nombre = next((e["nombre"] for e in esps if e["id"] == esp_id), None)
-                micro_id = insert_record(conn, rec, esp_id, esp_nombre)
-                n_skills = insert_skills(conn, micro_id, rec)
-                if esp_id:
-                    upsert_domain_mapping(conn, esp_id, rec["programa"], rec["domain_key"])
-                inserted.append({"asignatura": rec["asignatura"], "id": micro_id, "skills": n_skills})
-                print(f"  ✓ id={micro_id}  {rec['asignatura']}  ({n_skills} skills)")
+
+                sp = f"sp_{rec['asignatura'][:30].replace(' ', '_')}"
+                with conn.cursor() as _c:
+                    _c.execute(f"SAVEPOINT {sp!r}")
+                try:
+                    micro_id = insert_record(conn, rec, esp_id, esp_nombre)
+                    n_skills = insert_skills(conn, micro_id, rec)
+                    if esp_id:
+                        upsert_domain_mapping(conn, esp_id, rec["programa"], rec["domain_key"])
+                    inserted.append({"asignatura": rec["asignatura"], "id": micro_id, "skills": n_skills})
+                    print(f"  ✓ id={micro_id}  {rec['asignatura']}  ({n_skills} skills)")
+                    with conn.cursor() as _c:
+                        _c.execute(f"RELEASE SAVEPOINT {sp!r}")
+                except Exception as exc:
+                    with conn.cursor() as _c:
+                        _c.execute(f"ROLLBACK TO SAVEPOINT {sp!r}")
+                    failed.append(rec["asignatura"])
+                    print(
+                        f"  ✗ SKIP '{rec['asignatura']}' — {type(exc).__name__}: {exc}"
+                    )
+
             conn.commit()
-            print(f"\n  Committed. {len(inserted)} microcurriculos inserted.")
+            print(f"\n  Committed. {len(inserted)} ok, {len(failed)} skipped.")
+            if failed:
+                print("  Skipped asignaturas:")
+                for a in failed:
+                    print(f"    - {a}")
         except Exception as exc:
             conn.rollback()
             print(f"\n  ERROR — rolled back: {exc}")
