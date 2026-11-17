@@ -468,24 +468,42 @@ def _resolve_esp_id(programa: str, esps: list[dict]) -> int | None:
         return max(candidates) if candidates else None
 
 
+_NIVEL_MAP = {
+    "pregrado": "Pregrado",
+    "especializacion": "Especialización",
+    "maestria": "Maestría",
+    "doctorado": "Doctorado",
+}
+
+_CAMPO_LABORAL_MAP: dict[str, str] = {
+    "pregrado en marketing y publicidad": (
+        "Asesor de Estrategias de Marketing y Publicidad, "
+        "Coordinador de Marketing Digital y E-Commerce, "
+        "Especialista en Analítica y Métricas Digitales, "
+        "Community Manager y Estratega de Social Media, "
+        "Consultor en Branding, "
+        "Gerente de Comercio Electrónico"
+    ),
+}
+
+
 def upsert_especializacion(conn, programa: str, nivel: str) -> int:
-    """Insert or return existing especializacion id."""
+    """Return existing especializacion id, or insert and return new one."""
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM especializaciones WHERE nombre = %s", (programa,))
         row = cur.fetchone()
         if row:
             return row[0]
-        nivel_map = {"pregrado": "Pregrado", "especializacion": "Especialización",
-                     "maestria": "Maestría", "doctorado": "Doctorado"}
-        nivel_display = nivel_map.get(nivel.lower(), "Especialización")
+        nivel_display = _NIVEL_MAP.get(nivel.lower(), "Especialización")
+        campo = _CAMPO_LABORAL_MAP.get(_normalize_text(programa), "")
         cur.execute(
             """
-            INSERT INTO especializaciones (nombre, nivel_formacion)
-            VALUES (%s, %s)
+            INSERT INTO especializaciones (nombre, nivel, estado, modalidad, campo_laboral)
+            VALUES (%s, %s, 'Activo', 'Virtual', %s)
             ON CONFLICT (nombre) DO UPDATE SET nombre = EXCLUDED.nombre
             RETURNING id
             """,
-            (programa, nivel_display),
+            (programa, nivel_display, campo or None),
         )
         return cur.fetchone()[0]
 
@@ -603,6 +621,30 @@ def main() -> None:
         finally:
             if conn:
                 conn.close()
+
+
+def test_upsert_dry_run(programa: str, nivel: str) -> None:
+    """
+    Runs upsert_especializacion inside a ROLLBACK transaction so the INSERT
+    is verified against the live schema without persisting any data.
+    Use before --execute to confirm the SQL is correct.
+    """
+    _load_env_local()
+    try:
+        from scripts.load_microcurriculos import get_conn
+        conn = get_conn()
+    except Exception as exc:
+        print(f"Cannot connect to DB: {exc}")
+        return
+    try:
+        esp_id = upsert_especializacion(conn, programa, nivel)
+        print(f"[DRY-RUN] upsert_especializacion → id={esp_id}  (rolling back)")
+        conn.rollback()
+    except Exception as exc:
+        conn.rollback()
+        print(f"[DRY-RUN] FAILED: {exc}")
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
