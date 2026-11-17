@@ -21,6 +21,8 @@ outputs/raw/
 outputs/cache/
 outputs/tmp/
 outputs/screenshots/
+outputs/ingesta_*.md
+outputs/ingest_cache.json
 .local_sessions/
 cookies/
 playwright/.auth/
