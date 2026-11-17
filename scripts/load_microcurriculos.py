@@ -135,14 +135,20 @@ _RE_MARKETING = re.compile(
     r"Trade\s*Marketing|Marketing\s*Mix|Publicidad\s*Digital|Paid\s*Media|"
     r"Display\s*Advertising|Programática|RTB|Influencer\s*Marketing|"
     r"Marketing\s*de\s*Contenidos|Marketing\s*de\s*Afiliados|"
-    r"Embudo\s*de\s*Conversi[oó]n|Customer\s*Journey|Buyer\s*Persona|"
+    r"Embudo\s*de\s*Conversi[oó]n|Customer\s*Journey|Customer\s*Experience|"
+    r"Buyer\s*Persona|UX\b|CX\b|"
     r"KPI\b|ROI\b|ROAS\b|CPM\b|CPC\b|CTR\b|Retargeting|Remarketing|"
     r"Posicionamiento\s*de\s*Marca|Brand\s*Equity|Brand\s*Awareness|"
     r"Investigaci[oó]n\s*de\s*Mercados|Comportamiento\s*del\s*Consumidor|"
     r"Segmentaci[oó]n\s*de\s*Mercados|Mezcla\s*de\s*Mercadeo|"
     r"Publicidad\s*ATL|Publicidad\s*BTL|Publicidad\s*TTL|"
     r"Producci[oó]n\s*Audiovisual|Dise[nñ]o\s*Gr[aá]fico|Identidad\s*Visual|"
-    r"WordPress|Shopify|WooCommerce|Meta\s*Business|"
+    r"WordPress|Shopify|WooCommerce|PrestaShop|Magento|Meta\s*Business|"
+    r"Plataformas?\s+de\s+E.?[Cc]ommerce|"
+    r"Pasarelas?\s+de\s+Pago|Medios?\s+de\s+Pago|"
+    r"Log[ií]stica|Fulfillment|Omnicanalidad|"
+    r"Experiencia\s+de\s+Usuario|Cat[aá]logo\s+de\s+Productos|"
+    r"Gesti[oó]n\s+de\s+Inventarios|Seguridad\s+en\s+E.?[Cc]ommerce|"
     r"Instagram|TikTok|LinkedIn|YouTube|Pinterest|Twitter)\b",
     re.IGNORECASE,
 )
@@ -189,6 +195,30 @@ _CANONICAL_SKILLS: dict[str, str] = {
     "diseno grafico": "Diseño Gráfico",
     "diseño gráfico": "Diseño Gráfico",
     "identidad visual": "Identidad Visual",
+    # E-commerce vocabulary
+    "prestashop": "PrestaShop",
+    "magento": "Magento",
+    "ux": "UX",
+    "cx": "CX",
+    "customer experience": "Customer Experience",
+    "pasarelas de pago": "Pasarelas de Pago",
+    "pasarela de pago": "Pasarelas de Pago",
+    "medios de pago": "Medios de Pago",
+    "medio de pago": "Medios de Pago",
+    "logistica": "Logística",
+    "logística": "Logística",
+    "fulfillment": "Fulfillment",
+    "omnicanalidad": "Omnicanalidad",
+    "experiencia de usuario": "Experiencia de Usuario",
+    "catalogo de productos": "Catálogo de Productos",
+    "catálogo de productos": "Catálogo de Productos",
+    "gestion de inventarios": "Gestión de Inventarios",
+    "gestión de inventarios": "Gestión de Inventarios",
+    "seguridad en e-commerce": "Seguridad en E-Commerce",
+    "seguridad en ecommerce": "Seguridad en E-Commerce",
+    "plataformas de e-commerce": "Plataformas de E-Commerce",
+    "plataforma de e-commerce": "Plataformas de E-Commerce",
+    "plataformas de ecommerce": "Plataformas de E-Commerce",
 }
 
 # Terms to strip from marketing-program skill results only.
@@ -239,21 +269,20 @@ def extract_skills(text: str, include_marketing: bool = False) -> dict[str, list
     seen: set[str] = set()
 
     def _add(bucket: str, raw: str) -> None:
-        key = _normalize_text(raw)
+        # Dedup by CANONICAL form so variant spellings of the same term
+        # (e.g. "ecommerce" and "E-Commerce") count as one hit.
+        canonical = _title(raw)
+        key = _normalize_text(canonical)
         if key not in seen:
             seen.add(key)
-            buckets[bucket].append(_title(raw))
+            buckets[bucket].append(canonical)
 
     for m in _RE_PLATFORMS.finditer(text):
         _add("plataforma", m.group(0))
     for m in _RE_TOOLS.finditer(text):
         _add("herramienta", m.group(0))
     for m in _RE_TECH.finditer(text):
-        raw = m.group(0)
-        key = _normalize_text(raw)
-        if key not in seen:
-            seen.add(key)
-            buckets["tecnologia"].append(_title(raw))
+        _add("tecnologia", m.group(0))
     for m in _RE_TRANSVERSAL.finditer(text):
         _add("skill_transversal", m.group(0))
     for m in _RE_METHODS.finditer(text):
