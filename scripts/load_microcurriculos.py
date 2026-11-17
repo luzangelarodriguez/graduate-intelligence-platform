@@ -1201,31 +1201,69 @@ def insert_skills(conn, micro_id: int, rec: dict) -> int:
     return rows_inserted
 
 
+_CAMPO_LABORAL_ESP: dict[str, str] = {
+    "pregrado en marketing y publicidad": (
+        "Asesor de Estrategias de Marketing y Publicidad, "
+        "Coordinador de Marketing Digital y E-Commerce, "
+        "Especialista en Analítica y Métricas Digitales, "
+        "Community Manager y Estratega de Social Media, "
+        "Consultor en Branding, "
+        "Gerente de Comercio Electrónico"
+    ),
+}
+
+_NIVEL_DISPLAY_MAP: dict[str, str] = {
+    "pregrado": "Pregrado",
+    "especializacion": "Especialización",
+    "maestria": "Maestría",
+    "doctorado": "Doctorado",
+}
+
+
+def _validate_esp_columns(conn) -> None:
+    """Raise RuntimeError if required columns are missing in especializaciones."""
+    required = {"nombre", "nivel", "estado", "modalidad", "campo_laboral"}
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT column_name FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'especializaciones'
+            """,
+        )
+        present = {r[0] for r in cur.fetchall()}
+    missing = required - present
+    if missing:
+        raise RuntimeError(
+            f"especializaciones is missing columns: {missing}. "
+            f"Present columns: {sorted(present)}"
+        )
+
+
 def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
     """
     Idempotent: find or create a row in especializaciones for 'programa'.
     Returns the id of the existing or newly created row.
     Only called when match_esp_id returns None (program not in DB yet).
     """
+    # Validate schema before attempting INSERT
+    _validate_esp_columns(conn)
+
     # Infer nivel from program name
     prog_lower = programa.lower()
     if "pregrado" in prog_lower or "licenciatura" in prog_lower or "tecnología" in prog_lower:
-        nivel = "pregrado"
+        nivel_key = "pregrado"
     elif "maestría" in prog_lower or "maestria" in prog_lower:
-        nivel = "maestria"
+        nivel_key = "maestria"
     elif "doctorado" in prog_lower:
-        nivel = "doctorado"
+        nivel_key = "doctorado"
     else:
-        nivel = "especializacion"
+        nivel_key = "especializacion"
 
-    _NIVEL_DISPLAY = {
-        "pregrado": "Pregrado", "especializacion": "Especialización",
-        "maestria": "Maestría", "doctorado": "Doctorado",
-    }
-    nivel_display = _NIVEL_DISPLAY.get(nivel, "Especialización")
+    nivel_display = _NIVEL_DISPLAY_MAP.get(nivel_key, "Especialización")
+    campo = _CAMPO_LABORAL_ESP.get(_normalize_text(programa))
 
     with conn.cursor() as cur:
-        # Try to find existing row by exact nombre match
+        # Return existing row without touching it
         cur.execute(
             "SELECT id FROM especializaciones WHERE nombre = %s LIMIT 1",
             (programa,),
@@ -1234,17 +1272,34 @@ def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
         if row:
             return row[0]
 
-        # Real schema: nombre, nivel (not nivel_formacion), estado, modalidad
         cur.execute(
             """
-            INSERT INTO especializaciones (nombre, nivel, estado, modalidad)
-            VALUES (%s, %s, 'Activo', 'Virtual')
+            INSERT INTO especializaciones (nombre, nivel, estado, modalidad, campo_laboral)
+            VALUES (%s, %s, 'Activo', 'Virtual', %s)
             ON CONFLICT (nombre) DO UPDATE SET nombre = EXCLUDED.nombre
             RETURNING id
             """,
-            (programa, nivel_display),
+            (programa, nivel_display, campo),
         )
         return cur.fetchone()[0]
+
+
+def dry_run_upsert_especializacion(conn, programa: str, domain_key: str) -> None:
+    """
+    Runs upsert_especializacion inside a SAVEPOINT/ROLLBACK TO SAVEPOINT so
+    the INSERT is validated against the live schema without persisting data.
+    Call this before --execute to confirm the SQL is correct.
+    """
+    with conn.cursor() as cur:
+        cur.execute("SAVEPOINT dry_run_upsert")
+    try:
+        esp_id = upsert_especializacion(conn, programa, domain_key)
+        print(f"[DRY-RUN OK] upsert_especializacion('{programa}') → id={esp_id}  (rolling back)")
+    except Exception as exc:
+        print(f"[DRY-RUN FAIL] {exc}")
+    finally:
+        with conn.cursor() as cur:
+            cur.execute("ROLLBACK TO SAVEPOINT dry_run_upsert")
 
 
 def upsert_domain_mapping(conn, esp_id: int, programa: str, domain_key: str) -> None:
