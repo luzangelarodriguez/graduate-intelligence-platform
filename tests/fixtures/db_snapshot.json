@@ -1,0 +1,31 @@
+{
+  "_comment": "Run python tests/fixtures/generate_snapshot.py to populate from live DB. Values below are pre-confirmed by user.",
+  "_generated": null,
+  "programs": {
+    "108": {
+      "nombre": "Especialización en Criminología y Victimología",
+      "expected_asignaturas_min": 1,
+      "expected_skills_min": 1
+    },
+    "9": {
+      "nombre": "Dirección y Gestión de Proyectos",
+      "expected_asignaturas_min": 1,
+      "expected_skills_min": 1
+    },
+    "11": {
+      "nombre": "Especialización en Inteligencia Artificial",
+      "expected_asignaturas_min": 1,
+      "expected_skills_min": 1
+    },
+    "109": {
+      "nombre": "Pregrado en Ingeniería Informática",
+      "expected_asignaturas_min": 1,
+      "expected_skills_min": 1
+    },
+    "13": {
+      "nombre": "Visual Analytics",
+      "expected_asignaturas_min": 1,
+      "expected_skills_min": 1
+    }
+  }
+}
