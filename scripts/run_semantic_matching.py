@@ -115,28 +115,41 @@ def _debug_domain(
     programs: List[ProgramProfile],
     jobs: List[JobProfile],
     domain: str,
+    program_id: Optional[int] = None,
 ) -> None:
     """
     Print diagnostic info for a given domain:
-    - Skills of the first matching program
+    - Skills of the target program (--program-id if given; else the one with
+      the most skills in the domain, skipping programs with 0 skills)
     - For 10 jobs in that domain: title, inferred domain, extracted skills,
-      semantic/BM25/F1 score breakdown
+      common skills, F1 skill score
+    - sem/BM25 require live SBERT embeddings (loaded via run_matching)
     """
-    prog_matches = [p for p in programs if (p.domain or "").lower() == domain.lower()]
-    if not prog_matches:
+    domain_progs = [p for p in programs if (p.domain or "").lower() == domain.lower()]
+    if not domain_progs:
         print(f"[debug-domain] No program found with domain='{domain}'")
         print(f"  Available domains: {sorted({p.domain for p in programs if p.domain})}")
         return
 
-    prog = prog_matches[0]
+    if program_id is not None:
+        id_match = [p for p in domain_progs if p.especializacion_id == program_id]
+        prog = id_match[0] if id_match else max(domain_progs, key=lambda p: len(p.skills))
+    else:
+        with_skills = [p for p in domain_progs if p.skills]
+        prog = max(with_skills, key=lambda p: len(p.skills)) if with_skills else domain_progs[0]
+
     print(f"\n{'='*72}")
-    print(f"  PROGRAMA: {prog.program_name}  (id={prog.especializacion_id}  domain={prog.domain})")
+    print(f"  PROGRAMA : {prog.program_name}")
+    print(f"  id={prog.especializacion_id}  domain={prog.domain}  skills={len(prog.skills)}")
     print(f"  Skills del programa ({len(prog.skills)}):")
     for sk in sorted(prog.skills):
         print(f"    • {sk}")
 
     domain_jobs = [j for j in jobs if (j.domain or "").lower() == domain.lower()]
-    print(f"\n  Empleos en dominio '{domain}': {len(domain_jobs)} total — mostrando primeros 10")
+    no_skills   = [j for j in domain_jobs if not j.skills]
+    print(f"\n  Empleos en dominio '{domain}': {len(domain_jobs)} total")
+    print(f"  → {len(no_skills)} con 0 skills extraídas (candidatos para derivación desde título)")
+    print(f"  Mostrando primeros 10:")
     print(f"{'='*72}\n")
 
     for j in domain_jobs[:10]:
@@ -144,7 +157,6 @@ def _debug_domain(
         common = sorted(set(prog.skills) & set(job_skills))
         prog_set = set(prog.skills)
         job_set  = set(job_skills)
-        # Skill F1
         prec = len(common) / len(job_set)  if job_set  else 0.0
         rec  = len(common) / len(prog_set) if prog_set else 0.0
         f1   = 2 * prec * rec / (prec + rec) * 100 if (prec + rec) else 0.0
@@ -152,7 +164,7 @@ def _debug_domain(
         print(f"  Empresa: {getattr(j, 'company', '?')}  |  dominio_inferido={j.domain}")
         print(f"  Skills ({len(job_skills)}): {', '.join(job_skills[:12]) or '(ninguna)'}")
         print(f"  Comunes ({len(common)}): {', '.join(common[:10]) or '(ninguna)'}")
-        print(f"  F1_skills={f1:.1f}  sem=n/a_offline  BM25=n/a_offline")
+        print(f"  F1_skills={f1:.1f}  sem=requires-live-sbert  BM25=requires-live-sbert")
         print()
 
 
@@ -215,7 +227,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # --debug-domain: print program skills + per-job breakdown for a domain
     if args.debug_domain:
-        _debug_domain(programs, jobs, args.debug_domain)
+        _debug_domain(programs, jobs, args.debug_domain, program_id=args.program_id)
         return 0
 
     programs = _filter_programs(programs, args.program_id)

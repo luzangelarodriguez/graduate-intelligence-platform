@@ -292,11 +292,43 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
                             "presupuesto proyecto", "cronograma", "ms project"],
     "marketing_commercial": ["marketing", "seo", "sem", "google ads", "meta ads",
                               "google analytics", "crm", "embudo de conversion", "email marketing",
-                              "automatizacion", "redes sociales", "branding", "content marketing",
-                              "analitica web", "copywriting", "growth", "community manager",
+                              # "automatizacion" removed — bare term matches unrelated jobs like
+                              # "Analista de Automatización de Procesos". Replaced with specific form.
+                              "automatizacion de marketing",
+                              "redes sociales", "branding", "content marketing",
+                              "analitica web", "copywriting", "growth hacking", "community manager",
                               "e-commerce", "ecommerce", "digital marketing", "paid media",
-                              "conversion", "campana digital", "estrategia digital"],
+                              "conversion rate", "campana digital", "estrategia digital",
+                              "publicidad digital", "mercadeo", "hubspot", "shopify",
+                              "lead generation", "inbound marketing"],
+                              # "seo" is in _DOMAIN_BUCKET_BOUNDARY → uses word-boundary regex
+                              # in _bucket_hit() to prevent "aseo" → marketing_commercial.
 }
+
+
+# Short (≤3 char or single-word ≤5 char) bucket keywords that must match at a
+# word boundary in _infer_domain to avoid false positives like "seo" in "aseo".
+_DOMAIN_BUCKET_BOUNDARY: Dict[str, re.Pattern] = {}
+
+
+def _build_bucket_boundary_patterns() -> None:
+    boundary_terms = {"seo", "sem", "sql", "crm", "api", "pmp", "soc", "siem"}
+    for kw in boundary_terms:
+        _DOMAIN_BUCKET_BOUNDARY[kw] = re.compile(
+            r"(?<![a-z0-9])" + re.escape(_normalize(kw)) + r"(?![a-z0-9])"
+        )
+
+
+_build_bucket_boundary_patterns()
+
+
+def _bucket_hit(kw: str, n: str) -> bool:
+    """Return True if keyword `kw` appears in normalised text `n`.
+    Uses word-boundary regex for terms known to cause false positives as substrings.
+    """
+    if kw in _DOMAIN_BUCKET_BOUNDARY:
+        return bool(_DOMAIN_BUCKET_BOUNDARY[kw].search(n))
+    return kw in n
 
 
 def _infer_domain(text: str, program_name: str = "") -> str:
@@ -323,7 +355,7 @@ def _infer_domain(text: str, program_name: str = "") -> str:
         return "education"
     best = ("general", 0)
     for dom, kws in _DOMAIN_BUCKETS.items():
-        hits = sum(1 for kw in kws if kw in n)
+        hits = sum(1 for kw in kws if _bucket_hit(kw, n))
         if hits > best[1]:
             best = (dom, hits)
     return best[0]
@@ -565,12 +597,13 @@ _SKILLS_LOOKUP_NORM: List[str] = [
     if (n := _normalize(s)) and n not in SKILLS_EXCLUDE and len(n) >= 2
 ]
 
-# Compile per-term word-boundary patterns for short terms (≤ 4 chars) to
-# avoid "r" matching "errors", "sql" matching "psql", etc.
+# Compile per-term word-boundary patterns for short terms (≤ 5 chars) to
+# avoid "r" matching "errors", "sql" matching "psql", "scala" matching
+# "escalabilidad" / "escalas", etc.
 _SHORT_TERMS: Dict[str, re.Pattern] = {
     term: re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])")
     for term in _SKILLS_LOOKUP_NORM
-    if len(term) <= 4
+    if len(term) <= 5
 }
 
 
