@@ -344,7 +344,10 @@ _COMPATIBLE_DOMAINS: Dict[str, set] = {
     "education":    {"education"},
     "finanzas": {"finanzas"},
     "project_management": {"project_management", "gestion"},
-    "marketing_commercial": {"marketing_commercial", "general"},
+    # "general" removed from marketing_commercial: unclassified jobs (B2B, BI,
+    # docentes) must have real marketing keyword evidence to reach this program,
+    # handled by the GENERAL_SKILL_BYPASS with _MKT_REQUIRED_SKILLS guard below.
+    "marketing_commercial": {"marketing_commercial"},
     "general":  {"general"},   # no longer a wildcard
 }
 
@@ -515,6 +518,32 @@ SKILLS_LOOKUP: List[str] = [
     "ingeniero de datos", "arquitecto de datos",
     "looker studio", "google analytics", "google tag manager",
     "meta ads", "google ads", "crm",
+    # --- Marketing & Publicidad (es/en, normalized to ASCII lowercase) ---
+    "seo", "sem", "community manager", "social media", "social media marketing",
+    "branding", "copywriting", "marketing de contenidos", "content marketing",
+    "email marketing", "e-commerce", "ecommerce", "investigacion de mercados",
+    "estrategia de marca", "planeacion de medios", "publicidad digital",
+    "performance marketing", "embudo de conversion", "hubspot",
+    "shopify", "wordpress", "canva", "adobe creative", "adobe creative suite",
+    "relaciones publicas", "comportamiento del consumidor", "posicionamiento",
+    "posicionamiento de marca", "planeacion estrategica de medios",
+    "marketing digital", "mercadeo", "publicidad",
+    "google search console", "semrush", "ahrefs",
+    "instagram", "tiktok", "linkedin", "youtube",
+    "roi", "roas", "kpi marketing", "ctr", "cpc", "cpm",
+    "inbound marketing", "outbound marketing", "growth hacking",
+    "campana publicitaria", "campana digital", "estrategia digital",
+    "marketing mix", "mezcla de mercadeo", "segmentacion de mercados",
+    "analistica digital", "analitica digital", "analitica web",
+    "paid media", "paid social", "influencer marketing",
+    "diseno grafico", "identidad visual", "produccion audiovisual",
+    "estrategia de contenidos", "calendario editorial",
+    "comercio electronico", "tienda virtual", "pasarela de pago",
+    "logistica comercial", "fulfillment",
+    "neuromarketing", "marketing experiencial", "trade marketing",
+    "investigacion cualitativa", "investigacion cuantitativa",
+    "focus group", "encuesta de mercado",
+    # -------------------------------------------------------------------
     "sap", "salesforce", "oracle",
     "numpy", "matplotlib", "seaborn",
     "jupyter", "colab",
@@ -1044,9 +1073,28 @@ def run_matching(
             # N=2 requires two independent skill signals → strong evidence of relevance
             # without being so strict that thin microcurriculums never get bypass matches.
             _GENERAL_SKILL_BYPASS_MIN = 2
+            # Marketing programs require at least one marketing-specific skill
+            # in the job before a "general" job is allowed through. This blocks
+            # B2B/BI/docente jobs whose only overlap is generic terms like
+            # "comunicacion" or "excel".
+            _MKT_REQUIRED_SKILLS: frozenset = frozenset({
+                "seo", "sem", "community manager", "social media", "branding",
+                "copywriting", "marketing de contenidos", "content marketing",
+                "email marketing", "e-commerce", "ecommerce", "hubspot", "shopify",
+                "wordpress", "publicidad digital", "performance marketing",
+                "embudo de conversion", "marketing digital", "mercadeo",
+                "google ads", "meta ads", "google analytics", "paid media",
+                "paid social", "campana digital", "estrategia digital",
+                "inbound marketing", "growth hacking", "analistica digital",
+                "analitica digital", "analitica web", "social media marketing",
+            })
             if domain_filter and not domain_ok and job.domain == "general" and prog.skills and job.skills:
                 n_common_quick = len(set(prog.skills) & set(job.skills))
-                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN:
+                # For marketing programs, also require at least one marketing keyword
+                mkt_gate_ok = True
+                if prog.domain == "marketing_commercial":
+                    mkt_gate_ok = bool(set(job.skills) & _MKT_REQUIRED_SKILLS)
+                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN and mkt_gate_ok:
                     domain_ok = True
                     logger.debug(
                         "[DOMAIN-BYPASS] prog='%s' ← job='%s' (general, %d skills comunes)",

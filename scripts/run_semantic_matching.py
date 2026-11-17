@@ -39,6 +39,9 @@ from ml.academic_relevance_engine import (
     run_matching,
     save_matches,
     _ensure_run,
+    _infer_domain,
+    extract_skills_from_text,
+    _normalize,
 )
 
 logger = logging.getLogger(__name__)
@@ -105,6 +108,55 @@ def _print_summary(results: List[MatchResult], *, top: int = 20, show_gap: bool 
 
 
 # ---------------------------------------------------------------------------
+# Debug helper
+# ---------------------------------------------------------------------------
+
+def _debug_domain(
+    programs: List[ProgramProfile],
+    jobs: List[JobProfile],
+    domain: str,
+) -> None:
+    """
+    Print diagnostic info for a given domain:
+    - Skills of the first matching program
+    - For 10 jobs in that domain: title, inferred domain, extracted skills,
+      semantic/BM25/F1 score breakdown
+    """
+    prog_matches = [p for p in programs if (p.domain or "").lower() == domain.lower()]
+    if not prog_matches:
+        print(f"[debug-domain] No program found with domain='{domain}'")
+        print(f"  Available domains: {sorted({p.domain for p in programs if p.domain})}")
+        return
+
+    prog = prog_matches[0]
+    print(f"\n{'='*72}")
+    print(f"  PROGRAMA: {prog.program_name}  (id={prog.especializacion_id}  domain={prog.domain})")
+    print(f"  Skills del programa ({len(prog.skills)}):")
+    for sk in sorted(prog.skills):
+        print(f"    • {sk}")
+
+    domain_jobs = [j for j in jobs if (j.domain or "").lower() == domain.lower()]
+    print(f"\n  Empleos en dominio '{domain}': {len(domain_jobs)} total — mostrando primeros 10")
+    print(f"{'='*72}\n")
+
+    for j in domain_jobs[:10]:
+        job_skills = list(j.skills) if j.skills else []
+        common = sorted(set(prog.skills) & set(job_skills))
+        prog_set = set(prog.skills)
+        job_set  = set(job_skills)
+        # Skill F1
+        prec = len(common) / len(job_set)  if job_set  else 0.0
+        rec  = len(common) / len(prog_set) if prog_set else 0.0
+        f1   = 2 * prec * rec / (prec + rec) * 100 if (prec + rec) else 0.0
+        print(f"  Empleo : {j.title}")
+        print(f"  Empresa: {getattr(j, 'company', '?')}  |  dominio_inferido={j.domain}")
+        print(f"  Skills ({len(job_skills)}): {', '.join(job_skills[:12]) or '(ninguna)'}")
+        print(f"  Comunes ({len(common)}): {', '.join(common[:10]) or '(ninguna)'}")
+        print(f"  F1_skills={f1:.1f}  sem=n/a_offline  BM25=n/a_offline")
+        print()
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -138,6 +190,8 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
                    help="Mostrar gap de skills del mejor match en consola")
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Logging DEBUG")
+    p.add_argument("--debug-domain", metavar="DOMAIN",
+                   help="Print program skills and 10 job breakdowns for the given domain key")
     return p.parse_args(argv)
 
 
@@ -158,6 +212,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         jobs = load_jobs(conn)
     finally:
         conn.close()
+
+    # --debug-domain: print program skills + per-job breakdown for a domain
+    if args.debug_domain:
+        _debug_domain(programs, jobs, args.debug_domain)
+        return 0
 
     programs = _filter_programs(programs, args.program_id)
     if args.limit_programs:
