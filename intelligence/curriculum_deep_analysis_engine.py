@@ -183,6 +183,17 @@ C. AUSENCIAS NOTABLES — checklist de dominio:
      en criminología, criminología ambiental y situacional, marco legal actualizado
      (reformas recientes), victimología avanzada.
 
+   - Para marketing y publicidad / marketing digital:
+     posicionamiento SEO (técnico, on-page, off-page) y SEM, gestión de campañas
+     pagadas (Google Ads, Meta Ads, programática), analítica web (Google Analytics 4,
+     Search Console, Tag Manager), CRM y automatización de marketing (HubSpot,
+     Salesforce, Mailchimp), email marketing y estrategia de contenidos, investigación
+     de mercados (cualitativa y cuantitativa), copywriting y redacción persuasiva,
+     branding e identidad de marca, producción audiovisual y diseño gráfico aplicado,
+     gestión de e-commerce (Shopify, WooCommerce, UX/CRO, pasarelas de pago),
+     métricas de desempeño (KPIs, ROI de campañas, CAC/LTV), estrategia en redes
+     sociales y community management avanzado.
+
    Reporta como debilidad ÚNICAMENTE las ausencias del checklist de SU dominio, con
    impacto estimado. No importes ítems de otros dominios como brechas.
 
