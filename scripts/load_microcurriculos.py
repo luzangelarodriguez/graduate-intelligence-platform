@@ -688,10 +688,12 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
 
 # Lines that are page headers / footers in this specific PDF — must be stripped
 # before splitting into blocks so they don't corrupt the asignatura name detection.
+# Also catches lines produced when pdfplumber splits a header across two lines.
 _MYP_HEADER_RE = re.compile(
-    r"(MICROCURR[IÍ]CULOS?\s+DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
-    r"P[aá]gina\s+\d+\s+de\s+\d+|"
-    r"Página\s+\d+\s+de\s+307|"
+    r"(MICROCURR[IÍ]CULOS?\s+DEL\s+PROGRAMA|"
+    r"DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"DE\s+MARKETING\s+Y\s+PUBLICIDAD|"
+    r"P[aá]gina\s+\d+\s+de|"           # "Página 265 de" (may omit the total)
     r"PROGRAMA\s+ACAD[EÉ]MICO\s*/?\s*Pregrado)",
     re.IGNORECASE,
 )
@@ -712,14 +714,23 @@ _MYP_SECTION_LABELS = re.compile(
     re.IGNORECASE,
 )
 
-# Noise lines that are clearly not RA content
+# Noise lines that are clearly not RA content.
+# These are SKIPPED (the RA section continues past them) rather than acting as
+# stop conditions — this lets page-break headers inside the RA section be
+# transparent, so RAs that start on the next page are still captured.
 _MYP_NOISE_RA = re.compile(
     r"^(Resultado[s]?\s+de\s+Aprendizaje(\s+de\s+la\s+Asignatura)?[:\s]*$|"
     r"RA\s*\d*\s*[-:]?\s*$|"
     r"Componente\s+formativo|"
     r"L[ií]nea\s+de\s+formaci[oó]n|"
     r"Pregrado\s+en\s+Marketing|"
-    r"P[aá]gina\s+\d+)",
+    r"DE\s+MARKETING\s+Y\s+PUBLICIDAD|"
+    r"MICROCURR[IÍ]CULO|"
+    r"DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"No\s+aplica\.?$|"              # "CONTENIDO TEMÁTICO No aplica"
+    r"P[aá]gina\s+\d+|"
+    r"^\d{3}$)",                     # bare page-count number e.g. "307"
     re.IGNORECASE,
 )
 
@@ -820,17 +831,16 @@ def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
             desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
 
         # ── Resultados de Aprendizaje ─────────────────────────────────────────
-        # Stop the RA section at: CONTENIDO TEMÁTICO, BLOQUE N (Comercio
-        # Electrónico uses BLOQUE 1 instead of CONTENIDO TEMÁTICO), Tema N.
-        # (numbered topic lines starting a thematic block), next block header,
-        # or page markers. This prevents topic-line bleed even when CONTENIDO
-        # TEMÁTICO is missing.
+        # Stop the RA section only at real section boundaries:
+        # CONTENIDO TEMÁTICO, BLOQUE N. (Comercio Electrónico), Tema N.,
+        # next block header (DENOMINACIÓN). Page-break headers/footers
+        # (Página N de, MICROCURRÍCULOS…) are NOT stop conditions — they are
+        # skipped inline so that RAs starting on the next PDF page are captured.
         resultados: list[str] = []
         ra_match = re.search(
             r"RESULTADO[S]?\s+DE\s+APRENDIZAJE(?:\s+DE\s+LA\s+ASIGNATURA)?\s*"
             r"([\s\S]*?)"
-            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|BLOQUE\s+\d|Tema\s+\d\.|"
-            r"DENOMINACI[OÓ]N|P[aá]gina\s+\d+\s+de|MICROCURR|$)",
+            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|BLOQUE\s+\d|Tema\s+\d\.|DENOMINACI[OÓ]N|$)",
             block, re.IGNORECASE,
         )
         if ra_match:
@@ -889,8 +899,16 @@ def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
             if bloque_match:
                 ct_text = bloque_match.group(1)
 
+        # "CONTENIDO TEMÁTICO No aplica" — treat as no thematic content
+        ct_text_stripped = re.sub(r"\s+", " ", ct_text).strip().lower()
+        if ct_text_stripped in ("no aplica", "no aplica.", "n/a", "no aplica\n"):
+            ct_text = ""
+
         for line in ct_text.splitlines():
             line = line.strip()
+            # Skip page-break markers that may appear inside the thematic block
+            if _MYP_NOISE_RA.match(line):
+                continue
             if re.match(r"^\d+[\.\d]*\s+\S", line) and len(line) > 5:
                 temas.append(line[:200])
             elif re.match(r"^BLOQUE\s+\d", line, re.IGNORECASE) and len(line) > 5:
