@@ -1172,20 +1172,27 @@ def insert_record(conn, rec: dict, esp_id: int | None, esp_nombre: str | None = 
 
 
 def insert_skills(conn, micro_id: int, rec: dict) -> int:
-    # Deduplicate in Python using the same key the DB UNIQUE index uses:
-    # (microcurriculo_id, skill_normalized, tipo_skill).
-    # This prevents the transaction from entering an aborted state on UNIQUE
-    # violations, which would kill subsequent INSERTs in the same transaction.
+    # Dedup key uses casefold + strip accents (same as _normalize_text) only to
+    # decide which rows to skip — the value stored in skill_normalized stays as
+    # the original cased string (matching the convention of existing programs:
+    # 'Toma De Decisiones', 'Ética Profesional', etc.).
     seen: set[tuple[str, str]] = set()
     rows_to_insert: list[tuple] = []
     for tipo, skills in rec["skills"].items():
         for skill in skills:
-            norm = _normalize_text(skill)
-            key = (norm, tipo)
-            if key in seen:
+            dedup_key = (_normalize_text(skill), tipo)
+            if dedup_key in seen:
                 continue
-            seen.add(key)
-            rows_to_insert.append((micro_id, skill, norm, rec["domain_key"], tipo, 0.70, rec["source_document"]))
+            seen.add(dedup_key)
+            rows_to_insert.append((
+                micro_id,
+                skill,          # skill_original
+                skill,          # skill_normalized — same convention as existing rows
+                rec["domain_key"],
+                tipo,
+                0.70,
+                rec["source_document"],
+            ))
 
     rows_inserted = 0
     skipped = 0
