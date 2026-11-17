@@ -39,6 +39,9 @@ from ml.academic_relevance_engine import (
     run_matching,
     save_matches,
     _ensure_run,
+    _infer_domain,
+    extract_skills_from_text,
+    _normalize,
 )
 
 logger = logging.getLogger(__name__)
@@ -105,6 +108,67 @@ def _print_summary(results: List[MatchResult], *, top: int = 20, show_gap: bool 
 
 
 # ---------------------------------------------------------------------------
+# Debug helper
+# ---------------------------------------------------------------------------
+
+def _debug_domain(
+    programs: List[ProgramProfile],
+    jobs: List[JobProfile],
+    domain: str,
+    program_id: Optional[int] = None,
+) -> None:
+    """
+    Print diagnostic info for a given domain:
+    - Skills of the target program (--program-id if given; else the one with
+      the most skills in the domain, skipping programs with 0 skills)
+    - For 10 jobs in that domain: title, inferred domain, extracted skills,
+      common skills, F1 skill score
+    - sem/BM25 require live SBERT embeddings (loaded via run_matching)
+    """
+    domain_progs = [p for p in programs if (p.domain or "").lower() == domain.lower()]
+    if not domain_progs:
+        print(f"[debug-domain] No program found with domain='{domain}'")
+        print(f"  Available domains: {sorted({p.domain for p in programs if p.domain})}")
+        return
+
+    if program_id is not None:
+        id_match = [p for p in domain_progs if p.especializacion_id == program_id]
+        prog = id_match[0] if id_match else max(domain_progs, key=lambda p: len(p.skills))
+    else:
+        with_skills = [p for p in domain_progs if p.skills]
+        prog = max(with_skills, key=lambda p: len(p.skills)) if with_skills else domain_progs[0]
+
+    print(f"\n{'='*72}")
+    print(f"  PROGRAMA : {prog.program_name}")
+    print(f"  id={prog.especializacion_id}  domain={prog.domain}  skills={len(prog.skills)}")
+    print(f"  Skills del programa ({len(prog.skills)}):")
+    for sk in sorted(prog.skills):
+        print(f"    • {sk}")
+
+    domain_jobs = [j for j in jobs if (j.domain or "").lower() == domain.lower()]
+    no_skills   = [j for j in domain_jobs if not j.skills]
+    print(f"\n  Empleos en dominio '{domain}': {len(domain_jobs)} total")
+    print(f"  → {len(no_skills)} con 0 skills extraídas (candidatos para derivación desde título)")
+    print(f"  Mostrando primeros 10:")
+    print(f"{'='*72}\n")
+
+    for j in domain_jobs[:10]:
+        job_skills = list(j.skills) if j.skills else []
+        common = sorted(set(prog.skills) & set(job_skills))
+        prog_set = set(prog.skills)
+        job_set  = set(job_skills)
+        prec = len(common) / len(job_set)  if job_set  else 0.0
+        rec  = len(common) / len(prog_set) if prog_set else 0.0
+        f1   = 2 * prec * rec / (prec + rec) * 100 if (prec + rec) else 0.0
+        print(f"  Empleo : {j.title}")
+        print(f"  Empresa: {getattr(j, 'company', '?')}  |  dominio_inferido={j.domain}")
+        print(f"  Skills ({len(job_skills)}): {', '.join(job_skills[:12]) or '(ninguna)'}")
+        print(f"  Comunes ({len(common)}): {', '.join(common[:10]) or '(ninguna)'}")
+        print(f"  F1_skills={f1:.1f}  sem=requires-live-sbert  BM25=requires-live-sbert")
+        print()
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -138,6 +202,8 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
                    help="Mostrar gap de skills del mejor match en consola")
     p.add_argument("-v", "--verbose", action="store_true",
                    help="Logging DEBUG")
+    p.add_argument("--debug-domain", metavar="DOMAIN",
+                   help="Print program skills and 10 job breakdowns for the given domain key")
     return p.parse_args(argv)
 
 
@@ -158,6 +224,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         jobs = load_jobs(conn)
     finally:
         conn.close()
+
+    # --debug-domain: print program skills + per-job breakdown for a domain
+    if args.debug_domain:
+        _debug_domain(programs, jobs, args.debug_domain, program_id=args.program_id)
+        return 0
 
     programs = _filter_programs(programs, args.program_id)
     if args.limit_programs:

@@ -695,6 +695,9 @@ def related_universities(program_id: int) -> dict[str, Any]:
                        OR m.nombre_programa ILIKE '%tecnolog_a inform_tica%'
                        OR m.nombre_programa ILIKE '%ciencias de la computaci_n%'
                     )""",
+            146: """WHERE (m.nombre_programa ILIKE '%marketing%'
+                       OR m.nombre_programa ILIKE '%publicidad%'
+                       OR m.nombre_programa ILIKE '%mercadeo%')""",
         }
         where = PROGRAM_WHERE.get(program_id)
         if not where:
@@ -794,6 +797,9 @@ def oferta_demanda(program_id: int) -> dict[str, Any]:
                        OR m.nombre_programa ILIKE '%tecnolog_a inform_tica%'
                        OR m.nombre_programa ILIKE '%ciencias de la computaci_n%'
                     )""",
+            146: """WHERE (m.nombre_programa ILIKE '%marketing%'
+                       OR m.nombre_programa ILIKE '%publicidad%'
+                       OR m.nombre_programa ILIKE '%mercadeo%')""",
         }
 
         where = PROGRAM_WHERE.get(program_id)

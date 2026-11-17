@@ -47,6 +47,11 @@ DOMAIN_MAP: dict[str, str] = {
     "gerencia": "business",
     "administracion": "business",
     "direccion": "business",
+    "marketing digital": "marketing_commercial",
+    "marketing comercial": "marketing_commercial",
+    "marketing y publicidad": "marketing_commercial",
+    "mercadeo digital": "marketing_commercial",
+    "mercadeo y publicidad": "marketing_commercial",
     "derecho": "law",
     "educacion": "education",
     "ambiental": "health",
@@ -116,17 +121,141 @@ _RE_METHODS = re.compile(
     re.IGNORECASE,
 )
 
+# Skills específicos de Marketing y Publicidad (complementan los buckets genéricos)
+# Regla de inclusión: términos inequívocamente ligados a marketing/publicidad digital.
+# Excluidos deliberadamente: "Growth" (genérico), "Conversión" (genérico en español),
+# "Funnel" (muy corto, aparece en contextos no-marketing), "X" (Twitter/X — colisiona
+# con variables matemáticas).  Usar "Embudo de Conversión" o "Growth Hacking" en su lugar.
+_RE_MARKETING = re.compile(
+    r"\b(SEO|SEM|Google\s*Ads|Meta\s*Ads|Facebook\s*Ads|Google\s*Analytics|"
+    r"CRM|Salesforce|HubSpot|Mailchimp|Branding|Rebranding|Copywriting|"
+    r"Social\s*Media|Community\s*Manager|Content\s*Marketing|Inbound\s*Marketing|"
+    r"E.?commerce|Marketplace|Growth\s*Hacking|Email\s*Marketing|"
+    r"Analítica\s*Web|Analítica\s*Digital|Neuromarketing|Shopper\s*Marketing|"
+    r"Trade\s*Marketing|Marketing\s*Mix|Publicidad\s*Digital|Paid\s*Media|"
+    r"Display\s*Advertising|Programática|RTB|Influencer\s*Marketing|"
+    r"Marketing\s*de\s*Contenidos|Marketing\s*de\s*Afiliados|"
+    r"Embudo\s*de\s*Conversi[oó]n|Customer\s*Journey|Customer\s*Experience|"
+    r"Buyer\s*Persona|UX\b|CX\b|"
+    r"KPI\b|ROI\b|ROAS\b|CPM\b|CPC\b|CTR\b|Retargeting|Remarketing|"
+    r"Posicionamiento\s*de\s*Marca|Brand\s*Equity|Brand\s*Awareness|"
+    r"Investigaci[oó]n\s*de\s*Mercados|Comportamiento\s*del\s*Consumidor|"
+    r"Segmentaci[oó]n\s*de\s*Mercados|Mezcla\s*de\s*Mercadeo|"
+    r"Publicidad\s*ATL|Publicidad\s*BTL|Publicidad\s*TTL|"
+    r"Producci[oó]n\s*Audiovisual|Dise[nñ]o\s*Gr[aá]fico|Identidad\s*Visual|"
+    r"WordPress|Shopify|WooCommerce|PrestaShop|Magento|Meta\s*Business|"
+    r"Plataformas?\s+de\s+E.?[Cc]ommerce|"
+    r"Pasarelas?\s+de\s+Pago|Medios?\s+de\s+Pago|"
+    r"Log[ií]stica|Fulfillment|Omnicanalidad|"
+    r"Experiencia\s+de\s+Usuario|Cat[aá]logo\s+de\s+Productos|"
+    r"Gesti[oó]n\s+de\s+Inventarios|Seguridad\s+en\s+E.?[Cc]ommerce|"
+    r"Instagram|TikTok|LinkedIn|YouTube|Pinterest|Twitter)\b",
+    re.IGNORECASE,
+)
+
 
 def _normalize_text(text: str) -> str:
     nfkd = unicodedata.normalize("NFKD", text.lower())
     return "".join(c for c in nfkd if not unicodedata.combining(c)).strip()
 
 
+# Canonical forms that must override .title() — acronyms stay uppercase,
+# variant spellings of the same concept collapse to one form.
+_CANONICAL_SKILLS: dict[str, str] = {
+    # Acronyms
+    "seo": "SEO", "sem": "SEM", "roi": "ROI", "kpi": "KPI", "ctr": "CTR",
+    "crm": "CRM", "roas": "ROAS", "cpm": "CPM", "cpc": "CPC", "rtb": "RTB",
+    "nlp": "NLP", "olap": "OLAP", "oltp": "OLTP", "etl": "ETL", "elt": "ELT",
+    "pca": "PCA", "aws": "AWS", "gcp": "GCP",
+    # Tools with proper casing that .title() breaks
+    "power bi": "Power BI",
+    "hubspot": "HubSpot", "mailchimp": "Mailchimp",
+    "linkedin": "LinkedIn", "youtube": "YouTube", "tiktok": "TikTok",
+    "wordpress": "WordPress", "shopify": "Shopify", "woocommerce": "WooCommerce",
+    # E-Commerce variants all collapse to one form
+    "e-commerce": "E-Commerce", "ecommerce": "E-Commerce", "e commerce": "E-Commerce",
+    # Spanish marketing terms where .title() wrongly capitalises prepositions
+    "marketing de contenidos": "Marketing de Contenidos",
+    "marketing de afiliados": "Marketing de Afiliados",
+    "embudo de conversion": "Embudo de Conversión",
+    "embudo de conversión": "Embudo de Conversión",
+    "posicionamiento de marca": "Posicionamiento de Marca",
+    "investigacion de mercados": "Investigación de Mercados",
+    "investigación de mercados": "Investigación de Mercados",
+    "comportamiento del consumidor": "Comportamiento del Consumidor",
+    "segmentacion de mercados": "Segmentación de Mercados",
+    "segmentación de mercados": "Segmentación de Mercados",
+    "mezcla de mercadeo": "Mezcla de Mercadeo",
+    "analítica web": "Analítica Web",
+    "analitica web": "Analítica Web",
+    "analítica digital": "Analítica Digital",
+    "analitica digital": "Analítica Digital",
+    "produccion audiovisual": "Producción Audiovisual",
+    "producción audiovisual": "Producción Audiovisual",
+    "diseno grafico": "Diseño Gráfico",
+    "diseño gráfico": "Diseño Gráfico",
+    "identidad visual": "Identidad Visual",
+    # E-commerce vocabulary
+    "prestashop": "PrestaShop",
+    "magento": "Magento",
+    "ux": "UX",
+    "cx": "CX",
+    "customer experience": "Customer Experience",
+    "pasarelas de pago": "Pasarelas de Pago",
+    "pasarela de pago": "Pasarelas de Pago",
+    "medios de pago": "Medios de Pago",
+    "medio de pago": "Medios de Pago",
+    "logistica": "Logística",
+    "logística": "Logística",
+    "fulfillment": "Fulfillment",
+    "omnicanalidad": "Omnicanalidad",
+    "experiencia de usuario": "Experiencia de Usuario",
+    "catalogo de productos": "Catálogo de Productos",
+    "catálogo de productos": "Catálogo de Productos",
+    "gestion de inventarios": "Gestión de Inventarios",
+    "gestión de inventarios": "Gestión de Inventarios",
+    "seguridad en e-commerce": "Seguridad en E-Commerce",
+    "seguridad en ecommerce": "Seguridad en E-Commerce",
+    "plataformas de e-commerce": "Plataformas de E-Commerce",
+    "plataforma de e-commerce": "Plataformas de E-Commerce",
+    "plataformas de ecommerce": "Plataformas de E-Commerce",
+}
+
+# Terms to strip from marketing-program skill results only.
+# These are legitimate skills in other programs (R in data/CS, Gestión in PM,
+# Lean in operations) but are noisy/misleading in a marketing context.
+_MARKETING_SKILL_NOISE: set[str] = {
+    _n for _n in [
+        "r",            # single-letter programming language — too ambiguous
+        "gestion",      # bare Gestión — always appears, never specific
+        "gestión",
+        "presentacion", # bare Presentación
+        "presentación",
+        "lean",         # bare Lean without Six Sigma
+        "responsabilidad",  # bare (keep "responsabilidad social")
+    ]
+}
+
+
+def _filter_marketing_skills(skills: dict[str, list[str]]) -> dict[str, list[str]]:
+    """Remove noisy generic terms from Marketing y Publicidad skill results."""
+    filtered: dict[str, list[str]] = {}
+    for tipo, skill_list in skills.items():
+        kept = [s for s in skill_list if _normalize_text(s) not in _MARKETING_SKILL_NOISE]
+        if kept:
+            filtered[tipo] = kept
+    return filtered
+
+
 def _title(s: str) -> str:
-    return re.sub(r"\s+", " ", s.strip()).title()
+    s = re.sub(r"\s+", " ", s.strip())
+    norm = s.lower()
+    if norm in _CANONICAL_SKILLS:
+        return _CANONICAL_SKILLS[norm]
+    return s.title()
 
 
-def extract_skills(text: str) -> dict[str, list[str]]:
+def extract_skills(text: str, include_marketing: bool = False) -> dict[str, list[str]]:
     buckets: dict[str, list[str]] = {
         "tecnologia": [],
         "skill_tecnica": [],
@@ -135,28 +264,32 @@ def extract_skills(text: str) -> dict[str, list[str]]:
         "skill_transversal": [],
         "metodologia": [],
     }
+    if include_marketing:
+        buckets["marketing"] = []
     seen: set[str] = set()
 
     def _add(bucket: str, raw: str) -> None:
-        key = _normalize_text(raw)
+        # Dedup by CANONICAL form so variant spellings of the same term
+        # (e.g. "ecommerce" and "E-Commerce") count as one hit.
+        canonical = _title(raw)
+        key = _normalize_text(canonical)
         if key not in seen:
             seen.add(key)
-            buckets[bucket].append(_title(raw))
+            buckets[bucket].append(canonical)
 
     for m in _RE_PLATFORMS.finditer(text):
         _add("plataforma", m.group(0))
     for m in _RE_TOOLS.finditer(text):
         _add("herramienta", m.group(0))
     for m in _RE_TECH.finditer(text):
-        raw = m.group(0)
-        key = _normalize_text(raw)
-        if key not in seen:
-            seen.add(key)
-            buckets["tecnologia"].append(_title(raw))
+        _add("tecnologia", m.group(0))
     for m in _RE_TRANSVERSAL.finditer(text):
         _add("skill_transversal", m.group(0))
     for m in _RE_METHODS.finditer(text):
         _add("metodologia", m.group(0))
+    if include_marketing:
+        for m in _RE_MARKETING.finditer(text):
+            _add("marketing", m.group(0))
 
     return {k: v for k, v in buckets.items() if v}
 
@@ -580,6 +713,267 @@ def parse_pdf_microcurriculum(path: Path) -> list[dict[str, Any]]:
     return results
 
 
+# ── parse Marketing y Publicidad consolidated PDF ─────────────────────────────
+
+# Lines that are page headers / footers in this specific PDF — must be stripped
+# before splitting into blocks so they don't corrupt the asignatura name detection.
+# Also catches lines produced when pdfplumber splits a header across two lines.
+_MYP_HEADER_RE = re.compile(
+    r"(MICROCURR[IÍ]CULOS?\s+DEL\s+PROGRAMA|"
+    r"DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"DE\s+MARKETING\s+Y\s+PUBLICIDAD|"
+    r"P[aá]gina\s+\d+\s+de|"           # "Página 265 de" (may omit the total)
+    r"PROGRAMA\s+ACAD[EÉ]MICO\s*/?\s*Pregrado)",
+    re.IGNORECASE,
+)
+
+# Section header labels that must NOT be treated as asignatura names or RA content
+_MYP_SECTION_LABELS = re.compile(
+    r"^(DENOMINACI[OÓ]N\s+DE\s+LA\s+ASIGNATURA|"
+    r"COMPONENTE\s+FORMATIVO|"
+    r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA|"
+    r"RESULTADO[S]?\s+DE\s+APRENDIZAJE\s+DE\s+LA\s+ASIGNATURA|"
+    r"RESULTADO[S]?\s+DE\s+APRENDIZAJE|"
+    r"CONTENIDO[S]?\s+TEM[AÁ]TICO|"
+    r"CUATRIMESTRE|CUATRIMESTRES?|"
+    r"N[OÚ]MERO\s+DE\s+CR[EÉ]DITOS|CR[EÉ]DITOS?|HORAS?|"
+    r"COMPONENTE|L[IÍ]NEA|"
+    r"PROGRAMA\s+ACAD[EÉ]MICO|PREGRADO|"
+    r"Marketing\s+y\s+Publicidad$)$",  # bare program name as a header cell
+    re.IGNORECASE,
+)
+
+# Noise lines that are clearly not RA content.
+# These are SKIPPED (the RA section continues past them) rather than acting as
+# stop conditions — this lets page-break headers inside the RA section be
+# transparent, so RAs that start on the next page are still captured.
+_MYP_NOISE_RA = re.compile(
+    r"^(Resultado[s]?\s+de\s+Aprendizaje(\s+de\s+la\s+Asignatura)?[:\s]*$|"
+    r"RA\s*\d*\s*[-:]?\s*$|"
+    r"Componente\s+formativo|"
+    r"L[ií]nea\s+de\s+formaci[oó]n|"
+    r"Pregrado\s+en\s+Marketing|"
+    r"DE\s+MARKETING\s+Y\s+PUBLICIDAD|"
+    r"MICROCURR[IÍ]CULO|"
+    r"DEL\s+PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"PROGRAMA\s+ACAD[EÉ]MICO|"
+    r"No\s+aplica\.?$|"              # "CONTENIDO TEMÁTICO No aplica"
+    r"P[aá]gina\s+\d+|"
+    r"^\d{3}$)",                     # bare page-count number e.g. "307"
+    re.IGNORECASE,
+)
+
+
+def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
+    """
+    Parse the consolidated 307-page PDF for 'Pregrado en Marketing y Publicidad'.
+
+    Document structure per asignatura block (after splitting on
+    "DENOMINACIÓN DE LA ASIGNATURA"):
+        <name line>
+        CUATRIMESTRE / CRÉDITOS / HORAS table rows
+        COMPONENTE FORMATIVO DE LA ASIGNATURA
+        <componente> / <línea>
+        DESCRIPCIÓN DE LA ASIGNATURA
+        <texto libre>
+        RESULTADOS DE APRENDIZAJE DE LA ASIGNATURA
+        <RA list — numbered or bulleted>
+        CONTENIDO TEMÁTICO
+        1. <tema>
+          1.1 <subtema>
+
+    Duplicates by name (e.g. "Práctica Profesional", "Inglés Básico") are kept
+    as separate records; they get a sequential suffix in document_hash to avoid
+    ON CONFLICT collisions while still being distinct rows.
+    """
+    full_text = _extract_pdf_text(path)
+    doc_hash = hashlib.md5(path.read_bytes()).hexdigest()
+    programa = "Pregrado en Marketing y Publicidad"
+    domain_key = "marketing_commercial"
+
+    # Strip page-header/footer lines before processing
+    cleaned_lines: list[str] = []
+    for line in full_text.splitlines():
+        if _MYP_HEADER_RE.search(line.strip()):
+            continue
+        cleaned_lines.append(line)
+    cleaned_text = "\n".join(cleaned_lines)
+
+    # Split on DENOMINACIÓN DE LA ASIGNATURA
+    _DENOM_RE = re.compile(r"DENOMINACI[OÓ]N\s+DE\s+LA\s+ASIGNATURA", re.IGNORECASE)
+    blocks = _DENOM_RE.split(cleaned_text)
+    # blocks[0] = preamble, blocks[1:] = one per asignatura
+
+    results: list[dict[str, Any]] = []
+    # Track name occurrences to generate unique hashes for legitimate duplicates
+    name_occurrence: dict[str, int] = {}
+
+    for i, block in enumerate(blocks[1:], start=1):
+        lines = [ln.strip() for ln in block.splitlines()]
+
+        # ── Asignatura name: first non-empty, non-label, non-noise line ──────
+        asig_name = ""
+        for ln in lines:
+            if not ln:
+                continue
+            if _MYP_SECTION_LABELS.match(ln):
+                continue
+            if len(ln) < 3:
+                continue
+            # Skip pure numeric lines (page numbers, credit counts)
+            if re.fullmatch(r"[\d\s/]+", ln):
+                continue
+            # Skip lines that are only punctuation/symbols
+            if re.fullmatch(r"[^a-záéíóúñA-ZÁÉÍÓÚÑ]+", ln):
+                continue
+            asig_name = ln
+            break
+
+        if not asig_name:
+            continue
+
+        # ── Cuatrimestre / créditos ───────────────────────────────────────────
+        cuatrimestre = ""
+        creditos = ""
+        cuatri_match = re.search(r"cuatrimestre\s*[:\-]?\s*(\d+)", block, re.IGNORECASE)
+        if cuatri_match:
+            cuatrimestre = cuatri_match.group(1)
+        # Also accept bare "X" after CUATRIMESTRE header in table
+        if not cuatrimestre:
+            cuatri_table = re.search(
+                r"CUATRIMESTRE[^\n]*\n\s*(\d+)", block, re.IGNORECASE
+            )
+            if cuatri_table:
+                cuatrimestre = cuatri_table.group(1)
+        cred_match = re.search(r"cr[eé]ditos?\s*[:\-]?\s*(\d+)", block, re.IGNORECASE)
+        if cred_match:
+            creditos = cred_match.group(1)
+
+        # ── Descripción ───────────────────────────────────────────────────────
+        desc = ""
+        desc_match = re.search(
+            r"DESCRIPCI[OÓ]N\s+DE\s+LA\s+ASIGNATURA\s*([\s\S]*?)"
+            r"(?=RESULTADO[S]?\s+DE\s+APRENDIZAJE|CONTENIDO[S]?\s+TEM[AÁ]TICO|$)",
+            block, re.IGNORECASE,
+        )
+        if desc_match:
+            desc = re.sub(r"\s+", " ", desc_match.group(1)).strip()[:2000]
+
+        # ── Resultados de Aprendizaje ─────────────────────────────────────────
+        # Stop the RA section only at real section boundaries:
+        # CONTENIDO TEMÁTICO, BLOQUE N. (Comercio Electrónico), Tema N.,
+        # next block header (DENOMINACIÓN). Page-break headers/footers
+        # (Página N de, MICROCURRÍCULOS…) are NOT stop conditions — they are
+        # skipped inline so that RAs starting on the next PDF page are captured.
+        resultados: list[str] = []
+        ra_match = re.search(
+            r"RESULTADO[S]?\s+DE\s+APRENDIZAJE(?:\s+DE\s+LA\s+ASIGNATURA)?\s*"
+            r"([\s\S]*?)"
+            r"(?=CONTENIDO[S]?\s+TEM[AÁ]TICO|BLOQUE\s+\d|Tema\s+\d\.|DENOMINACI[OÓ]N|$)",
+            block, re.IGNORECASE,
+        )
+        if ra_match:
+            ra_text = ra_match.group(1)
+            # Build RAs with line-continuation joining.
+            # Numbered prefixes ("1. ", "2. ", "1.1 ") are stripped — they mark
+            # numbered RAs (e.g. Plan de Marketing Digital), NOT topic lines
+            # (topic lines are now excluded by the tighter stop pattern above).
+            current_ra: str | None = None
+
+            def _flush_ra(buf: str | None, out: list[str]) -> None:
+                if buf and len(buf) >= 15:
+                    out.append(buf)
+
+            for line in ra_text.splitlines():
+                original = line.strip()
+                if not original:
+                    _flush_ra(current_ra, resultados)
+                    current_ra = None
+                    continue
+                if _MYP_NOISE_RA.match(original) or _MYP_SECTION_LABELS.match(original):
+                    _flush_ra(current_ra, resultados)
+                    current_ra = None
+                    continue
+                # Strip leading number prefix ("1. ", "2. ", "1.1 ")
+                cleaned = re.sub(r"^\d+[\.\d]*[\.\)]\s+", "", original)
+                cleaned = cleaned.lstrip("•·▪*-–—").strip().rstrip('"')
+                if not cleaned:
+                    continue
+                # Starts with uppercase → new RA
+                if re.match(r"^[A-ZÁÉÍÓÚÑ]", cleaned):
+                    _flush_ra(current_ra, resultados)
+                    current_ra = cleaned
+                elif current_ra:
+                    # Continuation of previous RA
+                    current_ra = current_ra + " " + cleaned
+            _flush_ra(current_ra, resultados)
+
+        # ── Contenido temático ────────────────────────────────────────────────
+        # Support both "CONTENIDO TEMÁTICO" (most asignaturas) and the
+        # "BLOQUE N. / Tema N." layout used by some (e.g. Comercio Electrónico).
+        temas: list[str] = []
+        ct_text = ""
+        ct_match = re.search(
+            r"CONTENIDO[S]?\s+TEM[AÁ]TICO\s*([\s\S]*?)$",
+            block, re.IGNORECASE,
+        )
+        if ct_match:
+            ct_text = ct_match.group(1)
+        else:
+            # Fallback: capture everything from the first BLOQUE line to end
+            bloque_match = re.search(
+                r"(BLOQUE\s+\d[\s\S]*?)$",
+                block, re.IGNORECASE,
+            )
+            if bloque_match:
+                ct_text = bloque_match.group(1)
+
+        # "CONTENIDO TEMÁTICO No aplica" — treat as no thematic content
+        ct_text_stripped = re.sub(r"\s+", " ", ct_text).strip().lower()
+        if ct_text_stripped in ("no aplica", "no aplica.", "n/a", "no aplica\n"):
+            ct_text = ""
+
+        for line in ct_text.splitlines():
+            line = line.strip()
+            # Skip page-break markers that may appear inside the thematic block
+            if _MYP_NOISE_RA.match(line):
+                continue
+            if re.match(r"^\d+[\.\d]*\s+\S", line) and len(line) > 5:
+                temas.append(line[:200])
+            elif re.match(r"^BLOQUE\s+\d", line, re.IGNORECASE) and len(line) > 5:
+                temas.append(line[:200])
+
+        # ── Skills ────────────────────────────────────────────────────────────
+        skill_text = " ".join(filter(None, [asig_name, desc, ra_match.group(1) if ra_match else "", ct_text]))
+        skills = _filter_marketing_skills(extract_skills(skill_text, include_marketing=True))
+
+        # ── Unique hash — keep duplicates as separate rows ────────────────────
+        name_key = _normalize_text(asig_name)
+        occ = name_occurrence.get(name_key, 0) + 1
+        name_occurrence[name_key] = occ
+        # Suffix only on 2nd+ occurrence (Práctica Profesional I vs II)
+        hash_suffix = f":{occ}" if occ > 1 else ""
+
+        results.append({
+            "programa": programa,
+            "asignatura": asig_name,
+            "descripcion": desc or block[:500],
+            "resultados_aprendizaje": resultados[:15],
+            "contenido_tematico": temas[:20] or ([f"Cuatrimestre {cuatrimestre}"] if cuatrimestre else []),
+            "resultados_text_raw": ra_match.group(1) if ra_match else "",
+            "herramientas_recursos": "",
+            "skills": skills,
+            "semestre_num": cuatrimestre,
+            "creditos_num": creditos,
+            "source_document": path.name,
+            "source_path": str(path.relative_to(REPO_ROOT)),
+            "document_hash": f"{doc_hash}:{i}:{name_key[:20]}{hash_suffix}",
+            "domain_key": domain_key,
+        })
+
+    return results
+
+
 # ── discover all docx + pdf ───────────────────────────────────────────────────
 
 def discover_all() -> list[dict[str, Any]]:
@@ -595,7 +989,13 @@ def discover_all() -> list[dict[str, Any]]:
                     records.append(parsed)
         elif path.suffix.lower() == ".pdf":
             try:
-                records.extend(parse_pdf_microcurriculum(path))
+                # Route the Marketing y Publicidad consolidated PDF to its
+                # dedicated parser; all other PDFs use the generic UNIR parser.
+                name_lower = path.name.lower()
+                if "marketing" in name_lower and "publicidad" in name_lower:
+                    records.extend(parse_marketing_publicidad_pdf(path))
+                else:
+                    records.extend(parse_pdf_microcurriculum(path))
             except ImportError as exc:
                 print(f"  WARNING: skipping {path.name} — {exc}")
             except Exception as exc:
@@ -668,8 +1068,16 @@ _EXPLICIT_ESP_MAP: dict[str, int] = {
     # Administración de Empresas → id=82 (Alta Gerencia)
     "administracion de empresas": 82,
     "alta gerencia": 82,
-    # Ingeniería Informática (Pregrado) → id=109
-    "pregrado": 109,
+    # Ingeniería Informática (Pregrado) → id=109.
+    # Also catches "Especialización en Pregrado" (the UI label for that program)
+    # without colliding with "Pregrado en Marketing y Publicidad" because the
+    # fragment "especializacion en pregrado" is NOT a substring of "pregrado en
+    # marketing y publicidad".
+    "ingenieria informatica": 109,
+    "especializacion en pregrado": 109,
+    # Pregrado en Marketing y Publicidad — ID assigned after --execute; leave as None
+    # so fuzzy matching finds the real row in especializaciones.
+    # "marketing y publicidad": <ID_REAL>,  ← fill after insert
 }
 
 
@@ -764,33 +1172,205 @@ def insert_record(conn, rec: dict, esp_id: int | None, esp_nombre: str | None = 
 
 
 def insert_skills(conn, micro_id: int, rec: dict) -> int:
+    # Dedup key uses casefold + strip accents (same as _normalize_text) only to
+    # decide which rows to skip — the value stored in skill_normalized stays as
+    # the original cased string (matching the convention of existing programs:
+    # 'Toma De Decisiones', 'Ética Profesional', etc.).
+    seen: set[tuple[str, str]] = set()
+    rows_to_insert: list[tuple] = []
+    for tipo, skills in rec["skills"].items():
+        for skill in skills:
+            dedup_key = (_normalize_text(skill), tipo)
+            if dedup_key in seen:
+                continue
+            seen.add(dedup_key)
+            rows_to_insert.append((
+                micro_id,
+                skill,          # skill_original
+                skill,          # skill_normalized — same convention as existing rows
+                rec["domain_key"],
+                tipo,
+                0.70,
+                rec["source_document"],
+            ))
+
     rows_inserted = 0
+    skipped = 0
     with conn.cursor() as cur:
-        for tipo, skills in rec["skills"].items():
-            for skill in skills:
-                try:
-                    cur.execute(
-                        """
-                        INSERT INTO microcurriculo_skills
-                            (microcurriculo_id, skill_original, skill_normalized,
-                             skill_domain, tipo_skill, confidence_score, source_document)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (microcurriculo_id, skill_normalized, tipo_skill) DO NOTHING
-                        """,
-                        (
-                            micro_id,
-                            skill,
-                            skill,
-                            rec["domain_key"],
-                            tipo,
-                            0.70,
-                            rec["source_document"],
-                        ),
-                    )
-                    rows_inserted += cur.rowcount
-                except Exception:
-                    pass  # ignore individual skill conflicts
+        for row in rows_to_insert:
+            cur.execute(
+                """
+                INSERT INTO microcurriculo_skills
+                    (microcurriculo_id, skill_original, skill_normalized,
+                     skill_domain, tipo_skill, confidence_score, source_document)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (microcurriculo_id, skill_normalized, tipo_skill) DO NOTHING
+                """,
+                row,
+            )
+            if cur.rowcount:
+                rows_inserted += 1
+            else:
+                skipped += 1
     return rows_inserted
+
+
+_CAMPO_LABORAL_ESP: dict[str, str] = {
+    "pregrado en marketing y publicidad": (
+        "Asesor de Estrategias de Marketing y Publicidad, "
+        "Coordinador de Marketing Digital y E-Commerce, "
+        "Especialista en Analítica y Métricas Digitales, "
+        "Community Manager y Estratega de Social Media, "
+        "Consultor en Branding, "
+        "Gerente de Comercio Electrónico"
+    ),
+}
+
+_NIVEL_DISPLAY_MAP: dict[str, str] = {
+    "pregrado": "Pregrado",
+    "especializacion": "Especialización",
+    "maestria": "Maestría",
+    "doctorado": "Doctorado",
+}
+
+
+def _validate_esp_columns(conn) -> None:
+    """Raise RuntimeError if required columns are missing in especializaciones."""
+    required = {"nombre", "nivel", "estado", "modalidad", "campo_laboral"}
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT column_name FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'especializaciones'
+            """,
+        )
+        present = {r[0] for r in cur.fetchall()}
+    missing = required - present
+    if missing:
+        raise RuntimeError(
+            f"especializaciones is missing columns: {missing}. "
+            f"Present columns: {sorted(present)}"
+        )
+
+
+def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
+    """
+    Idempotent: find or create a row in especializaciones for 'programa'.
+    Returns the id of the existing or newly created row.
+    Only called when match_esp_id returns None (program not in DB yet).
+    """
+    # Validate schema before attempting INSERT
+    _validate_esp_columns(conn)
+
+    # Infer nivel from program name
+    prog_lower = programa.lower()
+    if "pregrado" in prog_lower or "licenciatura" in prog_lower or "tecnología" in prog_lower:
+        nivel_key = "pregrado"
+    elif "maestría" in prog_lower or "maestria" in prog_lower:
+        nivel_key = "maestria"
+    elif "doctorado" in prog_lower:
+        nivel_key = "doctorado"
+    else:
+        nivel_key = "especializacion"
+
+    nivel_display = _NIVEL_DISPLAY_MAP.get(nivel_key, "Especialización")
+    campo = _CAMPO_LABORAL_ESP.get(_normalize_text(programa))
+
+    with conn.cursor() as cur:
+        # Return existing row without touching it
+        cur.execute(
+            "SELECT id FROM especializaciones WHERE nombre = %s LIMIT 1",
+            (programa,),
+        )
+        row = cur.fetchone()
+        if row:
+            return row[0]
+
+        cur.execute(
+            """
+            INSERT INTO especializaciones (nombre, nivel, estado, modalidad, campo_laboral)
+            VALUES (%s, %s, 'Activo', 'Virtual', %s)
+            ON CONFLICT (nombre) DO UPDATE SET nombre = EXCLUDED.nombre
+            RETURNING id
+            """,
+            (programa, nivel_display, campo),
+        )
+        return cur.fetchone()[0]
+
+
+def dry_run_upsert_especializacion(conn, programa: str, domain_key: str) -> None:
+    """
+    Runs upsert_especializacion inside a SAVEPOINT/ROLLBACK TO SAVEPOINT so
+    the INSERT is validated against the live schema without persisting data.
+    Call this before --execute to confirm the SQL is correct.
+    """
+    with conn.cursor() as cur:
+        cur.execute("SAVEPOINT dry_run_upsert")
+    try:
+        esp_id = upsert_especializacion(conn, programa, domain_key)
+        print(f"[DRY-RUN OK] upsert_especializacion('{programa}') → id={esp_id}  (rolling back)")
+    except Exception as exc:
+        print(f"[DRY-RUN FAIL] {exc}")
+    finally:
+        with conn.cursor() as cur:
+            cur.execute("ROLLBACK TO SAVEPOINT dry_run_upsert")
+
+
+def dry_run_insert_all(conn, records: list[dict], esps: list[dict]) -> None:
+    """
+    Runs the full insert loop (upsert_especializacion + insert_record + insert_skills)
+    inside a single SAVEPOINT, then rolls back — nothing is persisted.
+    Reports per-asignatura skill counts and collisions for pre-flight validation.
+    """
+    with conn.cursor() as _c:
+        _c.execute("SAVEPOINT dry_run_all")
+    esp_id_cache: dict[str, int | None] = {}
+    esps_copy = list(esps)
+    ok: list[str] = []
+    skipped: list[str] = []
+    print("\n[DRY-RUN] Insert simulation (will rollback):")
+    try:
+        for sp_idx, rec in enumerate(records, 1):
+            prog = rec["programa"]
+            if prog not in esp_id_cache:
+                eid = match_esp_id(prog, esps_copy)
+                if eid is None:
+                    eid = upsert_especializacion(conn, prog, rec["domain_key"])
+                    esps_copy.append({"id": eid, "nombre": prog})
+                esp_id_cache[prog] = eid
+            esp_id = esp_id_cache[prog]
+            esp_nombre = next((e["nombre"] for e in esps_copy if e["id"] == esp_id), None)
+
+            sp = f"sp_dry_{sp_idx}"
+            with conn.cursor() as _c:
+                _c.execute(f"SAVEPOINT {sp}")
+            try:
+                micro_id = insert_record(conn, rec, esp_id, esp_nombre)
+                n_skills = insert_skills(conn, micro_id, rec)
+                # Count Python-level deduplication collisions
+                seen_py: set[tuple[str, str]] = set()
+                collisions = 0
+                for tipo, skills in rec["skills"].items():
+                    for skill in skills:
+                        key = (_normalize_text(skill), tipo)
+                        if key in seen_py:
+                            collisions += 1
+                        seen_py.add(key)
+                ok.append(rec["asignatura"])
+                print(
+                    f"  ✓ [{sp_idx:02d}] '{rec['asignatura']}'  skills={n_skills}  py_dupes={collisions}"
+                )
+                with conn.cursor() as _c:
+                    _c.execute(f"RELEASE SAVEPOINT {sp}")
+            except Exception as exc:
+                with conn.cursor() as _c:
+                    _c.execute(f"ROLLBACK TO SAVEPOINT {sp}")
+                skipped.append(rec["asignatura"])
+                print(f"  ✗ [{sp_idx:02d}] '{rec['asignatura']}' — {type(exc).__name__}: {exc}")
+    finally:
+        with conn.cursor() as _c:
+            _c.execute("ROLLBACK TO SAVEPOINT dry_run_all")
+    print(f"\n[DRY-RUN] {len(ok)} would insert, {len(skipped)} would fail.")
 
 
 def upsert_domain_mapping(conn, esp_id: int, programa: str, domain_key: str) -> None:
@@ -833,18 +1413,38 @@ def print_preview(records: list[dict], existing_keys: set[str], esps: list[dict]
     print(f"  A insertar              : {len(new_records)}")
     print()
 
+    # Asignaturas whose skills will be printed in full for validation
+    _VERBOSE_SKILLS = {
+        _normalize_text(n) for n in (
+            "Métricas y analíticas Digitales",
+            "Metricas y analiticas Digitales",
+            "Creatividad e Innovación",
+            "Creatividad e Innovacion",
+            "Social Media Marketing",
+            "Comercio Electrónico",
+            "Comercio Electronico",
+        )
+    }
+
     for prog, recs in sorted(by_prog.items()):
         esp_id = match_esp_id(prog, esps)
         domain = recs[0]["domain_key"]
+        esp_note = ""
+        if esp_id is None:
+            esp_note = "  ⚠️  NUEVO — se creará en especializaciones al ejecutar --execute"
         print(f"  📚 {prog}")
-        print(f"     especializacion_id = {esp_id}   domain_key = {domain}")
+        print(f"     especializacion_id = {esp_id}   domain_key = {domain}{esp_note}")
         for r in recs:
             key = _normalize_text(f"{r['programa']}|{r['asignatura']}")
             status = "✓ ya existe" if key in existing_keys else "+ NUEVO"
             n_skills = sum(len(v) for v in r["skills"].values())
             n_ra = len(r["resultados_aprendizaje"])
             print(f"     [{status}]  {r['asignatura']}")
-            print(f"              RA={n_ra}  skills={n_skills}  src={r['source_document'][:50]}")
+            print(f"              RA={n_ra}  skills={n_skills}  cuatrimestre={r.get('semestre_num','')}  src={r['source_document'][:50]}")
+            # Detailed skills dump for validation asignaturas
+            if _normalize_text(r["asignatura"]) in _VERBOSE_SKILLS:
+                for tipo, skill_list in sorted(r["skills"].items()):
+                    print(f"              skills[{tipo}]: {skill_list}")
         print()
 
 
@@ -1029,18 +1629,50 @@ def main() -> None:
             sys.exit(0)
 
         inserted = []
+        # Keep a local cache of program → esp_id resolved this run so that
+        # upsert_especializacion is called only once per new program, not once
+        # per asignatura.
+        esp_id_cache: dict[str, int | None] = {}
+        failed = []
         try:
-            for rec in new_records:
-                esp_id = match_esp_id(rec["programa"], esps)
+            for sp_idx, rec in enumerate(new_records, 1):
+                prog = rec["programa"]
+                if prog not in esp_id_cache:
+                    eid = match_esp_id(prog, esps)
+                    if eid is None:
+                        eid = upsert_especializacion(conn, prog, rec["domain_key"])
+                        print(f"  ✚ Created especializacion: '{prog}' → id={eid}")
+                        esps.append({"id": eid, "nombre": prog})
+                    esp_id_cache[prog] = eid
+                esp_id = esp_id_cache[prog]
                 esp_nombre = next((e["nombre"] for e in esps if e["id"] == esp_id), None)
-                micro_id = insert_record(conn, rec, esp_id, esp_nombre)
-                n_skills = insert_skills(conn, micro_id, rec)
-                if esp_id:
-                    upsert_domain_mapping(conn, esp_id, rec["programa"], rec["domain_key"])
-                inserted.append({"asignatura": rec["asignatura"], "id": micro_id, "skills": n_skills})
-                print(f"  ✓ id={micro_id}  {rec['asignatura']}  ({n_skills} skills)")
+
+                sp = f"sp_{sp_idx}"
+                with conn.cursor() as _c:
+                    _c.execute(f"SAVEPOINT {sp}")
+                try:
+                    micro_id = insert_record(conn, rec, esp_id, esp_nombre)
+                    n_skills = insert_skills(conn, micro_id, rec)
+                    if esp_id:
+                        upsert_domain_mapping(conn, esp_id, rec["programa"], rec["domain_key"])
+                    inserted.append({"asignatura": rec["asignatura"], "id": micro_id, "skills": n_skills})
+                    print(f"  ✓ id={micro_id}  {rec['asignatura']}  ({n_skills} skills)")
+                    with conn.cursor() as _c:
+                        _c.execute(f"RELEASE SAVEPOINT {sp}")
+                except Exception as exc:
+                    with conn.cursor() as _c:
+                        _c.execute(f"ROLLBACK TO SAVEPOINT {sp}")
+                    failed.append(rec["asignatura"])
+                    print(
+                        f"  ✗ SKIP '{rec['asignatura']}' — {type(exc).__name__}: {exc}"
+                    )
+
             conn.commit()
-            print(f"\n  Committed. {len(inserted)} microcurriculos inserted.")
+            print(f"\n  Committed. {len(inserted)} ok, {len(failed)} skipped.")
+            if failed:
+                print("  Skipped asignaturas:")
+                for a in failed:
+                    print(f"    - {a}")
         except Exception as exc:
             conn.rollback()
             print(f"\n  ERROR — rolled back: {exc}")

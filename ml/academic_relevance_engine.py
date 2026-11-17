@@ -290,7 +290,45 @@ _DOMAIN_BUCKETS: Dict[str, List[str]] = {
                             "kanban", "pmbok", "pmp", "planificacion", "gestion de proyectos",
                             "prince2", "ipma", "iso 21500", "valor ganado", "riesgo proyecto",
                             "presupuesto proyecto", "cronograma", "ms project"],
+    "marketing_commercial": ["marketing", "seo", "sem", "google ads", "meta ads",
+                              "google analytics", "crm", "embudo de conversion", "email marketing",
+                              # "automatizacion" removed — bare term matches unrelated jobs like
+                              # "Analista de Automatización de Procesos". Replaced with specific form.
+                              "automatizacion de marketing",
+                              "redes sociales", "branding", "content marketing",
+                              "analitica web", "copywriting", "growth hacking", "community manager",
+                              "e-commerce", "ecommerce", "digital marketing", "paid media",
+                              "conversion rate", "campana digital", "estrategia digital",
+                              "publicidad digital", "mercadeo", "hubspot", "shopify",
+                              "lead generation", "inbound marketing"],
+                              # "seo" is in _DOMAIN_BUCKET_BOUNDARY → uses word-boundary regex
+                              # in _bucket_hit() to prevent "aseo" → marketing_commercial.
 }
+
+
+# Short (≤3 char or single-word ≤5 char) bucket keywords that must match at a
+# word boundary in _infer_domain to avoid false positives like "seo" in "aseo".
+_DOMAIN_BUCKET_BOUNDARY: Dict[str, re.Pattern] = {}
+
+
+def _build_bucket_boundary_patterns() -> None:
+    boundary_terms = {"seo", "sem", "sql", "crm", "api", "pmp", "soc", "siem"}
+    for kw in boundary_terms:
+        _DOMAIN_BUCKET_BOUNDARY[kw] = re.compile(
+            r"(?<![a-z0-9])" + re.escape(_normalize(kw)) + r"(?![a-z0-9])"
+        )
+
+
+_build_bucket_boundary_patterns()
+
+
+def _bucket_hit(kw: str, n: str) -> bool:
+    """Return True if keyword `kw` appears in normalised text `n`.
+    Uses word-boundary regex for terms known to cause false positives as substrings.
+    """
+    if kw in _DOMAIN_BUCKET_BOUNDARY:
+        return bool(_DOMAIN_BUCKET_BOUNDARY[kw].search(n))
+    return kw in n
 
 
 def _infer_domain(text: str, program_name: str = "") -> str:
@@ -307,13 +345,17 @@ def _infer_domain(text: str, program_name: str = "") -> str:
     _PM_OVERRIDE = ("proyecto", "project manager", "pmo", "scrum master", "agile coach")
     if any(kw in name_n for kw in _PM_OVERRIDE):
         return "project_management"
+    _MKT_OVERRIDE = ("marketing digital", "marketing comercial", "mercadeo digital",
+                     "mercadeo y publicidad", "marketing y publicidad")
+    if any(kw in name_n for kw in _MKT_OVERRIDE):
+        return "marketing_commercial"
     n = _normalize(text)
     # Also check full text for override keywords
     if any(kw in n for kw in _EDUCATION_OVERRIDE):
         return "education"
     best = ("general", 0)
     for dom, kws in _DOMAIN_BUCKETS.items():
-        hits = sum(1 for kw in kws if kw in n)
+        hits = sum(1 for kw in kws if _bucket_hit(kw, n))
         if hits > best[1]:
             best = (dom, hits)
     return best[0]
@@ -334,6 +376,10 @@ _COMPATIBLE_DOMAINS: Dict[str, set] = {
     "education":    {"education"},
     "finanzas": {"finanzas"},
     "project_management": {"project_management", "gestion"},
+    # "general" removed from marketing_commercial: unclassified jobs (B2B, BI,
+    # docentes) must have real marketing keyword evidence to reach this program,
+    # handled by the GENERAL_SKILL_BYPASS with _MKT_REQUIRED_SKILLS guard below.
+    "marketing_commercial": {"marketing_commercial"},
     "general":  {"general"},   # no longer a wildcard
 }
 
@@ -504,6 +550,32 @@ SKILLS_LOOKUP: List[str] = [
     "ingeniero de datos", "arquitecto de datos",
     "looker studio", "google analytics", "google tag manager",
     "meta ads", "google ads", "crm",
+    # --- Marketing & Publicidad (es/en, normalized to ASCII lowercase) ---
+    "seo", "sem", "community manager", "social media", "social media marketing",
+    "branding", "copywriting", "marketing de contenidos", "content marketing",
+    "email marketing", "e-commerce", "ecommerce", "investigacion de mercados",
+    "estrategia de marca", "planeacion de medios", "publicidad digital",
+    "performance marketing", "embudo de conversion", "hubspot",
+    "shopify", "wordpress", "canva", "adobe creative", "adobe creative suite",
+    "relaciones publicas", "comportamiento del consumidor", "posicionamiento",
+    "posicionamiento de marca", "planeacion estrategica de medios",
+    "marketing digital", "mercadeo", "publicidad",
+    "google search console", "semrush", "ahrefs",
+    "instagram", "tiktok", "linkedin", "youtube",
+    "roi", "roas", "kpi marketing", "ctr", "cpc", "cpm",
+    "inbound marketing", "outbound marketing", "growth hacking",
+    "campana publicitaria", "campana digital", "estrategia digital",
+    "marketing mix", "mezcla de mercadeo", "segmentacion de mercados",
+    "analistica digital", "analitica digital", "analitica web",
+    "paid media", "paid social", "influencer marketing",
+    "diseno grafico", "identidad visual", "produccion audiovisual",
+    "estrategia de contenidos", "calendario editorial",
+    "comercio electronico", "tienda virtual", "pasarela de pago",
+    "logistica comercial", "fulfillment",
+    "neuromarketing", "marketing experiencial", "trade marketing",
+    "investigacion cualitativa", "investigacion cuantitativa",
+    "focus group", "encuesta de mercado",
+    # -------------------------------------------------------------------
     "sap", "salesforce", "oracle",
     "numpy", "matplotlib", "seaborn",
     "jupyter", "colab",
@@ -525,12 +597,13 @@ _SKILLS_LOOKUP_NORM: List[str] = [
     if (n := _normalize(s)) and n not in SKILLS_EXCLUDE and len(n) >= 2
 ]
 
-# Compile per-term word-boundary patterns for short terms (≤ 4 chars) to
-# avoid "r" matching "errors", "sql" matching "psql", etc.
+# Compile per-term word-boundary patterns for short terms (≤ 5 chars) to
+# avoid "r" matching "errors", "sql" matching "psql", "scala" matching
+# "escalabilidad" / "escalas", etc.
 _SHORT_TERMS: Dict[str, re.Pattern] = {
     term: re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])")
     for term in _SKILLS_LOOKUP_NORM
-    if len(term) <= 4
+    if len(term) <= 5
 }
 
 
@@ -1033,9 +1106,28 @@ def run_matching(
             # N=2 requires two independent skill signals → strong evidence of relevance
             # without being so strict that thin microcurriculums never get bypass matches.
             _GENERAL_SKILL_BYPASS_MIN = 2
+            # Marketing programs require at least one marketing-specific skill
+            # in the job before a "general" job is allowed through. This blocks
+            # B2B/BI/docente jobs whose only overlap is generic terms like
+            # "comunicacion" or "excel".
+            _MKT_REQUIRED_SKILLS: frozenset = frozenset({
+                "seo", "sem", "community manager", "social media", "branding",
+                "copywriting", "marketing de contenidos", "content marketing",
+                "email marketing", "e-commerce", "ecommerce", "hubspot", "shopify",
+                "wordpress", "publicidad digital", "performance marketing",
+                "embudo de conversion", "marketing digital", "mercadeo",
+                "google ads", "meta ads", "google analytics", "paid media",
+                "paid social", "campana digital", "estrategia digital",
+                "inbound marketing", "growth hacking", "analistica digital",
+                "analitica digital", "analitica web", "social media marketing",
+            })
             if domain_filter and not domain_ok and job.domain == "general" and prog.skills and job.skills:
                 n_common_quick = len(set(prog.skills) & set(job.skills))
-                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN:
+                # For marketing programs, also require at least one marketing keyword
+                mkt_gate_ok = True
+                if prog.domain == "marketing_commercial":
+                    mkt_gate_ok = bool(set(job.skills) & _MKT_REQUIRED_SKILLS)
+                if n_common_quick >= _GENERAL_SKILL_BYPASS_MIN and mkt_gate_ok:
                     domain_ok = True
                     logger.debug(
                         "[DOMAIN-BYPASS] prog='%s' ← job='%s' (general, %d skills comunes)",
