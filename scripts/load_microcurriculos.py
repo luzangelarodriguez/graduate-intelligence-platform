@@ -1330,7 +1330,7 @@ def dry_run_insert_all(conn, records: list[dict], esps: list[dict]) -> None:
     skipped: list[str] = []
     print("\n[DRY-RUN] Insert simulation (will rollback):")
     try:
-        for rec in records:
+        for sp_idx, rec in enumerate(records, 1):
             prog = rec["programa"]
             if prog not in esp_id_cache:
                 eid = match_esp_id(prog, esps_copy)
@@ -1341,13 +1341,13 @@ def dry_run_insert_all(conn, records: list[dict], esps: list[dict]) -> None:
             esp_id = esp_id_cache[prog]
             esp_nombre = next((e["nombre"] for e in esps_copy if e["id"] == esp_id), None)
 
-            sp = f"sp_dry_{rec['asignatura'][:20].replace(' ', '_')}"
+            sp = f"sp_dry_{sp_idx}"
             with conn.cursor() as _c:
-                _c.execute(f"SAVEPOINT {sp!r}")
+                _c.execute(f"SAVEPOINT {sp}")
             try:
                 micro_id = insert_record(conn, rec, esp_id, esp_nombre)
                 n_skills = insert_skills(conn, micro_id, rec)
-                # Count how many unique (norm, tipo) pairs were deduped in Python
+                # Count Python-level deduplication collisions
                 seen_py: set[tuple[str, str]] = set()
                 collisions = 0
                 for tipo, skills in rec["skills"].items():
@@ -1358,15 +1358,15 @@ def dry_run_insert_all(conn, records: list[dict], esps: list[dict]) -> None:
                         seen_py.add(key)
                 ok.append(rec["asignatura"])
                 print(
-                    f"  ✓ '{rec['asignatura']}'  skills_to_insert={n_skills}  py_dupes={collisions}"
+                    f"  ✓ [{sp_idx:02d}] '{rec['asignatura']}'  skills={n_skills}  py_dupes={collisions}"
                 )
                 with conn.cursor() as _c:
-                    _c.execute(f"RELEASE SAVEPOINT {sp!r}")
+                    _c.execute(f"RELEASE SAVEPOINT {sp}")
             except Exception as exc:
                 with conn.cursor() as _c:
-                    _c.execute(f"ROLLBACK TO SAVEPOINT {sp!r}")
+                    _c.execute(f"ROLLBACK TO SAVEPOINT {sp}")
                 skipped.append(rec["asignatura"])
-                print(f"  ✗ '{rec['asignatura']}' — {type(exc).__name__}: {exc}")
+                print(f"  ✗ [{sp_idx:02d}] '{rec['asignatura']}' — {type(exc).__name__}: {exc}")
     finally:
         with conn.cursor() as _c:
             _c.execute("ROLLBACK TO SAVEPOINT dry_run_all")
@@ -1635,7 +1635,7 @@ def main() -> None:
         esp_id_cache: dict[str, int | None] = {}
         failed = []
         try:
-            for rec in new_records:
+            for sp_idx, rec in enumerate(new_records, 1):
                 prog = rec["programa"]
                 if prog not in esp_id_cache:
                     eid = match_esp_id(prog, esps)
@@ -1647,9 +1647,9 @@ def main() -> None:
                 esp_id = esp_id_cache[prog]
                 esp_nombre = next((e["nombre"] for e in esps if e["id"] == esp_id), None)
 
-                sp = f"sp_{rec['asignatura'][:30].replace(' ', '_')}"
+                sp = f"sp_{sp_idx}"
                 with conn.cursor() as _c:
-                    _c.execute(f"SAVEPOINT {sp!r}")
+                    _c.execute(f"SAVEPOINT {sp}")
                 try:
                     micro_id = insert_record(conn, rec, esp_id, esp_nombre)
                     n_skills = insert_skills(conn, micro_id, rec)
@@ -1658,10 +1658,10 @@ def main() -> None:
                     inserted.append({"asignatura": rec["asignatura"], "id": micro_id, "skills": n_skills})
                     print(f"  ✓ id={micro_id}  {rec['asignatura']}  ({n_skills} skills)")
                     with conn.cursor() as _c:
-                        _c.execute(f"RELEASE SAVEPOINT {sp!r}")
+                        _c.execute(f"RELEASE SAVEPOINT {sp}")
                 except Exception as exc:
                     with conn.cursor() as _c:
-                        _c.execute(f"ROLLBACK TO SAVEPOINT {sp!r}")
+                        _c.execute(f"ROLLBACK TO SAVEPOINT {sp}")
                     failed.append(rec["asignatura"])
                     print(
                         f"  ✗ SKIP '{rec['asignatura']}' — {type(exc).__name__}: {exc}"
