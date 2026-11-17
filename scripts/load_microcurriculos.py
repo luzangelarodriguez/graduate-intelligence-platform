@@ -1218,6 +1218,12 @@ def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
     else:
         nivel = "especializacion"
 
+    _NIVEL_DISPLAY = {
+        "pregrado": "Pregrado", "especializacion": "Especialización",
+        "maestria": "Maestría", "doctorado": "Doctorado",
+    }
+    nivel_display = _NIVEL_DISPLAY.get(nivel, "Especialización")
+
     with conn.cursor() as cur:
         # Try to find existing row by exact nombre match
         cur.execute(
@@ -1228,24 +1234,17 @@ def upsert_especializacion(conn, programa: str, domain_key: str) -> int:
         if row:
             return row[0]
 
-        # Insert new row — only sets columns we know exist; ignores unknown ones
+        # Real schema: nombre, nivel (not nivel_formacion), estado, modalidad
         cur.execute(
             """
-            INSERT INTO especializaciones (nombre, nivel_formacion, estado)
-            VALUES (%s, %s, 'activo')
+            INSERT INTO especializaciones (nombre, nivel, estado, modalidad)
+            VALUES (%s, %s, 'Activo', 'Virtual')
+            ON CONFLICT (nombre) DO UPDATE SET nombre = EXCLUDED.nombre
             RETURNING id
             """,
-            (programa, nivel),
+            (programa, nivel_display),
         )
-        new_id = cur.fetchone()[0]
-
-        # Also set detected_domain if the column exists
-        if _has_column(conn, "especializaciones", "detected_domain"):
-            cur.execute(
-                "UPDATE especializaciones SET detected_domain = %s WHERE id = %s",
-                (domain_key, new_id),
-            )
-        return new_id
+        return cur.fetchone()[0]
 
 
 def upsert_domain_mapping(conn, esp_id: int, programa: str, domain_key: str) -> None:
