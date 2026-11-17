@@ -1,0 +1,47 @@
+DENOMINACIÓN DE LA ASIGNATURA
+Comercio Electrónico
+CUATRIMESTRE        CRÉDITOS        HORAS
+4                   3               144
+COMPONENTE FORMATIVO DE LA ASIGNATURA
+Componente profesional / Línea de profundización
+DESCRIPCIÓN DE LA ASIGNATURA
+Estudio de los modelos de negocio en entornos digitales, plataformas de e-commerce,
+medios de pago, logística de distribución y estrategias de fidelización del cliente.
+RESULTADOS DE APRENDIZAJE DE LA ASIGNATURA
+1. Identificar las principales plataformas de e-commerce a nivel global y regional
+2. Diseñar una tienda virtual usando Shopify o WooCommerce con pasarelas de pago integradas
+3. Aplicar estrategias de SEO para posicionamiento en Marketplace y motores de búsqueda
+BLOQUE 1. Fundamentos del Comercio Electrónico
+1. Modelos de negocio B2B, B2C, C2C y D2C
+1.1 Plataformas: Shopify, WooCommerce, PrestaShop, Magento
+1.2 Marketplaces: Amazon, Mercado Libre, Falabella
+2. Medios de pago y pasarelas
+2.1 PayPal, Stripe, PSE, Nequi
+2.2 Seguridad en E-Commerce y PCI-DSS
+3. Logística y fulfillment
+3.1 Last-mile delivery, omnicanalidad
+4. Customer Experience (CX) y UX
+4.1 Diseño de catálogo de productos
+4.2 Gestión de inventarios
+
+DENOMINACIÓN DE LA ASIGNATURA
+Marketing Digital
+CUATRIMESTRE        CRÉDITOS        HORAS
+2                   3               144
+COMPONENTE FORMATIVO DE LA ASIGNATURA
+Componente profesional / Línea de profundización digital
+DESCRIPCIÓN DE LA ASIGNATURA
+Fundamentos del marketing en entornos digitales: SEO, SEM, redes sociales,
+analítica web y métricas de desempeño (KPI, ROI, ROAS).
+RESULTADOS DE APRENDIZAJE DE LA ASIGNATURA
+1. Aplicar técnicas de SEO y SEM para aumentar la visibilidad de una marca
+2. Gestionar campañas en Google Ads y Meta Ads midiendo KPI y ROI
+3. Analizar datos de Google Analytics para tomar decisiones de marketing digital
+CONTENIDO TEMÁTICO
+1. SEO On-Page y Off-Page
+1.1 Google Search Console, Semrush
+2. SEM y Google Ads
+2.1 Campañas de búsqueda, display, shopping
+3. Redes sociales: Instagram, TikTok, LinkedIn
+3.1 Community Manager y Social Media Marketing
+4. Métricas: KPI, ROI, ROAS, CTR, CPC, CPM

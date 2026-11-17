@@ -1,0 +1,70 @@
+{
+  "block_1": {
+    "asignatura": "Comercio Electrónico",
+    "creditos": 3,
+    "cuatrimestre": 4,
+    "resultados_aprendizaje": [
+      "Identificar las principales plataformas de e-commerce a nivel global y regional",
+      "Diseñar una tienda virtual usando Shopify o WooCommerce con pasarelas de pago integradas",
+      "Aplicar estrategias de SEO para posicionamiento en Marketplace y motores de búsqueda"
+    ],
+    "contenidos": [
+      "Modelos de negocio B2B, B2C, C2C y D2C",
+      "Plataformas: Shopify, WooCommerce, PrestaShop, Magento",
+      "Medios de pago: PayPal, Stripe, PSE",
+      "Seguridad en E-Commerce",
+      "Logística y fulfillment",
+      "Customer Experience (CX) y UX"
+    ],
+    "skills": [
+      {"nombre": "E-Commerce", "tipo": "marketing"},
+      {"nombre": "Shopify", "tipo": "herramienta"},
+      {"nombre": "WooCommerce", "tipo": "herramienta"},
+      {"nombre": "PrestaShop", "tipo": "herramienta"},
+      {"nombre": "Magento", "tipo": "herramienta"},
+      {"nombre": "SEO", "tipo": "marketing"},
+      {"nombre": "Marketplace", "tipo": "marketing"},
+      {"nombre": "Pasarelas de Pago", "tipo": "competencia_dominio"},
+      {"nombre": "Seguridad en E-Commerce", "tipo": "competencia_dominio"},
+      {"nombre": "Logística", "tipo": "competencia_dominio"},
+      {"nombre": "Fulfillment", "tipo": "competencia_dominio"},
+      {"nombre": "Customer Experience", "tipo": "competencia_dominio"},
+      {"nombre": "UX", "tipo": "herramienta"},
+      {"nombre": "Gestión de Inventarios", "tipo": "competencia_dominio"}
+    ]
+  },
+  "block_2": {
+    "asignatura": "Marketing Digital",
+    "creditos": 3,
+    "cuatrimestre": 2,
+    "resultados_aprendizaje": [
+      "Aplicar técnicas de SEO y SEM para aumentar la visibilidad de una marca",
+      "Gestionar campañas en Google Ads y Meta Ads midiendo KPI y ROI",
+      "Analizar datos de Google Analytics para tomar decisiones de marketing digital"
+    ],
+    "contenidos": [
+      "SEO On-Page y Off-Page",
+      "SEM y Google Ads",
+      "Redes sociales: Instagram, TikTok, LinkedIn",
+      "Métricas: KPI, ROI, ROAS, CTR, CPC, CPM"
+    ],
+    "skills": [
+      {"nombre": "SEO", "tipo": "marketing"},
+      {"nombre": "SEM", "tipo": "marketing"},
+      {"nombre": "Google Ads", "tipo": "marketing"},
+      {"nombre": "Meta Ads", "tipo": "marketing"},
+      {"nombre": "Google Analytics", "tipo": "herramienta"},
+      {"nombre": "KPI", "tipo": "marketing"},
+      {"nombre": "ROI", "tipo": "marketing"},
+      {"nombre": "ROAS", "tipo": "marketing"},
+      {"nombre": "CTR", "tipo": "marketing"},
+      {"nombre": "CPC", "tipo": "marketing"},
+      {"nombre": "CPM", "tipo": "marketing"},
+      {"nombre": "Instagram", "tipo": "marketing"},
+      {"nombre": "TikTok", "tipo": "marketing"},
+      {"nombre": "LinkedIn", "tipo": "marketing"},
+      {"nombre": "Social Media Marketing", "tipo": "marketing"},
+      {"nombre": "Community Manager", "tipo": "competencia_dominio"}
+    ]
+  }
+}
