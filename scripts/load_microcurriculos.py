@@ -85,7 +85,7 @@ _RE_TOOLS = re.compile(
 )
 
 _RE_TECH = re.compile(
-    r"\b(Python|SQL|NoSQL|Spark|Hadoop|Kafka|Flink|"
+    r"\b(Python|R\b|SQL|NoSQL|Spark|Hadoop|Kafka|Flink|"
     r"TensorFlow|PyTorch|Keras|Scikit.?learn|XGBoost|LightGBM|"
     r"MongoDB|PostgreSQL|MySQL|SQLite|Cassandra|Redis|Elasticsearch|"
     r"OLAP|OLTP|ETL|ELT|Data\s*Warehouse|Data\s*Lake|Data\s*Mart|"
@@ -101,15 +101,15 @@ _RE_TRANSVERSAL = re.compile(
     r"\b(Liderazgo|Comunicaci[oó]n\s+efectiva|Comunicaci[oó]n|"
     r"Trabajo\s+en\s+equipo|Pensamiento\s+cr[ií]tico|"
     r"Resoluci[oó]n\s+de\s+problemas|Toma\s+de\s+decisiones|"
-    r"Gesti[oó]n\s+del\s+cambio|Planeaci[oó]n|"
+    r"Gesti[oó]n\s+del\s+cambio|Gesti[oó]n|Planeaci[oó]n|"
     r"Emprendimiento|Innovaci[oó]n|[EÉ]tica\s+profesional|[EÉ]tica|"
-    r"Responsabilidad\s+social\s+empresarial|Responsabilidad\s+social|"
-    r"Adaptabilidad|Creatividad|Negociaci[oó]n)\b",
+    r"Responsabilidad\s+social|Responsabilidad|Adaptabilidad|"
+    r"Creatividad|Negociaci[oó]n|Presentaci[oó]n)\b",
     re.IGNORECASE,
 )
 
 _RE_METHODS = re.compile(
-    r"\b(Scrum|Agile|CRISP.?DM|Design\s*Thinking|Lean\s+Six\s+Sigma|Six\s*Sigma|"
+    r"\b(Scrum|Agile|CRISP.?DM|Design\s*Thinking|Lean|Six\s*Sigma|"
     r"PMBOK|PRINCE2|IPMA|PMI|PMP|ISO\s*21500|Kanban|DevOps|DataOps|MLOps|"
     r"Valor\s+Ganado|Gesti[oó]n\s+de\s+Riesgos|Gesti[oó]n\s+de\s+Proyectos|"
     r"Planificaci[oó]n\s+de\s+Proyectos|MS\s*Project|"
@@ -156,13 +156,65 @@ def _normalize_text(text: str) -> str:
 # Canonical forms that must override .title() — acronyms stay uppercase,
 # variant spellings of the same concept collapse to one form.
 _CANONICAL_SKILLS: dict[str, str] = {
+    # Acronyms
     "seo": "SEO", "sem": "SEM", "roi": "ROI", "kpi": "KPI", "ctr": "CTR",
     "crm": "CRM", "roas": "ROAS", "cpm": "CPM", "cpc": "CPC", "rtb": "RTB",
     "nlp": "NLP", "olap": "OLAP", "oltp": "OLTP", "etl": "ETL", "elt": "ELT",
     "pca": "PCA", "aws": "AWS", "gcp": "GCP",
+    # Tools with proper casing that .title() breaks
     "power bi": "Power BI",
+    "hubspot": "HubSpot", "mailchimp": "Mailchimp",
+    "linkedin": "LinkedIn", "youtube": "YouTube", "tiktok": "TikTok",
+    "wordpress": "WordPress", "shopify": "Shopify", "woocommerce": "WooCommerce",
+    # E-Commerce variants all collapse to one form
     "e-commerce": "E-Commerce", "ecommerce": "E-Commerce", "e commerce": "E-Commerce",
+    # Spanish marketing terms where .title() wrongly capitalises prepositions
+    "marketing de contenidos": "Marketing de Contenidos",
+    "marketing de afiliados": "Marketing de Afiliados",
+    "embudo de conversion": "Embudo de Conversión",
+    "embudo de conversión": "Embudo de Conversión",
+    "posicionamiento de marca": "Posicionamiento de Marca",
+    "investigacion de mercados": "Investigación de Mercados",
+    "investigación de mercados": "Investigación de Mercados",
+    "comportamiento del consumidor": "Comportamiento del Consumidor",
+    "segmentacion de mercados": "Segmentación de Mercados",
+    "segmentación de mercados": "Segmentación de Mercados",
+    "mezcla de mercadeo": "Mezcla de Mercadeo",
+    "analítica web": "Analítica Web",
+    "analitica web": "Analítica Web",
+    "analítica digital": "Analítica Digital",
+    "analitica digital": "Analítica Digital",
+    "produccion audiovisual": "Producción Audiovisual",
+    "producción audiovisual": "Producción Audiovisual",
+    "diseno grafico": "Diseño Gráfico",
+    "diseño gráfico": "Diseño Gráfico",
+    "identidad visual": "Identidad Visual",
 }
+
+# Terms to strip from marketing-program skill results only.
+# These are legitimate skills in other programs (R in data/CS, Gestión in PM,
+# Lean in operations) but are noisy/misleading in a marketing context.
+_MARKETING_SKILL_NOISE: set[str] = {
+    _n for _n in [
+        "r",            # single-letter programming language — too ambiguous
+        "gestion",      # bare Gestión — always appears, never specific
+        "gestión",
+        "presentacion", # bare Presentación
+        "presentación",
+        "lean",         # bare Lean without Six Sigma
+        "responsabilidad",  # bare (keep "responsabilidad social")
+    ]
+}
+
+
+def _filter_marketing_skills(skills: dict[str, list[str]]) -> dict[str, list[str]]:
+    """Remove noisy generic terms from Marketing y Publicidad skill results."""
+    filtered: dict[str, list[str]] = {}
+    for tipo, skill_list in skills.items():
+        kept = [s for s in skill_list if _normalize_text(s) not in _MARKETING_SKILL_NOISE]
+        if kept:
+            filtered[tipo] = kept
+    return filtered
 
 
 def _title(s: str) -> str:
@@ -818,21 +870,35 @@ def parse_marketing_publicidad_pdf(path: Path) -> list[dict[str, Any]]:
             _flush_ra(current_ra, resultados)
 
         # ── Contenido temático ────────────────────────────────────────────────
+        # Support both "CONTENIDO TEMÁTICO" (most asignaturas) and the
+        # "BLOQUE N. / Tema N." layout used by some (e.g. Comercio Electrónico).
         temas: list[str] = []
+        ct_text = ""
         ct_match = re.search(
             r"CONTENIDO[S]?\s+TEM[AÁ]TICO\s*([\s\S]*?)$",
             block, re.IGNORECASE,
         )
         if ct_match:
-            for line in ct_match.group(1).splitlines():
-                line = line.strip()
-                # Keep numbered topic lines: "1. ...", "1.1 ..."
-                if re.match(r"^\d+[\.\d]*\s+\S", line) and len(line) > 5:
-                    temas.append(line[:200])
+            ct_text = ct_match.group(1)
+        else:
+            # Fallback: capture everything from the first BLOQUE line to end
+            bloque_match = re.search(
+                r"(BLOQUE\s+\d[\s\S]*?)$",
+                block, re.IGNORECASE,
+            )
+            if bloque_match:
+                ct_text = bloque_match.group(1)
+
+        for line in ct_text.splitlines():
+            line = line.strip()
+            if re.match(r"^\d+[\.\d]*\s+\S", line) and len(line) > 5:
+                temas.append(line[:200])
+            elif re.match(r"^BLOQUE\s+\d", line, re.IGNORECASE) and len(line) > 5:
+                temas.append(line[:200])
 
         # ── Skills ────────────────────────────────────────────────────────────
-        skill_text = " ".join(filter(None, [asig_name, desc, ra_match.group(1) if ra_match else "", ct_match.group(1) if ct_match else ""]))
-        skills = extract_skills(skill_text, include_marketing=True)
+        skill_text = " ".join(filter(None, [asig_name, desc, ra_match.group(1) if ra_match else "", ct_text]))
+        skills = _filter_marketing_skills(extract_skills(skill_text, include_marketing=True))
 
         # ── Unique hash — keep duplicates as separate rows ────────────────────
         name_key = _normalize_text(asig_name)
