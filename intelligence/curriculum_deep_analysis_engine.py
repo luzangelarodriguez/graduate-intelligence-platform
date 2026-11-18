@@ -183,6 +183,24 @@ C. AUSENCIAS NOTABLES — checklist de dominio:
      en criminología, criminología ambiental y situacional, marco legal actualizado
      (reformas recientes), victimología avanzada.
 
+   - Para marketing y publicidad / marketing digital:
+     posicionamiento SEO (técnico, on-page, off-page) y SEM, gestión de campañas
+     pagadas (Google Ads, Meta Ads, programática), analítica web (Google Analytics 4,
+     Search Console, Tag Manager), CRM y automatización de marketing (HubSpot,
+     Salesforce, Mailchimp), email marketing y estrategia de contenidos, investigación
+     de mercados (cualitativa y cuantitativa), copywriting y redacción persuasiva,
+     branding e identidad de marca, producción audiovisual y diseño gráfico aplicado,
+     gestión de e-commerce (Shopify, WooCommerce, UX/CRO, pasarelas de pago),
+     métricas de desempeño (KPIs, ROI de campañas, CAC/LTV), estrategia en redes
+     sociales y community management avanzado.
+     ⚠ EXCLUSIONES para este dominio: NO reportes como debilidad ni recomiendes
+     herramientas de gestión de proyectos (MS Project, Jira, Trello), metodologías
+     ágiles de gestión de proyectos (Scrum, Kanban, SAFe), MLOps, frameworks de
+     IA/ML (TensorFlow, PyTorch) ni analítica avanzada de IA, aunque el programa
+     incluya asignaturas con contenido tecnológico o de gestión. La brecha más
+     crítica en sintesis_ejecutiva debe pertenecer al checklist de marketing de
+     arriba, no a gestión de proyectos ni a IA.
+
    Reporta como debilidad ÚNICAMENTE las ausencias del checklist de SU dominio, con
    impacto estimado. No importes ítems de otros dominios como brechas.
 
@@ -192,6 +210,9 @@ REGLAS OBLIGATORIAS
 1. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
 2. No inventes herramientas ni competencias que no estén en el texto.
    Si algo no está en el texto sustantivo (excluida bibliografía), omítelo.
+   No atribuyas marcos, estándares ni actividades a organismos que no aparezcan
+   explícitamente en los textos (p. ej., los ODS pertenecen a la ONU, no a la
+   UNESCO; solo menciona organismos citados en el texto del programa).
 3. Distingue entre competencia explícita e inferida; cuando sea inferida,
    anótalo con "(inferida)" al final del nombre.
 4. NOMENCLATURA OBLIGATORIA — usa exactamente estas formas, sin variantes:
