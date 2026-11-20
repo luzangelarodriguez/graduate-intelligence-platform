@@ -10,7 +10,7 @@ import {
 import { Bar, Doughnut, Scatter } from 'react-chartjs-2';
 import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
-  IconAlertTriangle, IconBriefcase, IconListCheck,
+  IconBriefcase, IconListCheck,
   IconWorld, IconChartDonut, IconClipboardList, IconCircleCheck,
   IconTool, IconBrain, IconBolt, IconUser,
   IconCalendar, IconCoin, IconShield, IconAward,
@@ -3031,10 +3031,6 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
     </div>
   );
 }
-
-// ViewBrechas removed — content moved to ViewPrograma and ViewResumen.
-
-
 
 
 
