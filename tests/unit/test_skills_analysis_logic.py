@@ -8,6 +8,7 @@ import pytest
 
 from api.skills_analysis_logic import (
     HARD_CAP,
+    RUIDO_SIEMPRE,
     TRANSVERSALES,
     build_matriz_completa,
     compute_brechas_criticas,
@@ -152,24 +153,21 @@ class TestSubsumeJobSkills:
         assert subsume_job_skills(["marketing"]) == ["marketing"]
 
 
-# ── sas_has_analytics_context() ───────────────────────────────────────────────
+# ── RUIDO_SIEMPRE / sas_has_analytics_context() ───────────────────────────────
+# Audit of 50 "sas" matches: 49 were S.A.S. legal suffix, 1 was the software.
+# "sas" is now universally discarded via RUIDO_SIEMPRE.
 
 class TestSasAnalyticsContext:
-    def test_sas_kept_with_sql(self):
-        assert sas_has_analytics_context(frozenset({"sas", "sql", "excel"}))
+    def test_ruido_siempre_contains_sas(self):
+        assert norm("sas") in RUIDO_SIEMPRE
+        assert norm("S.A.S.") in RUIDO_SIEMPRE
+        assert norm("SAS") in RUIDO_SIEMPRE
 
-    def test_sas_kept_with_python(self):
-        assert sas_has_analytics_context(frozenset({"sas", "python", "marketing"}))
-
-    def test_sas_kept_with_estadistica(self):
-        assert sas_has_analytics_context(frozenset({"sas", "estadística", "spss"}))
-
-    def test_sas_discarded_no_signal(self):
-        assert not sas_has_analytics_context(frozenset({"sas", "ventas", "negociacion"}))
-
-    def test_sas_discarded_in_company_context(self):
-        # typical S.A.S. company-type context has no analytics signals
-        assert not sas_has_analytics_context(frozenset({"sas", "servicio al cliente"}))
+    def test_sas_always_returns_false(self):
+        # sas_has_analytics_context is kept for external callers but always False
+        assert not sas_has_analytics_context(frozenset({"sas", "sql", "excel"}))
+        assert not sas_has_analytics_context(frozenset({"sas", "python"}))
+        assert not sas_has_analytics_context(frozenset({"sas", "ventas"}))
 
 
 # ── frequency_threshold() ─────────────────────────────────────────────────────
@@ -226,7 +224,8 @@ class TestProcessJobSkillRows:
         assert "python" in skills
         assert "rare skill" not in skills  # norm converts underscore
 
-    def test_sas_discarded_without_analytics(self):
+    def test_sas_always_discarded(self):
+        # "sas" is in RUIDO_SIEMPRE — discarded regardless of co-occurring skills
         rows = self._rows({
             "1": ["sas", "ventas"],
             "2": ["sas", "negociacion"],
@@ -235,14 +234,26 @@ class TestProcessJobSkillRows:
         result, _ = process_job_skill_rows(rows)
         assert all(r["skill"].lower() != "sas" for r in result)
 
-    def test_sas_kept_with_analytics(self):
+    def test_sas_discarded_even_with_analytics(self):
+        # Even with sql/python context, "sas" is universally discarded
         rows = self._rows({
             "1": ["sas", "sql", "estadistica"],
             "2": ["sas", "python"],
             "3": ["sas", "spss"],
         })
         result, _ = process_job_skill_rows(rows)
-        assert any(r["skill"].lower() == "sas" for r in result)
+        assert all(r["skill"].lower() != "sas" for r in result)
+
+    def test_sas_dot_notation_discarded(self):
+        # "S.A.S." normalises to "s a s" which is also in RUIDO_SIEMPRE
+        rows = self._rows({
+            "1": ["S.A.S.", "ventas"],
+            "2": ["S.A.S.", "marketing"],
+            "3": ["S.A.S.", "finanzas"],
+        })
+        result, _ = process_job_skill_rows(rows)
+        sas_variants = {"sas", "s.a.s.", "s a s"}
+        assert all(r["skill"].lower() not in sas_variants for r in result)
 
     def test_subsuncion_applied(self):
         # "redes" and "redes sociales" in same job → only "redes sociales" survives

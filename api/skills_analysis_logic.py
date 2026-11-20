@@ -122,23 +122,20 @@ def is_transversal(skill: str) -> bool:
     return norm(skill) in TRANSVERSALES
 
 
-# ── SAS analytics-context filter ──────────────────────────────────────────────
-
-_SAS_SIGNALS: frozenset[str] = frozenset(norm(s) for s in {
-    "sql", "python", "r", "spss", "stata", "power bi", "tableau",
-    "estadistica", "analisis de datos", "analitica",
-    "machine learning", "data science",
-    "mineria de datos", "big data", "sas analytics",
-    "regresion", "modelado estadistico",
+# ── Always-discard noise skills ───────────────────────────────────────────────
+# Audit of 50 matches containing "sas" across programs 13/20/109/146 (last run):
+# 49 of 50 were the S.A.S. legal suffix in a company name or a job-board noise
+# block; only 1 was SAS the statistical software. The analytics-context filter
+# (sas_has_analytics_context) is not reliable enough — discard "sas" universally.
+RUIDO_SIEMPRE: frozenset[str] = frozenset({
+    norm("sas"),    # "sas" — almost always S.A.S. legal suffix in Colombian job ads
+    norm("s a s"),  # "S.A.S." normalises to "s a s"
 })
 
 
 def sas_has_analytics_context(job_skills: frozenset[str]) -> bool:
-    """
-    Return True if any analytics/stats signal appears in the same job's
-    normalised skill set, so 'sas' is kept as the statistical software SAS.
-    """
-    return bool({norm(s) for s in job_skills} & _SAS_SIGNALS)
+    """Kept for external callers; always returns False — SAS is universally discarded."""
+    return False
 
 
 # ── Phrase matching ────────────────────────────────────────────────────────────
@@ -216,7 +213,7 @@ def process_job_skill_rows(
     Given rows of {match_id, skill} from the per-job query:
       1. Group by match_id.
       2. Apply subsunción within each job.
-      3. Apply SAS analytics-context filter.
+      3. Discard skills in RUIDO_SIEMPRE (e.g. "sas" / "s a s").
       4. Count per-skill frequencies (how many jobs mention the skill).
       5. Apply frequency_threshold(n_matches) and HARD_CAP.
 
@@ -236,13 +233,12 @@ def process_job_skill_rows(
     n_matches = len(jobs)
     threshold = frequency_threshold(n_matches)
 
-    # Apply subsunción and SAS filter per job; then accumulate frequencies
+    # Apply subsunción and always-discard noise filter per job; accumulate frequencies
     freq: dict[str, int] = {}
     for job_skills_raw in jobs.values():
         job_skills = subsume_job_skills(job_skills_raw)
-        job_set = frozenset(job_skills)
         for skill in job_skills:
-            if norm(skill) == "sas" and not sas_has_analytics_context(job_set):
+            if norm(skill) in RUIDO_SIEMPRE:
                 continue
             key = norm(skill)
             # Use the first seen display form for each normalised key
