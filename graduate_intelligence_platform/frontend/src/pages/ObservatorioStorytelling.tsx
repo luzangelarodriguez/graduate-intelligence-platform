@@ -692,7 +692,7 @@ function tipoMeta(tipo: string | undefined) {
 
 function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
-  const topBrechas = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
+  const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
   const maxMarket  = topMarket[0]?.frecuencia ?? 1;
 
   // Afinidad ocupacional: (high + medium) vacantes / total
@@ -813,6 +813,14 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           <p style={{ fontSize: 8, fontWeight: 800, color: '#D1D5DB', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '4px 0 0' }}>DATOS QUE IMPULSAN FUTUROS</p>
         </div>
       </div>
+
+      {/* ── evidencia_baja warning ──────────────────────────────────────────── */}
+      {skills?.evidencia_baja && (
+        <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+          <span style={{ fontSize: 12, color: '#92400E' }}>Pocas vacantes analizadas: interpreta estos resultados con cautela.</span>
+        </div>
+      )}
 
       {/* ── 5 KPI cards ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5 flex-shrink-0">
