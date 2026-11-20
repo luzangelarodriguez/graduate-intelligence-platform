@@ -23,6 +23,8 @@ outputs/tmp/
 outputs/screenshots/
 outputs/ingesta_*.md
 outputs/ingest_cache.json
+outputs/verif_*.py
+outputs/audit_*.py
 .local_sessions/
 cookies/
 playwright/.auth/
