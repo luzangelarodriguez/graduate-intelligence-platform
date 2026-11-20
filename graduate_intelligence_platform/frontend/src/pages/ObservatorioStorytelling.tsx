@@ -180,6 +180,8 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
       { skill: 'Airflow', frecuencia_mercado: 12 }, { skill: 'dbt', frecuencia_mercado: 10 },
     ],
     exclusivas_programa: [{ skill: 'R', cobertura: 3 }, { skill: 'Estadística', cobertura: 3 }],
+    brechas_criticas: [{ skill: 'Spark', frecuencia_mercado: 16 }, { skill: 'AWS', frecuencia_mercado: 14 }],
+    transversales: [], evidencia_baja: false, n_matches: 0,
   },
   11: {
     program_id: 11, cobertura_pct: 61,
@@ -201,6 +203,8 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
       { skill: 'Kubernetes', frecuencia_mercado: 11 },
     ],
     exclusivas_programa: [{ skill: 'Estadística', cobertura: 4 }, { skill: 'Álgebra Lineal', cobertura: 3 }],
+    brechas_criticas: [{ skill: 'AWS', frecuencia_mercado: 15 }, { skill: 'Docker', frecuencia_mercado: 13 }],
+    transversales: [], evidencia_baja: false, n_matches: 0,
   },
   108: {
     program_id: 108, cobertura_pct: 38,
@@ -216,9 +220,11 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
       { skill: 'Análisis datos', frecuencia_mercado: 14 }, { skill: 'SPSS', frecuencia_mercado: 11 },
     ],
     exclusivas_programa: [{ skill: 'Criminología', cobertura: 4 }],
+    brechas_criticas: [{ skill: 'Análisis datos', frecuencia_mercado: 14 }],
+    transversales: [], evidencia_baja: false, n_matches: 0,
   },
-  20: { program_id: 20, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], cobertura_pct: 0 },
-  9:  { program_id: 9, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [] },
+  20: { program_id: 20, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], cobertura_pct: 0, brechas_criticas: [], transversales: [], evidencia_baja: false, n_matches: 0 },
+  9:  { program_id: 9, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], brechas_criticas: [], transversales: [], evidencia_baja: false, n_matches: 0 },
 };
 
 // ─── Pertinencia scale ─────────────────────────────────────────────────────────
