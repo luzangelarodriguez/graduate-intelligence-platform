@@ -979,20 +979,24 @@ def compare_programs(ids: str = Query(default="13,11,108,20")) -> list[dict]:
 
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
-    """Bidirectional skills analysis: market demand vs. program curriculum for a given program."""
-    import unicodedata as _ud
+    """
+    Bidirectional skills analysis: market demand vs. program curriculum.
 
-    def _norm(s: str) -> str:
-        """Lowercase + strip accents for cross-set comparison."""
-        return "".join(
-            c for c in _ud.normalize("NFD", s.lower())
-            if _ud.category(c) != "Mn"
-        )
-
-    def _match(a: str, b: str) -> bool:
-        """Exact or prefix match (min 6 chars) after normalization."""
-        na, nb = _norm(a), _norm(b)
-        return na == nb or (len(na) >= 6 and (na.startswith(nb) or nb.startswith(na)))
+    New fields added in this version (all existing fields preserved):
+        transversales   : generic/management skills excluded from cobertura_pct
+        brechas_criticas: brechas with frecuencia >= p66 of brecha frequencies
+        n_matches       : number of high/medium job matches used
+        evidencia_baja  : true when n_matches < 15 (low-confidence signal)
+        fortalezas[*].prog_skill_match : which program skill covered this market skill
+        fortalezas[*].regla : "exacta" | "frase"
+        matriz_completa[*].tipo : fortaleza | brecha | transversal | solo_programa
+    """
+    from api.skills_analysis_logic import (
+        build_matriz_completa,
+        cross_analyze,
+        norm as _sal_norm,
+        process_job_skill_rows,
+    )
 
     _EMPTY = {
         "program_id":          program_id,
@@ -1002,46 +1006,44 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         "fortalezas":          [],
         "exclusivas_programa": [],
         "cobertura_pct":       0.0,
+        "transversales":       [],
+        "brechas_criticas":    [],
+        "n_matches":           0,
+        "evidencia_baja":      True,
     }
     try:
         from api.database import fetch_all
 
-        # 1. Skills from jobs that actually matched THIS program in the latest run
-        market_rows = fetch_all(
+        # 1. Per-job skill rows (no aggregation yet — needed for subsunción + SAS filter)
+        raw_rows = fetch_all(
             """
-            SELECT skill, COUNT(*) AS frecuencia
-            FROM (
-                SELECT jsonb_array_elements_text(skills_empleo) AS skill
-                FROM ml_program_job_matches
-                WHERE especializacion_id = %s
-                  AND run_id = (
-                      SELECT MAX(run_id) FROM ml_program_job_matches
-                      WHERE especializacion_id = %s
-                  )
-                  AND relevance_label IN ('high', 'medium')
-                  AND skills_empleo IS NOT NULL
-                  AND skills_empleo != '[]'::jsonb
-                  AND jsonb_typeof(skills_empleo) = 'array'
-                  AND skills_en_comun IS NOT NULL
-                  AND skills_en_comun != '[]'::jsonb
-                  AND jsonb_array_length(skills_en_comun) > 0
-            ) t
-            GROUP BY skill
-            HAVING COUNT(*) >= 2
-            ORDER BY frecuencia DESC
-            LIMIT 30
+            SELECT m.id AS match_id,
+                   jsonb_array_elements_text(m.skills_empleo) AS skill
+            FROM ml_program_job_matches m
+            WHERE m.especializacion_id = %s
+              AND m.run_id = (
+                  SELECT MAX(run_id) FROM ml_program_job_matches
+                  WHERE especializacion_id = %s
+              )
+              AND m.relevance_label IN ('high', 'medium')
+              AND m.skills_empleo IS NOT NULL
+              AND m.skills_empleo != '[]'::jsonb
+              AND jsonb_typeof(m.skills_empleo) = 'array'
+              AND m.skills_en_comun IS NOT NULL
+              AND m.skills_en_comun != '[]'::jsonb
+              AND jsonb_array_length(m.skills_en_comun) > 0
             """,
             (program_id, program_id),
         )
-        skills_mercado_raw = [
-            {"skill": r["skill"], "frecuencia": int(r["frecuencia"])}
-            for r in market_rows
-            if r["skill"] and "skillmatch" not in r["skill"].lower()
-        ]
 
-        # 1b. Tipo-skill lookup: for each market skill, get the most common
-        # normalized tipo_skill from job_skills (joined via ml_program_job_matches).
-        # Uses MODE() to pick the most frequent category per skill key.
+        # 1a. Subsunción + SAS filter + frequency threshold (all in pure Python)
+        skills_mercado_raw, n_matches = process_job_skill_rows(
+            [{"match_id": r["match_id"], "skill": r["skill"]} for r in raw_rows]
+        )
+
+        # 1b. Tipo-skill lookup (unchanged — MODE over job_skills table)
+        import unicodedata as _ud
+
         tipo_rows = fetch_all(
             """
             SELECT
@@ -1056,8 +1058,6 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             """,
             (program_id, program_id),
         )
-        # Import the cleaning helper; it normalizes tipo_skill to one of:
-        # herramienta / tecnica / habilidad / competencia
         from backend.repositories.empleos_repository import _clean_tipo_skill
         from crawlers.storage.postgres_warehouse import canonicalize_skill
 
@@ -1070,22 +1070,19 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
                 continue
             raw_cat = (row["tipo_skill_raw"] or "").strip().lower()
             if raw_cat in _UNCLASSIFIED:
-                # skill_category is Unknown/Unclassified — backfill from taxonomy by name
                 taxonomy_cat = canonicalize_skill(key).category
                 tipo_lookup[key] = _clean_tipo_skill(None, taxonomy_cat)
             else:
                 tipo_lookup[key] = _clean_tipo_skill(None, row["tipo_skill_raw"])
 
         def _tipo_for(skill: str) -> str:
-            """Return normalized tipo_skill for a market skill name."""
-            norm = "".join(
+            norm_key = "".join(
                 c for c in _ud.normalize("NFD", skill.lower())
                 if _ud.category(c) != "Mn"
             ).strip()
-            result = tipo_lookup.get(norm, tipo_lookup.get(skill.lower().strip()))
+            result = tipo_lookup.get(norm_key, tipo_lookup.get(skill.lower().strip()))
             if result is not None:
                 return result
-            # Last-resort taxonomy lookup for skills not in tipo_lookup at all
             taxonomy_cat = canonicalize_skill(skill).category
             if taxonomy_cat.lower() not in _UNCLASSIFIED:
                 return _clean_tipo_skill(None, taxonomy_cat)
@@ -1096,8 +1093,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             for s in skills_mercado_raw
         ]
 
-        # 2. Skills from program curriculum (microcurriculo)
-        # Column is skill_normalized (with skill_original as fallback) per load_microcurriculo_excel.py
+        # 2. Skills from program curriculum (microcurriculo) — unchanged query
         prog_rows = fetch_all(
             """
             SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
@@ -1122,60 +1118,29 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             if r["skill_name"]
         ]
 
-        # 3. Cross analysis — prefix match after normalization
-        def _find_prog_match(m_skill: str):
-            """Return matching programa skill or None."""
-            for p in skills_programa:
-                if _match(m_skill, p["skill"]):
-                    return p
-            return None
+        # 3. Cross-analysis via pure-logic module
+        analysis = cross_analyze(skills_mercado, skills_programa)
 
-        fortalezas = []
-        brechas = []
-        matched_prog_skills: set[str] = set()
+        fortalezas       = analysis["fortalezas"]
+        brechas          = analysis["brechas"]
+        transversales    = analysis["transversales"]
+        cobertura_pct    = analysis["cobertura_pct"]
+        exclusivas_programa = analysis["exclusivas_programa"]
+        brechas_criticas = analysis["brechas_criticas"]
 
-        for m in skills_mercado:
-            p = _find_prog_match(m["skill"])
-            if p:
-                fortalezas.append({
-                    "skill": m["skill"],
-                    "frecuencia_mercado": m["frecuencia"],
-                    "cobertura_programa": p["cobertura"],
-                })
-                matched_prog_skills.add(p["skill"])
-            else:
-                brechas.append({"skill": m["skill"], "frecuencia_mercado": m["frecuencia"]})
-
-        exclusivas_programa = [
-            {"skill": s["skill"], "cobertura": s["cobertura"]}
-            for s in skills_programa
-            if s["skill"] not in matched_prog_skills
-        ]
-
-        total_mercado = len(skills_mercado)
-        cobertura_pct = round(len(fortalezas) / total_mercado * 100, 1) if total_mercado else 0.0
-
-        # Build matriz_completa: union of all skills from both sides
-        # Keys: normalized skill name → {demanda_mercado, oferta_programa}
-        matriz: dict[str, dict] = {}
-        for m in skills_mercado:
-            key = _norm(m["skill"])
-            matriz[key] = {"skill": m["skill"], "demanda_mercado": m["frecuencia"], "oferta_programa": 0}
-        for p in skills_programa:
-            key = _norm(p["skill"])
-            # Try to find if this prog skill already exists under a market-skill key (prefix match)
-            matched_key = next(
-                (k for k in matriz if _match(p["skill"], matriz[k]["skill"])), None
-            )
-            if matched_key:
-                matriz[matched_key]["oferta_programa"] = p["cobertura"]
-            else:
-                matriz[key] = {"skill": p["skill"], "demanda_mercado": 0, "oferta_programa": p["cobertura"]}
-        matriz_completa = sorted(matriz.values(), key=lambda x: -x["demanda_mercado"])
+        # 4. Build matriz_completa with tipo tags
+        fortaleza_norms  = {_sal_norm(f["skill"]) for f in fortalezas}
+        transversal_norms = {_sal_norm(t["skill"]) for t in transversales}
+        matriz_completa = build_matriz_completa(
+            skills_mercado, skills_programa, fortaleza_norms, transversal_norms
+        )
 
         logger.info(
-            "skills-analysis/%s: market_skills=%d, prog_skills=%d, fortalezas=%d, brechas=%d, matriz=%d",
-            program_id, len(skills_mercado), len(skills_programa), len(fortalezas), len(brechas), len(matriz_completa),
+            "skills-analysis/%s: n_matches=%d, market=%d, prog=%d, "
+            "fortalezas=%d, brechas=%d, transversales=%d, brechas_criticas=%d, matriz=%d",
+            program_id, n_matches, len(skills_mercado), len(skills_programa),
+            len(fortalezas), len(brechas), len(transversales), len(brechas_criticas),
+            len(matriz_completa),
         )
 
         return {
@@ -1187,6 +1152,11 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             "exclusivas_programa": exclusivas_programa,
             "cobertura_pct":       cobertura_pct,
             "matriz_completa":     matriz_completa,
+            # ── new fields (additive) ──────────────────────────────────────
+            "transversales":       transversales,
+            "brechas_criticas":    brechas_criticas,
+            "n_matches":           n_matches,
+            "evidencia_baja":      n_matches < 15,
         }
     except Exception as exc:
         logger.error("skills_analysis error program_id=%s: %s", program_id, exc, exc_info=True)
