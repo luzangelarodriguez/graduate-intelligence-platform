@@ -1129,9 +1129,9 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   }, [programaId]);
 
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
-  const topBrechas = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 8);
+  const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 8);
   const totalRequisitos = skillsMercadoDeduped.length;
-  const totalBrechas    = skills?.brechas.length ?? 0;
+  const totalBrechas    = skills?.brechas_criticas?.length ?? skills?.brechas?.length ?? 0;
 
   const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
   const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
@@ -1528,9 +1528,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
             </div>
           </div>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Mapa de pertinencia: Demanda vs. Cobertura curricular</p>
-          <div style={{ height: 220 }}>
-            <SkillScatter matriz={skills?.matriz_completa ?? []} />
-          </div>
+          <BrechasScatter
+            matriz={skills?.matriz_completa ?? []}
+            criticasSet={new Set((skills?.brechas_criticas ?? []).map(b => b.skill.toLowerCase()))}
+          />
         </div>
 
         {/* 4 — Brechas table */}
@@ -2290,7 +2291,7 @@ const INF = {
   border: '#E5E7EB',
 } as const;
 
-function ViewPrograma({ programaId }: ViewProps) {
+function ViewPrograma({ programaId, skills, coberturaPct }: ViewProps) {
   const [data, setData]       = useState<DeepAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(false);
@@ -2609,6 +2610,35 @@ function ViewPrograma({ programaId }: ViewProps) {
           )}
         </div>
       </div>
+
+      {/* ── Mapa de pertinencia curricular ── */}
+      {(skills?.matriz_completa ?? []).length > 0 && (
+        <div style={{ padding: '14px 16px', borderTop: `1px solid ${D.border}` }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: D.ink, margin: '0 0 4px' }}>Mapa de pertinencia curricular</p>
+          <p style={{ fontSize: 10, color: D.muted, margin: '0 0 10px' }}>
+            Cobertura curricular {coberturaPct}% · Skills críticas en rojo
+          </p>
+          <BrechasScatter
+            matriz={skills!.matriz_completa!}
+            criticasSet={new Set((skills?.brechas_criticas ?? []).map(b => b.skill.toLowerCase()))}
+          />
+        </div>
+      )}
+
+      {/* ── Competencias transversales del mercado ── */}
+      {(skills?.transversales ?? []).length > 0 && (
+        <div style={{ padding: '14px 16px', borderTop: `1px solid ${D.border}` }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: D.ink, margin: '0 0 10px' }}>Competencias transversales del mercado</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {skills!.transversales!.map(t => (
+              <span key={t.skill} style={{ fontSize: 11, fontWeight: 500, color: D.text, background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 20, padding: '4px 12px' }}>
+                {t.skill}
+                <span style={{ fontSize: 9, color: D.mutedD, marginLeft: 5 }}>{t.frecuencia_mercado}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Footer nota metodológica ── */}
       <div style={{ padding: '8px 16px 12px', borderTop: `1px solid ${D.border}`, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
@@ -2986,7 +3016,7 @@ function SparkBars({ color, bars = [4, 6, 5, 8, 6, 9, 7] }: { color: string; bar
 // ─── BrechasScatter ───────────────────────────────────────────────────────────
 const UMBRAL_BIEN_CUBIERTA = 2; // oferta_programa >= 2 → skill cubierta por ≥2 asignaturas
 
-export function computeScatterGroups(matriz: MatrizSkill[], topThirdDemand: number) {
+export function computeScatterGroups(matriz: MatrizSkill[], criticasSet: Set<string>) {
   const groups = {
     verde:    [] as { x: number; y: number; skill: string }[],
     amarillo: [] as { x: number; y: number; skill: string }[],
@@ -2994,12 +3024,13 @@ export function computeScatterGroups(matriz: MatrizSkill[], topThirdDemand: numb
     gris:     [] as { x: number; y: number; skill: string }[],
   };
   for (const m of matriz) {
+    if (m.tipo === 'solo_programa') continue;
     const pt = { x: m.demanda_mercado, y: m.oferta_programa, skill: m.skill };
     if (m.demanda_mercado > 0 && m.oferta_programa >= UMBRAL_BIEN_CUBIERTA) {
       groups.verde.push(pt);
     } else if (m.demanda_mercado > 0 && m.oferta_programa > 0 && m.oferta_programa < UMBRAL_BIEN_CUBIERTA) {
       groups.amarillo.push(pt);
-    } else if (m.demanda_mercado > 0 && m.oferta_programa === 0 && topThirdDemand > 0 && m.demanda_mercado >= topThirdDemand) {
+    } else if (m.demanda_mercado > 0 && m.oferta_programa === 0 && criticasSet.has(m.skill.toLowerCase())) {
       groups.rojo.push(pt);
     } else {
       groups.gris.push(pt);
@@ -3016,8 +3047,8 @@ const SCATTER_CATS = {
 } as const;
 type SCKey = keyof typeof SCATTER_CATS;
 
-function BrechasScatter({ matriz, topThirdDemand }: { matriz: MatrizSkill[]; topThirdDemand: number }) {
-  const groups = computeScatterGroups(matriz, topThirdDemand);
+function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; criticasSet: Set<string> }) {
+  const groups = computeScatterGroups(matriz, criticasSet);
 
   const datasets = (Object.keys(SCATTER_CATS) as SCKey[]).map(k => ({
     label: SCATTER_CATS[k].label,
@@ -3096,21 +3127,17 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
   const bycat: Record<SkillCat, Brecha[]> = { herramienta: [], competencia: [], habilidad: [], otro: [] };
   for (const b of sorted) bycat[classifySkill(b.skill)].push(b);
 
-  const topThirdIdx = Math.max(0, Math.floor(sorted.length * 2 / 3));
-  const topThirdThreshold = sorted[topThirdIdx]?.frecuencia_mercado ?? 0;
-  const brechasAlta = sorted.filter(b => (b.frecuencia_mercado ?? 0) > topThirdThreshold);
+  const brechasAlta = skills.brechas_criticas ?? [];
 
   const matriz = skills.matriz_completa ?? [];
-  const skillsAnalizadas = matriz.length || rawBrechas.length + skills.fortalezas.length;
+  const criticasSet = new Set((brechasAlta).map(b => b.skill.toLowerCase()));
+  const skillsAnalizadas = matriz.filter(m => m.tipo !== 'solo_programa').length || rawBrechas.length + skills.fortalezas.length;
   const wellCovered = skills.fortalezas.length;
   const topBrechas = sorted.slice(0, 4);
   const topBrecha = sorted[0];
 
-  const demandsSorted = [...matriz.map(m => m.demanda_mercado)].sort((a, b) => a - b);
-  const scatterTopThird = demandsSorted[Math.floor(demandsSorted.length * 2 / 3)] ?? 1;
-
-  // 4-category totals for stacked bar (verified: sum = matriz.length)
-  const scatterGroups = computeScatterGroups(matriz, scatterTopThird);
+  // 4-category totals for stacked bar (excludes solo_programa via criticasSet)
+  const scatterGroups = computeScatterGroups(matriz, criticasSet);
   const catCounts = [
     { key: 'verde',    label: 'Bien cubierta',    color: '#0ca30c', count: scatterGroups.verde.length },
     { key: 'amarillo', label: 'Cobertura parcial', color: '#D97706', count: scatterGroups.amarillo.length },
@@ -3264,7 +3291,7 @@ function ViewBrechas({ skills, coberturaPct, dataPobre }: ViewProps) {
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0 }}>Mapa de pertinencia curricular</p>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{skillsAnalizadas} skills</span>
               </div>
-              <BrechasScatter matriz={matriz} topThirdDemand={scatterTopThird} />
+              <BrechasScatter matriz={matriz} criticasSet={criticasSet} />
             </div>
           )}
         </div>
@@ -3705,7 +3732,7 @@ function ViewRecomendaciones({
   redesignJob, redesignDlError, onStartRedesign, onDownloadRedesign, onClearRedesign,
 }: ViewProps) {
   const topBrechas   = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
-  const brechasAlta  = topBrechas.filter(b => b.frecuencia_mercado >= 10);
+  const brechasAlta  = skills?.brechas_criticas ?? [];
   const topFortalezas = [...(skills?.fortalezas ?? [])].sort((a, b) => b.cobertura_programa - a.cobertura_programa);
   const ruido = (skills?.brechas ?? []).filter(b => classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3);
 
