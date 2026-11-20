@@ -54,16 +54,21 @@ interface Summary {
 }
 interface SkillMercado  { skill: string; frecuencia: number; tipo_skill?: string }
 interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string[] }
-interface Brecha        { skill: string; frecuencia_mercado: number }
-interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number }
+interface Brecha           { skill: string; frecuencia_mercado: number }
+interface TransversalSkill { skill: string; frecuencia_mercado: number }
+interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number; regla?: string; prog_skill_match?: string }
 interface Exclusiva     { skill: string; cobertura: number }
-interface MatrizSkill   { skill: string; demanda_mercado: number; oferta_programa: number }
+interface MatrizSkill   { skill: string; demanda_mercado: number; oferta_programa: number; tipo?: 'fortaleza' | 'brecha' | 'transversal' | 'solo_programa' }
 interface SkillsAnalysis {
   program_id: number;
   skills_mercado: SkillMercado[]; skills_programa: SkillPrograma[];
   brechas: Brecha[]; fortalezas: Fortaleza[]; exclusivas_programa: Exclusiva[];
   cobertura_pct: number;
   matriz_completa?: MatrizSkill[];
+  brechas_criticas?: Brecha[];
+  transversales?: TransversalSkill[];
+  evidencia_baja?: boolean;
+  n_matches?: number;
 }
 interface Competitor {
   nombre_ies: string; nombre_programa: string; ciudad: string; modalidad: string;
