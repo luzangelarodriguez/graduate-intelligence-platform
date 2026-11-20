@@ -16,6 +16,7 @@ from api.skills_analysis_logic import (
     frequency_threshold,
     is_transversal,
     norm,
+    norm_match,
     phrase_covers,
     process_job_skill_rows,
     sas_has_analytics_context,
@@ -412,3 +413,139 @@ class TestBuildMatrizCompleta:
         # solo_programa entries have demanda_mercado == 0
         for e in solo:
             assert e["demanda_mercado"] == 0
+
+
+# ── norm_match() ───────────────────────────────────────────────────────────────
+
+class TestNormMatch:
+    def test_strips_level_qualifier(self):
+        assert norm_match("excel avanzado") == "excel"
+        assert norm_match("python intermedio") == "python"
+        assert norm_match("sql basico") == "sql"
+
+    def test_depluralize_english(self):
+        assert norm_match("dashboards") == "dashboard"
+
+    def test_no_depluralize_spanish_es(self):
+        # "redes": prev char is 'e' (vowel) → keep "redes"
+        assert norm_match("redes") == "redes"
+
+    def test_sinonimo_mercadeo_marketing(self):
+        assert norm_match("mercadeo") == "marketing"
+
+    def test_sinonimo_redes_sociales(self):
+        assert norm_match("redes sociales") == "social media"
+
+    def test_sinonimo_ecommerce(self):
+        assert norm_match("e-commerce") == "e commerce"
+        assert norm_match("ecommerce") == "e commerce"
+        assert norm_match("comercio electrónico") == "e commerce"
+
+    def test_sinonimo_kpis(self):
+        assert norm_match("KPIs") == "metricas"
+
+    def test_no_change_no_synonym(self):
+        assert norm_match("python") == "python"
+        assert norm_match("marketing digital") == "marketing digital"
+
+
+# ── Coverage via norm_match ────────────────────────────────────────────────────
+
+class TestNormMatchCoverage:
+    def _prog(self, skills):
+        return [{"skill": s, "cobertura": 1, "asignaturas": []} for s in skills]
+
+    def test_mercadeo_covered_by_marketing(self):
+        """market 'mercadeo' → norm_match → 'marketing'; prog has 'marketing' → fortaleza."""
+        result = cross_analyze(
+            market_skills=[{"skill": "mercadeo", "frecuencia": 5}],
+            prog_skills=self._prog(["marketing"]),
+        )
+        assert len(result["fortalezas"]) == 1
+
+    def test_excel_avanzado_covered_by_excel(self):
+        """market 'excel avanzado' → norm_match strips 'avanzado' → 'excel'; prog has 'excel' → fortaleza."""
+        result = cross_analyze(
+            market_skills=[{"skill": "excel avanzado", "frecuencia": 4}],
+            prog_skills=self._prog(["excel"]),
+        )
+        assert len(result["fortalezas"]) == 1
+        assert result["fortalezas"][0]["regla"] == "sinonimo_o_nivel"
+
+    def test_dashboards_covered_by_dashboard(self):
+        """market 'dashboards' → depluralize → 'dashboard'; prog has 'dashboard' → fortaleza."""
+        result = cross_analyze(
+            market_skills=[{"skill": "dashboards", "frecuencia": 3}],
+            prog_skills=self._prog(["dashboard"]),
+        )
+        assert len(result["fortalezas"]) == 1
+
+    def test_redes_sociales_covered_by_social_media(self):
+        """market 'redes sociales' → synonym → 'social media'; prog has 'social media' → fortaleza."""
+        result = cross_analyze(
+            market_skills=[{"skill": "redes sociales", "frecuencia": 5}],
+            prog_skills=self._prog(["social media"]),
+        )
+        assert len(result["fortalezas"]) == 1
+
+    def test_no_false_coverage_different_skills(self):
+        """norm_match should not invent coverage where none exists."""
+        result = cross_analyze(
+            market_skills=[{"skill": "tableau", "frecuencia": 3}],
+            prog_skills=self._prog(["power bi"]),
+        )
+        assert len(result["brechas"]) == 1
+        assert len(result["fortalezas"]) == 0
+
+
+# ── PARAGUAS ──────────────────────────────────────────────────────────────────
+
+class TestParaguas:
+    def _prog(self, skills):
+        return [{"skill": s, "cobertura": 1, "asignaturas": []} for s in skills]
+
+    def test_paraguas_not_covered_with_2_components(self):
+        """2 of 7 components → NOT covered (needs ≥ 3)."""
+        result = cross_analyze(
+            market_skills=[{"skill": "marketing digital", "frecuencia": 5}],
+            prog_skills=self._prog(["seo", "sem"]),
+        )
+        assert len(result["brechas"]) == 1
+        assert len(result["fortalezas"]) == 0
+
+    def test_paraguas_covered_with_3_components(self):
+        """3 of 7 components → covered."""
+        result = cross_analyze(
+            market_skills=[{"skill": "marketing digital", "frecuencia": 5}],
+            prog_skills=self._prog(["seo", "sem", "email marketing"]),
+        )
+        assert len(result["fortalezas"]) == 1
+        assert "paraguas" in result["fortalezas"][0]["regla"]
+
+    def test_paraguas_covered_with_all_components(self):
+        """All 7 components → covered."""
+        result = cross_analyze(
+            market_skills=[{"skill": "marketing digital", "frecuencia": 5}],
+            prog_skills=self._prog([
+                "seo", "sem", "email marketing", "google ads",
+                "social media", "google analytics", "community manager",
+            ]),
+        )
+        assert len(result["fortalezas"]) == 1
+        assert "paraguas" in result["fortalezas"][0]["regla"]
+
+    def test_evidencia_baja_true_when_few_matches(self):
+        result = cross_analyze(
+            market_skills=[{"skill": "python", "frecuencia": 2}],
+            prog_skills=self._prog(["python"]),
+            n_matches=10,
+        )
+        assert result["evidencia_baja"] is True
+
+    def test_evidencia_baja_false_when_enough_matches(self):
+        result = cross_analyze(
+            market_skills=[{"skill": "python", "frecuencia": 2}],
+            prog_skills=self._prog(["python"]),
+            n_matches=20,
+        )
+        assert result["evidencia_baja"] is False

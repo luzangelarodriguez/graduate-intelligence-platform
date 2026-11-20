@@ -35,6 +35,63 @@ def norm(s: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# ── norm_match helpers ─────────────────────────────────────────────────────────
+
+_QUALIFIER_RE = re.compile(
+    r"\b(avanzado|avanzada|basico|basica|intermedio|intermedia|nivel|experto|experta)\b"
+)
+
+
+def _depluralize(word: str) -> str:
+    """
+    Strip trailing 's' only for English-style plurals (consonant + s).
+    Leaves Spanish vowel-stem plurals (redes, sociales) intact.
+    """
+    if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
+        if word[-2] not in "aeiou":
+            return word[:-1]
+    return word
+
+
+SINONIMOS: dict[str, str] = {
+    "mercadeo": "marketing",
+    "redes sociales": "social media",
+    "e commerce": "e commerce",
+    "ecommerce": "e commerce",
+    "comercio electronico": "e commerce",
+    "indicadores": "metricas",
+    "kpis": "metricas",
+}
+
+PARAGUAS: dict[str, frozenset[str]] = {
+    "marketing digital": frozenset({
+        "seo",
+        "sem",
+        "email marketing",
+        "google ads",
+        "social media",
+        "google analytics",
+        "community manager",
+    }),
+}
+
+
+def norm_match(s: str) -> str:
+    """
+    Normalise for MATCHING only — never use for display.
+
+    Steps on top of norm():
+    1. Strip level qualifiers (avanzado, basico, intermedio, nivel, experto…)
+    2. Depluralize English-style plurals word-by-word (dashboards → dashboard)
+    3. Apply SINONIMOS map (mercadeo → marketing, redes sociales → social media…)
+    """
+    text = norm(s)
+    text = _QUALIFIER_RE.sub("", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    text = " ".join(_depluralize(w) for w in text.split())
+    return SINONIMOS.get(text, text)
+
+
 # ── Transversal skills ─────────────────────────────────────────────────────────
 
 TRANSVERSALES: frozenset[str] = frozenset({
@@ -217,21 +274,57 @@ def process_job_skill_rows(
 
 class MatchDetail(NamedTuple):
     prog_skill: str
-    rule: str  # "exacta" | "frase" | "ninguna"
+    rule: str  # "exacta" | "frase" | "sinonimo_o_nivel" | "paraguas: ..." | "ninguna"
 
 
 def find_prog_match(market_skill: str, prog_skills: list[dict]) -> MatchDetail:
     """
     Find which program skill covers market_skill (and by what rule).
-    Exact match takes priority over phrase match.
+
+    Uses norm_match() for comparison so that level qualifiers (avanzado/basico),
+    English plurals (dashboards→dashboard), and synonyms (mercadeo→marketing)
+    are stripped before comparing.  Rule labels:
+        "exacta"          : surface-identical after norm()
+        "frase"           : prog contains market as whole-word phrase (no transformation)
+        "sinonimo_o_nivel": match required synonym mapping or qualifier stripping
+        "paraguas: ..."   : umbrella skill covered by ≥3 of its components
+        "ninguna"         : no coverage found
     """
-    nm = norm(market_skill)
+    nm = norm_match(market_skill)
+    n_orig_m = norm(market_skill)
+    transformed_m = nm != n_orig_m
+
+    # 1. Try exact match via norm_match
     for p in prog_skills:
-        if nm == norm(p["skill"]):
+        np = norm_match(p["skill"])
+        if nm == np:
+            if transformed_m or np != norm(p["skill"]):
+                return MatchDetail(p["skill"], "sinonimo_o_nivel")
             return MatchDetail(p["skill"], "exacta")
-    for p in prog_skills:
-        if phrase_covers(market_skill, p["skill"]):
-            return MatchDetail(p["skill"], "frase")
+
+    # 2. Try phrase match via norm_match (prog contains market phrase)
+    words = nm.split()
+    letters = len(nm.replace(" ", ""))
+    if len(words) >= 2 or letters >= 6:
+        for p in prog_skills:
+            np = norm_match(p["skill"])
+            if nm != np and bool(_phrase_re(nm).search(np)):
+                if transformed_m or norm_match(p["skill"]) != norm(p["skill"]):
+                    return MatchDetail(p["skill"], "sinonimo_o_nivel")
+                return MatchDetail(p["skill"], "frase")
+
+    # 3. Try PARAGUAS umbrella rule
+    if nm in PARAGUAS:
+        components = PARAGUAS[nm]
+        matched = [
+            comp
+            for comp in components
+            if any(norm_match(p["skill"]) == comp for p in prog_skills)
+        ]
+        if len(matched) >= 3:
+            rule = "paraguas: " + ", ".join(sorted(matched))
+            return MatchDetail("<paraguas>", rule)
+
     return MatchDetail("", "ninguna")
 
 
@@ -251,6 +344,7 @@ def compute_brechas_criticas(brechas: list[dict]) -> list[dict]:
 def cross_analyze(
     market_skills: list[dict],
     prog_skills: list[dict],
+    n_matches: int = 0,
 ) -> dict:
     """
     Core cross-analysis.
@@ -262,6 +356,7 @@ def cross_analyze(
         cobertura_pct      : fortalezas / (fortalezas + brechas) × 100
         exclusivas_programa: program skills not matched by any market skill
         brechas_criticas   : brechas with frecuencia >= p66 of brecha frequencies
+        evidencia_baja     : True when n_matches < 15 (small corpus warning)
     """
     transversales: list[dict] = []
     fortalezas: list[dict] = []
@@ -317,6 +412,7 @@ def cross_analyze(
         "cobertura_pct": cobertura_pct,
         "exclusivas_programa": exclusivas_programa,
         "brechas_criticas": brechas_criticas,
+        "evidencia_baja": n_matches < 15,
     }
 
 
