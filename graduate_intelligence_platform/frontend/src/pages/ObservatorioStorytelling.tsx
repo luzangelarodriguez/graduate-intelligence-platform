@@ -637,9 +637,9 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
     : { label: 'Brecha', bg: '#FEE2E2', color: '#991B1B' };
 
   // Brechas badge
-  const totalBrechas      = skills?.brechas.length ?? 0;
-  const altaBrechasCount  = Math.min(topBrechas.length, 3);
-  const brechasBadge      = totalBrechas > 0
+  const totalBrechas         = skills?.brechas?.length ?? 0;
+  const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
+  const brechasBadge         = criticalBrechasCount > 0
     ? { label: 'Atención', bg: '#FEF3C7', color: '#92400E' }
     : { label: 'Sin brechas', bg: '#D1FAE5', color: '#065F46' };
 
@@ -771,11 +771,11 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>Índice ponderado de afinidad, cobertura y relevancia</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: nivel.bg, color: nivel.color }}>{nivel.label}</span>
         </div>
-        {/* 4. Brechas detectadas */}
+        {/* 4. Brechas críticas */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
-          <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Brechas detectadas</p>
-          <p style={{ fontSize: 26, fontWeight: 800, color: '#DC2626', margin: '0 0 2px', lineHeight: 1 }}>{totalBrechas}</p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>{altaBrechasCount} requieren intervención prioritaria</p>
+          <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Brechas críticas</p>
+          <p style={{ fontSize: 26, fontWeight: 800, color: '#DC2626', margin: '0 0 2px', lineHeight: 1 }}>{criticalBrechasCount}</p>
+          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>{totalBrechas} brechas en total</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: brechasBadge.bg, color: brechasBadge.color }}>{brechasBadge.label}</span>
         </div>
         {/* 5. Requisitos analizados */}
