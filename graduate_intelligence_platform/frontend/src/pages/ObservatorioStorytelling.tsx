@@ -45,7 +45,7 @@ interface Programa {
 interface TopMatch {
   programa: string; empleo: string; empresa: string; score: number; label: string;
   skills_en_comun: string[]; skills_faltantes: string[];
-  fuente?: string; familia?: string;
+  fuente?: string; familia?: string; perfil_nombre?: string;
 }
 interface Summary {
   run_id: number | null; fecha: string;
@@ -3360,13 +3360,17 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
   const pctFamilia    = top10.length > 0 ? Math.round((conFamilia / top10.length) * 100) : 0;
   const familiaRows   = (() => {
     const counts: Record<string, number> = {};
+    const perfiles: Record<string, string> = {};
     top10.forEach(m => {
       const f = (m.familia ?? '').trim();
-      if (f) counts[f] = (counts[f] ?? 0) + 1;
+      if (!f) return;
+      counts[f] = (counts[f] ?? 0) + 1;
+      if (!perfiles[f] && m.perfil_nombre) perfiles[f] = m.perfil_nombre;
     });
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
+      .slice(0, 10)
+      .map(([f, cnt]) => [f, cnt, perfiles[f] ?? ''] as [string, number, string]);
   })();
   const familiaMax = familiaRows.length > 0 ? familiaRows[0][1] : 1;
 
@@ -3604,12 +3608,17 @@ function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {familiaRows.map(([familia, cnt]) => (
+                  {familiaRows.map(([familia, cnt, perfilNombre]) => (
                     <div key={familia}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 1 }}>
                         <span style={{ fontSize: 10, color: '#374151', fontWeight: 500 }}>{familia}</span>
                         <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{cnt}</span>
                       </div>
+                      {perfilNombre && (
+                        <p style={{ fontSize: 9, color: '#9CA3AF', margin: '0 0 3px', lineHeight: 1.3 }}>
+                          {perfilNombre}
+                        </p>
+                      )}
                       <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{
                           height: '100%',

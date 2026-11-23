@@ -502,7 +502,12 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
                 m.job_title                         AS empleo,
                 COALESCE(m.company, '')             AS empresa,
                 COALESCE(j.source, '')              AS fuente,
-                COALESCE(j.semantic_title_family, '') AS familia,
+                COALESCE(
+                    NULLIF(TRIM(op.familia), ''),
+                    NULLIF(TRIM(j.semantic_title_family), ''),
+                    ''
+                )                                   AS familia,
+                COALESCE(NULLIF(TRIM(op.nombre), ''), '') AS perfil_nombre,
                 ROUND(m.score_match::numeric, 1)    AS score,
                 m.relevance_label                   AS label,
                 m.skills_en_comun                   AS skills_en_comun,
@@ -510,6 +515,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
             FROM ml_program_job_matches m
             LEFT JOIN especializaciones e ON e.id = m.especializacion_id
             LEFT JOIN jobs j ON j.id::text = m.empleo_id
+            LEFT JOIN occupational_profiles op ON op.id = j.perfil_id
             WHERE m.run_id = {run_id} {pid_filter}
               AND m.relevance_label IN ('high', 'medium')
             ORDER BY m.score_match DESC
@@ -524,6 +530,7 @@ def dashboard_summary(program_id: int | None = Query(default=None)) -> dict[str,
                 "empresa":         r["empresa"],
                 "fuente":          r["fuente"],
                 "familia":         r["familia"],
+                "perfil_nombre":   r["perfil_nombre"],
                 "score":           float(r["score"] or 0),
                 "label":           r["label"],
                 "skills_en_comun": r["skills_en_comun"] if r["skills_en_comun"] is not None else [],
