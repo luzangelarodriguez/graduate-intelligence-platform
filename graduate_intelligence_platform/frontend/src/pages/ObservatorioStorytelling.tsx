@@ -1104,16 +1104,6 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
 
   const TH_ML = { padding: '5px 8px', fontSize: 9, fontWeight: 700 as const, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}`, textAlign: 'left' as const };
 
-  // Breadcrumb sections for reference
-  const BREAD = [
-    { id: '1', label: '¿Es pertinente?' },
-    { id: '2', label: '¿Qué demanda el mercado?' },
-    { id: '3', label: '¿Qué tanto responde el programa?' },
-    { id: '4', label: '¿Dónde están las brechas?' },
-    { id: '5', label: '¿Qué decisiones tomar?' },
-    { id: '6', label: '¿La tendencia es favorable?' },
-  ];
-
   const SEC_TABS = [
     { id: 'perfiles',       label: 'Perfiles ocupacionales' },
     { id: 'herramientas',   label: 'Herramientas' },
@@ -1134,16 +1124,6 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
           <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>Evidencia para decisiones de renovación, fortalecimiento y actualización curricular</p>
         </div>
         <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0, textAlign: 'right', flexShrink: 0 }}>Corte: {new Date().toLocaleDateString('es-CO')}</p>
-      </div>
-
-      {/* ── Breadcrumb navigation ───────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 0', borderBottom: `1px solid ${C.border}` }}>
-        {BREAD.map((b, i) => (
-          <span key={b.id} style={{ fontSize: 10, color: i === 0 ? C.navy : '#9CA3AF', fontWeight: i === 0 ? 700 : 500 }}>
-            <span style={{ color: C.navy, fontWeight: 700, marginRight: 3 }}>{b.id}</span>{b.label}
-            {i < BREAD.length - 1 && <span style={{ margin: '0 6px', color: '#D1D5DB' }}>›</span>}
-          </span>
-        ))}
       </div>
 
       {/* ── SECCIÓN 1 — Lectura ejecutiva ─────────────────────────────────────── */}
