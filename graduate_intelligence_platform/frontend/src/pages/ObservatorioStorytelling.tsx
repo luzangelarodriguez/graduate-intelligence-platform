@@ -124,14 +124,13 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'empleos' | 'recomendaciones' | 'contexto';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'recomendaciones' | 'contexto';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
   { id: 'mercado',         label: 'Mercado',          Icon: IconChartBar      },
   { id: 'programa',        label: 'Programa',         Icon: IconSchool        },
   { id: 'cobertura',       label: 'Oferta y Demanda', Icon: IconTarget        },
-  { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
   { id: 'contexto',        label: 'Contexto',         Icon: IconWorld         },
 ];
@@ -4136,7 +4135,6 @@ export default function ObservatorioStorytelling() {
     mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} ofertaDemandaError={ofertaDemandaError} />,
-    empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
     contexto:        <ViewContexto        {...viewProps} />,
   };
