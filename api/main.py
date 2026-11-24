@@ -977,6 +977,79 @@ def compare_programs(ids: str = Query(default="13,11,108,20")) -> list[dict]:
         return []
 
 
+# ── SQL shared by /skills-analysis endpoint and _run_redesign ─────────────────
+
+_SQL_MARKET_SKILLS = """
+    SELECT m.id AS match_id,
+           jsonb_array_elements_text(m.skills_empleo) AS skill
+    FROM ml_program_job_matches m
+    WHERE m.especializacion_id = %s
+      AND m.run_id = (
+          SELECT MAX(run_id) FROM ml_program_job_matches
+          WHERE especializacion_id = %s
+      )
+      AND m.relevance_label IN ('high', 'medium')
+      AND m.skills_empleo IS NOT NULL
+      AND m.skills_empleo != '[]'::jsonb
+      AND jsonb_typeof(m.skills_empleo) = 'array'
+      AND m.skills_en_comun IS NOT NULL
+      AND m.skills_en_comun != '[]'::jsonb
+      AND jsonb_array_length(m.skills_en_comun) > 0
+"""
+
+_SQL_PROG_SKILLS = """
+    SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
+           COUNT(*) AS cobertura,
+           ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
+    FROM microcurriculo_skills ms
+    JOIN microcurriculos m ON m.id = ms.microcurriculo_id
+    WHERE m.specialization_id = %s
+      AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
+    GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
+    ORDER BY cobertura DESC
+"""
+
+
+def _market_analysis_for_program(program_id: int, fetch_all_fn: Any) -> dict:
+    """
+    Shared core: query high/medium job matches + microcurriculo skills, run cross_analyze.
+
+    Accepts fetch_all_fn so the function can be called with a mock in unit tests.
+    Returns the cross_analyze dict plus:
+        skills_mercado_raw : list[{skill, frecuencia}] before tipo enrichment
+        skills_mercado     : same, without tipo_skill (endpoint adds it)
+        skills_programa    : list[{skill, cobertura, asignaturas}]
+        n_matches          : number of job matches used
+    """
+    from api.skills_analysis_logic import cross_analyze, process_job_skill_rows
+
+    raw_rows = fetch_all_fn(_SQL_MARKET_SKILLS, (program_id, program_id))
+    skills_mercado_raw, n_matches = process_job_skill_rows(
+        [{"match_id": r["match_id"], "skill": r["skill"]} for r in raw_rows]
+    )
+
+    prog_rows = fetch_all_fn(_SQL_PROG_SKILLS, (program_id,))
+    skills_programa = [
+        {
+            "skill":       r["skill_name"],
+            "cobertura":   int(r["cobertura"]),
+            "asignaturas": list(r["asignaturas"]) if r["asignaturas"] else [],
+        }
+        for r in prog_rows
+        if r["skill_name"]
+    ]
+
+    skills_mercado = [{"skill": s["skill"], "frecuencia": s["frecuencia"]} for s in skills_mercado_raw]
+    analysis = cross_analyze(skills_mercado, skills_programa, n_matches)
+    return {
+        **analysis,
+        "skills_mercado_raw": skills_mercado_raw,
+        "skills_mercado":     skills_mercado,
+        "skills_programa":    skills_programa,
+        "n_matches":          n_matches,
+    }
+
+
 @app.get("/api/dashboard/skills-analysis/{program_id}", tags=["dashboard"])
 def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """
@@ -993,9 +1066,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     """
     from api.skills_analysis_logic import (
         build_matriz_completa,
-        cross_analyze,
         norm as _sal_norm,
-        process_job_skill_rows,
     )
 
     _EMPTY = {
@@ -1014,34 +1085,19 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
     try:
         from api.database import fetch_all
 
-        # 1. Per-job skill rows (no aggregation yet — needed for subsunción + SAS filter)
-        raw_rows = fetch_all(
-            """
-            SELECT m.id AS match_id,
-                   jsonb_array_elements_text(m.skills_empleo) AS skill
-            FROM ml_program_job_matches m
-            WHERE m.especializacion_id = %s
-              AND m.run_id = (
-                  SELECT MAX(run_id) FROM ml_program_job_matches
-                  WHERE especializacion_id = %s
-              )
-              AND m.relevance_label IN ('high', 'medium')
-              AND m.skills_empleo IS NOT NULL
-              AND m.skills_empleo != '[]'::jsonb
-              AND jsonb_typeof(m.skills_empleo) = 'array'
-              AND m.skills_en_comun IS NOT NULL
-              AND m.skills_en_comun != '[]'::jsonb
-              AND jsonb_array_length(m.skills_en_comun) > 0
-            """,
-            (program_id, program_id),
-        )
+        # 1. Core market + curriculum analysis (shared with _run_redesign)
+        core = _market_analysis_for_program(program_id, fetch_all)
+        skills_mercado_raw  = core["skills_mercado_raw"]
+        n_matches           = core["n_matches"]
+        fortalezas          = core["fortalezas"]
+        brechas             = core["brechas"]
+        transversales       = core["transversales"]
+        cobertura_pct       = core["cobertura_pct"]
+        exclusivas_programa = core["exclusivas_programa"]
+        brechas_criticas    = core["brechas_criticas"]
+        skills_programa     = core["skills_programa"]
 
-        # 1a. Subsunción + SAS filter + frequency threshold (all in pure Python)
-        skills_mercado_raw, n_matches = process_job_skill_rows(
-            [{"match_id": r["match_id"], "skill": r["skill"]} for r in raw_rows]
-        )
-
-        # 1b. Tipo-skill lookup (unchanged — MODE over job_skills table)
+        # 1b. Tipo-skill lookup (endpoint-specific — not needed by redesign)
         import unicodedata as _ud
 
         tipo_rows = fetch_all(
@@ -1093,40 +1149,9 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             for s in skills_mercado_raw
         ]
 
-        # 2. Skills from program curriculum (microcurriculo) — unchanged query
-        prog_rows = fetch_all(
-            """
-            SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
-                   COUNT(*) AS cobertura,
-                   ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
-            FROM microcurriculo_skills ms
-            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
-            WHERE m.specialization_id = %s
-              AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
-            GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
-            ORDER BY cobertura DESC
-            """,
-            (program_id,),
-        )
-        skills_programa = [
-            {
-                "skill":       r["skill_name"],
-                "cobertura":   int(r["cobertura"]),
-                "asignaturas": list(r["asignaturas"]) if r["asignaturas"] else [],
-            }
-            for r in prog_rows
-            if r["skill_name"]
-        ]
-
-        # 3. Cross-analysis via pure-logic module
-        analysis = cross_analyze(skills_mercado, skills_programa)
-
-        fortalezas       = analysis["fortalezas"]
-        brechas          = analysis["brechas"]
-        transversales    = analysis["transversales"]
-        cobertura_pct    = analysis["cobertura_pct"]
-        exclusivas_programa = analysis["exclusivas_programa"]
-        brechas_criticas = analysis["brechas_criticas"]
+        # 2 & 3. Cross-analysis handled in _market_analysis_for_program above.
+        # fortalezas, brechas, transversales, cobertura_pct, exclusivas_programa,
+        # brechas_criticas, skills_programa are already set from core.
 
         # 4. Build matriz_completa with tipo tags
         fortaleza_norms  = {_sal_norm(f["skill"]) for f in fortalezas}
@@ -1590,15 +1615,6 @@ def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: l
 
 def _run_redesign(job_id: str, program_id: int) -> None:
     """Background task: analyze curriculum vs brechas and call OpenAI for each relevant subject."""
-    import unicodedata as _ud
-
-    def _norm(s: str) -> str:
-        return "".join(c for c in _ud.normalize("NFD", s.lower()) if _ud.category(c) != "Mn")
-
-    def _match(a: str, b: str) -> bool:
-        na, nb = _norm(a), _norm(b)
-        return na == nb or (len(na) >= 6 and (na.startswith(nb) or nb.startswith(na)))
-
     job = _REDESIGN_JOBS[job_id]
 
     def _update(status: str, **kw: Any) -> None:
@@ -1631,87 +1647,59 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _update("error", error="No se encontraron microcurrículos para este programa. Ejecuta primero el pipeline de carga.")
             return
 
-        # 2. Compute brechas using same logic as skills-analysis
+        # 2. Compute brechas using unified market analysis (same SQL as /skills-analysis)
         _update("running", current_step="Calculando brechas curriculares")
 
-        market_rows = fetch_all(
-            """
-            SELECT skill, COUNT(*) AS frecuencia
-            FROM (
-                SELECT jsonb_array_elements_text(skills_empleo) AS skill
-                FROM ml_program_job_matches
-                WHERE especializacion_id = %s
-                  AND run_id = (SELECT MAX(run_id) FROM ml_program_job_matches WHERE especializacion_id = %s)
-                  AND skills_empleo IS NOT NULL AND skills_empleo != '[]'::jsonb
-                  AND jsonb_typeof(skills_empleo) = 'array'
-            ) t
-            GROUP BY skill HAVING COUNT(*) >= 2
-            ORDER BY frecuencia DESC LIMIT 30
-            """,
-            (program_id, program_id),
-        )
-        skills_mercado = [r["skill"] for r in market_rows if r["skill"]]
-
-        prog_rows = fetch_all(
-            """
-            SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name
-            FROM microcurriculo_skills ms
-            JOIN microcurriculos m ON m.id = ms.microcurriculo_id
-            WHERE m.specialization_id = %s
-              AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
-            GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
-            """,
-            (program_id,),
-        )
-        skills_programa = [r["skill_name"] for r in prog_rows if r["skill_name"]]
-
-        # Brechas = market skills not matched by program skills
-        brechas: list[str] = []
-        for ms in skills_mercado:
-            if not any(_match(ms, ps) for ps in skills_programa):
-                brechas.append(ms)
+        analysis = _market_analysis_for_program(program_id, fetch_all)
+        brechas_criticas_data = analysis["brechas_criticas"]  # list[{skill, frecuencia_mercado}]
+        n_matches = analysis["n_matches"]
 
         logger.info(
-            "[REDESIGN-DEBUG] program_id=%s market_skills=%d prog_skills=%d brechas=%d list=%s",
-            program_id, len(skills_mercado), len(skills_programa), len(brechas), brechas,
+            "[REDESIGN-DEBUG] program_id=%s n_matches=%d market_skills=%d prog_skills=%d "
+            "brechas=%d brechas_criticas=%d",
+            program_id, n_matches,
+            len(analysis["fortalezas"]) + len(analysis["brechas"]),
+            len(analysis["skills_programa"]),
+            len(analysis["brechas"]),
+            len(brechas_criticas_data),
         )
+
+        if analysis["evidencia_baja"]:
+            result = {
+                "program_id":             program_id,
+                "asignaturas_analizadas": len(mc_rows),
+                "advertencia": (
+                    f"Evidencia insuficiente: solo {n_matches} vacantes de afinidad alta o media. "
+                    "Se necesitan al menos 15 para un rediseño confiable."
+                ),
+                "propuestas": [],
+                "evidencia_baja": True,
+            }
+            _REDESIGN_CACHE[program_id] = result
+            _update("done", result=result)
+            return
+
+        brechas: list[str] = [b["skill"] for b in brechas_criticas_data]
 
         if not brechas:
             _update("done", result={
                 "program_id": program_id,
                 "asignaturas_analizadas": len(mc_rows),
-                "advertencia": "No se encontraron brechas curriculares — el programa ya cubre las skills del mercado.",
+                "advertencia": "No se encontraron brechas curriculares críticas — el programa ya cubre las skills de alta demanda del mercado.",
                 "propuestas": [],
             })
             _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
             return
 
-        # FIX 1: Filter generic/noise skills before sending to OpenAI
-        # Use token-level matching + accent-stripping so "gestión financiera" matches "financiero"
-        import unicodedata as _ud2
-        def _norm_noise(s: str) -> str:
-            return "".join(c for c in _ud2.normalize("NFD", s.lower()) if _ud2.category(c) != "Mn")
-
-        _RUIDO_EXCLUIDO_TOKENS = {
-            'financiero', 'sas', 'excel', 'trabajo en equipo', 'estrategia',
-            'gestion', 'comunicacion', 'liderazgo', 'innovacion', 'negociacion',
-            'planeacion', 'ventas', 'comercial', 'servicio al cliente', 'contabilidad',
-            'presupuesto', 'facturacion', 'logistica', 'power bi', 'tableau',
-            'office', 'word', 'powerpoint', 'microsoft', 'erp', 'sap',
-        }
-
-        def _is_ruido(skill: str) -> bool:
-            normed = _norm_noise(skill)
-            # Exact match after normalizing
-            if normed in _RUIDO_EXCLUIDO_TOKENS:
-                return True
-            # Any noise token appears as a word within the skill
-            tokens = set(normed.split())
-            return bool(tokens & _RUIDO_EXCLUIDO_TOKENS)
-
-        brechas_filtradas = [b for b in brechas if not _is_ruido(b)]
+        # brechas_criticas already excludes transversales and applies RUIDO_SIEMPRE;
+        # keep a minimal tool-noise filter only for the OpenAI call quality.
+        _TOOL_NOISE = frozenset({
+            'excel', 'power bi', 'tableau', 'office', 'word', 'powerpoint',
+            'microsoft', 'erp', 'sap', 'contabilidad', 'facturacion',
+        })
+        brechas_filtradas = [b for b in brechas if b.lower() not in _TOOL_NOISE]
         if not brechas_filtradas:
-            brechas_filtradas = brechas  # fallback: use all if filter removes everything
+            brechas_filtradas = brechas
 
         # 3. Score each asignatura by TF-IDF relevance to brechas
         _update("running", current_step="Calculando relevancia de asignaturas")
@@ -1756,13 +1744,15 @@ def _run_redesign(job_id: str, program_id: int) -> None:
 
         # Debug block included in every response
         debug_info = {
-            "fix_version":        "v4-token-overlap-noise-token-match",
-            "brechas_count":      len(brechas),
+            "fix_version":            "v5-unified-market-analysis",
+            "n_matches":              n_matches,
+            "brechas_criticas_count": len(brechas_criticas_data),
+            "brechas_count":          len(brechas),
             "brechas_filtradas_count": len(brechas_filtradas),
-            "brechas_sample":     brechas[:10],
+            "brechas_sample":         brechas[:10],
             "brechas_filtradas_sample": brechas_filtradas[:10],
-            "umbral":             "ninguno (top-5 por ranking de token overlap)",
-            "asignaturas_scores": sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
+            "umbral":                 "brechas_criticas (p66) · top-5 asignaturas por TF-IDF",
+            "asignaturas_scores":     sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
         }
 
         if not top:
@@ -1805,7 +1795,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         result = {
             "program_id":             program_id,
             "asignaturas_analizadas": len(mc_rows),
-            "brechas_totales":        len(brechas),
+            "brechas_criticas_count": len(brechas_criticas_data),
             "propuestas":             propuestas,
             "debug":                  debug_info,
         }
