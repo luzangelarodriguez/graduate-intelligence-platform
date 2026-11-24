@@ -1061,7 +1061,7 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
 
 // ─── ViewMercadoLaboral — Pertinencia frente al mercado (6 secciones) ────────
 
-function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, skillsMercadoDeduped, univ, totales, programaId }: ViewProps) {
+function ViewMercadoLaboral({ prog, meta, score, nivel, veredicto, coberturaPct, skills, skillsMercadoDeduped, univ, totales, programaId }: ViewProps) {
   const [secTab, setSecTab] = useState<string>('perfiles');
   const [perfiles, setPerfiles] = useState<OccupationalProfile[]>([]);
   const [kpis, setKpis] = useState<{ total_ofertas: number; total_perfiles: number; total_skills: number } | null>(null);
@@ -1105,14 +1105,6 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
   const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
-  const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
-  const pertColor   = coberturaPct >= 60 ? '#059669' : coberturaPct >= 35 ? '#D97706' : '#DC2626';
-  const pertBg      = coberturaPct >= 60 ? '#D1FAE5' : coberturaPct >= 35 ? '#FEF3C7' : '#FEE2E2';
-  const pertDesc    = coberturaPct >= 60
-    ? 'Existe demanda, el programa está alineado con el mercado y presenta oportunidades de mejora.'
-    : coberturaPct >= 35
-    ? 'El programa responde parcialmente. Se recomienda fortalecer las brechas identificadas.'
-    : 'Brecha significativa entre el currículo y las competencias del mercado.';
 
   const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
   const perfilesTotal = kpis?.total_perfiles ?? perfiles.length;
@@ -1200,11 +1192,15 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
               <div style={{ fontSize: 9, color: '#9CA3AF' }}>{kpi.sub}</div>
             </div>
           ))}
-          {/* Pertinencia laboral badge */}
-          <div style={{ background: pertBg, border: `1px solid ${pertColor}33`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: pertColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>PERTINENCIA LABORAL</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: pertColor, lineHeight: 1, marginBottom: 6 }}>{pertLabel}</div>
-            <div style={{ fontSize: 9, color: '#374151', lineHeight: 1.5 }}>{pertDesc}</div>
+          {/* Veredicto curricular badge — S1 */}
+          <div style={{ background: veredicto ? veredicto.bg : '#F9FAFB', border: `1px solid ${veredicto ? veredicto.color + '33' : C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: veredicto ? veredicto.color : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>VEREDICTO CURRICULAR</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: veredicto ? veredicto.color : '#9CA3AF', lineHeight: 1.1, marginBottom: 4 }}>{veredicto ? veredicto.label : '—'}</div>
+            <div style={{ fontSize: 9, color: '#374151', lineHeight: 1.5, marginBottom: veredicto?.preliminar ? 4 : 0 }}>{veredicto ? veredicto.rule : 'Cargando datos…'}</div>
+            <div style={{ fontSize: 8, color: '#9CA3AF', lineHeight: 1.3, marginBottom: veredicto?.preliminar ? 2 : 0 }}>{veredicto ? veredicto.threshold : ''}</div>
+            {veredicto?.preliminar && (
+              <div style={{ fontSize: 8, color: '#6B7280', lineHeight: 1.3 }}>Lectura preliminar: {veredicto.preliminar.label}</div>
+            )}
           </div>
         </div>
       </div>
@@ -1540,11 +1536,15 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 1fr', gap: 16 }}>
-          {/* Pertinencia badge */}
-          <div style={{ background: pertBg, borderRadius: 10, padding: '14px 16px', border: `1px solid ${pertColor}33` }}>
-            <p style={{ fontSize: 9, fontWeight: 700, color: pertColor, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px' }}>Pertinencia laboral:</p>
-            <p style={{ fontSize: 26, fontWeight: 900, color: pertColor, margin: '0 0 6px', lineHeight: 1 }}>{pertLabel}</p>
-            <p style={{ fontSize: 10, color: '#374151', lineHeight: 1.5, margin: 0 }}>{pertDesc}</p>
+          {/* Veredicto curricular badge — S4 */}
+          <div style={{ background: veredicto ? veredicto.bg : '#F9FAFB', borderRadius: 10, padding: '14px 16px', border: `1px solid ${veredicto ? veredicto.color + '33' : C.border}` }}>
+            <p style={{ fontSize: 9, fontWeight: 700, color: veredicto ? veredicto.color : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px' }}>Veredicto curricular:</p>
+            <p style={{ fontSize: 22, fontWeight: 900, color: veredicto ? veredicto.color : '#9CA3AF', margin: '0 0 4px', lineHeight: 1.1 }}>{veredicto ? veredicto.label : '—'}</p>
+            <p style={{ fontSize: 9, color: '#374151', lineHeight: 1.5, margin: veredicto?.preliminar ? '0 0 2px' : 0 }}>{veredicto ? veredicto.rule : 'Cargando datos…'}</p>
+            <p style={{ fontSize: 8, color: '#9CA3AF', lineHeight: 1.3, margin: veredicto?.preliminar ? '0 0 2px' : 0 }}>{veredicto ? veredicto.threshold : ''}</p>
+            {veredicto?.preliminar && (
+              <p style={{ fontSize: 8, color: '#6B7280', lineHeight: 1.3, margin: 0 }}>Lectura preliminar: {veredicto.preliminar.label}</p>
+            )}
           </div>
           {/* Hallazgos */}
           <div>
