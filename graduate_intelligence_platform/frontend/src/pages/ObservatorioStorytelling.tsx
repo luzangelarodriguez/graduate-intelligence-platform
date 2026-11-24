@@ -285,7 +285,7 @@ function veredictoPrograma({
   if (dataPobre || !Number.isFinite(cobertura) || !Number.isFinite(criticas)) {
     return {
       label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
-      rule: ruleStr, threshold: 'Datos insuficientes para este programa',
+      rule: ruleStr, threshold: 'Sin vacantes suficientes para este programa',
       desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
     };
   }
@@ -293,7 +293,7 @@ function veredictoPrograma({
     const prel = _veredictoSinGuardia(coberturaValida, criticasValidas, ruleStr);
     return {
       label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
-      rule: ruleStr, threshold: 'Pocas vacantes analizadas',
+      rule: ruleStr, threshold: 'Menos de 15 vacantes de afinidad alta o media',
       desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
       preliminar: { label: prel.label, rule: ruleStr },
     };
@@ -652,7 +652,7 @@ function tipoMeta(tipo: string | undefined) {
   return TIPO_META[tipo ?? ''] ?? { bar: '#94A3B8', label: 'Otro', badgeBg: '#F1F5F9', badgeColor: '#475569' };
 }
 
-function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
+function ViewResumen({ summary, prog, meta, score, nivel, veredicto, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
   const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
   const maxMarket  = topMarket[0]?.frecuencia ?? 1;
@@ -749,12 +749,15 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
     ? `Actualizar el currículo para convertir la alta afinidad ocupacional en mayor pertinencia y empleabilidad.`
     : `Revisar la alineación del programa con el mercado laboral para incrementar la pertinencia integral.`;
 
-  // Interpretation callout
-  const interpretacion = afinidadPct >= 60 && score < 55
-    ? `Existe una alta oportunidad laboral para el perfil, pero el currículo solo responde parcialmente a los requisitos solicitados. La baja pertinencia no proviene de la falta de vacantes, sino de las brechas de cobertura y aplicación.`
-    : score >= 60
-    ? `El programa muestra buena alineación con el mercado laboral. Se recomienda mantener la actualización curricular continua para sostener la pertinencia.`
-    : `El programa presenta brechas significativas frente a las demandas del mercado. Se requiere actualización curricular prioritaria en las áreas identificadas.`;
+  // Interpretation callout — derived from veredicto, never from score_promedio
+  const interpretacion = veredicto === null ? null
+    : veredicto.label === 'Mantener'
+    ? `El currículo responde bien a las demandas actuales del mercado. Se recomienda mantener la actualización continua para sostener esta posición.`
+    : veredicto.label === 'Fortalecer'
+    ? `El programa cubre parcialmente los requisitos del mercado. Fortalecer las áreas con mayor demanda y menor cobertura puede mejorar su alineación con el mercado.`
+    : veredicto.label === 'Actualizar'
+    ? `El programa presenta brechas significativas frente a las demandas del mercado. Se requiere actualización curricular prioritaria en las áreas identificadas.`
+    : `Los datos disponibles no son suficientes para un diagnóstico preciso. Interpreta los indicadores con cautela hasta contar con más vacantes analizadas.`;
 
   const TH = { textAlign: 'left' as const, padding: '5px 8px', fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}` };
 
@@ -802,12 +805,15 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           </p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: coberturaBadge.bg, color: coberturaBadge.color }}>{coberturaBadge.label}</span>
         </div>
-        {/* 3. Pertinencia integral */}
-        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
-          <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Pertinencia integral</p>
-          <p style={{ fontSize: 26, fontWeight: 800, color: nivel.color, margin: '0 0 2px', lineHeight: 1 }}>{score.toFixed(0)}<span style={{ fontSize: 13, fontWeight: 600, color: '#9CA3AF' }}>/100</span></p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>Índice ponderado de afinidad, cobertura y relevancia</p>
-          <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: nivel.bg, color: nivel.color }}>{nivel.label}</span>
+        {/* 3. Veredicto curricular */}
+        <div style={{ background: veredicto ? veredicto.bg : '#F9FAFB', border: `1px solid ${veredicto ? veredicto.color + '44' : C.border}`, borderRadius: 12, padding: '12px 14px' }}>
+          <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Veredicto curricular</p>
+          <p style={{ fontSize: 22, fontWeight: 900, color: veredicto ? veredicto.color : '#9CA3AF', margin: '0 0 4px', lineHeight: 1.1 }}>{veredicto ? veredicto.label : '—'}</p>
+          <p style={{ fontSize: 9, color: '#374151', margin: '0 0 2px', lineHeight: 1.4 }}>{veredicto ? veredicto.rule : 'Cargando datos…'}</p>
+          <p style={{ fontSize: 8, color: '#9CA3AF', margin: veredicto?.preliminar ? '0 0 4px' : 0, lineHeight: 1.3 }}>{veredicto ? veredicto.threshold : ''}</p>
+          {veredicto?.preliminar && (
+            <p style={{ fontSize: 8, color: '#6B7280', margin: 0, lineHeight: 1.3 }}>Lectura preliminar: {veredicto.preliminar.label}</p>
+          )}
         </div>
         {/* 4. Brechas críticas */}
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
@@ -825,13 +831,15 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
       </div>
 
       {/* ── Interpretation callout ──────────────────────────────────────────── */}
-      <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0 }}>
-        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>🧭</span>
-        <div>
-          <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 3px' }}>¿Cómo se interpreta?</p>
-          <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.6 }}>{interpretacion}</p>
+      {interpretacion && (
+        <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0 }}>
+          <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>🧭</span>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: '0 0 3px' }}>¿Cómo se interpreta?</p>
+            <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.6 }}>{interpretacion}</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {dataPobre ? (
         <ExplorandoMsg />
