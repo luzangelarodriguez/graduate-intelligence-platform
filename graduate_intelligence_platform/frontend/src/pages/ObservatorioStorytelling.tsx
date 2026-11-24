@@ -701,7 +701,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           </div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>{totales.matches} vacantes analizadas · Corte: {summary.fecha}</p>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>{totales.matches} vacantes evaluadas · Corte: {summary.fecha}</p>
           <p style={{ fontSize: 8, fontWeight: 800, color: '#D1D5DB', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '4px 0 0' }}>DATOS QUE IMPULSAN FUTUROS</p>
         </div>
       </div>
@@ -720,7 +720,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Afinidad ocupacional</p>
           <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadCount}</p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con alta alineación al perfil de egreso</p>
+          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con afinidad alta o media</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: afinidadBadge.bg, color: afinidadBadge.color }}>{afinidadBadge.label}</span>
         </div>
         {/* 2. Cobertura curricular */}
@@ -773,7 +773,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             {/* Left: Requisitos más solicitados por el mercado */}
             <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>Requisitos más solicitados por el mercado</p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con alta afinidad al programa</p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con afinidad alta o media</p>
               {topMarket.length === 0 ? <Spinner /> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {topMarket.map((s, i) => {
@@ -1107,7 +1107,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes analizadas', sub: `${meta.nombre}` },
+            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes con afinidad alta/media', sub: `${meta.nombre}` },
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
             { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
@@ -1478,7 +1478,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes analizadas en el período.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes con afinidad alta o media en el período.</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
