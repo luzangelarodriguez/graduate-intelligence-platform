@@ -3192,7 +3192,7 @@ const MARKET_STUDIES = [
   {
     icon: '🌐',
     title: 'World Economic Forum — Future of Jobs Report 2025',
-    summary: 'La IA y el análisis de grandes datos encabezan la lista de habilidades de más rápido crecimiento a nivel global, seguidas de ciberseguridad y alfabetización tecnológica. Se proyecta que el 40% de las habilidades requeridas en el trabajo cambiarán para 2030, y el 63% de los empleadores ya identifican la brecha de habilidades como su principal barrera de transformación.',
+    summary: 'La IA y el análisis de grandes datos encabezan la lista de habilidades de más rápido crecimiento a nivel global, seguidas de ciberseguridad y alfabetización tecnológica. Se proyecta que el 39% de las habilidades requeridas en el trabajo cambiarán para 2030, y el 63% de los empleadores ya identifican la brecha de habilidades como su principal barrera de transformación.',
     url: 'https://www.weforum.org/publications/the-future-of-jobs-report-2025',
     source: 'weforum.org · 2025',
   },
@@ -3206,9 +3206,9 @@ const MARKET_STUDIES = [
   {
     icon: '📊',
     title: 'Adecco Colombia — Tendencias del Mercado Laboral 2026',
-    summary: 'El mercado laboral colombiano en 2026 prioriza la productividad sobre el volumen de contratación, impulsado por la aceleración de la IA y automatización. Las empresas están invirtiendo en upskilling y migrando hacia modelos de selección basados en competencias medibles.',
-    url: 'https://www.eltiempo.com',
-    source: 'El Tiempo · feb 2026',
+    summary: 'El mercado laboral colombiano en 2026 está pasando del volumen de contratación al impacto del talento: las organizaciones priorizan perfiles de alto impacto en entornos tecnológicos, analíticos y comerciales, buscando profesionales que combinen competencias técnicas con capacidad de adaptación a contextos de transformación acelerada.',
+    url: 'https://lanotaeconomica.com.co/movidas-empresarial/asi-cambiara-el-mercado-laboral-en-colombia-durante-el-2026/',
+    source: 'Adecco Colombia, vía La Nota Económica',
   },
 ];
 
@@ -3254,6 +3254,7 @@ function WefG1Disruption() {
         ))}
       </div>
       <WefSourceNote fig="Figura 3.2" />
+      <p style={{ fontSize: 9, color: '#F59E0B', margin: '6px 0 0' }}>⚠ Cifras Colombia (41 %, +2 pts) pendientes de verificación directa en el informe WEF 2025.</p>
     </div>
   );
 }
@@ -3305,6 +3306,7 @@ function WefG2SkillsTrends() {
         <Bar data={data} options={opts} />
       </div>
       <WefSourceNote fig="Figura 3.4" />
+      <p style={{ fontSize: 9, color: '#F59E0B', margin: '6px 0 0' }}>⚠ Porcentajes de variación neta pendientes de verificación directa en Figura 3.4 del informe WEF 2025.</p>
     </div>
   );
 }
@@ -3568,7 +3570,7 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
               <span style={{ fontSize: 20 }}>{s.icon}</span>
               <p style={{ fontSize: 12, fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.3 }}>{s.title}</p>
             </div>
-            <p style={{ fontSize: 11, color: '#374151', fontStyle: 'italic', lineHeight: 1.7, margin: 0, flex: 1 }}>"{s.summary}"</p>
+            <p style={{ fontSize: 11, color: '#374151', fontStyle: 'italic', lineHeight: 1.7, margin: 0, flex: 1 }}>{s.summary}</p>
             <a href={s.url} target="_blank" rel="noopener noreferrer"
                style={{ fontSize: 9, fontWeight: 700, color: '#6B7280', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.06em', borderTop: `1px solid ${C.border}`, paddingTop: 8, marginTop: 4 }}>
               📎 {s.source}
@@ -3632,8 +3634,8 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { label: '39%',   desc: 'de las habilidades laborales cambiarán a nivel global para 2030', color: '#2563EB', source: 'WEF 2025' },
-            { label: '170M',  desc: 'empleos nuevos netos proyectados globalmente para 2030', color: '#059669', source: 'WEF 2025' },
-            { label: '91,3%', desc: 'tasa de vinculación laboral de graduados de posgrado en Colombia (2023)', color: '#7C3AED', source: 'OLE MEN 2023' },
+            { label: '+78M',  desc: 'empleos netos proyectados para 2030 (170M creados − 92M desplazados)', color: '#059669', source: 'WEF 2025' },
+            { label: '91,3%', desc: 'tasa de vinculación laboral de graduados de posgrado en Colombia (2023)', color: '#7C3AED', source: 'OLE MEN 2023 ⚠ por verificar' },
           ].map(kpi => (
             <div key={kpi.label} style={{ textAlign: 'center', padding: '12px 8px', borderRadius: 10, background: `${kpi.color}08`, border: `1px solid ${kpi.color}22` }}>
               <p style={{ fontSize: 28, fontWeight: 900, color: kpi.color, margin: '0 0 6px', lineHeight: 1 }}>{kpi.label}</p>
