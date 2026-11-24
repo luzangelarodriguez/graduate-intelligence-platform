@@ -224,12 +224,81 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
   9:  { program_id: 9, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], brechas_criticas: [], transversales: [], evidencia_baja: false, n_matches: 0 },
 };
 
-// ─── Pertinencia scale ─────────────────────────────────────────────────────────
+// ─── Pertinencia scale (legacy — will be removed after verdictoPrograma rollout) ──
 function pertinenciaLevel(score: number): { label: string; color: string; bg: string; desc: string } {
   if (score >= 75) return { label: 'Excelente', color: '#059669', bg: '#d1fae5', desc: 'El currículo está muy bien alineado con las demandas actuales del mercado laboral.' };
   if (score >= 60) return { label: 'Buena',     color: '#2563eb', bg: '#dbeafe', desc: 'Buena alineación general; existen oportunidades de fortalecimiento en áreas específicas.' };
   if (score >= 40) return { label: 'Moderada',  color: C.gold,   bg: C.goldBg,  desc: 'Alineación parcial. Se recomienda actualización curricular prioritaria.' };
   return              { label: 'Crítica',   color: '#dc2626', bg: '#fee2e2', desc: 'Brecha significativa entre el currículo y las competencias demandadas por el mercado.' };
+}
+
+// ─── veredictoPrograma — single unified verdict ───────────────────────────────
+type Veredicto = 'Evidencia limitada' | 'Actualizar' | 'Fortalecer' | 'Mantener';
+
+interface VeredictoOutput {
+  label: Veredicto;
+  color: string;
+  bg: string;
+  rule: string;      // cifras reales del programa, e.g. "Cobertura 55.2 % · 5 brechas críticas"
+  threshold: string; // umbral que disparó el resultado o motivo de la guardia
+  desc: string;
+  // Solo presente cuando evidenciaBaja=true (hay datos pero confianza baja).
+  // Ausente cuando dataPobre=true o skills=null (sin datos suficientes).
+  preliminar?: { label: Veredicto; rule: string };
+}
+
+const UMBRALES_VEREDICTO = {
+  actualizar_cobertura: 50,
+  actualizar_criticas:  6,
+  fortalecer_cobertura: 75,
+  fortalecer_criticas:  3,
+} as const;
+
+function _veredictoSinGuardia(cobertura: number, criticas: number, ruleStr: string): VeredictoOutput {
+  const { actualizar_cobertura: AC, actualizar_criticas: AK, fortalecer_cobertura: FC, fortalecer_criticas: FK } = UMBRALES_VEREDICTO;
+  if (cobertura < AC || criticas >= AK)
+    return {
+      label: 'Actualizar', color: '#DC2626', bg: '#FEE2E2',
+      rule: ruleStr, threshold: `Cobertura < ${AC} % o ≥ ${AK} brechas críticas`,
+      desc: 'Se requiere actualización curricular prioritaria en las áreas identificadas.',
+    };
+  if (cobertura < FC || criticas >= FK)
+    return {
+      label: 'Fortalecer', color: '#D97706', bg: '#FEF3C7',
+      rule: ruleStr, threshold: `Cobertura < ${FC} % o ≥ ${FK} brechas críticas`,
+      desc: 'Existen oportunidades concretas de mejora curricular en áreas específicas.',
+    };
+  return {
+    label: 'Mantener', color: '#059669', bg: '#D1FAE5',
+    rule: ruleStr, threshold: `Cobertura ≥ ${FC} % y < ${FK} brechas críticas`,
+    desc: 'El currículo responde bien a las demandas actuales del mercado.',
+  };
+}
+
+function veredictoPrograma({
+  cobertura, criticas, evidenciaBaja, dataPobre,
+}: { cobertura: number; criticas: number; evidenciaBaja: boolean; dataPobre: boolean }): VeredictoOutput {
+  const coberturaValida = Number.isFinite(cobertura) ? cobertura : 0;
+  const criticasValidas = Number.isFinite(criticas)  ? criticas  : 0;
+  const ruleStr = `Cobertura ${coberturaValida.toFixed(1)} % · ${criticasValidas} brechas críticas`;
+
+  if (dataPobre || !Number.isFinite(cobertura) || !Number.isFinite(criticas)) {
+    return {
+      label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
+      rule: ruleStr, threshold: 'Datos insuficientes para este programa',
+      desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
+    };
+  }
+  if (evidenciaBaja) {
+    const prel = _veredictoSinGuardia(coberturaValida, criticasValidas, ruleStr);
+    return {
+      label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
+      rule: ruleStr, threshold: 'Pocas vacantes analizadas',
+      desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
+      preliminar: { label: prel.label, rule: ruleStr },
+    };
+  }
+  return _veredictoSinGuardia(coberturaValida, criticasValidas, ruleStr);
 }
 
 // ─── Skill normalization + classification ─────────────────────────────────────
