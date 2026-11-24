@@ -745,9 +745,14 @@ function ViewResumen({ summary, prog, meta, score, nivel, veredicto, coberturaPc
     `Elevar la cobertura curricular del ${coberturaPct}% hacia una meta institucional definida por el comité.`,
     `Integrar proyectos empresariales con ${topMarket.slice(0, 3).map(s => displaySkill(s.skill)).join(', ')}.`,
   ];
-  const decisionEjecutiva = afinidadPct >= 60
-    ? `Actualizar el currículo para convertir la alta afinidad ocupacional en mayor pertinencia y empleabilidad.`
-    : `Revisar la alineación del programa con el mercado laboral para incrementar la pertinencia integral.`;
+  const decisionEjecutiva = veredicto === null ? null
+    : veredicto.label === 'Mantener'
+    ? `Sostener la actualización curricular continua y monitorear el mercado para anticipar cambios en la demanda.`
+    : veredicto.label === 'Fortalecer'
+    ? `Priorizar las brechas identificadas en el plan de mejora curricular y revisar la alineación con el mercado de forma periódica.`
+    : veredicto.label === 'Actualizar'
+    ? `Iniciar una revisión curricular estructurada con participación del sector productivo para cerrar las brechas identificadas.`
+    : `Ampliar el seguimiento de vacantes antes de tomar decisiones curriculares de fondo.`;
 
   // Interpretation callout — derived from veredicto, never from score_promedio
   const interpretacion = veredicto === null ? null
@@ -978,13 +983,15 @@ function ViewResumen({ summary, prog, meta, score, nivel, veredicto, coberturaPc
                 ))}
               </div>
               {/* Decisión ejecutiva callout */}
-              <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>⚙️</span>
-                <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#1D4ED8', margin: '0 0 3px' }}>Decisión ejecutiva</p>
-                  <p style={{ fontSize: 10, color: '#1E40AF', margin: 0, lineHeight: 1.6 }}>{decisionEjecutiva}</p>
+              {decisionEjecutiva && (
+                <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '12px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>⚙️</span>
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#1D4ED8', margin: '0 0 3px' }}>Decisión ejecutiva</p>
+                    <p style={{ fontSize: 10, color: '#1E40AF', margin: 0, lineHeight: 1.6 }}>{decisionEjecutiva}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Referencia competitiva */}
