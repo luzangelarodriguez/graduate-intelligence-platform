@@ -234,7 +234,6 @@ interface VeredictoOutput {
   bg: string;
   rule: string;      // cifras reales del programa, e.g. "Cobertura 55.2 % · 5 brechas críticas"
   threshold: string; // umbral que disparó el resultado o motivo de la guardia
-  desc: string;
   // Solo presente cuando evidenciaBaja=true (hay datos pero confianza baja).
   // Ausente cuando dataPobre=true o skills=null (sin datos suficientes).
   preliminar?: { label: Veredicto; rule: string };
@@ -253,18 +252,15 @@ function _veredictoSinGuardia(cobertura: number, criticas: number, ruleStr: stri
     return {
       label: 'Actualizar', color: '#DC2626', bg: '#FEE2E2',
       rule: ruleStr, threshold: `Cobertura < ${AC} % o ≥ ${AK} brechas críticas`,
-      desc: 'Se requiere actualización curricular prioritaria en las áreas identificadas.',
     };
   if (cobertura < FC || criticas >= FK)
     return {
       label: 'Fortalecer', color: '#D97706', bg: '#FEF3C7',
       rule: ruleStr, threshold: `Cobertura < ${FC} % o ≥ ${FK} brechas críticas`,
-      desc: 'Existen oportunidades concretas de mejora curricular en áreas específicas.',
     };
   return {
     label: 'Mantener', color: '#059669', bg: '#D1FAE5',
     rule: ruleStr, threshold: `Cobertura ≥ ${FC} % y < ${FK} brechas críticas`,
-    desc: 'El currículo responde bien a las demandas actuales del mercado.',
   };
 }
 
@@ -278,8 +274,7 @@ function veredictoPrograma({
   if (dataPobre || !Number.isFinite(cobertura) || !Number.isFinite(criticas)) {
     return {
       label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
-      rule: ruleStr, threshold: 'Sin vacantes suficientes para este programa',
-      desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
+      rule: 'Sin datos suficientes', threshold: 'Sin vacantes suficientes para este programa',
     };
   }
   if (evidenciaBaja) {
@@ -287,7 +282,6 @@ function veredictoPrograma({
     return {
       label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
       rule: ruleStr, threshold: 'Menos de 15 vacantes de afinidad alta o media',
-      desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
       preliminar: { label: prel.label, rule: ruleStr },
     };
   }
@@ -779,7 +773,7 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
       {skills?.evidencia_baja && (
         <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-          <span style={{ fontSize: 12, color: '#92400E' }}>Pocas vacantes analizadas: interpreta estos resultados con cautela.</span>
+          <span style={{ fontSize: 12, color: '#92400E' }}>Pocas vacantes de afinidad alta o media: interpreta estos resultados con cautela.</span>
         </div>
       )}
 
@@ -3772,11 +3766,15 @@ export default function ObservatorioStorytelling() {
   const dataPobre      = totales.matches < 10 || totales.empleos_compatibles < 3;
   // skillsFailed evaluated first: a failed fetch with no FALLBACK_SKILLS entry
   // leaves skills===null; without this order that would yield null permanently.
+  const sinMicrocurriculos = skills !== null && !skillsFailed && (skills.skills_programa?.length ?? 0) === 0;
   const veredicto: VeredictoOutput | null = skillsFailed ? {
     label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
-    rule: `Cobertura ${coberturaPct.toFixed(1)} % · 0 brechas críticas`,
+    rule: 'Sin datos en vivo',
     threshold: 'Sin datos en vivo',
-    desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
+  } : sinMicrocurriculos ? {
+    label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
+    rule: 'Sin contenido curricular cargado',
+    threshold: 'Sin contenido curricular cargado',
   } : skills === null ? null : veredictoPrograma({
     cobertura:     coberturaPct,
     criticas:      skills.brechas_criticas?.length ?? 0,
