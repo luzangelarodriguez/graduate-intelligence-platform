@@ -104,7 +104,7 @@ interface RedisenioPropuesta {
 }
 interface RediseniResult {
   program_id: number; asignaturas_analizadas: number;
-  propuestas: RedisenioPropuesta[]; advertencia?: string; debug?: Record<string, unknown>;
+  propuestas: RedisenioPropuesta[]; advertencia?: string; evidencia_baja?: boolean; debug?: Record<string, unknown>;
 }
 interface RediseniJob {
   job_id: string; status: 'queued' | 'running' | 'done' | 'error';
@@ -3153,6 +3153,15 @@ function ViewRecomendaciones({
           </div>
         ) : redesignJob.result ? (() => {
           const { result } = redesignJob;
+          if (result.evidencia_baja) {
+            return (
+              <div style={{ background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 10, padding: '14px 18px' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: '0 0 6px' }}>⚠ Evidencia insuficiente</p>
+                <p style={{ fontSize: 12, color: '#78350F', margin: '0 0 12px' }}>{result.advertencia}</p>
+                <button onClick={onClearRedesign} style={{ background: 'transparent', color: '#92400E', border: '1px solid #F59E0B', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>↺ Nuevo análisis</button>
+              </div>
+            );
+          }
           const propuestas = result.propuestas ?? [];
           return (
             <div>
