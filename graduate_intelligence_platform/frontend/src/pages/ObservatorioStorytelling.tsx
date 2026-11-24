@@ -12,10 +12,9 @@ import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconBriefcase, IconListCheck,
   IconWorld, IconChartDonut, IconClipboardList, IconCircleCheck,
-  IconTool, IconBrain, IconBolt, IconUser,
+  IconBrain, IconBolt,
   IconCalendar, IconCoin, IconShield, IconAward,
   IconBulb, IconMessage, IconUsers, IconCheck,
-  IconBuilding, IconSearch, IconFileDescription, IconTrophy,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -124,14 +123,13 @@ const PROGRAMS = [
 ];
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'empleos' | 'recomendaciones' | 'contexto';
+type ViewId = 'resumen' | 'mercado' | 'programa' | 'cobertura' | 'recomendaciones' | 'contexto';
 
 const NAV_ITEMS: { id: ViewId; label: string; Icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>> }[] = [
   { id: 'resumen',         label: 'Resumen',         Icon: IconGauge         },
   { id: 'mercado',         label: 'Mercado',          Icon: IconChartBar      },
   { id: 'programa',        label: 'Programa',         Icon: IconSchool        },
   { id: 'cobertura',       label: 'Oferta y Demanda', Icon: IconTarget        },
-  { id: 'empleos',         label: 'Empleos',          Icon: IconBriefcase     },
   { id: 'recomendaciones', label: 'Recomendaciones',  Icon: IconListCheck     },
   { id: 'contexto',        label: 'Contexto',         Icon: IconWorld         },
 ];
@@ -518,36 +516,6 @@ function isNoiseSkill(skill: string): boolean {
   return skill.length > 40 || skill.toLowerCase().includes('confianza extraccion');
 }
 
-function SkillBarList({ items, color, valueLabel = 'vacantes' }: {
-  items: { label: string; value: number; rawSkill?: string }[];
-  color: string;
-  valueLabel?: string;
-}) {
-  const max = Math.max(...items.map(i => i.value), 1);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-      {items.map(({ label, value, rawSkill }) => {
-        const sk = rawSkill ?? label;
-        const isCert = isCertSkill(sk);
-        return (
-          <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0 }}>
-              <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
-              {isCert && (
-                <span style={{ fontSize: 8, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap' }}>Marco/Cert.</span>
-              )}
-            </div>
-            <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${(value / max) * 100}%`, borderRadius: 6, background: color }} />
-            </div>
-            <span title={`${value} ${valueLabel}`} style={{ fontSize: 10, color: '#9CA3AF', minWidth: 22, textAlign: 'right' }}>{value}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function DashPanel({ title, children, style, className, badge }: {
   title: string; children: React.ReactNode; style?: React.CSSProperties; className?: string; badge?: string | number;
 }) {
@@ -733,7 +701,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
           </div>
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>{totales.matches} vacantes analizadas · Corte: {summary.fecha}</p>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: 0 }}>{totales.matches} vacantes evaluadas · Corte: {summary.fecha}</p>
           <p style={{ fontSize: 8, fontWeight: 800, color: '#D1D5DB', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '4px 0 0' }}>DATOS QUE IMPULSAN FUTUROS</p>
         </div>
       </div>
@@ -752,7 +720,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
         <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 5px' }}>Afinidad ocupacional</p>
           <p style={{ fontSize: 26, fontWeight: 800, color: '#059669', margin: '0 0 2px', lineHeight: 1 }}>{afinidadCount}</p>
-          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con alta alineación al perfil de egreso</p>
+          <p style={{ fontSize: 9, color: '#6B7280', margin: '0 0 5px', lineHeight: 1.4 }}>vacantes con afinidad alta o media</p>
           <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 8px', background: afinidadBadge.bg, color: afinidadBadge.color }}>{afinidadBadge.label}</span>
         </div>
         {/* 2. Cobertura curricular */}
@@ -805,7 +773,7 @@ function ViewResumen({ summary, prog, meta, score, nivel, coberturaPct, empCompa
             {/* Left: Requisitos más solicitados por el mercado */}
             <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>Requisitos más solicitados por el mercado</p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con alta afinidad al programa</p>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 12px' }}>De las {afinidadCount} vacantes con afinidad alta o media</p>
               {topMarket.length === 0 ? <Spinner /> : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {topMarket.map((s, i) => {
@@ -1055,7 +1023,8 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
   const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 8);
   const totalRequisitos = skillsMercadoDeduped.length;
-  const totalBrechas    = skills?.brechas_criticas?.length ?? skills?.brechas?.length ?? 0;
+  const totalBrechas         = skills?.brechas?.length ?? 0;
+  const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
   const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
   const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
@@ -1099,20 +1068,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
       : 'Revisar y actualizar el plan de estudios con habilidades emergentes.',
     `Elevar la cobertura curricular del ${coberturaPct}% hacia una meta institucional definida por el comité.`,
     `Integrar proyectos empresariales con ${topMarket.slice(0, 3).map(s => displaySkill(s.skill)).join(', ')}.`,
-    totalBrechas > 4 ? 'Priorizar un plan de rediseño curricular con enfoque en empleabilidad.' : 'Mantener actualización continua del plan de estudios.',
+    criticalBrechasCount > 4 ? 'Priorizar un plan de rediseño curricular con enfoque en empleabilidad.' : 'Mantener actualización continua del plan de estudios.',
   ];
 
   const TH_ML = { padding: '5px 8px', fontSize: 9, fontWeight: 700 as const, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}`, textAlign: 'left' as const };
-
-  // Breadcrumb sections for reference
-  const BREAD = [
-    { id: '1', label: '¿Es pertinente?' },
-    { id: '2', label: '¿Qué demanda el mercado?' },
-    { id: '3', label: '¿Qué tanto responde el programa?' },
-    { id: '4', label: '¿Dónde están las brechas?' },
-    { id: '5', label: '¿Qué decisiones tomar?' },
-    { id: '6', label: '¿La tendencia es favorable?' },
-  ];
 
   const SEC_TABS = [
     { id: 'perfiles',       label: 'Perfiles ocupacionales' },
@@ -1136,16 +1095,6 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0, textAlign: 'right', flexShrink: 0 }}>Corte: {new Date().toLocaleDateString('es-CO')}</p>
       </div>
 
-      {/* ── Breadcrumb navigation ───────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', padding: '6px 0', borderBottom: `1px solid ${C.border}` }}>
-        {BREAD.map((b, i) => (
-          <span key={b.id} style={{ fontSize: 10, color: i === 0 ? C.navy : '#9CA3AF', fontWeight: i === 0 ? 700 : 500 }}>
-            <span style={{ color: C.navy, fontWeight: 700, marginRight: 3 }}>{b.id}</span>{b.label}
-            {i < BREAD.length - 1 && <span style={{ margin: '0 6px', color: '#D1D5DB' }}>›</span>}
-          </span>
-        ))}
-      </div>
-
       {/* ── SECCIÓN 1 — Lectura ejecutiva ─────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
@@ -1158,11 +1107,11 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes analizadas', sub: `${meta.nombre}` },
+            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes con afinidad alta/media', sub: `${meta.nombre}` },
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
             { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
-            { icon: '⚠️', value: totalBrechas, label: 'Brechas prioritarias', sub: 'De alta demanda' },
+            { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
             <div key={i} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -1439,29 +1388,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         )}
       </div>
 
-      {/* ── SECCIÓN 3 + 4 — Mapa de pertinencia + Brechas ───────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-
-        {/* 3 — Scatter */}
-        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+      {/* ── SECCIÓN 3 — Brechas ─────────────────────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>3</span>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué tanto responde el programa?</p>
-              <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Análisis de alineación entre demanda del mercado y cobertura curricular</p>
-            </div>
-          </div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Mapa de pertinencia: Demanda vs. Cobertura curricular</p>
-          <BrechasScatter
-            matriz={skills?.matriz_completa ?? []}
-            criticasSet={new Set((skills?.brechas_criticas ?? []).map(b => b.skill.toLowerCase()))}
-          />
-        </div>
-
-        {/* 4 — Brechas table */}
-        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
+            <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>3</span>
             <div>
               <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Dónde están las brechas?</p>
               <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Requisitos clave y nivel de cobertura curricular</p>
@@ -1521,12 +1451,11 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
             )
           }
         </div>
-      </div>
 
-      {/* ── SECCIÓN 5 — Decisiones ───────────────────────────────────────────── */}
+      {/* ── SECCIÓN 4 — Decisiones ───────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>5</span>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué decisiones tomar?</p>
             <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Síntesis y recomendaciones</p>
@@ -1549,11 +1478,14 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes analizadas en el período.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes con afinidad alta o media en el período.</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{totalBrechas}</strong> competencias críticas no cubiertas en el currículo.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}>
+                  <strong>{criticalBrechasCount}</strong> competencias críticas no cubiertas en el currículo.
+                  <span style={{ display: 'block', fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{totalBrechas} brechas en total</span>
+                </p>
               </div>
             </div>
           </div>
@@ -1569,10 +1501,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         </div>
       </div>
 
-      {/* ── SECCIÓN 6 — Tendencia ────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 5 — Tendencia ────────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>6</span>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>5</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿La tendencia es favorable?</p>
             <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Evolución y contexto del mercado laboral</p>
@@ -2925,18 +2857,6 @@ function MiniDonut({ pct, color = '#3B82F6' }: { pct: number; color?: string }) 
   );
 }
 
-function SparkBars({ color, bars = [4, 6, 5, 8, 6, 9, 7] }: { color: string; bars?: number[] }) {
-  const max = 9, h = 28;
-  return (
-    <svg width={56} height={h + 4} style={{ opacity: 0.65, flexShrink: 0 }}>
-      {bars.map((v, i) => {
-        const bh = Math.round((v / max) * h);
-        return <rect key={i} x={i * 8} y={h - bh} width={5} height={bh} rx={2} fill={color} />;
-      })}
-    </svg>
-  );
-}
-
 // ─── BrechasScatter ───────────────────────────────────────────────────────────
 const UMBRAL_BIEN_CUBIERTA = 2; // oferta_programa >= 2 → skill cubierta por ≥2 asignaturas
 
@@ -3028,377 +2948,6 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-
-
-
-
-// ─── Empleos wizard steps ────────────────────────────────────────────────────
-const EMPLEO_STEPS = [
-  { n: 1, Icon: IconSearch,          title: 'Total de oportunidades',     sub: 'Ver el universo de vacantes'     },
-  { n: 2, Icon: IconUsers,           title: 'Familias ocupacionales',     sub: 'Conocer su distribución'         },
-  { n: 3, Icon: IconBuilding,        title: 'Cargos y empresas',          sub: 'Explorar las principales opciones' },
-  { n: 4, Icon: IconListCheck,       title: 'Requisitos de las vacantes', sub: 'Identificar lo más solicitado'   },
-  { n: 5, Icon: IconFileDescription, title: 'Detalle de la oferta',       sub: 'Revisar cada vacante'            },
-];
-
-// ── Score legend tiers ───────────────────────────────────────────────────────
-const SCORE_TIERS = [
-  { label: 'Alta',     min: 70, max: 100, color: '#059669', bg: '#D1FAE5', textColor: '#065F46' },
-  { label: 'Moderada', min: 40, max: 69,  color: '#D97706', bg: '#FEF3C7', textColor: '#92400E' },
-  { label: 'Baja',     min: 0,  max: 39,  color: '#DC2626', bg: '#FEE2E2', textColor: '#991B1B' },
-] as const;
-
-function scoreTier(score: number) {
-  return SCORE_TIERS.find(t => score >= t.min && score <= t.max) ?? SCORE_TIERS[1];
-}
-
-function ViewEmpleos({ summary, totales, top_matches }: ViewProps) {
-  const top10 = top_matches.slice(0, 10);
-
-  // ── KPI derivations ──────────────────────────────────────────────────────
-  const vacantesCompatibles = totales.empleos_compatibles;
-  const vacantesPriorizadas = top10.length;
-  const mayorCoincidencia   = top10.length > 0 ? Math.round(Math.max(...top10.map(m => m.score))) : 0;
-  const promedioTop10       = top10.length > 0
-    ? Math.round((top10.reduce((s, m) => s + m.score, 0) / top10.length) * 10) / 10
-    : 0;
-  const EMPRESA_ANONIMA = new Set([
-    'importante empresa del sector',
-    'sin empresa',
-    '(sin empresa)',
-    'confidencial',
-    'empresa confidencial',
-  ]);
-  const isAnonima = (e: string) => EMPRESA_ANONIMA.has(e.trim().toLowerCase());
-  const empresasTop10     = new Set(top10.map(m => m.empresa).filter(e => e && !isAnonima(e))).size;
-  const ofertasAnonimas   = top10.filter(m => !m.empresa || isAnonima(m.empresa)).length;
-
-  // ── Familia ocupacional — cobertura ──────────────────────────────────────
-  const conFamilia    = top10.filter(m => m.familia && m.familia.trim() !== '').length;
-  const pctFamilia    = top10.length > 0 ? Math.round((conFamilia / top10.length) * 100) : 0;
-  const familiaRows   = (() => {
-    const counts: Record<string, number> = {};
-    top10.forEach(m => {
-      const f = (m.familia ?? '').trim();
-      if (f) counts[f] = (counts[f] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-  })();
-  const familiaMax = familiaRows.length > 0 ? familiaRows[0][1] : 1;
-
-  // ── Score distribution — buckets of 5 pts ────────────────────────────────
-  const scoreBuckets = (() => {
-    if (top10.length === 0) return [] as { label: string; count: number; color: string }[];
-    const counts: Record<number, number> = {};
-    top10.forEach(m => {
-      const bucket = Math.floor(m.score / 5) * 5;
-      counts[bucket] = (counts[bucket] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .map(([b, cnt]) => {
-        const lo = Number(b);
-        const tier = scoreTier(lo + 2);
-        return { label: `${lo}–${lo + 4} pts`, count: cnt, color: tier.color };
-      })
-      .sort((a, b) => {
-        const loA = parseInt(a.label);
-        const loB = parseInt(b.label);
-        return loB - loA;
-      });
-  })();
-  const scoreMax = scoreBuckets.length > 0 ? Math.max(...scoreBuckets.map(b => b.count)) : 1;
-
-  // ── Nota de contexto dinámica ─────────────────────────────────────────────
-  const contextNote = (() => {
-    if (top10.length === 0) return null;
-    const tiers = top10.map(m => scoreTier(m.score).label);
-    const unique = new Set(tiers);
-    if (unique.size === 1) {
-      const tier = scoreTier(top10[0].score);
-      return `Todas las ofertas priorizadas presentan coincidencia ${tier.label.toLowerCase()}; ninguna supera ${mayorCoincidencia}/100.`;
-    }
-    return null;
-  })();
-
-  // ── Date formatting ──────────────────────────────────────────────────────
-  const corteLabel = (() => {
-    if (!summary.fecha) return '';
-    const d = new Date(summary.fecha + 'T00:00:00');
-    return d.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
-  })();
-
-  const kpis = [
-    {
-      icon: <IconBriefcase size={26} />,
-      value: vacantesCompatibles,
-      label: 'Vacantes compatibles',
-      desc: 'Ofertas relacionadas con el perfil',
-      accent: C.navy,
-      accentBg: '#EEF2FF',
-    },
-    {
-      icon: <IconTrophy size={26} />,
-      value: vacantesPriorizadas,
-      label: 'Vacantes priorizadas',
-      desc: 'Ofertas con mayor coincidencia',
-      accent: '#7C3AED',
-      accentBg: '#F5F3FF',
-    },
-    {
-      icon: <IconTarget size={26} />,
-      value: `${mayorCoincidencia}/100`,
-      label: 'Mayor coincidencia',
-      desc: 'Mejor resultado entre vacante y perfil',
-      accent: '#D97706',
-      accentBg: '#FEF3C7',
-    },
-    {
-      icon: <IconChartBar size={26} />,
-      value: `${promedioTop10}/100`,
-      label: 'Promedio Top 10',
-      desc: 'Coincidencia promedio del ranking',
-      accent: '#D97706',
-      accentBg: '#FEF3C7',
-    },
-    {
-      icon: <IconBuilding size={26} />,
-      value: empresasTop10,
-      label: 'Empresas / Fuentes Top 10',
-      desc: ofertasAnonimas > 0
-        ? `Empresas identificadas + ${ofertasAnonimas} de empleador no revelado`
-        : 'Organizaciones o fuentes diferentes',
-      accent: '#065F46',
-      accentBg: '#D1FAE5',
-    },
-  ];
-
-  // ── Estado 0: sin matches ─────────────────────────────────────────────────
-  const emptyState = top_matches.length === 0;
-
-  return (
-    <div className="flex flex-col gap-4 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
-
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div style={{ flexShrink: 0 }}>
-        <h1 style={{ fontSize: 18, fontWeight: 800, color: C.navy, margin: '0 0 2px' }}>
-          Desglose de vacantes compatibles
-        </h1>
-        <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 4px' }}>
-          Composición de la demanda laboral relacionada con el perfil de egreso
-        </p>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-          <span style={{ fontWeight: 600, color: C.navy }}>{vacantesCompatibles}</span> vacantes con solapamiento de habilidades
-          {corteLabel && <> · Corte: <span style={{ fontWeight: 600 }}>{corteLabel}</span></>}
-        </p>
-      </div>
-
-      {/* ── Wizard navigation ──────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', gap: 0, background: '#fff',
-        border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', flexShrink: 0,
-      }}>
-        {EMPLEO_STEPS.map((step, idx) => (
-          <div key={step.n} style={{
-            flex: 1, display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 14px',
-            borderRight: idx < EMPLEO_STEPS.length - 1 ? `1px solid ${C.border}` : 'none',
-            background: step.n === 1 ? '#EEF2FF' : '#fff',
-          }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-              background: step.n === 1 ? C.navy : '#E5E7EB',
-              color: step.n === 1 ? '#fff' : '#6B7280',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 13, fontWeight: 800,
-            }}>
-              {step.n}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: step.n === 1 ? C.navy : '#374151', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {step.title}
-              </p>
-              <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {step.sub}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Estado 0: sin datos analizados ─────────────────────────────────── */}
-      {emptyState ? (
-        <div style={{
-          background: '#F9FAFB', borderRadius: 12, border: `1px solid ${C.border}`,
-          padding: '32px 24px', display: 'flex', flexDirection: 'column',
-          alignItems: 'center', gap: 12, flexShrink: 0,
-        }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: '50%', background: '#E5E7EB',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF',
-          }}>
-            <IconBriefcase size={26} />
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#374151', margin: '0 0 4px' }}>
-              Aún no hay vacantes analizadas para este programa
-            </p>
-            <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>
-              El análisis de compatibilidad laboral estará disponible cuando se procese el microcurrículo.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* ── KPI cards ──────────────────────────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, flexShrink: 0 }}>
-            {kpis.map(kpi => (
-              <div key={kpi.label} style={{
-                background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`,
-                padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8,
-              }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 10, background: kpi.accentBg,
-                  color: kpi.accent, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {kpi.icon}
-                </div>
-                <div>
-                  <p style={{ fontSize: 28, fontWeight: 800, color: kpi.accent, margin: 0, lineHeight: 1 }}>
-                    {kpi.value}
-                  </p>
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#374151', margin: '4px 0 2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {kpi.label}
-                  </p>
-                  <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
-                    {kpi.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* ── Explanation box ─────────────────────────────────────────────── */}
-          <div style={{
-            background: '#EEF2FF', borderRadius: 12, border: `1px solid #C7D2FE`,
-            padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start', flexShrink: 0,
-          }}>
-            <div style={{ color: '#4F46E5', flexShrink: 0, paddingTop: 1 }}>
-              <IconBulb size={18} />
-            </div>
-            <div>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#3730A3', margin: '0 0 3px' }}>¿Qué muestran estas cifras?</p>
-              <p style={{ fontSize: 11, color: '#4338CA', margin: 0, lineHeight: 1.5 }}>
-                Las <strong>{vacantesCompatibles}</strong> vacantes representan el universo de oportunidades relacionadas con el perfil.
-                El ranking permite reconocer qué cargos, empresas y familias ocupacionales presentan mayor afinidad.{' '}
-                <strong>El puntaje mide coincidencia de requisitos; no representa probabilidad de conseguir empleo.</strong>
-              </p>
-            </div>
-          </div>
-
-          {/* ── Gráficos — fila de 2 columnas ──────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flexShrink: 0 }}>
-
-            {/* Gráfico 1 — Familia ocupacional */}
-            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: '0 0 2px' }}>
-                Vacantes por familia ocupacional
-              </p>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 14px' }}>Top 10 · vacantes con match high/medium</p>
-
-              {pctFamilia < 20 ? (
-                <div style={{
-                  background: '#F9FAFB', borderRadius: 8, border: `1px dashed #D1D5DB`,
-                  padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start',
-                }}>
-                  <div style={{ color: '#9CA3AF', flexShrink: 0, paddingTop: 1 }}>
-                    <IconSearch size={16} />
-                  </div>
-                  <p style={{ fontSize: 11, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
-                    Clasificación ocupacional no disponible para este programa —{' '}
-                    <strong>{pctFamilia}%</strong> de vacantes con familia asignada.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {familiaRows.map(([familia, cnt]) => (
-                    <div key={familia}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                        <span style={{ fontSize: 10, color: '#374151', fontWeight: 500 }}>{familia}</span>
-                        <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{cnt}</span>
-                      </div>
-                      <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${Math.round((cnt / familiaMax) * 100)}%`,
-                          background: C.navy,
-                          borderRadius: 3,
-                        }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Gráfico 2 — Distribución de score */}
-            <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '16px 18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>
-                  Distribución del nivel de coincidencia
-                </p>
-                {/* Leyenda */}
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                  {SCORE_TIERS.map(t => (
-                    <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: 2, background: t.color }} />
-                      <span style={{ fontSize: 9, color: '#6B7280' }}>{t.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '0 0 14px' }}>Top 10 · buckets de 5 puntos</p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {scoreBuckets.map(bucket => (
-                  <div key={bucket.label}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 10, color: '#374151', fontWeight: 500 }}>{bucket.label}</span>
-                      <span style={{ fontSize: 10, color: '#6B7280', fontWeight: 600 }}>{bucket.count} vacante{bucket.count !== 1 ? 's' : ''}</span>
-                    </div>
-                    <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%',
-                        width: `${Math.round((bucket.count / scoreMax) * 100)}%`,
-                        background: bucket.color,
-                        borderRadius: 3,
-                      }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Nota de contexto dinámica */}
-              {contextNote && (
-                <div style={{
-                  marginTop: 14, padding: '8px 10px',
-                  background: '#F9FAFB', borderRadius: 8, border: `1px solid #E5E7EB`,
-                }}>
-                  <p style={{ fontSize: 10, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
-                    {contextNote}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-
     </div>
   );
 }
@@ -4174,7 +3723,6 @@ export default function ObservatorioStorytelling() {
     mercado:         <ViewMercadoLaboral   {...viewProps} />,
     programa:        <ViewPrograma        {...viewProps} />,
     cobertura:       <ViewOfertaDemanda   {...viewProps} ofertaDemanda={ofertaDemanda} ofertaDemandaError={ofertaDemandaError} />,
-    empleos:         <ViewEmpleos         {...viewProps} />,
     recomendaciones: <ViewRecomendaciones {...viewProps} />,
     contexto:        <ViewContexto        {...viewProps} />,
   };
