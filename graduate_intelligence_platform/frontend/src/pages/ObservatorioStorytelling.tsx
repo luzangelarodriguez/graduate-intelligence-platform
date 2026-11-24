@@ -1418,27 +1418,8 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         )}
       </div>
 
-      {/* ── SECCIÓN 3 + 4 — Mapa de pertinencia + Brechas ───────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-
-        {/* 3 — Scatter */}
-        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>3</span>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué tanto responde el programa?</p>
-              <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Análisis de alineación entre demanda del mercado y cobertura curricular</p>
-            </div>
-          </div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Mapa de pertinencia: Demanda vs. Cobertura curricular</p>
-          <BrechasScatter
-            matriz={skills?.matriz_completa ?? []}
-            criticasSet={new Set((skills?.brechas_criticas ?? []).map(b => b.skill.toLowerCase()))}
-          />
-        </div>
-
-        {/* 4 — Brechas table */}
-        <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
+      {/* ── SECCIÓN 4 — Brechas ─────────────────────────────────────────────── */}
+      <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
             <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
             <div>
@@ -1500,7 +1481,6 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
             )
           }
         </div>
-      </div>
 
       {/* ── SECCIÓN 5 — Decisiones ───────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
