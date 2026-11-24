@@ -224,13 +224,6 @@ const FALLBACK_SKILLS: Record<number, SkillsAnalysis> = {
   9:  { program_id: 9, cobertura_pct: 0, skills_mercado: [], skills_programa: [], brechas: [], fortalezas: [], exclusivas_programa: [], brechas_criticas: [], transversales: [], evidencia_baja: false, n_matches: 0 },
 };
 
-// ─── Pertinencia scale (legacy — will be removed after verdictoPrograma rollout) ──
-function pertinenciaLevel(score: number): { label: string; color: string; bg: string; desc: string } {
-  if (score >= 75) return { label: 'Excelente', color: '#059669', bg: '#d1fae5', desc: 'El currículo está muy bien alineado con las demandas actuales del mercado laboral.' };
-  if (score >= 60) return { label: 'Buena',     color: '#2563eb', bg: '#dbeafe', desc: 'Buena alineación general; existen oportunidades de fortalecimiento en áreas específicas.' };
-  if (score >= 40) return { label: 'Moderada',  color: C.gold,   bg: C.goldBg,  desc: 'Alineación parcial. Se recomienda actualización curricular prioritaria.' };
-  return              { label: 'Crítica',   color: '#dc2626', bg: '#fee2e2', desc: 'Brecha significativa entre el currículo y las competencias demandadas por el mercado.' };
-}
 
 // ─── veredictoPrograma — single unified verdict ───────────────────────────────
 type Veredicto = 'Evidencia limitada' | 'Actualizar' | 'Fortalecer' | 'Mantener';
@@ -620,8 +613,6 @@ interface ViewProps {
   summary: Summary;
   prog: Programa;
   meta: typeof PROGRAMS[0];
-  score: number;
-  nivel: ReturnType<typeof pertinenciaLevel>;
   veredicto: VeredictoOutput | null;
   coberturaPct: number;
   brechaPct: number;
@@ -652,7 +643,7 @@ function tipoMeta(tipo: string | undefined) {
   return TIPO_META[tipo ?? ''] ?? { bar: '#94A3B8', label: 'Otro', badgeBg: '#F1F5F9', badgeColor: '#475569' };
 }
 
-function ViewResumen({ summary, prog, meta, score, nivel, veredicto, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
+function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatibles, skills, skillsMercadoDeduped, univ, totales, dataPobre }: ViewProps) {
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
   const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 6);
   const maxMarket  = topMarket[0]?.frecuencia ?? 1;
@@ -1068,7 +1059,7 @@ function alignSkill(skill: string, daItems: DeepAnalysisItem[]): { estado: 'alin
 
 // ─── ViewMercadoLaboral — Pertinencia frente al mercado (6 secciones) ────────
 
-function ViewMercadoLaboral({ prog, meta, score, nivel, veredicto, coberturaPct, skills, skillsMercadoDeduped, univ, totales, programaId }: ViewProps) {
+function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skillsMercadoDeduped, univ, totales, programaId }: ViewProps) {
   const [secTab, setSecTab] = useState<string>('perfiles');
   const [perfiles, setPerfiles] = useState<OccupationalProfile[]>([]);
   const [kpis, setKpis] = useState<{ total_ofertas: number; total_perfiles: number; total_skills: number } | null>(null);
@@ -3038,7 +3029,7 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
 }
 
 function ViewRecomendaciones({
-  skills, score, nivel, coberturaPct, brechaPct, empCompatibles, dataPobre,
+  skills, coberturaPct, brechaPct, empCompatibles, dataPobre,
   redesignJob, redesignDlError, onStartRedesign, onDownloadRedesign, onClearRedesign,
 }: ViewProps) {
   const topBrechas   = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
@@ -3514,7 +3505,7 @@ function WefChartsSection({ nombrePrograma }: { nombrePrograma: string }) {
   );
 }
 
-function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
+function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
   const [analisis, setAnalisis]   = useState<string | null>(null);
   const [loading, setLoading]     = useState(false);
   const [generated, setGenerated] = useState<string | null>(null);
@@ -3570,7 +3561,7 @@ function ViewContexto({ meta, programaId, score, skills }: ViewProps) {
               Análisis personalizado IA — {meta.nombre}
             </p>
             <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>
-              Conecta los estudios anteriores con la situación específica de este programa (score: {score.toFixed(0)}/100)
+              Conecta los estudios anteriores con la situación específica de este programa (cobertura: {coberturaPct.toFixed(1)} %)
             </p>
           </div>
           {!loading && (
@@ -3774,8 +3765,6 @@ export default function ObservatorioStorytelling() {
   const { totales, programas, top_matches, skill_matches } = d;
   const prog  = programas.find(p => p.id === programaId) ?? programas[0];
   const meta  = PROGRAMS.find(p => p.id === programaId) ?? PROGRAMS[0];
-  const score = prog?.score_promedio ?? 0;
-  const nivel = pertinenciaLevel(score);
   const coberturaPct   = skills?.cobertura_pct ?? 0;
   const brechaPct      = skills ? 100 - coberturaPct : 0;
   // Use the backend-aggregated count over ALL matches (not the truncated top-30 sample).
@@ -3809,7 +3798,7 @@ export default function ObservatorioStorytelling() {
   })();
 
   const viewProps: ViewProps = {
-    summary: d, prog, meta, score, nivel, veredicto, coberturaPct, brechaPct, empCompatibles,
+    summary: d, prog, meta, veredicto, coberturaPct, brechaPct, empCompatibles,
     skills, skillsMercadoDeduped, univ, totales, top_matches, skill_matches, dataPobre, programaId,
     redesignJob, redesignDlError,
     onStartRedesign: startRedesign,
