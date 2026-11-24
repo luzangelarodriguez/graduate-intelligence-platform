@@ -1067,11 +1067,14 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
 
   useEffect(() => {
     if (!programaId) return;
+    let cancelled = false;
+    const ctrl = new AbortController();
+    const sig = ctrl.signal;
     setLoading(true);
     const safeArr = (url: string) =>
-      fetch(url).then(r => r.ok ? r.json() : []).then(d => Array.isArray(d) ? d : []).catch(() => []);
+      fetch(url, { signal: sig }).then(r => r.ok ? r.json() : []).then(d => Array.isArray(d) ? d : []).catch(err => { if (err.name === 'AbortError') throw err; return []; });
     const safeObj = (url: string, fb: object) =>
-      fetch(url).then(r => r.ok ? r.json() : fb).then(d => (d && typeof d === 'object' && !Array.isArray(d)) ? d : fb).catch(() => fb);
+      fetch(url, { signal: sig }).then(r => r.ok ? r.json() : fb).then(d => (d && typeof d === 'object' && !Array.isArray(d)) ? d : fb).catch(err => { if (err.name === 'AbortError') throw err; return fb; });
     Promise.all([
       safeArr(`${API}/api/programas/${programaId}/perfiles-ocupacionales`),
       safeObj(`${API}/api/programas/${programaId}/perfiles-kpis`, { total_ofertas: 0, total_perfiles: 0, total_skills: 0 }),
@@ -1080,6 +1083,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
       safeArr(`${API}/api/programas/${programaId}/tendencia-mensual`),
       safeObj(`${API}/api/programas/${programaId}/perfiles-homologados`, { kpis: null, familias: [] }),
     ]).then(([profs, kpiData, secs, cities, trend, homData]) => {
+      if (cancelled) return;
       setPerfiles(profs as OccupationalProfile[]);
       setKpis(kpiData as typeof kpis);
       setSectores(secs as SectorItem[]);
@@ -1087,7 +1091,8 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
       setTendencia(trend as TendenciaItem[]);
       setHomologado(homData as HomologadoData);
       setLoading(false);
-    });
+    }).catch(() => {});
+    return () => { cancelled = true; ctrl.abort(); };
   }, [programaId]);
 
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
@@ -1744,25 +1749,30 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
 
   useEffect(() => {
     if (!programaId) return;
-    fetch(`${API}/api/programs/${programaId}/deep-analysis`)
+    const ctrl = new AbortController();
+    fetch(`${API}/api/programs/${programaId}/deep-analysis`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: DeepAnalysisData) => setDeepAnalysis(d))
-      .catch(() => setDeepAnalysis({}));
+      .catch(err => { if (err.name === 'AbortError') return; setDeepAnalysis({}); });
+    return () => ctrl.abort();
   }, [programaId]);
 
   useEffect(() => {
     if (!programaId) return;
+    let cancelled = false;
+    const ctrl = new AbortController();
+    const sig = ctrl.signal;
     setProfilesLoading(true);
     const safeArray = (url: string) =>
-      fetch(url)
+      fetch(url, { signal: sig })
         .then(r => { if (!r.ok) return []; return r.json(); })
         .then(d => Array.isArray(d) ? d : [])
-        .catch(() => []);
+        .catch(err => { if (err.name === 'AbortError') throw err; return []; });
     const safeObj = (url: string, fallback: object) =>
-      fetch(url)
+      fetch(url, { signal: sig })
         .then(r => { if (!r.ok) return fallback; return r.json(); })
         .then(d => (d && typeof d === 'object' && !Array.isArray(d)) ? d : fallback)
-        .catch(() => fallback);
+        .catch(err => { if (err.name === 'AbortError') throw err; return fallback; });
     Promise.all([
       safeArray(`${API}/api/programas/${programaId}/perfiles-ocupacionales`),
       safeObj(`${API}/api/programas/${programaId}/perfiles-kpis`, { total_ofertas: 0, total_perfiles: 0, total_skills: 0 }),
@@ -1770,6 +1780,7 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
       safeArray(`${API}/api/programas/${programaId}/ciudades`),
       safeArray(`${API}/api/programas/${programaId}/tendencia-mensual`),
     ]).then(([profs, kpiData, secs, cities, trend]) => {
+      if (cancelled) return;
       setProfiles(profs as OccupationalProfile[]);
       setKpis(kpiData as ProfileKpis);
       setSectores(secs as SectorItem[]);
@@ -1780,17 +1791,20 @@ function ViewPerfiles({ programaId, coberturaPct }: ViewProps) {
         if (prev && profs.some((p: OccupationalProfile) => p.perfil === prev)) return prev;
         return profs[0]?.perfil ?? null;
       });
-    }).catch(() => { setProfiles([]); setProfilesLoading(false); });
+    }).catch(err => { if (err.name === 'AbortError') return; setProfiles([]); setProfilesLoading(false); });
+    return () => { cancelled = true; ctrl.abort(); };
   }, [programaId]);
 
   useEffect(() => {
     if (!programaId || !selectedPerfil) return;
+    const ctrl = new AbortController();
     setProfileSkills(null);
     const p = new URLSearchParams({ perfil: selectedPerfil });
-    fetch(`${API}/api/programas/${programaId}/perfil-skills?${p}`)
+    fetch(`${API}/api/programas/${programaId}/perfil-skills?${p}`, { signal: ctrl.signal })
       .then(r => r.json())
       .then((d: ProfileSkill[]) => setProfileSkills(d))
-      .catch(() => setProfileSkills([]));
+      .catch(err => { if (err.name === 'AbortError') return; setProfileSkills([]); });
+    return () => ctrl.abort();
   }, [programaId, selectedPerfil]);
 
   const groupedSkills = useMemo<Record<string, ProfileSkill[]> | null>(() => {
@@ -2223,10 +2237,11 @@ function ViewPrograma({ programaId, skills, coberturaPct }: ViewProps) {
   const [error, setError]     = useState(false);
 
   useEffect(() => {
+    const ctrl = new AbortController();
     setLoading(true);
     setError(false);
     setData(null);
-    fetch(`${API}/api/programs/${programaId}/deep-analysis`)
+    fetch(`${API}/api/programs/${programaId}/deep-analysis`, { signal: ctrl.signal })
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -2235,7 +2250,8 @@ function ViewPrograma({ programaId, skills, coberturaPct }: ViewProps) {
         setData(json.analysis_json ?? json.analysis ?? json);
         setLoading(false);
       })
-      .catch(() => { setError(true); setLoading(false); });
+      .catch(err => { if (err.name === 'AbortError') return; setError(true); setLoading(false); });
+    return () => ctrl.abort();
   }, [programaId]);
 
   if (loading) return <div style={{ padding: 24 }}><Spinner /></div>;
@@ -3637,44 +3653,53 @@ export default function ObservatorioStorytelling() {
 
   // Fetch summary
   useEffect(() => {
+    const ctrl = new AbortController();
     setLoading(true); setIsFallback(false);
-    fetch(`${API}/api/dashboard/summary?program_id=${programaId}`)
+    fetch(`${API}/api/dashboard/summary?program_id=${programaId}`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: Summary) => { setSummary(d); setLoading(false); })
-      .catch(() => {
+      .catch(err => {
+        if (err.name === 'AbortError') return;
         const fb = { ...FALLBACK, programas: FALLBACK.programas.filter(p => p.id === programaId) };
         const prog = fb.programas[0];
         if (prog) fb.totales = { matches: prog.matches_total, alta: prog.labels.high, media: prog.labels.medium, baja: prog.labels.low, empleos_compatibles: 0 };
         setSummary(fb); setIsFallback(true); setLoading(false);
       });
+    return () => ctrl.abort();
   }, [programaId]);
 
   // Fetch skills
   useEffect(() => {
+    const ctrl = new AbortController();
     setSkills(null); setSkillsFailed(false);
-    fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
+    fetch(`${API}/api/dashboard/skills-analysis/${programaId}`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: SkillsAnalysis) => setSkills(d))
-      .catch(() => { setSkillsFailed(true); setSkills(FALLBACK_SKILLS[programaId] ?? null); });
+      .catch(err => { if (err.name === 'AbortError') return; setSkillsFailed(true); setSkills(FALLBACK_SKILLS[programaId] ?? null); });
+    return () => ctrl.abort();
   }, [programaId]);
 
   // Fetch universities
   useEffect(() => {
+    const ctrl = new AbortController();
     setUniv(null);
-    fetch(`${API}/api/programs/related-universities/${programaId}`)
+    fetch(`${API}/api/programs/related-universities/${programaId}`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: UniversityData) => setUniv(d))
-      .catch(() => setUniv(null));
+      .catch(err => { if (err.name === 'AbortError') return; setUniv(null); });
+    return () => ctrl.abort();
   }, [programaId]);
 
   // Fetch oferta y demanda
   useEffect(() => {
+    const ctrl = new AbortController();
     setOfertaDemanda(null);
     setOfertaDemandaError(false);
-    fetch(`${API}/api/programs/oferta-demanda/${programaId}`)
+    fetch(`${API}/api/programs/oferta-demanda/${programaId}`, { signal: ctrl.signal })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: OfertaDemandaData) => setOfertaDemanda(d))
-      .catch(() => { setOfertaDemanda(null); setOfertaDemandaError(true); });
+      .catch(err => { if (err.name === 'AbortError') return; setOfertaDemanda(null); setOfertaDemandaError(true); });
+    return () => ctrl.abort();
   }, [programaId]);
 
   // Reset redesign on program change
