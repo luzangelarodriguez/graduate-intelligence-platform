@@ -1054,7 +1054,8 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
   const topMarket  = skillsMercadoDeduped.slice(0, 8);
   const topBrechas = [...(skills?.brechas_criticas ?? skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).slice(0, 8);
   const totalRequisitos = skillsMercadoDeduped.length;
-  const totalBrechas    = skills?.brechas_criticas?.length ?? skills?.brechas?.length ?? 0;
+  const totalBrechas         = skills?.brechas?.length ?? 0;
+  const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
   const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
   const pertLabel   = coberturaPct >= 60 ? 'ALTA' : coberturaPct >= 35 ? 'MEDIA' : 'BAJA';
@@ -1098,7 +1099,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
       : 'Revisar y actualizar el plan de estudios con habilidades emergentes.',
     `Elevar la cobertura curricular del ${coberturaPct}% hacia una meta institucional definida por el comité.`,
     `Integrar proyectos empresariales con ${topMarket.slice(0, 3).map(s => displaySkill(s.skill)).join(', ')}.`,
-    totalBrechas > 4 ? 'Priorizar un plan de rediseño curricular con enfoque en empleabilidad.' : 'Mantener actualización continua del plan de estudios.',
+    criticalBrechasCount > 4 ? 'Priorizar un plan de rediseño curricular con enfoque en empleabilidad.' : 'Mantener actualización continua del plan de estudios.',
   ];
 
   const TH_ML = { padding: '5px 8px', fontSize: 9, fontWeight: 700 as const, color: '#9CA3AF', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}`, textAlign: 'left' as const };
@@ -1141,7 +1142,7 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
             { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
-            { icon: '⚠️', value: totalBrechas, label: 'Brechas prioritarias', sub: 'De alta demanda' },
+            { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
             <div key={i} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -1512,7 +1513,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{totalBrechas}</strong> competencias críticas no cubiertas en el currículo.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}>
+                  <strong>{criticalBrechasCount}</strong> competencias críticas no cubiertas en el currículo.
+                  <span style={{ display: 'block', fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{totalBrechas} brechas en total</span>
+                </p>
               </div>
             </div>
           </div>
