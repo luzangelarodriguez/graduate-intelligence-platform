@@ -248,16 +248,24 @@ const UMBRALES_VEREDICTO = {
 
 function _veredictoSinGuardia(cobertura: number, criticas: number, ruleStr: string): VeredictoOutput {
   const { actualizar_cobertura: AC, actualizar_criticas: AK, fortalecer_cobertura: FC, fortalecer_criticas: FK } = UMBRALES_VEREDICTO;
-  if (cobertura < AC || criticas >= AK)
+  if (cobertura < AC || criticas >= AK) {
+    const parts: string[] = [];
+    if (cobertura < AC) parts.push(`Cobertura < ${AC} %`);
+    if (criticas >= AK) parts.push(`≥ ${AK} brechas críticas`);
     return {
       label: 'Actualizar', color: '#DC2626', bg: '#FEE2E2',
-      rule: ruleStr, threshold: `Cobertura < ${AC} % o ≥ ${AK} brechas críticas`,
+      rule: ruleStr, threshold: parts.join(' y '),
     };
-  if (cobertura < FC || criticas >= FK)
+  }
+  if (cobertura < FC || criticas >= FK) {
+    const parts: string[] = [];
+    if (cobertura < FC) parts.push(`Cobertura < ${FC} %`);
+    if (criticas >= FK) parts.push(`≥ ${FK} brechas críticas`);
     return {
       label: 'Fortalecer', color: '#D97706', bg: '#FEF3C7',
-      rule: ruleStr, threshold: `Cobertura < ${FC} % o ≥ ${FK} brechas críticas`,
+      rule: ruleStr, threshold: parts.join(' y '),
     };
+  }
   return {
     label: 'Mantener', color: '#059669', bg: '#D1FAE5',
     rule: ruleStr, threshold: `Cobertura ≥ ${FC} % y < ${FK} brechas críticas`,
