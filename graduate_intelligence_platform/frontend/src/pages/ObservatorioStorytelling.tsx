@@ -1388,10 +1388,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         )}
       </div>
 
-      {/* ── SECCIÓN 4 — Brechas ─────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 3 — Brechas ─────────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
+            <span style={{ background: '#DC2626', color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>3</span>
             <div>
               <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Dónde están las brechas?</p>
               <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Requisitos clave y nivel de cobertura curricular</p>
@@ -1452,10 +1452,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
           }
         </div>
 
-      {/* ── SECCIÓN 5 — Decisiones ───────────────────────────────────────────── */}
+      {/* ── SECCIÓN 4 — Decisiones ───────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>5</span>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>4</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿Qué decisiones tomar?</p>
             <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Síntesis y recomendaciones</p>
@@ -1501,10 +1501,10 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
         </div>
       </div>
 
-      {/* ── SECCIÓN 6 — Tendencia ────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 5 — Tendencia ────────────────────────────────────────────── */}
       <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>6</span>
+          <span style={{ background: C.navy, color: '#fff', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 8px' }}>5</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 800, color: C.navy, margin: 0 }}>¿La tendencia es favorable?</p>
             <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Evolución y contexto del mercado laboral</p>
