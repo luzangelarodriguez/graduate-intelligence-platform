@@ -12,10 +12,9 @@ import {
   IconGauge, IconChartBar, IconSchool, IconTarget,
   IconBriefcase, IconListCheck,
   IconWorld, IconChartDonut, IconClipboardList, IconCircleCheck,
-  IconTool, IconBrain, IconBolt, IconUser,
+  IconBrain, IconBolt,
   IconCalendar, IconCoin, IconShield, IconAward,
   IconBulb, IconMessage, IconUsers, IconCheck,
-  IconBuilding, IconSearch, IconFileDescription, IconTrophy,
   type IconProps,
 } from '@tabler/icons-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
@@ -515,36 +514,6 @@ function DonutChart({ labels, values, colors }: { labels: string[]; values: numb
 
 function isNoiseSkill(skill: string): boolean {
   return skill.length > 40 || skill.toLowerCase().includes('confianza extraccion');
-}
-
-function SkillBarList({ items, color, valueLabel = 'vacantes' }: {
-  items: { label: string; value: number; rawSkill?: string }[];
-  color: string;
-  valueLabel?: string;
-}) {
-  const max = Math.max(...items.map(i => i.value), 1);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-      {items.map(({ label, value, rawSkill }) => {
-        const sk = rawSkill ?? label;
-        const isCert = isCertSkill(sk);
-        return (
-          <div key={label} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', alignItems: 'center', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 0 }}>
-              <span title={label} style={{ fontSize: 11, color: '#4B5563', fontWeight: 500 }}>{label}</span>
-              {isCert && (
-                <span style={{ fontSize: 8, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap' }}>Marco/Cert.</span>
-              )}
-            </div>
-            <div style={{ height: 7, borderRadius: 6, background: '#E5E7EB', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${(value / max) * 100}%`, borderRadius: 6, background: color }} />
-            </div>
-            <span title={`${value} ${valueLabel}`} style={{ fontSize: 10, color: '#9CA3AF', minWidth: 22, textAlign: 'right' }}>{value}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
 }
 
 function DashPanel({ title, children, style, className, badge }: {
@@ -2866,18 +2835,6 @@ function MiniDonut({ pct, color = '#3B82F6' }: { pct: number; color?: string }) 
         transform={`rotate(-90 ${cx} ${cy})`} />
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle"
         style={{ fontSize: 12, fontWeight: 700, fill: color }}>{pct}%</text>
-    </svg>
-  );
-}
-
-function SparkBars({ color, bars = [4, 6, 5, 8, 6, 9, 7] }: { color: string; bars?: number[] }) {
-  const max = 9, h = 28;
-  return (
-    <svg width={56} height={h + 4} style={{ opacity: 0.65, flexShrink: 0 }}>
-      {bars.map((v, i) => {
-        const bh = Math.round((v / max) * h);
-        return <rect key={i} x={i * 8} y={h - bh} width={5} height={bh} rx={2} fill={color} />;
-      })}
     </svg>
   );
 }
