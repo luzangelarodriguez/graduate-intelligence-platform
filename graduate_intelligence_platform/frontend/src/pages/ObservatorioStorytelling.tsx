@@ -622,6 +622,7 @@ interface ViewProps {
   meta: typeof PROGRAMS[0];
   score: number;
   nivel: ReturnType<typeof pertinenciaLevel>;
+  veredicto: VeredictoOutput | null;
   coberturaPct: number;
   brechaPct: number;
   empCompatibles: number;
@@ -3630,6 +3631,7 @@ export default function ObservatorioStorytelling() {
   const [redesignJob, setRedesignJob]         = useState<RediseniJob | null>(null);
   const [redesignDlError, setRedesignDlError] = useState(false);
   const [sidebarOpen, setSidebarOpen]         = useState(false);
+  const [skillsFailed, setSkillsFailed]       = useState(false);
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const redesignPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -3649,11 +3651,11 @@ export default function ObservatorioStorytelling() {
 
   // Fetch skills
   useEffect(() => {
-    setSkills(null);
+    setSkills(null); setSkillsFailed(false);
     fetch(`${API}/api/dashboard/skills-analysis/${programaId}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((d: SkillsAnalysis) => setSkills(d))
-      .catch(() => setSkills(FALLBACK_SKILLS[programaId] ?? null));
+      .catch(() => { setSkillsFailed(true); setSkills(FALLBACK_SKILLS[programaId] ?? null); });
   }, [programaId]);
 
   // Fetch universities
@@ -3764,6 +3766,19 @@ export default function ObservatorioStorytelling() {
   // Use the backend-aggregated count over ALL matches (not the truncated top-30 sample).
   const empCompatibles = totales.empleos_compatibles ?? top_matches.filter(m => m.skills_en_comun.length > 0).length;
   const dataPobre      = totales.matches < 10 || totales.empleos_compatibles < 3;
+  // skillsFailed evaluated first: a failed fetch with no FALLBACK_SKILLS entry
+  // leaves skills===null; without this order that would yield null permanently.
+  const veredicto: VeredictoOutput | null = skillsFailed ? {
+    label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
+    rule: `Cobertura ${coberturaPct.toFixed(1)} % · 0 brechas críticas`,
+    threshold: 'Sin datos en vivo',
+    desc: 'Los datos disponibles son insuficientes para emitir un veredicto confiable.',
+  } : skills === null ? null : veredictoPrograma({
+    cobertura:     coberturaPct,
+    criticas:      skills.brechas_criticas?.length ?? 0,
+    evidenciaBaja: skills.evidencia_baja ?? false,
+    dataPobre,
+  });
 
   // Deduplicated market skills
   const skillsMercadoDeduped: SkillMercado[] = (() => {
@@ -3779,7 +3794,7 @@ export default function ObservatorioStorytelling() {
   })();
 
   const viewProps: ViewProps = {
-    summary: d, prog, meta, score, nivel, coberturaPct, brechaPct, empCompatibles,
+    summary: d, prog, meta, score, nivel, veredicto, coberturaPct, brechaPct, empCompatibles,
     skills, skillsMercadoDeduped, univ, totales, top_matches, skill_matches, dataPobre, programaId,
     redesignJob, redesignDlError,
     onStartRedesign: startRedesign,
