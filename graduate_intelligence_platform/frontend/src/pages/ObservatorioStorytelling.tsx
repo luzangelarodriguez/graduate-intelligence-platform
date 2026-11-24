@@ -1510,9 +1510,27 @@ function ViewMercadoLaboral({ prog, meta, score, nivel, coberturaPct, skills, sk
             <p style={{ fontSize: 10, color: '#6B7280', margin: 0 }}>Evolución y contexto del mercado laboral</p>
           </div>
         </div>
-        <div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Evolución de vacantes relacionadas</p>
-          {loading ? <Spinner /> : <MiniTrendChart data={tendencia} />}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Evolución de vacantes relacionadas</p>
+            {loading ? <Spinner /> : <MiniTrendChart data={tendencia} />}
+          </div>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Perspectiva del mercado</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { icon: '📈', text: `Demanda activa en el período analizado con ${vacantesTotal.toLocaleString('es-CO')} vacantes.` },
+                { icon: '🌐', text: 'Mayor crecimiento en sectores de tecnología, servicios profesionales y finanzas.' },
+                { icon: '🤖', text: 'Aumento en la adopción de IA y analítica avanzada como competencia transversal.' },
+                { icon: '🎯', text: `Oportunidad para perfiles con habilidades digitales y ${topMarket[0] ? displaySkill(topMarket[0].skill) : 'gestión de datos'}.` },
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                  <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}>{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
