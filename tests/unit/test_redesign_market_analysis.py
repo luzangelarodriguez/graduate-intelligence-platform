@@ -43,6 +43,30 @@ class TestSasFiltered:
         result, _ = process_job_skill_rows(rows)
         assert result == []
 
+    def test_power_bi_survives_process_job_skill_rows(self):
+        """power bi is NOT in RUIDO_SIEMPRE so it reaches brechas_criticas."""
+        rows = _make_rows([
+            ["Python", "Power BI", "SQL"],
+            ["Python", "Power BI", "Data Analysis"],
+            ["Python", "Power BI", "Machine Learning"],
+        ])
+        result, _ = process_job_skill_rows(rows)
+        skill_names_lower = [r["skill"].lower() for r in result]
+        assert any("power bi" in s for s in skill_names_lower), (
+            "power bi should survive RUIDO_SIEMPRE and reach brechas_criticas"
+        )
+
+    def test_power_bi_in_brechas_criticas(self):
+        """When power bi appears frequently in market but not in curriculum, it ends in brechas_criticas."""
+        market = [{"skill": "Power BI", "frecuencia": 20},
+                  {"skill": "Python",   "frecuencia": 20}]
+        prog = [{"skill": "Python", "cobertura": 2, "asignaturas": []}]
+        result = cross_analyze(market, prog, n_matches=20)
+        bc_skills = [b["skill"].lower() for b in result["brechas_criticas"]]
+        assert any("power bi" in s for s in bc_skills), (
+            f"power bi should be in brechas_criticas; got: {bc_skills}"
+        )
+
 
 # ── Subsunción ─────────────────────────────────────────────────────────────────
 

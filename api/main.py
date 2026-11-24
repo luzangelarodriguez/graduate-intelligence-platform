@@ -1691,22 +1691,12 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
             return
 
-        # brechas_criticas already excludes transversales and applies RUIDO_SIEMPRE;
-        # keep a minimal tool-noise filter only for the OpenAI call quality.
-        _TOOL_NOISE = frozenset({
-            'excel', 'power bi', 'tableau', 'office', 'word', 'powerpoint',
-            'microsoft', 'erp', 'sap', 'contabilidad', 'facturacion',
-        })
-        brechas_filtradas = [b for b in brechas if b.lower() not in _TOOL_NOISE]
-        if not brechas_filtradas:
-            brechas_filtradas = brechas
-
         # 3. Score each asignatura by TF-IDF relevance to brechas
         _update("running", current_step="Calculando relevancia de asignaturas")
 
         logger.info(
-            "[REDESIGN-DEBUG] program_id=%s brechas=%d filtradas=%d brechas_filtradas=%s",
-            program_id, len(brechas), len(brechas_filtradas), brechas_filtradas,
+            "[REDESIGN-DEBUG] program_id=%s brechas=%d brechas=%s",
+            program_id, len(brechas), brechas,
         )
 
         scored: list[dict[str, Any]] = []
@@ -1714,7 +1704,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         for row in mc_rows:
             text = (row["clean_text"] or "").strip()
             # FIX 2: get per-skill scores so each subject gets its own ranked brechas
-            score, ranked_skills = _compute_tfidf_relevance(text, brechas_filtradas)
+            score, ranked_skills = _compute_tfidf_relevance(text, brechas)
             asig_nombre = row["nombre"] or f"Asignatura {row['id']}"
             logger.info(
                 "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f top_skills=%s",
@@ -1722,7 +1712,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             )
             confianza = "alta" if score > 0.08 else "media" if score > 0.03 else "baja"
             # Top brechas specifically relevant to THIS asignatura
-            top_brechas_asig = [skill for skill, _ in ranked_skills[:6]] if ranked_skills else brechas_filtradas[:5]
+            top_brechas_asig = [skill for skill, _ in ranked_skills[:6]] if ranked_skills else brechas[:5]
             all_scores.append({
                 "nombre":          asig_nombre[:60],
                 "clean_text_len":  len(text),
@@ -1748,9 +1738,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             "n_matches":              n_matches,
             "brechas_criticas_count": len(brechas_criticas_data),
             "brechas_count":          len(brechas),
-            "brechas_filtradas_count": len(brechas_filtradas),
             "brechas_sample":         brechas[:10],
-            "brechas_filtradas_sample": brechas_filtradas[:10],
             "umbral":                 "brechas_criticas (p66) · top-5 asignaturas por TF-IDF",
             "asignaturas_scores":     sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
         }
