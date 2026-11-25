@@ -2258,3 +2258,12 @@ def get_top_vacantes(
         logger.warning("get_top_vacantes failed: %s", exc)
         return {"total": 0, "page": page, "per_page": per_page, "items": []}
 
+
+# ─── Market Studies ───────────────────────────────────────────────────────────
+
+@app.get("/api/dashboard/market-studies/{program_id}", tags=["dashboard"])
+def get_market_studies(program_id: int) -> dict[str, Any]:
+    """Return structured market studies for a program, or empty hallazgos if none."""
+    from api.market_studies import PROGRAM_STUDIES
+    return PROGRAM_STUDIES.get(program_id, {"hallazgos": []})
+

@@ -76,6 +76,17 @@ interface Competitor {
   periodicidad_admision: string; matriculados: number; graduados: number; inscritos: number;
 }
 interface UniversityData { program_id: number; competitors: Competitor[]; total: number }
+
+interface MarketHallazgo {
+  texto: string; fuente: string; url: string; fecha: string; verificada: boolean;
+}
+interface MarketStudiesData {
+  resumen?: string;
+  hallazgos: MarketHallazgo[];
+  habilidades_al_alza?: string[];
+  pierde_peso?: { texto: string; lectura_propia: boolean };
+  evidencia?: 'industria' | 'academica' | 'mixta';
+}
 interface OfertaDemandaMercado {
   programas_similares: number; instituciones: number;
   matriculados_total: number; graduados_total: number;
@@ -3537,8 +3548,17 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
   const [loading, setLoading]     = useState(false);
   const [generated, setGenerated] = useState<string | null>(null);
   const [aiError, setAiError]     = useState(false);
+  const [estudios, setEstudios]   = useState<MarketStudiesData | null>(null);
 
   const hasBrechas = (skills?.brechas?.length ?? 0) > 0;
+
+  useEffect(() => {
+    if (!programaId) return;
+    fetch(`${API}/api/dashboard/market-studies/${programaId}`)
+      .then(r => r.ok ? r.json() : { hallazgos: [] })
+      .then((d: MarketStudiesData) => setEstudios(d))
+      .catch(() => setEstudios({ hallazgos: [] }));
+  }, [programaId]);
 
   function generate() {
     setLoading(true); setAiError(false);
@@ -3579,6 +3599,62 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
 
       {/* WEF Charts — 3 generales + 1 condicional por dominio */}
       <WefChartsSection nombrePrograma={meta.nombre} />
+
+      {/* Parte C — Hallazgos por programa (desde /api/dashboard/market-studies) */}
+      {estudios && estudios.hallazgos.length > 0 && (
+        <div style={{ flexShrink: 0 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Hallazgos para {meta.nombre}
+          </p>
+          <div className="flex flex-col gap-2">
+            {estudios.hallazgos.map((h, i) => (
+              <div key={i} style={{ background: '#fff', borderRadius: 10, border: `1px solid ${C.border}`, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, flexShrink: 0, marginTop: 2,
+                    background: h.verificada ? '#D1FAE5' : '#FEF3C7',
+                    color:      h.verificada ? '#065F46' : '#92400E',
+                  }}>
+                    {h.verificada ? '✓ Verificada' : '⚠ Por verificar'}
+                  </span>
+                  <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.6, margin: 0, flex: 1 }}>{h.texto}</p>
+                </div>
+                <a href={h.url} target="_blank" rel="noopener noreferrer"
+                   style={{ fontSize: 9, color: '#6B7280', textDecoration: 'none', display: 'block', marginTop: 6 }}>
+                  📎 {h.fuente} · {h.fecha}
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* Habilidades en alza */}
+          {estudios.habilidades_al_alza && estudios.habilidades_al_alza.length > 0 && (
+            <div style={{ marginTop: 10 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#059669', margin: '0 0 6px' }}>↑ Habilidades en alza para este perfil</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {estudios.habilidades_al_alza.map(skill => (
+                  <span key={skill} style={{ fontSize: 10, background: '#D1FAE5', color: '#065F46', padding: '3px 10px', borderRadius: 20, fontWeight: 600 }}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pierde peso */}
+          {estudios.pierde_peso && (
+            <div style={{ marginTop: 8, background: '#FEF2F2', borderRadius: 8, border: '1px solid #FECACA', padding: '10px 12px' }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#B91C1C', margin: '0 0 4px' }}>↓ Pierde peso</p>
+              <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}>
+                {estudios.pierde_peso.texto}
+                {estudios.pierde_peso.lectura_propia && (
+                  <span style={{ fontSize: 9, color: '#9CA3AF', marginLeft: 6 }}>(lectura propia)</span>
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Parte B — AI personalized analysis */}
       <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 20px', flexShrink: 0 }}>
