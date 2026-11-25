@@ -3554,10 +3554,13 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
 
   useEffect(() => {
     if (!programaId) return;
+    let cancelled = false;
+    setEstudios(null);
     fetch(`${API}/api/dashboard/market-studies/${programaId}`)
       .then(r => r.ok ? r.json() : { hallazgos: [] })
-      .then((d: MarketStudiesData) => setEstudios(d))
-      .catch(() => setEstudios({ hallazgos: [] }));
+      .then((d: MarketStudiesData) => { if (!cancelled) setEstudios(d); })
+      .catch(() => { if (!cancelled) setEstudios({ hallazgos: [] }); });
+    return () => { cancelled = true; };
   }, [programaId]);
 
   function generate() {
@@ -3604,8 +3607,18 @@ function ViewContexto({ meta, programaId, coberturaPct, skills }: ViewProps) {
       {estudios && estudios.hallazgos.length > 0 && (
         <div style={{ flexShrink: 0 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Hallazgos para {meta.nombre}
+            Tendencias internacionales para {meta.nombre}
           </p>
+          {estudios.resumen && (
+            <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.6, margin: '0 0 6px' }}>{estudios.resumen}</p>
+          )}
+          {estudios.evidencia && (
+            <p style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', margin: '0 0 10px', letterSpacing: '0.04em' }}>
+              {estudios.evidencia === 'industria' && 'Evidencia de industria: encuestas con interés comercial'}
+              {estudios.evidencia === 'academica' && 'Evidencia académica: literatura no verificada aquí'}
+              {estudios.evidencia === 'mixta'     && 'Evidencia mixta: industria y literatura académica'}
+            </p>
+          )}
           <div className="flex flex-col gap-2">
             {estudios.hallazgos.map((h, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: 10, border: `1px solid ${C.border}`, padding: '12px 14px' }}>
