@@ -66,8 +66,9 @@ PROGRAM_STUDIES: dict[int, dict[str, Any]] = {
             "hasta 2030 y la combinación IA y big data lidera las habilidades en alza "
             "globalmente (WEF). Hacia 2029, las decisiones modeladas explícitamente "
             "serán cinco veces más confiables y el streaming de datos para IA pasará "
-            "del 15 % al 60 % (Gartner). En América Latina, la IA concentra el 7 % "
-            "de las vacantes y es el área de habilidades de más rápido crecimiento (BID)."
+            "de menos del 15 % en 2025 a más del 60 % en 2028 (Gartner). En América "
+            "Latina, alrededor del 7 % de las vacantes de la región mencionaba IA "
+            "(BID, jun 2025)."
         ),
         "hallazgos": [
             _h(
@@ -192,8 +193,9 @@ PROGRAM_STUDIES: dict[int, dict[str, Any]] = {
         "resumen": (
             "PMI anticipa hasta 30 millones de nuevos profesionales de proyectos para 2035, "
             "pero el rol evoluciona: los proyectos son más complejos y la IA ya asiste en "
-            "investigación, documentación e identificación de riesgos. El reto emergente "
-            "es gobernar agentes de IA en entornos con poca claridad de roles."
+            "investigación, documentación e identificación de riesgos. Una encuesta citada "
+            "por PMI indica que el 48 % de las empresas no tiene roles claros para gestionar "
+            "agentes de IA."
         ),
         "hallazgos": [
             _h(
@@ -249,10 +251,9 @@ PROGRAM_STUDIES: dict[int, dict[str, Any]] = {
     # ── 109 · Ingeniería Informática ─────────────────────────────────────────
     109: {
         "resumen": (
-            "Encuestas a líderes de ingeniería muestran que la IA dificulta evaluar "
-            "habilidades técnicas en candidatos, pero los fundamentos de programación "
-            "siguen siendo base indiscutida. Los desarrolladores figuran entre los "
-            "empleos de mayor crecimiento según el WEF."
+            "En entrevistas con 54 profesionales, ninguno propuso abandonar los fundamentos "
+            "de programación. Una encuesta a 400 líderes de ingeniería mostró que el 71 % "
+            "considera que la IA dificultó evaluar habilidades técnicas de candidatos."
         ),
         "hallazgos": [
             _h(
@@ -319,10 +320,9 @@ PROGRAM_STUDIES: dict[int, dict[str, Any]] = {
     # ── 11 · Inteligencia Artificial ─────────────────────────────────────────
     11: {
         "resumen": (
-            "La IA generativa alcanzó el 53 % de adopción en apenas tres años "
-            "y los agentes autónomos se acercan a la referencia humana en tareas de escritorio. "
-            "El mercado laboral demanda especialistas en ingeniería, evaluación y gobernanza "
-            "de IA, no solo en su uso."
+            "Los especialistas en IA y aprendizaje automático son el tercer empleo de mayor "
+            "crecimiento según el WEF, y Gartner recomienda gobernanza de decisiones "
+            "automatizadas."
         ),
         "hallazgos": [
             _h(
@@ -379,11 +379,8 @@ PROGRAM_STUDIES: dict[int, dict[str, Any]] = {
     # ── 20 · Neuropsicología y Educación ─────────────────────────────────────
     20: {
         "resumen": (
-            "La evaluación neuropsicológica avanza hacia lo digital y lo remoto: "
-            "la validez diagnóstica de las pruebas en línea es ya comparable a la presencial "
-            "según varios metaanálisis. La IA entra en los marcos clínicos con promesas "
-            "de mayor precisión pero con riesgos de sesgo algorítmico y pérdida de privacidad "
-            "que el profesional deberá gestionar."
+            "La literatura reciente, no verificada aquí abriendo cada fuente, apunta a "
+            "evaluación digital y remota, con advertencias sobre sesgo algorítmico y privacidad."
         ),
         "hallazgos": [
             _h(
