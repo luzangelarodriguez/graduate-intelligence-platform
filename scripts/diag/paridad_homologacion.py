@@ -96,9 +96,7 @@ _SQL_PROG_SKILLS = """
 _AC, _AK, _FC, _FK = 50, 6, 75, 3
 
 
-def _veredicto(cobertura: float, n_criticas: int, evidencia_baja: bool) -> str:
-    if evidencia_baja:
-        return "Evidencia limitada"
+def _veredicto(cobertura: float, n_criticas: int) -> str:
     if cobertura < _AC or n_criticas >= _AK:
         return "Actualizar"
     if cobertura < _FC or n_criticas >= _FK:
@@ -156,7 +154,6 @@ def _run_analysis(conn, program_id: int, process_fn) -> dict:
         "veredicto":       _veredicto(
             analysis["cobertura_pct"],
             len(analysis["brechas_criticas"]),
-            analysis["evidencia_baja"],
         ),
         "skills":          {s["skill"]: s["frecuencia"] for s in skills_raw},
     }
@@ -189,7 +186,7 @@ def _compare(before: dict, after: dict) -> dict:
 
 _SEP = "─" * 80
 _COLS = ["programa", "n_matches", "umbral", "n_hab", "cobertura_%",
-         "fortalezas", "brechas", "criticas", "veredicto"]
+         "fortalezas", "brechas", "criticas", "evidencia_baja", "veredicto"]
 
 
 def _fmt_row(prog_id: int, r: dict) -> list:
@@ -202,6 +199,7 @@ def _fmt_row(prog_id: int, r: dict) -> list:
         r["n_fortalezas"],
         r["n_brechas"],
         r["n_criticas"],
+        r["evidencia_baja"],
         r["veredicto"],
     ]
 
@@ -236,6 +234,11 @@ def _print_comparison(program_id: int, before: dict, after: dict, diff: dict) ->
             vbs, vas = str(vb), str(va)
         changed = " ◄" if delta not in ("0", "+0", "+0.0", "—") else ""
         print(f"  {label:<18} {vbs:>12} {vas:>12} {delta:>8}{changed}")
+
+    vb_ev = before["evidencia_baja"]
+    va_ev = after["evidencia_baja"]
+    ev_delta = " ◄ CAMBIA" if vb_ev != va_ev else ""
+    print(f"  {'evidencia_baja':<18} {str(vb_ev):>12} {str(va_ev):>12}{ev_delta}")
 
     vb_ver = before["veredicto"]
     va_ver = after["veredicto"]
