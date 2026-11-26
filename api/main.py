@@ -42,6 +42,7 @@ from api.contracts import (
 )
 from api.logging import RequestLoggingMiddleware, configure_logging
 from api.market_sample import _MARKET_SAMPLE_CTE
+from api.microcurriculo_filters import SQL_FILTRO_NO_PRUEBA as _SQL_FILTRO_NO_PRUEBA
 from api import services
 
 
@@ -1003,7 +1004,7 @@ _SQL_MARKET_SIZE = f"""
     WHERE ms.especializacion_id = %s
 """
 
-_SQL_PROG_SKILLS = """
+_SQL_PROG_SKILLS = f"""
     SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
            COUNT(*) AS cobertura,
            ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
@@ -1011,6 +1012,7 @@ _SQL_PROG_SKILLS = """
     JOIN microcurriculos m ON m.id = ms.microcurriculo_id
     WHERE m.specialization_id = %s
       AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
+      {_SQL_FILTRO_NO_PRUEBA}
     GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
     ORDER BY cobertura DESC
 """
@@ -1629,15 +1631,16 @@ def _run_redesign(job_id: str, program_id: int) -> None:
 
         _update("running", current_step="Cargando microcurrículos")
 
-        # 1. Fetch microcurriculos for this program
+        # 1. Fetch microcurriculos for this program (excludes test/sandbox rows)
         mc_rows = fetch_all(
-            """
+            f"""
             SELECT m.id, m.asignatura, m.clean_text,
                    COALESCE(m.asignatura, m.source_document) AS nombre
             FROM microcurriculos m
             WHERE m.specialization_id = %s
               AND m.clean_text IS NOT NULL
               AND length(m.clean_text) > 50
+              {_SQL_FILTRO_NO_PRUEBA}
             ORDER BY m.asignatura NULLS LAST
             """,
             (program_id,),
