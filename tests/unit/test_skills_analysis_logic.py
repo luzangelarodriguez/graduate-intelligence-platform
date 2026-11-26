@@ -275,6 +275,199 @@ class TestProcessJobSkillRows:
         assert len(result) <= HARD_CAP
 
 
+# ── Alias canonicalization (canonical_key + SKILL_ALIASES) ────────────────────
+
+class TestAliasCanonicalisation:
+    """
+    Tests for the alias-based deduplication introduced in process_job_skill_rows.
+
+    Four invariants (a)–(d) plus a cross-analysis coverage test (e).
+    """
+
+    def _rows(self, jobs: dict[str, list[str]]) -> list[dict]:
+        return [
+            {"match_id": mid, "skill": skill}
+            for mid, skills in jobs.items()
+            for skill in skills
+        ]
+
+    # (a) Same vacancy: "reporte" + "reportes" → counted once
+    def test_dedupe_within_vacancy_reportes(self):
+        rows = self._rows({
+            "1": ["reporte", "reportes", "excel"],
+            "2": ["reporte", "excel"],
+            "3": ["reporte", "excel"],
+        })
+        result, n = process_job_skill_rows(rows)
+        assert n == 3
+        freq = {r["skill"]: r["frecuencia"] for r in result}
+        # "reporte" and "reportes" collapse to one entry; must appear in all 3 jobs
+        reporte_key = next((s for s in freq if "reporte" in s), None)
+        assert reporte_key is not None, f"No reporte entry found; got: {list(freq)}"
+        assert freq[reporte_key] == 3, (
+            f"Expected freq=3 for reporte group, got {freq[reporte_key]}"
+        )
+
+    # (b) Same vacancy: "analista de datos" + "analisis de datos" → counted once
+    def test_dedupe_within_vacancy_analista_analisis(self):
+        rows = self._rows({
+            "1": ["analista de datos", "analisis de datos", "python"],
+            "2": ["analisis de datos", "python"],
+            "3": ["analisis de datos", "python"],
+        })
+        result, n = process_job_skill_rows(rows)
+        assert n == 3
+        freq = {r["skill"]: r["frecuencia"] for r in result}
+        analisis_key = next((s for s in freq if "analisis" in s or "analista" in s), None)
+        assert analisis_key is not None, f"No analisis entry; got: {list(freq)}"
+        assert freq[analisis_key] == 3
+
+    # (c) General invariant: no frequency exceeds n_matches
+    def test_no_frequency_exceeds_n_matches(self):
+        rows = self._rows({
+            "1": ["reporte", "reportes", "dashboard", "dashboards"],
+            "2": ["reporte", "dashboard"],
+            "3": ["reportes", "dashboards"],
+            "4": ["reporte", "dashboards"],
+            "5": ["reportes", "dashboard"],
+        })
+        result, n = process_job_skill_rows(rows)
+        for entry in result:
+            assert entry["frecuencia"] <= n, (
+                f"freq={entry['frecuencia']} > n_matches={n} for skill '{entry['skill']}'"
+            )
+
+    # (d) Alias across different vacancies: sums into one entry
+    def test_alias_sums_across_vacancies(self):
+        # 4 jobs: 2 have "reportes", 2 have "reporte" → one entry with freq=4
+        rows = self._rows({
+            "1": ["reportes", "sql"],
+            "2": ["reporte",  "sql"],
+            "3": ["reportes", "sql"],
+            "4": ["reporte",  "sql"],
+        })
+        result, n = process_job_skill_rows(rows)
+        assert n == 4
+        freq = {r["skill"]: r["frecuencia"] for r in result}
+        reporte_entries = [v for k, v in freq.items() if "reporte" in k]
+        assert len(reporte_entries) == 1, (
+            f"Expected one merged entry for reporte group, got: {list(freq)}"
+        )
+        assert reporte_entries[0] == 4
+
+    # (e) Cross-analysis: "reportes" in market covered by "reporte" in program
+    def test_reportes_covered_by_reporte_in_program(self):
+        rows = self._rows({
+            str(i): ["reportes", "python"] for i in range(5)
+        })
+        result, n = process_job_skill_rows(rows)
+        from api.skills_analysis_logic import cross_analyze
+        prog = [
+            {"skill": "reporte", "cobertura": 2, "asignaturas": []},
+            {"skill": "Python",  "cobertura": 3, "asignaturas": []},
+        ]
+        analysis = cross_analyze(result, prog, n_matches=n)
+        fortaleza_skills = {f["skill"] for f in analysis["fortalezas"]}
+        brecha_skills    = {b["skill"] for b in analysis["brechas"]}
+        assert any("reporte" in s for s in fortaleza_skills), (
+            f"'reportes' should be covered by 'reporte'; brechas={brecha_skills}"
+        )
+        assert not any("reporte" in s for s in brecha_skills), (
+            f"'reporte' group should not appear in brechas; got: {brecha_skills}"
+        )
+
+    # (e2) Cross-analysis: "dashboards" covered by "dashboard" in program
+    def test_dashboards_covered_by_dashboard_in_program(self):
+        rows = self._rows({
+            str(i): ["dashboards", "sql"] for i in range(5)
+        })
+        result, n = process_job_skill_rows(rows)
+        from api.skills_analysis_logic import cross_analyze
+        prog = [
+            {"skill": "dashboard", "cobertura": 2, "asignaturas": []},
+            {"skill": "SQL",       "cobertura": 3, "asignaturas": []},
+        ]
+        analysis = cross_analyze(result, prog, n_matches=n)
+        fortaleza_skills = {f["skill"] for f in analysis["fortalezas"]}
+        brecha_skills    = {b["skill"] for b in analysis["brechas"]}
+        assert any("dashboard" in s for s in fortaleza_skills), (
+            f"'dashboards' should be covered by 'dashboard'; brechas={brecha_skills}"
+        )
+
+    # (f) Display name: without alias, first-seen form is preserved
+    def test_display_name_no_alias_is_first_seen(self):
+        # "Machine Learning" appears in 3 jobs — no alias for it
+        rows = self._rows({
+            "1": ["Machine Learning", "Python"],
+            "2": ["machine learning", "Python"],
+            "3": ["MACHINE LEARNING", "Python"],
+        })
+        result, _ = process_job_skill_rows(rows)
+        freq = {r["skill"]: r["frecuencia"] for r in result}
+        ml_key = next((s for s in freq if "machine" in s.lower()), None)
+        assert ml_key is not None
+        # Display form is the first-seen raw form
+        assert ml_key == "Machine Learning", (
+            f"Expected first-seen form 'Machine Learning', got '{ml_key}'"
+        )
+
+    # (g) Display name: with alias, canonical destination is used
+    def test_display_name_with_alias_is_canonical(self):
+        # Only "reportes" appears; display should be "reporte" (alias destination)
+        rows = self._rows({str(i): ["reportes", "sql"] for i in range(5)})
+        result, _ = process_job_skill_rows(rows)
+        freq = {r["skill"]: r["frecuencia"] for r in result}
+        assert "reporte" in freq, (
+            f"Expected display name 'reporte' (alias destination), got: {list(freq)}"
+        )
+        assert "reportes" not in freq
+
+
+# ── find_prog_match canonical_key coverage ────────────────────────────────────
+
+class TestFindProgMatchCanonical:
+    """
+    Verify that find_prog_match uses canonical_key on both sides, so alias pairs
+    (reportes↔reporte, analista de datos↔analisis de datos) cross-match correctly,
+    while unrelated skills (sql vs bases de datos) do NOT.
+    """
+
+    def _prog(self, skills: list[str]) -> list[dict]:
+        return [{"skill": s, "cobertura": 1, "asignaturas": []} for s in skills]
+
+    def test_market_reporte_covered_by_prog_reportes(self):
+        # canonical_key("reporte")="reporte", canonical_key("reportes")="reporte" → match
+        detail = find_prog_match("reporte", self._prog(["reportes"]))
+        assert detail.rule != "ninguna", (
+            "market 'reporte' should be covered by prog 'reportes' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_market_reportes_covered_by_prog_reporte(self):
+        # canonical_key("reportes")="reporte", canonical_key("reporte")="reporte" → match
+        detail = find_prog_match("reportes", self._prog(["reporte"]))
+        assert detail.rule != "ninguna", (
+            "market 'reportes' should be covered by prog 'reporte' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_market_analisis_covered_by_prog_analista(self):
+        # canonical_key("analisis de datos")="analisis de datos"
+        # canonical_key("analista de datos")="analisis de datos" → match
+        detail = find_prog_match("analisis de datos", self._prog(["analista de datos"]))
+        assert detail.rule != "ninguna", (
+            "market 'analisis de datos' should be covered by prog 'analista de datos' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_sql_not_covered_by_bases_de_datos(self):
+        # "sql" and "bases de datos" are intentionally NOT unified — must stay separate
+        detail = find_prog_match("sql", self._prog(["bases de datos"]))
+        assert detail.rule == "ninguna", (
+            "'sql' must NOT be covered by 'bases de datos' — these are separate skills"
+        )
+
+
 # ── cross_analyze() ───────────────────────────────────────────────────────────
 
 class TestCrossAnalyze:

@@ -21,6 +21,8 @@ import re
 import unicodedata
 from typing import NamedTuple
 
+from api.skill_aliases import SKILL_ALIASES
+
 
 # ── Normalisation ──────────────────────────────────────────────────────────────
 
@@ -90,6 +92,18 @@ def norm_match(s: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     text = " ".join(_depluralize(w) for w in text.split())
     return SINONIMOS.get(text, text)
+
+
+def canonical_key(skill: str) -> str:
+    """
+    Grouping key for frequency counting in process_job_skill_rows.
+
+    Applies norm_match() (strips level qualifiers, English plurals, synonyms)
+    then looks up SKILL_ALIASES for any remaining explicit mappings (e.g.
+    Spanish plurals that _depluralize does not handle).
+    """
+    k = norm_match(skill)
+    return SKILL_ALIASES.get(k, k)
 
 
 # ── Transversal skills ─────────────────────────────────────────────────────────
@@ -233,28 +247,35 @@ def process_job_skill_rows(
     n_matches = len(jobs)
     threshold = frequency_threshold(n_matches)
 
-    # Apply subsunción and always-discard noise filter per job; accumulate frequencies
+    # Apply subsunción, alias dedup, noise filter per job; accumulate frequencies.
+    # Each canonical key is counted at most once per vacancy (set-based dedup),
+    # so no frequency can exceed n_matches.
     freq: dict[str, int] = {}
     for job_skills_raw in jobs.values():
         job_skills = subsume_job_skills(job_skills_raw)
+        seen_keys: set[str] = set()
         for skill in job_skills:
             if norm(skill) in RUIDO_SIEMPRE:
                 continue
-            key = norm(skill)
-            # Use the first seen display form for each normalised key
+            key = canonical_key(skill)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
             if key not in freq:
                 freq[key] = 0
             freq[key] += 1
 
-    # Build display-name map (first seen per normalised key)
+    # Build display-name map: alias destination if skill has an explicit alias,
+    # else first-seen raw form (unchanged from previous behaviour).
     display: dict[str, str] = {}
     for row in rows:
         skill = row.get("skill") or ""
         if not skill or "skillmatch" in skill.lower():
             continue
-        key = norm(skill)
+        key = canonical_key(skill)
         if key not in display:
-            display[key] = skill
+            nm = norm_match(skill)
+            display[key] = SKILL_ALIASES.get(nm, skill)
 
     # Filter by threshold and sort
     candidates = [
@@ -277,35 +298,36 @@ def find_prog_match(market_skill: str, prog_skills: list[dict]) -> MatchDetail:
     """
     Find which program skill covers market_skill (and by what rule).
 
-    Uses norm_match() for comparison so that level qualifiers (avanzado/basico),
-    English plurals (dashboards→dashboard), and synonyms (mercadeo→marketing)
-    are stripped before comparing.  Rule labels:
+    Uses canonical_key() for comparison so that level qualifiers (avanzado/basico),
+    English plurals (dashboards→dashboard), synonyms (mercadeo→marketing), and
+    explicit aliases (reportes→reporte, analista de datos→analisis de datos) are
+    unified before comparing.  Rule labels:
         "exacta"          : surface-identical after norm()
         "frase"           : prog contains market as whole-word phrase (no transformation)
-        "sinonimo_o_nivel": match required synonym mapping or qualifier stripping
+        "sinonimo_o_nivel": match required synonym mapping, qualifier stripping, or alias
         "paraguas: ..."   : umbrella skill covered by ≥3 of its components
         "ninguna"         : no coverage found
     """
-    nm = norm_match(market_skill)
+    nm = canonical_key(market_skill)
     n_orig_m = norm(market_skill)
     transformed_m = nm != n_orig_m
 
-    # 1. Try exact match via norm_match
+    # 1. Try exact match via canonical_key
     for p in prog_skills:
-        np = norm_match(p["skill"])
+        np = canonical_key(p["skill"])
         if nm == np:
             if transformed_m or np != norm(p["skill"]):
                 return MatchDetail(p["skill"], "sinonimo_o_nivel")
             return MatchDetail(p["skill"], "exacta")
 
-    # 2. Try phrase match via norm_match (prog contains market phrase)
+    # 2. Try phrase match via canonical_key (prog contains market phrase)
     words = nm.split()
     letters = len(nm.replace(" ", ""))
     if len(words) >= 2 or letters >= 6:
         for p in prog_skills:
-            np = norm_match(p["skill"])
+            np = canonical_key(p["skill"])
             if nm != np and bool(_phrase_re(nm).search(np)):
-                if transformed_m or norm_match(p["skill"]) != norm(p["skill"]):
+                if transformed_m or canonical_key(p["skill"]) != norm(p["skill"]):
                     return MatchDetail(p["skill"], "sinonimo_o_nivel")
                 return MatchDetail(p["skill"], "frase")
 
@@ -315,7 +337,7 @@ def find_prog_match(market_skill: str, prog_skills: list[dict]) -> MatchDetail:
         matched = [
             comp
             for comp in components
-            if any(norm_match(p["skill"]) == comp for p in prog_skills)
+            if any(canonical_key(p["skill"]) == comp for p in prog_skills)
         ]
         if len(matched) >= 3:
             rule = "paraguas: " + ", ".join(sorted(matched))
