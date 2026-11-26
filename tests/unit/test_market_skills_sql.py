@@ -124,10 +124,12 @@ def market_symbols():
 
 class TestSqlStructure:
     def test_no_relevance_label_filter(self, market_symbols):
+        # relevance_label is SELECTed for n_muestra_alta_media, but must not appear
+        # in a WHERE / FILTER clause that narrows the market sample.
         sql = market_symbols["sql"]
-        assert "relevance_label" not in sql, (
-            "_SQL_MARKET_SKILLS must not filter by relevance_label"
-        )
+        assert not re.search(
+            r"relevance_label\s+IN\b", sql, re.IGNORECASE
+        ), "_SQL_MARKET_SKILLS must not filter the sample by relevance_label IN (...)"
 
     def test_no_skills_en_comun_filter(self, market_symbols):
         sql = market_symbols["sql"]
@@ -185,15 +187,17 @@ class TestSqlStructure:
 EXPECTED_KEYS = {
     "fortalezas", "brechas", "transversales", "brechas_criticas",
     "cobertura_pct", "exclusivas_programa", "evidencia_baja",
-    "skills_mercado_raw", "skills_mercado", "skills_programa", "n_matches",
+    "skills_mercado_raw", "skills_mercado", "skills_programa",
+    "n_matches", "n_muestra_alta_media",
 }
 
 
 def _make_mock_rows():
     return [
-        {"match_id": 1, "skill": "Python"},
-        {"match_id": 1, "skill": "SQL"},
-        {"match_id": 2, "skill": "Excel"},
+        {"match_id": 1, "relevance_label": "high",   "skill": "Python"},
+        {"match_id": 1, "relevance_label": "high",   "skill": "SQL"},
+        {"match_id": 2, "relevance_label": "medium", "skill": "Excel"},
+        {"match_id": 3, "relevance_label": "low",    "skill": "Word"},
     ]
 
 
@@ -261,3 +265,22 @@ class TestMarketAnalysisForProgram:
         result = fn(99, fake_fetch)
         assert result["n_matches"] == 0
         assert result["evidencia_baja"] is True
+
+    def test_n_muestra_alta_media_counts_high_medium_matches(self, market_symbols):
+        fn  = market_symbols["fn"]
+        sql = market_symbols["sql"]
+
+        def fake_fetch(s: str, params: tuple) -> list[dict]:
+            if s is sql:
+                return _make_mock_rows()  # match_ids 1(high), 2(medium), 3(low)
+            return _make_mock_prog_rows()
+
+        result = fn(99, fake_fetch)
+        # 2 distinct match_ids with high/medium (1 and 2); match_id 3 is low
+        assert result["n_muestra_alta_media"] == 2
+
+    def test_jobs_activo_guard_in_sql(self, market_symbols):
+        sql = market_symbols["sql"]
+        assert re.search(r"COALESCE\s*\(\s*j\.activo", sql, re.IGNORECASE), (
+            "_SQL_MARKET_SKILLS must guard with COALESCE(j.activo, TRUE) = TRUE"
+        )

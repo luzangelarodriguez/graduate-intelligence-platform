@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from api.market_sample import _MARKET_SAMPLE_CTE
 from backend.repositories.base import fetch_all, fetch_one
 
 _SKILL_REPR_RE      = re.compile(r"SkillMatch\([^)]*skill_normalized='([^']+)'[^)]*\)")
@@ -244,12 +245,9 @@ def fetch_occupational_profiles(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return top occupational profiles (semantic_title_family) for a program via ml_program_job_matches."""
+    """Return top occupational profiles (semantic_title_family) for a program via market_sample."""
     job_filters = [
-        "m.especializacion_id = %s",
-        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "m.relevance_label IN ('high', 'medium')",
-        "COALESCE(j.activo, TRUE) = TRUE",
+        "ms.especializacion_id = %s",
         "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
         "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
@@ -274,11 +272,12 @@ def fetch_occupational_profiles(
     where = " AND ".join(job_filters)
     return fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))) AS perfil,
             COUNT(DISTINCT j.id)::int AS vacantes
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         WHERE {where}
         GROUP BY LOWER(TRIM(COALESCE(j.semantic_title_family, j.title)))
         ORDER BY vacantes DESC
@@ -300,12 +299,9 @@ def fetch_profile_skills(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Return skills for jobs matching a semantic_title_family for a given program via ml_program_job_matches."""
+    """Return skills for jobs matching a semantic_title_family for a given program via market_sample."""
     job_filters = [
-        "m.especializacion_id = %s",
-        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "m.relevance_label IN ('high', 'medium')",
-        "COALESCE(j.activo, TRUE) = TRUE",
+        "ms.especializacion_id = %s",
         "LOWER(TRIM(COALESCE(j.semantic_title_family, j.title))) = LOWER(TRIM(%s))",
         "COALESCE(js.canonical_skill, js.skill_family, js.skill_category, '') != ''",
     ]
@@ -330,12 +326,13 @@ def fetch_profile_skills(
     where = " AND ".join(job_filters)
     rows = fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             COALESCE(js.canonical_skill, js.skill_family, js.skill_category) AS nombre,
             COALESCE(NULLIF(TRIM(js.skill_category), ''), 'Otros') AS tipo_skill,
             COUNT(DISTINCT j.id)::int AS vacantes
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         JOIN job_skills js ON js.job_id = j.id
         WHERE {where}
         GROUP BY js.canonical_skill, js.skill_family, js.skill_category
@@ -367,12 +364,9 @@ def fetch_profile_kpis(
     portal: str | None = None,
     db_name: str | None = None,
 ) -> dict[str, Any]:
-    """Return aggregate KPIs for jobs matched to a program via ml_program_job_matches."""
+    """Return aggregate KPIs for jobs matched to a program via market_sample."""
     job_filters = [
-        "m.especializacion_id = %s",
-        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "m.relevance_label IN ('high', 'medium')",
-        "COALESCE(j.activo, TRUE) = TRUE",
+        "ms.especializacion_id = %s",
         "COALESCE(j.semantic_title_family, j.title) IS NOT NULL",
         "TRIM(COALESCE(j.semantic_title_family, j.title)) != ''",
     ]
@@ -397,12 +391,13 @@ def fetch_profile_kpis(
     where = " AND ".join(job_filters)
     row = fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             COUNT(DISTINCT j.id)::int AS total_ofertas,
             COUNT(DISTINCT COALESCE(j.semantic_title_family, j.title))::int AS total_perfiles,
             COUNT(DISTINCT COALESCE(js.canonical_skill, js.skill_family, js.skill_category))::int AS total_skills
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         LEFT JOIN job_skills js ON js.job_id = j.id
         WHERE {where}
         """,
@@ -416,10 +411,7 @@ def fetch_profile_kpis(
 
 def _base_job_filters(especializacion_id: int) -> tuple[list[str], list[Any]]:
     filters = [
-        "m.especializacion_id = %s",
-        "m.run_id = (SELECT MAX(id) FROM ml_training_runs WHERE task_name = 'program_job_match')",
-        "m.relevance_label IN ('high', 'medium')",
-        "COALESCE(j.activo, TRUE) = TRUE",
+        "ms.especializacion_id = %s",
     ]
     return filters, [especializacion_id]
 
@@ -435,11 +427,12 @@ def fetch_sectores(
     where = " AND ".join(filters)
     return fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             j.industry AS sector,
             COUNT(DISTINCT j.id)::int AS vacantes
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         WHERE {where}
         GROUP BY j.industry
         ORDER BY vacantes DESC
@@ -461,11 +454,12 @@ def fetch_ciudades(
     where = " AND ".join(filters)
     return fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             j.location AS ciudad,
             COUNT(DISTINCT j.id)::int AS vacantes
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         WHERE {where}
         GROUP BY j.location
         ORDER BY vacantes DESC
@@ -486,11 +480,12 @@ def fetch_tendencia_mensual(
     where = " AND ".join(filters)
     return fetch_all(
         f"""
+        WITH {_MARKET_SAMPLE_CTE}
         SELECT
             TO_CHAR(DATE_TRUNC('month', j.created_at), 'YYYY-MM') AS mes,
             COUNT(DISTINCT j.id)::int AS vacantes
-        FROM jobs j
-        JOIN ml_program_job_matches m ON m.empleo_id = j.id::text
+        FROM market_sample ms
+        JOIN jobs j ON j.id::text = ms.empleo_id
         WHERE {where}
         GROUP BY DATE_TRUNC('month', j.created_at)
         ORDER BY DATE_TRUNC('month', j.created_at)

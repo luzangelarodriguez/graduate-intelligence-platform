@@ -68,6 +68,7 @@ interface SkillsAnalysis {
   transversales?: TransversalSkill[];
   evidencia_baja?: boolean;
   n_matches?: number;
+  n_muestra_alta_media?: number;
 }
 interface Competitor {
   nombre_ies: string; nombre_programa: string; ciudad: string; modalidad: string;
@@ -1121,11 +1122,13 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const totalBrechas         = skills?.brechas?.length ?? 0;
   const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
-  const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
+  const muestraTotal        = skills?.n_matches ?? 0;
+  const nMuestraAltaMedia   = skills?.n_muestra_alta_media ?? 0;
+  const afinidadPct         = Math.round((nMuestraAltaMedia / Math.max(muestraTotal, 1)) * 100);
 
   const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
-  const muestraTotal  = skills?.n_matches ?? 0;
-  const perfilesTotal = kpis?.total_perfiles ?? perfiles.length;
+  const perfilesTotal = homologado?.kpis?.perfiles_homologados ?? (kpis?.total_perfiles ?? perfiles.length);
+  const familiasTotal = homologado?.kpis?.familias_identificadas ?? 0;
   const maxPerf = perfiles[0]?.vacantes ?? 1;
   const maxSec  = sectores[0]?.vacantes ?? 1;
   const maxCiu  = ciudades[0]?.vacantes ?? 1;
@@ -1196,8 +1199,8 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
           {[
             { icon: '💼', value: muestraTotal.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${meta.nombre}` },
-            { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
-            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
+            { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: `agrupados en ${familiasTotal} familias` },
+            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad alta o media', sub: `${nMuestraAltaMedia} de ${muestraTotal} vacantes de la muestra` },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
             { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
