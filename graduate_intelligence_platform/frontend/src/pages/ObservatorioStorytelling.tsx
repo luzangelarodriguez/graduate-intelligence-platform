@@ -300,7 +300,7 @@ function veredictoPrograma({
     const prel = _veredictoSinGuardia(coberturaValida, criticasValidas, ruleStr);
     return {
       label: 'Evidencia limitada', color: '#6B7280', bg: '#F3F4F6',
-      rule: ruleStr, threshold: 'Menos de 15 vacantes de afinidad alta o media',
+      rule: ruleStr, threshold: 'Menos de 15 vacantes en la muestra de mercado',
       preliminar: { label: prel.label, rule: ruleStr },
     };
   }
@@ -792,7 +792,7 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
       {skills?.evidencia_baja && (
         <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-          <span style={{ fontSize: 12, color: '#92400E' }}>Pocas vacantes de afinidad alta o media: interpreta estos resultados con cautela.</span>
+          <span style={{ fontSize: 12, color: '#92400E' }}>Pocas vacantes en la muestra de mercado: interpreta estos resultados con cautela.</span>
         </div>
       )}
 
