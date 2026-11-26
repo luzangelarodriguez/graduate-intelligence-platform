@@ -21,6 +21,8 @@ import re
 import unicodedata
 from typing import NamedTuple
 
+from api.skill_aliases import SKILL_ALIASES
+
 
 # ── Normalisation ──────────────────────────────────────────────────────────────
 
@@ -90,6 +92,18 @@ def norm_match(s: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     text = " ".join(_depluralize(w) for w in text.split())
     return SINONIMOS.get(text, text)
+
+
+def canonical_key(skill: str) -> str:
+    """
+    Grouping key for frequency counting in process_job_skill_rows.
+
+    Applies norm_match() (strips level qualifiers, English plurals, synonyms)
+    then looks up SKILL_ALIASES for any remaining explicit mappings (e.g.
+    Spanish plurals that _depluralize does not handle).
+    """
+    k = norm_match(skill)
+    return SKILL_ALIASES.get(k, k)
 
 
 # ── Transversal skills ─────────────────────────────────────────────────────────
@@ -233,28 +247,35 @@ def process_job_skill_rows(
     n_matches = len(jobs)
     threshold = frequency_threshold(n_matches)
 
-    # Apply subsunción and always-discard noise filter per job; accumulate frequencies
+    # Apply subsunción, alias dedup, noise filter per job; accumulate frequencies.
+    # Each canonical key is counted at most once per vacancy (set-based dedup),
+    # so no frequency can exceed n_matches.
     freq: dict[str, int] = {}
     for job_skills_raw in jobs.values():
         job_skills = subsume_job_skills(job_skills_raw)
+        seen_keys: set[str] = set()
         for skill in job_skills:
             if norm(skill) in RUIDO_SIEMPRE:
                 continue
-            key = norm(skill)
-            # Use the first seen display form for each normalised key
+            key = canonical_key(skill)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
             if key not in freq:
                 freq[key] = 0
             freq[key] += 1
 
-    # Build display-name map (first seen per normalised key)
+    # Build display-name map: alias destination if skill has an explicit alias,
+    # else first-seen raw form (unchanged from previous behaviour).
     display: dict[str, str] = {}
     for row in rows:
         skill = row.get("skill") or ""
         if not skill or "skillmatch" in skill.lower():
             continue
-        key = norm(skill)
+        key = canonical_key(skill)
         if key not in display:
-            display[key] = skill
+            nm = norm_match(skill)
+            display[key] = SKILL_ALIASES.get(nm, skill)
 
     # Filter by threshold and sort
     candidates = [
