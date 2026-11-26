@@ -438,7 +438,7 @@ function isCertSkill(s: string): boolean {
 const CAT_META: Record<SkillCat, { label: string; color: string; bar: string }> = {
   herramienta: { label: 'Herramientas', color: '#2563EB', bar: '#3B82F6' },
   competencia:  { label: 'Competencias', color: '#059669', bar: '#10B981' },
-  habilidad:    { label: 'Habilidades',  color: '#D97706', bar: '#F59E0B' },
+  habilidad:    { label: 'Habilidades blandas',  color: '#D97706', bar: '#F59E0B' },
   otro:         { label: 'Otros',        color: '#64748B', bar: '#94A3B8' },
 };
 
@@ -464,12 +464,16 @@ function ExplorandoMsg() {
   );
 }
 
-function SkillTag({ skill, variant = 'default' }: { skill: string; variant?: 'default' | 'gap' | 'match' }) {
+function SkillTag({ skill, variant = 'default', tipoSkill }: { skill: string; variant?: 'default' | 'gap' | 'match'; tipoSkill?: string }) {
   if (variant === 'gap')
     return <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: 'rgba(220,38,38,0.1)', color: '#dc2626', border: '1px solid rgba(220,38,38,0.25)' }}>− {skill}</span>;
   if (variant === 'match')
     return <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: 'rgba(5,150,105,0.1)', color: '#059669', border: '1px solid rgba(5,150,105,0.25)' }}>✓ {skill}</span>;
-  const m = CAT_META[classifySkill(skill)];
+  const cat: SkillCat = tipoSkill === 'herramienta' ? 'herramienta'
+    : tipoSkill === 'habilidad' ? 'habilidad'
+    : tipoSkill === 'competencia' ? 'competencia'
+    : classifySkill(skill);
+  const m = CAT_META[cat];
   return <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: `${m.bar}22`, color: m.color, border: `1px solid ${m.bar}44` }}>{skill}</span>;
 }
 
@@ -695,7 +699,11 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
     : [];
 
   // Category coverage helper
-  const catKeyFor = (skill: string): string => {
+  const catKeyFor = (skill: string, tipoSkill?: string): string => {
+    if (tipoSkill === 'herramienta') return 'herramienta';
+    if (tipoSkill === 'habilidad')   return 'habilidad';
+    if (tipoSkill === 'competencia') return 'competencia';
+    if (tipoSkill === 'tecnica')     return 'tecnica';
     const c = classifySkill(skill);
     if (c === 'herramienta') return 'herramienta';
     if (c === 'habilidad')   return 'habilidad';
@@ -713,14 +721,14 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
     };
     if (skills) {
       for (const f of [...skills.fortalezas].sort((a, b) => (b.cobertura_programa ?? 0) - (a.cobertura_programa ?? 0))) {
-        const k = catKeyFor(f.skill);
+        const k = catKeyFor(f.skill, f.tipo_skill);
         if (catDef[k]) {
           catDef[k].cubiertos += 1;
           if (catDef[k].topSkills.length < 4) catDef[k].topSkills.push(displaySkill(f.skill));
         }
       }
       for (const b of skills.brechas) {
-        const k = catKeyFor(b.skill);
+        const k = catKeyFor(b.skill, b.tipo_skill);
         if (catDef[k]) catDef[k].brechas += 1;
       }
     }
@@ -733,8 +741,8 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
 
   // Brechas table: evidencia + acción sugerida
   const fortalezaSet = new Set((skills?.fortalezas ?? []).map(f => f.skill.toLowerCase()));
-  const brechaAccion = (skill: string): string => {
-    const c = classifySkill(skill);
+  const brechaAccion = (skill: string, tipoSkill?: string): string => {
+    const c = tipoSkill ?? classifySkill(skill);
     if (c === 'herramienta') return 'Incluir como tecnología del perfil';
     if (c === 'habilidad')   return 'Incorporar en actividades colaborativas';
     if (c === 'competencia') return 'Integrar gestión aplicada al currículo';
@@ -963,7 +971,7 @@ function ViewResumen({ summary, prog, meta, veredicto, coberturaPct, empCompatib
                           <td style={{ padding: '8px 8px', textAlign: 'center' }}>
                             <span style={{ fontSize: 9, fontWeight: 700, borderRadius: 20, padding: '2px 9px', background: prioridad.bg, color: prioridad.color }}>{prioridad.label}</span>
                           </td>
-                          <td style={{ padding: '8px 8px', fontSize: 10, color: '#6B7280' }}>{brechaAccion(b.skill)}</td>
+                          <td style={{ padding: '8px 8px', fontSize: 10, color: '#6B7280' }}>{brechaAccion(b.skill, b.tipo_skill)}</td>
                         </tr>
                       );
                     })}
@@ -1143,8 +1151,8 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
     return cats;
   }, [topMarket]);
 
-  const brechaAccion = (skill: string): string => {
-    const c = classifySkill(skill);
+  const brechaAccion = (skill: string, tipoSkill?: string): string => {
+    const c = tipoSkill ?? classifySkill(skill);
     if (c === 'herramienta') return 'Incluir como tecnología del perfil';
     if (c === 'habilidad')   return 'Incorporar en actividades colaborativas';
     if (c === 'competencia') return 'Integrar gestión aplicada al currículo';
@@ -1771,7 +1779,7 @@ const SKILL_COLS = [
   { key: 'herramientas', label: 'Herramientas', icon: '🔧', kw: ['herramient', 'tool', 'software', 'plataform', 'tecnolog'] },
   { key: 'conocimientos', label: 'Conocimientos', icon: '📚', kw: ['conocimient', 'saber', 'knowledge', 'marco', 'metodolog', 'estandar', 'estándar'] },
   { key: 'competencias', label: 'Competencias', icon: '📊', kw: ['competenci', 'gestion', 'gestión', 'analisis', 'análisis', 'proceso'] },
-  { key: 'habilidades', label: 'Habilidades', icon: '👥', kw: ['habilidad', 'blanda', 'soft', 'transvers', 'interpersonal', 'comunic', 'liderazg'] },
+  { key: 'habilidades', label: 'Habilidades blandas', icon: '👥', kw: ['habilidad', 'blanda', 'soft', 'transvers', 'interpersonal', 'comunic', 'liderazg'] },
 ];
 
 function classifyTipoSkill(tipo: string): string {

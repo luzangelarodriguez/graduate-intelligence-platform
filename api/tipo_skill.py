@@ -4,7 +4,10 @@ Extracted from dashboard_skills_analysis so the logic can be unit-tested without
 """
 from __future__ import annotations
 
+import logging
 import unicodedata
+
+logger = logging.getLogger(__name__)
 
 HERRAMIENTAS_FORZADAS: frozenset[str] = frozenset({
     "excel avanzado",
@@ -54,7 +57,7 @@ def tipo_para_skill(skill: str, tipo_lookup: dict[str, str]) -> str:
         taxonomy_cat = canonicalize_skill(skill).category
         if taxonomy_cat.lower() not in _UNCLASSIFIED:
             return _clean_tipo_skill(None, taxonomy_cat)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("tipo_para_skill taxonomy fallback failed for %r: %s", skill, exc)
 
     return "competencia"
