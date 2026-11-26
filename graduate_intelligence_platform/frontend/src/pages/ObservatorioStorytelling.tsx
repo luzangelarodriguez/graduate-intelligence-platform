@@ -53,9 +53,9 @@ interface Summary {
 }
 interface SkillMercado  { skill: string; frecuencia: number; tipo_skill?: string }
 interface SkillPrograma { skill: string; cobertura: number; asignaturas?: string[] }
-interface Brecha           { skill: string; frecuencia_mercado: number }
-interface TransversalSkill { skill: string; frecuencia_mercado: number }
-interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number; regla?: string; prog_skill_match?: string }
+interface Brecha           { skill: string; frecuencia_mercado: number; tipo_skill?: string }
+interface TransversalSkill { skill: string; frecuencia_mercado: number; tipo_skill?: string }
+interface Fortaleza     { skill: string; frecuencia_mercado: number; cobertura_programa: number; regla?: string; prog_skill_match?: string; tipo_skill?: string }
 interface Exclusiva     { skill: string; cobertura: number }
 interface MatrizSkill   { skill: string; demanda_mercado: number; oferta_programa: number; tipo?: 'fortaleza' | 'brecha' | 'transversal' | 'solo_programa' }
 interface SkillsAnalysis {
@@ -649,7 +649,7 @@ interface ViewProps {
 const TIPO_META: Record<string, { bar: string; label: string; badgeBg: string; badgeColor: string }> = {
   herramienta: { bar: '#3B82F6', label: 'Herramienta', badgeBg: '#DBEAFE', badgeColor: '#1D4ED8' },
   tecnica:     { bar: '#059669', label: 'Conocimiento', badgeBg: '#D1FAE5', badgeColor: '#065F46' },
-  habilidad:   { bar: '#F59E0B', label: 'Habilidad',   badgeBg: '#FEF3C7', badgeColor: '#92400E' },
+  habilidad:   { bar: '#F59E0B', label: 'Habilidad blanda', badgeBg: '#FEF3C7', badgeColor: '#92400E' },
   competencia: { bar: '#14B8A6', label: 'Competencia',  badgeBg: '#CCFBF1', badgeColor: '#0F766E' },
 };
 function tipoMeta(tipo: string | undefined) {
@@ -1166,7 +1166,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
     { id: 'herramientas',   label: 'Herramientas' },
     { id: 'conocimientos',  label: 'Conocimientos' },
     { id: 'competencias',   label: 'Competencias' },
-    { id: 'habilidades',    label: 'Habilidades' },
+    { id: 'habilidades',    label: 'Habilidades blandas' },
     { id: 'sectores',       label: 'Sectores' },
     { id: 'ubicacion',      label: 'Ubicación geográfica' },
   ];
@@ -1502,7 +1502,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                   </tr></thead>
                   <tbody>
                     {topBrechas.map((b, i) => {
-                      const cat = classifySkill(b.skill);
+                      const cat = b.tipo_skill ?? classifySkill(b.skill);
                       const tm  = tipoMeta(cat);
                       const freq = b.frecuencia_mercado ?? 0;
                       const pctDem = Math.round((freq / Math.max(muestraTotal, 1)) * 100);
@@ -1551,7 +1551,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                       </tr></thead>
                       <tbody>
                         {[...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).map((b) => {
-                          const cat = classifySkill(b.skill);
+                          const cat = b.tipo_skill ?? classifySkill(b.skill);
                           const tm  = tipoMeta(cat);
                           const freq = b.frecuencia_mercado ?? 0;
                           const pctDemAll = Math.round((freq / Math.max(muestraTotal, 1)) * 100);

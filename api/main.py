@@ -1115,7 +1115,9 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         skills_programa     = core["skills_programa"]
 
         # 1b. Tipo-skill lookup (endpoint-specific — not needed by redesign)
-        import unicodedata as _ud
+        from api.tipo_skill import tipo_para_skill as _tipo_para_skill
+        from backend.repositories.empleos_repository import _clean_tipo_skill
+        from crawlers.storage.postgres_warehouse import canonicalize_skill
 
         tipo_rows = fetch_all(
             """
@@ -1131,9 +1133,6 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             """,
             (program_id, program_id),
         )
-        from backend.repositories.empleos_repository import _clean_tipo_skill
-        from crawlers.storage.postgres_warehouse import canonicalize_skill
-
         _UNCLASSIFIED = {"unknown", "unclassified", ""}
 
         tipo_lookup: dict[str, str] = {}
@@ -1148,23 +1147,16 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             else:
                 tipo_lookup[key] = _clean_tipo_skill(None, row["tipo_skill_raw"])
 
-        def _tipo_for(skill: str) -> str:
-            norm_key = "".join(
-                c for c in _ud.normalize("NFD", skill.lower())
-                if _ud.category(c) != "Mn"
-            ).strip()
-            result = tipo_lookup.get(norm_key, tipo_lookup.get(skill.lower().strip()))
-            if result is not None:
-                return result
-            taxonomy_cat = canonicalize_skill(skill).category
-            if taxonomy_cat.lower() not in _UNCLASSIFIED:
-                return _clean_tipo_skill(None, taxonomy_cat)
-            return "competencia"
-
         skills_mercado = [
-            {"skill": s["skill"], "frecuencia": s["frecuencia"], "tipo_skill": _tipo_for(s["skill"])}
+            {"skill": s["skill"], "frecuencia": s["frecuencia"], "tipo_skill": _tipo_para_skill(s["skill"], tipo_lookup)}
             for s in skills_mercado_raw
         ]
+
+        # Enrich brechas, fortalezas, transversales, brechas_criticas with tipo_skill
+        brechas = [{**b, "tipo_skill": _tipo_para_skill(b["skill"], tipo_lookup)} for b in brechas]
+        brechas_criticas = [{**b, "tipo_skill": _tipo_para_skill(b["skill"], tipo_lookup)} for b in brechas_criticas]
+        fortalezas = [{**f, "tipo_skill": _tipo_para_skill(f["skill"], tipo_lookup)} for f in fortalezas]
+        transversales = [{**t, "tipo_skill": _tipo_para_skill(t["skill"], tipo_lookup)} for t in transversales]
 
         # 2 & 3. Cross-analysis handled in _market_analysis_for_program above.
         # fortalezas, brechas, transversales, cobertura_pct, exclusivas_programa,
