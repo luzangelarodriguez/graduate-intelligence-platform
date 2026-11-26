@@ -3117,13 +3117,38 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
 }
 
 function ViewRecomendaciones({
-  skills, coberturaPct, brechaPct, empCompatibles, dataPobre,
+  skills, coberturaPct, dataPobre,
   redesignJob, redesignDlError, onStartRedesign, onDownloadRedesign, onClearRedesign,
 }: ViewProps) {
-  const topBrechas   = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
-  const brechasAlta  = skills?.brechas_criticas ?? [];
+  const topBrechas    = [...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0));
   const topFortalezas = [...(skills?.fortalezas ?? [])].sort((a, b) => b.cobertura_programa - a.cobertura_programa);
-  const ruido = (skills?.brechas ?? []).filter(b => classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3);
+  const ruido         = (skills?.brechas ?? []).filter(b => classifySkill(b.skill) === 'otro' && (b.frecuencia_mercado ?? 0) < 3);
+  const evidenciaBaja = skills?.evidencia_baja ?? false;
+
+  const fortalezas         = skills?.fortalezas ?? [];
+  const brechas            = skills?.brechas    ?? [];
+  const brechasCriticasOrd = [...(skills?.brechas_criticas ?? [])].sort(
+    (a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)
+  );
+  const universoTotal = fortalezas.length + brechas.length;
+  const sumTodasFrec  = [...fortalezas, ...brechas].reduce((s, x) => s + (x.frecuencia_mercado ?? 0), 0);
+  const sumFortFrec   = fortalezas.reduce((s, x) => s + (x.frecuencia_mercado ?? 0), 0);
+
+  const calcEsc = (incorp: { skill: string; frecuencia_mercado: number }[]) => {
+    const k   = incorp.length;
+    const cob = universoTotal === 0 ? 0 : ((fortalezas.length + k) / universoTotal) * 100;
+    const sumIncorp = incorp.reduce((s, x) => s + (x.frecuencia_mercado ?? 0), 0);
+    const dem = sumTodasFrec === 0 ? 0 : ((sumFortFrec + sumIncorp) / sumTodasFrec) * 100;
+    const incSet   = new Set(incorp.map(x => x.skill));
+    const critRest = brechasCriticasOrd.filter(x => !incSet.has(x.skill)).length;
+    return { k, cob, dem, verd: _veredictoSinGuardia(cob, critRest, `Cobertura ${cob.toFixed(1)} %`) };
+  };
+
+  const escA        = calcEsc(brechasCriticasOrd.slice(0, 2));
+  const escB        = calcEsc(brechasCriticasOrd);
+  const escC        = calcEsc(brechas);
+  const bIgualA     = brechasCriticasOrd.length <= 2;
+  const criticasSet = new Set((skills?.brechas_criticas ?? []).map(x => x.skill));
 
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:overflow-y-auto" style={{ padding: '20px 24px' }}>
@@ -3134,27 +3159,50 @@ function ViewRecomendaciones({
 
       {dataPobre ? <ExplorandoMsg /> : (
         <>
-          {/* Simulation scenarios */}
-          <DashPanel title="Simulación Curricular — Impacto estimado de incorporar brechas" style={{ flexShrink: 0 }}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {[
-                { title: 'Escenario A — Mínimo',   sub: `Incorporar top ${Math.min(brechasAlta.length, 2)} brechas críticas`,         pertinencia: `+${Math.round(brechaPct * 0.25)}%`, cobertura: `${Math.min(coberturaPct + 15, 99)}%`, empleos: `+${Math.round(empCompatibles * 0.2)}`, color: C.gold },
-                { title: 'Escenario B — Moderado', sub: `Incorporar brechas de prioridad alta (${brechasAlta.length})`,                pertinencia: `+${Math.round(brechaPct * 0.45)}%`, cobertura: `${Math.min(coberturaPct + 25, 99)}%`, empleos: `+${Math.round(empCompatibles * 0.4)}`, color: '#2563eb' },
-                { title: 'Escenario C — Completo', sub: `Incorporar todas las brechas (${skills?.brechas.length ?? '—'})`,             pertinencia: `+${Math.round(brechaPct * 0.70)}%`, cobertura: `${Math.min(coberturaPct + 40, 99)}%`, empleos: `+${Math.round(empCompatibles * 0.65)}`, color: '#059669' },
-              ].map(sc => (
-                <div key={sc.title} style={{ border: `1px solid ${sc.color}44`, borderRadius: 10, padding: '12px 14px', background: `${sc.color}08` }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: sc.color, margin: '0 0 4px' }}>{sc.title}</p>
-                  <p style={{ fontSize: 10, color: '#6B7280', margin: '0 0 10px' }}>{sc.sub}</p>
-                  {[{ k: 'Pertinencia', v: sc.pertinencia }, { k: 'Cobertura', v: sc.cobertura }, { k: 'Empleos comp.', v: sc.empleos }].map(({ k, v }) => (
-                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                      <span style={{ color: '#6B7280' }}>{k}</span>
-                      <span style={{ fontWeight: 700, color: sc.color }}>{v}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
+          {evidenciaBaja && (
+            <div style={{ background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 8, padding: '10px 14px', flexShrink: 0 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: '#92400E', margin: 0 }}>
+                ⚠ Muestra pequeña (&lt;15 vacantes) — proyecciones orientativas
+              </p>
             </div>
-          </DashPanel>
+          )}
+
+          {/* Simulation scenarios */}
+          {brechas.length === 0 ? (
+            <DashPanel title="Simulación Curricular" style={{ flexShrink: 0 }}>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Sin brechas por incorporar — el programa cubre todo el universo analizado.</p>
+            </DashPanel>
+          ) : (
+            <DashPanel title="Simulación Curricular — Impacto de incorporar brechas" style={{ flexShrink: 0 }}>
+              <div className={`grid grid-cols-1 ${bIgualA ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-2.5`}>
+                {[
+                  { title: 'Escenario A — Mínimo',   sub: `Top 2 brechas críticas (${escA.k})`,                              esc: escA, color: C.gold    },
+                  ...(!bIgualA ? [{ title: 'Escenario B — Moderado', sub: `Todas las brechas críticas (${brechasCriticasOrd.length})`, esc: escB, color: '#2563eb' as const }] : []),
+                  { title: 'Escenario C — Completo', sub: `Todas las brechas (${brechas.length})`,                            esc: escC, color: '#059669' },
+                ].map(sc => (
+                  <div key={sc.title} style={{ border: `1px solid ${sc.color}44`, borderRadius: 10, padding: '12px 14px', background: `${sc.color}08` }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: sc.color, margin: '0 0 4px' }}>{sc.title}</p>
+                    <p style={{ fontSize: 10, color: '#6B7280', margin: '0 0 10px' }}>{sc.sub}</p>
+                    {([
+                      { k: 'Cobertura',        v: `${sc.esc.cob.toFixed(1)} %` },
+                      { k: 'Demanda cubierta', v: `${sc.esc.dem.toFixed(1)} %` },
+                      { k: 'Veredicto',        v: sc.esc.verd.label            },
+                    ] as { k: string; v: string }[]).map(({ k, v }) => (
+                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                        <span style={{ color: '#6B7280' }}>{k}</span>
+                        <span style={{ fontWeight: 700, color: k === 'Veredicto' ? sc.esc.verd.color : sc.color }}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              {bIgualA && brechasCriticasOrd.length > 0 && (
+                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '8px 0 0' }}>
+                  Escenario B = A (≤ 2 brechas críticas)
+                </p>
+              )}
+            </DashPanel>
+          )}
 
           {/* Recommendations */}
           {skills && (skills.brechas.length > 0 || skills.fortalezas.length > 0) && (
@@ -3164,11 +3212,11 @@ function ViewRecomendaciones({
                   <div key={b.skill} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8 }}>
                     <span style={{ fontSize: 16, flexShrink: 0 }}>⚠</span>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', margin: '0 0 2px' }}>Incorporar "{b.skill}"</p>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', margin: '0 0 2px' }}>Incorporar "{displaySkill(b.skill)}"</p>
                       <p style={{ fontSize: 11, color: '#7F1D1D', margin: 0 }}>{b.frecuencia_mercado} vacantes lo demandan — no está cubierto en el currículo.</p>
                     </div>
                     <span style={{ fontSize: 10, fontWeight: 800, color: '#DC2626', background: '#FEE2E2', borderRadius: 20, padding: '2px 8px', flexShrink: 0, whiteSpace: 'nowrap' }}>
-                      {b.frecuencia_mercado >= 10 ? 'Urgente' : 'Alta'}
+                      {criticasSet.has(b.skill) ? 'Urgente' : 'Alta'}
                     </span>
                   </div>
                 ))}
