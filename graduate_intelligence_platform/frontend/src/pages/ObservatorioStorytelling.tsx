@@ -68,6 +68,7 @@ interface SkillsAnalysis {
   transversales?: TransversalSkill[];
   evidencia_baja?: boolean;
   n_matches?: number;
+  n_vacantes_muestra?: number;
 }
 interface Competitor {
   nombre_ies: string; nombre_programa: string; ciudad: string; modalidad: string;
@@ -1121,11 +1122,11 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const totalBrechas         = skills?.brechas?.length ?? 0;
   const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
-  const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
+  const muestraTotal     = skills?.n_matches ?? 0;
+  const nVacantesMuestra = skills?.n_vacantes_muestra ?? muestraTotal;
 
-  const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
-  const muestraTotal  = skills?.n_matches ?? 0;
-  const perfilesTotal = kpis?.total_perfiles ?? perfiles.length;
+  const perfilesTotal = homologado?.kpis?.perfiles_homologados ?? (kpis?.total_perfiles ?? perfiles.length);
+  const familiasTotal = homologado?.kpis?.familias_identificadas ?? 0;
   const maxPerf = perfiles[0]?.vacantes ?? 1;
   const maxSec  = sectores[0]?.vacantes ?? 1;
   const maxCiu  = ciudades[0]?.vacantes ?? 1;
@@ -1193,11 +1194,10 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: muestraTotal.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${meta.nombre}` },
-            { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
-            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
+            { icon: '💼', value: nVacantesMuestra.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${muestraTotal} con habilidades identificadas` },
+            { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: `agrupados en ${familiasTotal} familias` },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
             { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
@@ -1281,7 +1281,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                         <strong>{hk.vacantes_sin_homologar}</strong> vacante{hk.vacantes_sin_homologar !== 1 ? 's' : ''} sin clasificar — el catálogo de patrones se amplía progresivamente.
                       </p>
                     )}
-                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>Los perfiles se calculan sobre las vacantes de afinidad alta o media del programa.</p>
+                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>Los perfiles se calculan sobre la muestra de mercado del programa (vacantes activas, corrida más reciente).</p>
                     {/* Jerarquía expandible */}
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                       <thead><tr>
@@ -1592,7 +1592,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0 0' }}>
-                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>Calculado sobre {muestraTotal} vacantes de la muestra de mercado</span>
+                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>Calculado sobre {muestraTotal} vacantes con habilidades identificadas</span>
                   <button
                     onClick={() => setBrechasExpanded(v => !v)}
                     style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
@@ -1630,12 +1630,8 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
             <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Hallazgos principales</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>👤</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{afinidadPct}%</strong> de los perfiles laborales coinciden con el perfil de egreso.</p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{muestraTotal.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{nVacantesMuestra.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
@@ -1676,7 +1672,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
             <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Perspectiva del mercado</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { icon: '📈', text: `Demanda activa en el período analizado con ${muestraTotal.toLocaleString('es-CO')} vacantes en la muestra de mercado.` },
+                { icon: '📈', text: `Demanda activa en el período analizado con ${nVacantesMuestra.toLocaleString('es-CO')} vacantes en la muestra de mercado.` },
                 { icon: '🌐', text: 'Mayor crecimiento en sectores de tecnología, servicios profesionales y finanzas.' },
                 { icon: '🤖', text: 'Aumento en la adopción de IA y analítica avanzada como competencia transversal.' },
                 { icon: '🎯', text: `Oportunidad para perfiles con habilidades digitales y ${topMarket[0] ? displaySkill(topMarket[0].skill) : 'gestión de datos'}.` },
