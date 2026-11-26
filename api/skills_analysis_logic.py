@@ -298,35 +298,36 @@ def find_prog_match(market_skill: str, prog_skills: list[dict]) -> MatchDetail:
     """
     Find which program skill covers market_skill (and by what rule).
 
-    Uses norm_match() for comparison so that level qualifiers (avanzado/basico),
-    English plurals (dashboards→dashboard), and synonyms (mercadeo→marketing)
-    are stripped before comparing.  Rule labels:
+    Uses canonical_key() for comparison so that level qualifiers (avanzado/basico),
+    English plurals (dashboards→dashboard), synonyms (mercadeo→marketing), and
+    explicit aliases (reportes→reporte, analista de datos→analisis de datos) are
+    unified before comparing.  Rule labels:
         "exacta"          : surface-identical after norm()
         "frase"           : prog contains market as whole-word phrase (no transformation)
-        "sinonimo_o_nivel": match required synonym mapping or qualifier stripping
+        "sinonimo_o_nivel": match required synonym mapping, qualifier stripping, or alias
         "paraguas: ..."   : umbrella skill covered by ≥3 of its components
         "ninguna"         : no coverage found
     """
-    nm = norm_match(market_skill)
+    nm = canonical_key(market_skill)
     n_orig_m = norm(market_skill)
     transformed_m = nm != n_orig_m
 
-    # 1. Try exact match via norm_match
+    # 1. Try exact match via canonical_key
     for p in prog_skills:
-        np = norm_match(p["skill"])
+        np = canonical_key(p["skill"])
         if nm == np:
             if transformed_m or np != norm(p["skill"]):
                 return MatchDetail(p["skill"], "sinonimo_o_nivel")
             return MatchDetail(p["skill"], "exacta")
 
-    # 2. Try phrase match via norm_match (prog contains market phrase)
+    # 2. Try phrase match via canonical_key (prog contains market phrase)
     words = nm.split()
     letters = len(nm.replace(" ", ""))
     if len(words) >= 2 or letters >= 6:
         for p in prog_skills:
-            np = norm_match(p["skill"])
+            np = canonical_key(p["skill"])
             if nm != np and bool(_phrase_re(nm).search(np)):
-                if transformed_m or norm_match(p["skill"]) != norm(p["skill"]):
+                if transformed_m or canonical_key(p["skill"]) != norm(p["skill"]):
                     return MatchDetail(p["skill"], "sinonimo_o_nivel")
                 return MatchDetail(p["skill"], "frase")
 
@@ -336,7 +337,7 @@ def find_prog_match(market_skill: str, prog_skills: list[dict]) -> MatchDetail:
         matched = [
             comp
             for comp in components
-            if any(norm_match(p["skill"]) == comp for p in prog_skills)
+            if any(canonical_key(p["skill"]) == comp for p in prog_skills)
         ]
         if len(matched) >= 3:
             rule = "paraguas: " + ", ".join(sorted(matched))

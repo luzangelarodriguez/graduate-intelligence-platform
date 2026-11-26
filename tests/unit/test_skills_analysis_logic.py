@@ -423,6 +423,51 @@ class TestAliasCanonicalisation:
         assert "reportes" not in freq
 
 
+# ── find_prog_match canonical_key coverage ────────────────────────────────────
+
+class TestFindProgMatchCanonical:
+    """
+    Verify that find_prog_match uses canonical_key on both sides, so alias pairs
+    (reportes↔reporte, analista de datos↔analisis de datos) cross-match correctly,
+    while unrelated skills (sql vs bases de datos) do NOT.
+    """
+
+    def _prog(self, skills: list[str]) -> list[dict]:
+        return [{"skill": s, "cobertura": 1, "asignaturas": []} for s in skills]
+
+    def test_market_reporte_covered_by_prog_reportes(self):
+        # canonical_key("reporte")="reporte", canonical_key("reportes")="reporte" → match
+        detail = find_prog_match("reporte", self._prog(["reportes"]))
+        assert detail.rule != "ninguna", (
+            "market 'reporte' should be covered by prog 'reportes' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_market_reportes_covered_by_prog_reporte(self):
+        # canonical_key("reportes")="reporte", canonical_key("reporte")="reporte" → match
+        detail = find_prog_match("reportes", self._prog(["reporte"]))
+        assert detail.rule != "ninguna", (
+            "market 'reportes' should be covered by prog 'reporte' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_market_analisis_covered_by_prog_analista(self):
+        # canonical_key("analisis de datos")="analisis de datos"
+        # canonical_key("analista de datos")="analisis de datos" → match
+        detail = find_prog_match("analisis de datos", self._prog(["analista de datos"]))
+        assert detail.rule != "ninguna", (
+            "market 'analisis de datos' should be covered by prog 'analista de datos' via alias"
+        )
+        assert detail.rule == "sinonimo_o_nivel"
+
+    def test_sql_not_covered_by_bases_de_datos(self):
+        # "sql" and "bases de datos" are intentionally NOT unified — must stay separate
+        detail = find_prog_match("sql", self._prog(["bases de datos"]))
+        assert detail.rule == "ninguna", (
+            "'sql' must NOT be covered by 'bases de datos' — these are separate skills"
+        )
+
+
 # ── cross_analyze() ───────────────────────────────────────────────────────────
 
 class TestCrossAnalyze:
