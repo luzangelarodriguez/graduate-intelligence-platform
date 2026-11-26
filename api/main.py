@@ -2106,7 +2106,8 @@ def get_perfiles_homologados(program_id: int) -> dict:
 
     Uses jobs.perfil_id populated by the homologation engine (Fase B).
     Jobs without a perfil_id are grouped under familia=null / perfil=null ('Sin clasificar').
-    Only counts high/medium relevance matches, deduped by empleo_id.
+    Sample definition: rank-1 per empleo_id from the latest run, activo jobs only
+    (shared _MARKET_SAMPLE_CTE — no relevance_label filter on the sample).
     """
     SQL_FAMILIAS = f"""
         WITH {_MARKET_SAMPLE_CTE},

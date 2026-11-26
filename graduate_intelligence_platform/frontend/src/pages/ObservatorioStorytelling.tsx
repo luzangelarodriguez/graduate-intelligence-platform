@@ -1125,6 +1125,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const muestraTotal        = skills?.n_matches ?? 0;
   const nMuestraAltaMedia   = skills?.n_muestra_alta_media ?? 0;
   const afinidadPct         = Math.round((nMuestraAltaMedia / Math.max(muestraTotal, 1)) * 100);
+  const muestraTotalDisplay = homologado?.kpis?.total_vacantes ?? muestraTotal;
 
   const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
   const perfilesTotal = homologado?.kpis?.perfiles_homologados ?? (kpis?.total_perfiles ?? perfiles.length);
@@ -1198,9 +1199,9 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: muestraTotal.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${meta.nombre}` },
+            { icon: '💼', value: muestraTotalDisplay.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${muestraTotal} con habilidades identificadas` },
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: `agrupados en ${familiasTotal} familias` },
-            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad alta o media', sub: `${nMuestraAltaMedia} de ${muestraTotal} vacantes de la muestra` },
+            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad alta o media', sub: `${nMuestraAltaMedia} de ${muestraTotal} vacantes con habilidades identificadas` },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
             { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
