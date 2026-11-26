@@ -1125,7 +1125,6 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const muestraTotal     = skills?.n_matches ?? 0;
   const nVacantesMuestra = skills?.n_vacantes_muestra ?? muestraTotal;
 
-  const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
   const perfilesTotal = homologado?.kpis?.perfiles_homologados ?? (kpis?.total_perfiles ?? perfiles.length);
   const familiasTotal = homologado?.kpis?.familias_identificadas ?? 0;
   const maxPerf = perfiles[0]?.vacantes ?? 1;
@@ -1593,7 +1592,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0 0' }}>
-                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>Calculado sobre {muestraTotal} vacantes de la muestra de mercado</span>
+                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>Calculado sobre {muestraTotal} vacantes con habilidades identificadas</span>
                   <button
                     onClick={() => setBrechasExpanded(v => !v)}
                     style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
@@ -1632,7 +1631,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{muestraTotal.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{nVacantesMuestra.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
@@ -1673,7 +1672,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
             <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Perspectiva del mercado</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { icon: '📈', text: `Demanda activa en el período analizado con ${muestraTotal.toLocaleString('es-CO')} vacantes en la muestra de mercado.` },
+                { icon: '📈', text: `Demanda activa en el período analizado con ${nVacantesMuestra.toLocaleString('es-CO')} vacantes en la muestra de mercado.` },
                 { icon: '🌐', text: 'Mayor crecimiento en sectores de tecnología, servicios profesionales y finanzas.' },
                 { icon: '🤖', text: 'Aumento en la adopción de IA y analítica avanzada como competencia transversal.' },
                 { icon: '🎯', text: `Oportunidad para perfiles con habilidades digitales y ${topMarket[0] ? displaySkill(topMarket[0].skill) : 'gestión de datos'}.` },
