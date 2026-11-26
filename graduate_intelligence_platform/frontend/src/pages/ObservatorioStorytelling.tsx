@@ -68,7 +68,7 @@ interface SkillsAnalysis {
   transversales?: TransversalSkill[];
   evidencia_baja?: boolean;
   n_matches?: number;
-  n_muestra_alta_media?: number;
+  n_vacantes_muestra?: number;
 }
 interface Competitor {
   nombre_ies: string; nombre_programa: string; ciudad: string; modalidad: string;
@@ -1122,10 +1122,8 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const totalBrechas         = skills?.brechas?.length ?? 0;
   const criticalBrechasCount = skills?.brechas_criticas?.length ?? totalBrechas;
 
-  const muestraTotal        = skills?.n_matches ?? 0;
-  const nMuestraAltaMedia   = skills?.n_muestra_alta_media ?? 0;
-  const afinidadPct         = Math.round((nMuestraAltaMedia / Math.max(muestraTotal, 1)) * 100);
-  const muestraTotalDisplay = homologado?.kpis?.total_vacantes ?? muestraTotal;
+  const muestraTotal     = skills?.n_matches ?? 0;
+  const nVacantesMuestra = skills?.n_vacantes_muestra ?? muestraTotal;
 
   const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
   const perfilesTotal = homologado?.kpis?.perfiles_homologados ?? (kpis?.total_perfiles ?? perfiles.length);
@@ -1197,11 +1195,10 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: muestraTotalDisplay.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${muestraTotal} con habilidades identificadas` },
+            { icon: '💼', value: nVacantesMuestra.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${muestraTotal} con habilidades identificadas` },
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: `agrupados en ${familiasTotal} familias` },
-            { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad alta o media', sub: `${nMuestraAltaMedia} de ${muestraTotal} vacantes con habilidades identificadas` },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
             { icon: '⚠️', value: criticalBrechasCount, label: 'Brechas prioritarias', sub: 'De alta demanda' },
           ].map((kpi, i) => (
@@ -1285,7 +1282,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                         <strong>{hk.vacantes_sin_homologar}</strong> vacante{hk.vacantes_sin_homologar !== 1 ? 's' : ''} sin clasificar — el catálogo de patrones se amplía progresivamente.
                       </p>
                     )}
-                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>Los perfiles se calculan sobre las vacantes de afinidad alta o media del programa.</p>
+                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>Los perfiles se calculan sobre la muestra de mercado del programa (vacantes activas, corrida más reciente).</p>
                     {/* Jerarquía expandible */}
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                       <thead><tr>
@@ -1633,10 +1630,6 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
           <div>
             <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 10px' }}>Hallazgos principales</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>👤</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{afinidadPct}%</strong> de los perfiles laborales coinciden con el perfil de egreso.</p>
-              </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
                 <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{muestraTotal.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>

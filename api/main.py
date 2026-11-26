@@ -987,13 +987,20 @@ def compare_programs(ids: str = Query(default="13,11,108,20")) -> list[dict]:
 _SQL_MARKET_SKILLS = f"""
     WITH {_MARKET_SAMPLE_CTE}
     SELECT ms.match_id,
-           ms.relevance_label,
+           ms.empleo_id,
            jsonb_array_elements_text(ms.skills_empleo) AS skill
     FROM market_sample ms
     WHERE ms.especializacion_id = %s
       AND ms.skills_empleo IS NOT NULL
       AND jsonb_typeof(ms.skills_empleo) = 'array'
       AND ms.skills_empleo != '[]'::jsonb
+"""
+
+_SQL_MARKET_SIZE = f"""
+    WITH {_MARKET_SAMPLE_CTE}
+    SELECT COUNT(DISTINCT ms.empleo_id)::int AS n_vacantes_muestra
+    FROM market_sample ms
+    WHERE ms.especializacion_id = %s
 """
 
 _SQL_PROG_SKILLS = """
@@ -1023,10 +1030,8 @@ def _market_analysis_for_program(program_id: int, fetch_all_fn: Any) -> dict:
     from api.skills_analysis_logic import cross_analyze, process_job_skill_rows
 
     raw_rows = fetch_all_fn(_SQL_MARKET_SKILLS, (program_id,))
-    n_muestra_alta_media = len({
-        r["match_id"] for r in raw_rows
-        if r.get("relevance_label") in ("high", "medium")
-    })
+    size_rows = fetch_all_fn(_SQL_MARKET_SIZE, (program_id,))
+    n_vacantes_muestra = int(size_rows[0]["n_vacantes_muestra"]) if size_rows else 0
     skills_mercado_raw, n_matches = process_job_skill_rows(
         [{"match_id": r["match_id"], "skill": r["skill"]} for r in raw_rows]
     )
@@ -1050,7 +1055,7 @@ def _market_analysis_for_program(program_id: int, fetch_all_fn: Any) -> dict:
         "skills_mercado":        skills_mercado,
         "skills_programa":       skills_programa,
         "n_matches":             n_matches,
-        "n_muestra_alta_media":  n_muestra_alta_media,
+        "n_vacantes_muestra":    n_vacantes_muestra,
     }
 
 
@@ -1084,7 +1089,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         "transversales":       [],
         "brechas_criticas":    [],
         "n_matches":             0,
-        "n_muestra_alta_media":  0,
+        "n_vacantes_muestra":    0,
         "evidencia_baja":        True,
     }
     try:
@@ -1093,8 +1098,8 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
         # 1. Core market + curriculum analysis (shared with _run_redesign)
         core = _market_analysis_for_program(program_id, fetch_all)
         skills_mercado_raw   = core["skills_mercado_raw"]
-        n_matches            = core["n_matches"]
-        n_muestra_alta_media = core["n_muestra_alta_media"]
+        n_matches          = core["n_matches"]
+        n_vacantes_muestra = core["n_vacantes_muestra"]
         fortalezas          = core["fortalezas"]
         brechas             = core["brechas"]
         transversales       = core["transversales"]
@@ -1187,7 +1192,7 @@ def dashboard_skills_analysis(program_id: int) -> dict[str, Any]:
             "transversales":       transversales,
             "brechas_criticas":    brechas_criticas,
             "n_matches":             n_matches,
-            "n_muestra_alta_media":  n_muestra_alta_media,
+            "n_vacantes_muestra":    n_vacantes_muestra,
             "evidencia_baja":        n_matches < 15,
         }
     except Exception as exc:

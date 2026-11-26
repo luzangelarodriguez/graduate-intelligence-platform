@@ -1,18 +1,17 @@
 """
-Unit tests for the _SQL_MARKET_SKILLS constant and _market_analysis_for_program.
+Unit tests for _SQL_MARKET_SKILLS, _SQL_MARKET_SIZE, and _market_analysis_for_program.
 
 FastAPI is not installed in the unit-test environment.  To avoid polluting
 sys.modules globally the `market_symbols` session fixture:
   1. Temporarily installs stubs for every module api/main.py imports.
-  2. Imports api.main and extracts the two symbols we need.
+  2. Imports api.main and extracts the symbols we need.
   3. IMMEDIATELY restores sys.modules (removes stubs and api.main) before
      yielding.  Symbols remain valid — they are plain Python objects in memory.
 
 No top-level import of api.main happens, so collection-time pollution is zero.
 Other tests in the suite are not affected.
 
-(a) Structural tests: verify _SQL_MARKET_SKILLS removed relevance_label /
-    skills_en_comun and introduced RANK() OVER (PARTITION BY m.empleo_id).
+(a) Structural tests: verify _SQL_MARKET_SKILLS and _SQL_MARKET_SIZE structure.
 
 (b) Integration stub tests: verify _market_analysis_for_program calls
     fetch_all_fn with (program_id,) and returns all expected keys.
@@ -106,8 +105,9 @@ def market_symbols():
 
     try:
         import api.main as _main  # noqa: PLC0415
-        sql = _main._SQL_MARKET_SKILLS
-        fn  = _main._market_analysis_for_program
+        sql      = _main._SQL_MARKET_SKILLS
+        sql_size = _main._SQL_MARKET_SIZE
+        fn       = _main._market_analysis_for_program
     finally:
         # Restore sys.modules regardless of import success
         for name, orig in originals.items():
@@ -117,15 +117,14 @@ def market_symbols():
                 sys.modules[name] = orig
 
     # Symbols are live Python objects; sys.modules is now pristine
-    yield {"sql": sql, "fn": fn}
+    yield {"sql": sql, "sql_size": sql_size, "fn": fn}
 
 
 # ── (a) Structural tests on _SQL_MARKET_SKILLS ───────────────────────────────
 
 class TestSqlStructure:
     def test_no_relevance_label_filter(self, market_symbols):
-        # relevance_label is SELECTed for n_muestra_alta_media, but must not appear
-        # in a WHERE / FILTER clause that narrows the market sample.
+        # relevance_label must not appear in a WHERE / FILTER clause that narrows the market sample.
         sql = market_symbols["sql"]
         assert not re.search(
             r"relevance_label\s+IN\b", sql, re.IGNORECASE
@@ -182,22 +181,44 @@ class TestSqlStructure:
         assert "jsonb_typeof" in sql
 
 
+class TestSqlMarketSizeStructure:
+    def test_contains_count_distinct_empleo_id(self, market_symbols):
+        sql_size = market_symbols["sql_size"]
+        assert re.search(
+            r"COUNT\s*\(\s*DISTINCT\s+ms\.empleo_id\s*\)", sql_size, re.IGNORECASE
+        ), "_SQL_MARKET_SIZE must COUNT(DISTINCT ms.empleo_id)"
+
+    def test_single_placeholder(self, market_symbols):
+        sql_size = market_symbols["sql_size"]
+        assert sql_size.count("%s") == 1, (
+            "_SQL_MARKET_SIZE must have exactly 1 %s placeholder"
+        )
+
+    def test_no_skills_empleo_where_filter(self, market_symbols):
+        # _SQL_MARKET_SIZE counts ALL jobs in sample; must not apply the skills_empleo
+        # IS NOT NULL / != '[]' WHERE guard that _SQL_MARKET_SKILLS uses.
+        sql_size = market_symbols["sql_size"]
+        assert "skills_empleo IS NOT NULL" not in sql_size, (
+            "_SQL_MARKET_SIZE must not filter by skills_empleo (counts all jobs in sample)"
+        )
+
+
 # ── (b) _market_analysis_for_program call signature and return keys ───────────
 
 EXPECTED_KEYS = {
     "fortalezas", "brechas", "transversales", "brechas_criticas",
     "cobertura_pct", "exclusivas_programa", "evidencia_baja",
     "skills_mercado_raw", "skills_mercado", "skills_programa",
-    "n_matches", "n_muestra_alta_media",
+    "n_matches", "n_vacantes_muestra",
 }
 
 
 def _make_mock_rows():
+    # 2 distinct match_ids (jobs with skills); market sample may have more jobs without skills
     return [
-        {"match_id": 1, "relevance_label": "high",   "skill": "Python"},
-        {"match_id": 1, "relevance_label": "high",   "skill": "SQL"},
-        {"match_id": 2, "relevance_label": "medium", "skill": "Excel"},
-        {"match_id": 3, "relevance_label": "low",    "skill": "Word"},
+        {"match_id": 1, "empleo_id": "job_a", "skill": "Python"},
+        {"match_id": 1, "empleo_id": "job_a", "skill": "SQL"},
+        {"match_id": 2, "empleo_id": "job_b", "skill": "Excel"},
     ]
 
 
@@ -209,8 +230,9 @@ def _make_mock_prog_rows():
 
 class TestMarketAnalysisForProgram:
     def test_calls_market_sql_with_single_program_id(self, market_symbols):
-        fn  = market_symbols["fn"]
-        sql = market_symbols["sql"]
+        fn       = market_symbols["fn"]
+        sql      = market_symbols["sql"]
+        sql_size = market_symbols["sql_size"]
         program_id = 42
         calls: list[tuple] = []
 
@@ -221,20 +243,29 @@ class TestMarketAnalysisForProgram:
                     f"Market SQL called with {params!r}, expected ({program_id},)"
                 )
                 return _make_mock_rows()
+            if s is sql_size:
+                assert params == (program_id,)
+                return [{"n_vacantes_muestra": 2}]
             return _make_mock_prog_rows()
 
         fn(program_id, fake_fetch)
         market_calls = [c for c in calls if c[0] is sql]
         assert len(market_calls) == 1, "Market SQL must be called exactly once"
         assert market_calls[0][1] == (program_id,)
+        size_calls = [c for c in calls if c[0] is sql_size]
+        assert len(size_calls) == 1, "Market size SQL must be called exactly once"
+        assert size_calls[0][1] == (program_id,)
 
     def test_result_contains_all_expected_keys(self, market_symbols):
-        fn  = market_symbols["fn"]
-        sql = market_symbols["sql"]
+        fn       = market_symbols["fn"]
+        sql      = market_symbols["sql"]
+        sql_size = market_symbols["sql_size"]
 
         def fake_fetch(s: str, params: tuple) -> list[dict]:
             if s is sql:
                 return _make_mock_rows()
+            if s is sql_size:
+                return [{"n_vacantes_muestra": 2}]
             return _make_mock_prog_rows()
 
         result = fn(99, fake_fetch)
@@ -242,42 +273,52 @@ class TestMarketAnalysisForProgram:
         assert not missing, f"Missing keys in result: {missing}"
 
     def test_n_matches_is_int(self, market_symbols):
-        fn  = market_symbols["fn"]
-        sql = market_symbols["sql"]
+        fn       = market_symbols["fn"]
+        sql      = market_symbols["sql"]
+        sql_size = market_symbols["sql_size"]
 
         def fake_fetch(s: str, params: tuple) -> list[dict]:
             if s is sql:
                 return _make_mock_rows()
+            if s is sql_size:
+                return [{"n_vacantes_muestra": 2}]
             return _make_mock_prog_rows()
 
         result = fn(99, fake_fetch)
         assert isinstance(result["n_matches"], int)
 
     def test_empty_market_rows_gives_zero_n_matches(self, market_symbols):
-        fn  = market_symbols["fn"]
-        sql = market_symbols["sql"]
+        fn       = market_symbols["fn"]
+        sql      = market_symbols["sql"]
+        sql_size = market_symbols["sql_size"]
 
         def fake_fetch(s: str, params: tuple) -> list[dict]:
             if s is sql:
                 return []
+            if s is sql_size:
+                return [{"n_vacantes_muestra": 0}]
             return _make_mock_prog_rows()
 
         result = fn(99, fake_fetch)
         assert result["n_matches"] == 0
+        assert result["n_vacantes_muestra"] == 0
         assert result["evidencia_baja"] is True
 
-    def test_n_muestra_alta_media_counts_high_medium_matches(self, market_symbols):
-        fn  = market_symbols["fn"]
-        sql = market_symbols["sql"]
+    def test_n_vacantes_muestra_exceeds_n_matches_when_some_jobs_lack_skills(self, market_symbols):
+        fn       = market_symbols["fn"]
+        sql      = market_symbols["sql"]
+        sql_size = market_symbols["sql_size"]
 
         def fake_fetch(s: str, params: tuple) -> list[dict]:
             if s is sql:
-                return _make_mock_rows()  # match_ids 1(high), 2(medium), 3(low)
+                return _make_mock_rows()  # 2 jobs with skills
+            if s is sql_size:
+                return [{"n_vacantes_muestra": 3}]  # 3 total in sample, 1 without skills
             return _make_mock_prog_rows()
 
         result = fn(99, fake_fetch)
-        # 2 distinct match_ids with high/medium (1 and 2); match_id 3 is low
-        assert result["n_muestra_alta_media"] == 2
+        assert result["n_vacantes_muestra"] == 3
+        assert result["n_matches"] == 2
 
     def test_jobs_activo_guard_in_sql(self, market_symbols):
         sql = market_symbols["sql"]
