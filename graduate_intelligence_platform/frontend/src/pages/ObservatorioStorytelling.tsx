@@ -1082,6 +1082,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const [homologado, setHomologado] = useState<HomologadoData | null>(null);
   const [expandedFamilias, setExpandedFamilias] = useState<Set<string>>(new Set());
   const [expandedPerfiles, setExpandedPerfiles] = useState<Set<string>>(new Set());
+  const [brechasExpanded, setBrechasExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -1123,6 +1124,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
   const afinidadPct = Math.round((((prog?.labels?.high ?? 0) + (prog?.labels?.medium ?? 0)) / Math.max(totales.matches, 1)) * 100);
 
   const vacantesTotal = kpis?.total_ofertas ?? totales.matches;
+  const muestraTotal  = skills?.n_matches ?? 0;
   const perfilesTotal = kpis?.total_perfiles ?? perfiles.length;
   const maxPerf = perfiles[0]?.vacantes ?? 1;
   const maxSec  = sectores[0]?.vacantes ?? 1;
@@ -1193,7 +1195,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) 200px', gap: 10 }}>
           {[
-            { icon: '💼', value: vacantesTotal.toLocaleString('es-CO'), label: 'Vacantes con afinidad alta/media', sub: `${meta.nombre}` },
+            { icon: '💼', value: muestraTotal.toLocaleString('es-CO'), label: 'Vacantes en la muestra de mercado', sub: `${meta.nombre}` },
             { icon: '👤', value: perfilesTotal, label: 'Perfiles ocupacionales', sub: 'Perfiles distintos detectados' },
             { icon: '🎯', value: `${afinidadPct}%`, label: 'Afinidad perfil–mercado', sub: 'De las vacantes son pertinentes al programa' },
             { icon: '🎓', value: `${coberturaPct}%`, label: 'Cobertura curricular', sub: 'De los requisitos principales' },
@@ -1279,6 +1281,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                         <strong>{hk.vacantes_sin_homologar}</strong> vacante{hk.vacantes_sin_homologar !== 1 ? 's' : ''} sin clasificar — el catálogo de patrones se amplía progresivamente.
                       </p>
                     )}
+                    <p style={{ fontSize: 9, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>Los perfiles se calculan sobre las vacantes de afinidad alta o media del programa.</p>
                     {/* Jerarquía expandible */}
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                       <thead><tr>
@@ -1378,7 +1381,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                               </div>
                             </td>
                             <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{s.frecuencia ?? 0}</td>
-                            <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round(((s.frecuencia ?? 0) / Math.max(vacantesTotal, 1)) * 100)}%</td>
+                            <td style={{ padding: '6px 8px', textAlign: 'right', color: '#6B7280' }}>{Math.round(((s.frecuencia ?? 0) / Math.max(muestraTotal, 1)) * 100)}%</td>
                           </tr>
                         );
                       })}
@@ -1493,7 +1496,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
                   <thead><tr>
-                    {['Requisito', 'Tipo', 'Vacantes', 'Cobertura', 'Brecha', 'Prioridad'].map(h => (
+                    {['Requisito', 'Tipo', 'Vacantes', 'Demanda %', 'Brecha', 'Prioridad'].map(h => (
                       <th key={h} style={{ ...TH_ML, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr></thead>
@@ -1502,9 +1505,10 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                       const cat = classifySkill(b.skill);
                       const tm  = tipoMeta(cat);
                       const freq = b.frecuencia_mercado ?? 0;
-                      const pctDem = Math.round((freq / Math.max(vacantesTotal, 1)) * 100);
-                      const prioColor = i < 3 ? '#DC2626' : i < 5 ? '#D97706' : '#059669';
-                      const prioLabel = i < 3 ? 'Crítica' : i < 5 ? 'Alta' : 'Media';
+                      const pctDem = Math.round((freq / Math.max(muestraTotal, 1)) * 100);
+                      const esCritica = skills?.brechas_criticas?.some(bc => bc.skill === b.skill) ?? false;
+                      const prioColor = esCritica ? '#DC2626' : '#D97706';
+                      const prioLabel = esCritica ? 'Crítica' : 'Alta';
                       return (
                         <tr key={b.skill} style={{ borderBottom: `1px solid #F9FAFB` }}>
                           <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
@@ -1536,7 +1540,66 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
                     })}
                   </tbody>
                 </table>
-                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '8px 0 0' }}>Ver todos los requisitos ({totalBrechas}) ›</p>
+                {brechasExpanded && (
+                  <div style={{ marginTop: 12 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: C.navy, margin: '0 0 8px' }}>Todos los requisitos detectados</p>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
+                      <thead><tr>
+                        {['Requisito', 'Tipo', 'Vacantes', 'Demanda %', 'Brecha', 'Prioridad'].map(h => (
+                          <th key={h} style={{ ...TH_ML, whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr></thead>
+                      <tbody>
+                        {[...(skills?.brechas ?? [])].sort((a, b) => (b.frecuencia_mercado ?? 0) - (a.frecuencia_mercado ?? 0)).map((b) => {
+                          const cat = classifySkill(b.skill);
+                          const tm  = tipoMeta(cat);
+                          const freq = b.frecuencia_mercado ?? 0;
+                          const pctDemAll = Math.round((freq / Math.max(muestraTotal, 1)) * 100);
+                          const esCriticaAll = skills?.brechas_criticas?.some(bc => bc.skill === b.skill) ?? false;
+                          const prioColorAll = esCriticaAll ? '#DC2626' : '#D97706';
+                          const prioLabelAll = esCriticaAll ? 'Crítica' : 'Alta';
+                          return (
+                            <tr key={b.skill} style={{ borderBottom: `1px solid #F9FAFB` }}>
+                              <td style={{ padding: '6px 8px', color: C.navy, fontWeight: 500 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                  <span style={{ fontSize: 12 }}>{cat === 'herramienta' ? '🔧' : cat === 'habilidad' ? '👥' : cat === 'competencia' ? '📊' : '📚'}</span>
+                                  {displaySkill(b.skill)}
+                                </div>
+                              </td>
+                              <td style={{ padding: '6px 8px' }}>
+                                <span style={{ fontSize: 8, fontWeight: 700, background: tm.badgeBg, color: tm.badgeColor, borderRadius: 3, padding: '1px 5px', whiteSpace: 'nowrap' }}>{tm.label}</span>
+                              </td>
+                              <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 700, color: C.navy }}>{freq}</td>
+                              <td style={{ padding: '6px 8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <div style={{ width: 36, height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                                    <div style={{ width: `${pctDemAll}%`, height: '100%', background: '#EF4444', borderRadius: 2 }} />
+                                  </div>
+                                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>{pctDemAll}%</span>
+                                </div>
+                              </td>
+                              <td style={{ padding: '6px 8px', textAlign: 'center' }}>
+                                <span style={{ fontSize: 9, fontWeight: 700, color: '#DC2626', background: '#FEE2E2', borderRadius: 4, padding: '1px 6px' }}>Sí</span>
+                              </td>
+                              <td style={{ padding: '6px 8px', textAlign: 'center' }}>
+                                <span style={{ fontSize: 9, fontWeight: 700, color: prioColorAll, background: `${prioColorAll}22`, borderRadius: 4, padding: '1px 6px' }}>{prioLabelAll}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0 0' }}>
+                  <span style={{ fontSize: 9, color: '#9CA3AF' }}>Calculado sobre {muestraTotal} vacantes de la muestra de mercado</span>
+                  <button
+                    onClick={() => setBrechasExpanded(v => !v)}
+                    style={{ fontSize: 10, color: '#6B7280', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  >
+                    {brechasExpanded ? 'Ver menos ›' : `Ver todos los requisitos (${totalBrechas}) ›`}
+                  </button>
+                </div>
               </div>
             )
           }
@@ -1572,7 +1635,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>📈</span>
-                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{vacantesTotal.toLocaleString('es-CO')}</strong> vacantes con afinidad alta o media en el período.</p>
+                <p style={{ fontSize: 11, color: '#374151', margin: 0, lineHeight: 1.5 }}><strong>{muestraTotal.toLocaleString('es-CO')}</strong> vacantes en la muestra de mercado del programa.</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
@@ -1613,7 +1676,7 @@ function ViewMercadoLaboral({ prog, meta, veredicto, coberturaPct, skills, skill
             <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>Perspectiva del mercado</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { icon: '📈', text: `Demanda activa en el período analizado con ${vacantesTotal.toLocaleString('es-CO')} vacantes.` },
+                { icon: '📈', text: `Demanda activa en el período analizado con ${muestraTotal.toLocaleString('es-CO')} vacantes en la muestra de mercado.` },
                 { icon: '🌐', text: 'Mayor crecimiento en sectores de tecnología, servicios profesionales y finanzas.' },
                 { icon: '🤖', text: 'Aumento en la adopción de IA y analítica avanzada como competencia transversal.' },
                 { icon: '🎯', text: `Oportunidad para perfiles con habilidades digitales y ${topMarket[0] ? displaySkill(topMarket[0].skill) : 'gestión de datos'}.` },
