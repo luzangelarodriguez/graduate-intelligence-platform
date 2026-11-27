@@ -31,16 +31,18 @@ _TIMEOUT = int(os.getenv("OPENAI_TIMEOUT_SECONDS") or "60")  # deeper analysis n
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
 def _fetch_microcurriculos(specialization_id: int) -> list[dict[str, Any]]:
-    """Return rows from microcurriculos for the given specialization."""
+    """Return rows from microcurriculos for the given specialization (excludes test rows)."""
     from backend.repositories.base import fetch_all  # local import avoids circular dep
+    from api.microcurriculo_filters import SQL_FILTRO_NO_PRUEBA
     rows = fetch_all(
-        """
+        f"""
         SELECT id, asignatura, clean_text
-        FROM microcurriculos
-        WHERE specialization_id = %s
-          AND clean_text IS NOT NULL
-          AND length(clean_text) > 50
-        ORDER BY asignatura NULLS LAST
+        FROM microcurriculos m
+        WHERE m.specialization_id = %s
+          AND m.clean_text IS NOT NULL
+          AND length(m.clean_text) > 50
+          {SQL_FILTRO_NO_PRUEBA}
+        ORDER BY m.asignatura NULLS LAST
         """,
         (specialization_id,),
     )

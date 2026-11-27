@@ -2453,7 +2453,7 @@ function ViewPrograma({ programaId, skills, coberturaPct }: ViewProps) {
         <SectionLabel n="1" q1="¿Qué se" q2="analizó?" />
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: D.border }}>
           {([
-            { icon: <IconClipboardList size={20} color={D.white} />, value: uniqueAsignaturas, label: 'Asignaturas\nanalizadas' },
+            { icon: <IconClipboardList size={20} color={D.white} />, value: uniqueAsignaturas, label: 'Asignaturas\ncitadas en el análisis' },
             { icon: <IconSchool        size={20} color={D.white} />, value: totalElementos,    label: 'Elementos\ncurriculares' },
             { icon: <IconListCheck     size={20} color={D.white} />, value: 5,                  label: 'Categorías' },
             { icon: <IconAward         size={20} color={D.white} />, value: coherencia,         label: 'Coherencia\ncurricular', hi: true },
