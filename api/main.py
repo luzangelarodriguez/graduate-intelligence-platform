@@ -1043,7 +1043,10 @@ def _market_analysis_for_program(program_id: int, fetch_all_fn: Any) -> dict:
         {
             "skill":       r["skill_name"],
             "asignaturas": list(r["asignaturas"]) if r["asignaturas"] else [],
-            "cobertura":   len(list(r["asignaturas"])) if r["asignaturas"] else 0,
+            "cobertura":   (
+                len(list(r["asignaturas"])) if r["asignaturas"]
+                else (1 if int(r["cobertura"]) > 0 else 0)
+            ),
         }
         for r in prog_rows
         if r["skill_name"]
