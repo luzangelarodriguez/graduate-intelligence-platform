@@ -201,3 +201,39 @@ class TestEdgeCases:
         result = _enrich_debilidades_with_market(debs, mkt)
         assert result[0]["origen"] == "mercado"
         assert result[1]["origen"] == "criterio_experto"
+
+
+# ── F. all_skills overrides top_skills for cross-reference ───────────────────
+
+class TestAllSkillsLookup:
+    def test_skill_en_posicion_30_recibe_evidencia(self):
+        """Skill at rank 30 (outside top 25) must receive evidencia when in all_skills."""
+        top25 = [{"skill": f"skill_{i}", "frecuencia": 100 - i} for i in range(25)]
+        skill_rank30 = {"skill": "kotlin", "frecuencia": 5}
+        all_skills = top25 + [{"skill": f"skill_{i}", "frecuencia": 4} for i in range(25, 29)] + [skill_rank30]
+        mkt = {
+            "top_skills": top25,
+            "all_skills": all_skills,
+            "n_matches": 200,
+        }
+        result = _enrich_debilidades_with_market(
+            [_deb(terminos_clave=["kotlin"])], mkt
+        )
+        assert result[0]["origen"] == "mercado"
+        assert result[0]["evidencia_mercado"]["frecuencia"] == 5
+
+    def test_sin_all_skills_usa_top_skills(self):
+        """When all_skills absent, falls back to top_skills."""
+        mkt = {"top_skills": [{"skill": "python", "frecuencia": 40}], "n_matches": 100}
+        result = _enrich_debilidades_with_market([_deb(terminos_clave=["python"])], mkt)
+        assert result[0]["origen"] == "mercado"
+
+    def test_skill_fuera_de_top25_pero_no_en_all_skills_sin_evidencia(self):
+        """Skill outside top_skills and all_skills → criterio_experto."""
+        mkt = {
+            "top_skills": [{"skill": "python", "frecuencia": 40}],
+            "all_skills": [{"skill": "python", "frecuencia": 40}],
+            "n_matches": 100,
+        }
+        result = _enrich_debilidades_with_market([_deb(terminos_clave=["kotlin"])], mkt)
+        assert result[0]["origen"] == "criterio_experto"

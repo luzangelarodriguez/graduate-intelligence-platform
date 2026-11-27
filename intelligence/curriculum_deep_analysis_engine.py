@@ -322,8 +322,11 @@ def _enrich_debilidades_with_market(
     from api.skills_analysis_logic import canonical_key
 
     n_matches = market_context.get("n_matches", 0) or 1  # avoid division by zero
+    # Prefer all_skills (complete list) over top_skills for cross-reference.
+    # top_skills is limited to 25 and would miss skills ranked >25.
+    skills_for_lookup = market_context.get("all_skills") or market_context.get("top_skills", [])
     mkt_lookup: dict[str, int] = {}
-    for s in market_context.get("top_skills", []):
+    for s in skills_for_lookup:
         ck = canonical_key(s["skill"])
         freq = s.get("frecuencia", 0)
         if ck not in mkt_lookup or freq > mkt_lookup[ck]:

@@ -2057,7 +2057,8 @@ def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
             )
             all_mkt.sort(key=lambda x: x["frecuencia"], reverse=True)
             market_ctx = {
-                "top_skills":      all_mkt[:25],
+                "top_skills":      all_mkt[:25],   # LLM context only (top 25)
+                "all_skills":      all_mkt,         # full list for evidencia_mercado cross-ref
                 "brechas_criticas": analysis_data.get("brechas_criticas", []),
                 "n_matches":       analysis_data.get("n_matches", 0),
             }
