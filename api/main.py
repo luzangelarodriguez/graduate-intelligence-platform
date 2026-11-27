@@ -1584,14 +1584,15 @@ def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: l
             f"Eres un diseñador curricular universitario colombiano experto en pertinencia académica. "
             f"Aquí están los contenidos/resultados de aprendizaje (RA) actuales "
             f"de la asignatura '{asignatura}':\n\n{texto_resumido}\n\n"
-            f"El mercado laboral demanda estas competencias que el programa NO cubre actualmente: "
-            f"{brechas_str}\n\n"
+            f"El mercado laboral demanda estas competencias, asignadas a esta asignatura "
+            f"por encaje temático con sus contenidos actuales: {brechas_str}\n\n"
             f"INSTRUCCIONES IMPORTANTES:\n"
-            f"1. Solo propón RAs si la competencia es académicamente coherente con el campo de '{asignatura}'.\n"
-            f"2. Si ninguna de las brechas dadas es coherente con el contenido de la asignatura "
-            f"(ej: pedir Excel o habilidades financieras a una asignatura de neuropsicología clínica), "
-            f"responde con ras_propuestos: [] y explica en justificacion por qué ninguna aplica.\n"
-            f"3. Para las brechas coherentes, propón 1 o 2 RAs NUEVOS o MODIFICADOS en formato académico "
+            f"1. Verifica que la brecha sea académicamente coherente con el campo real de '{asignatura}'. "
+            f"Si la asignación fue incorrecta (p. ej. se pide Excel a neuropsicología clínica), "
+            f"DEBES responder con ras_propuestos: [] y explicar en justificacion por qué no aplica. "
+            f"PROHIBIDO forzar propuestas cuando el contenido no encaja.\n"
+            f"2. Solo propón RAs para brechas coherentes con el contenido de esta asignatura.\n"
+            f"3. Para cada brecha coherente, propón 1 o 2 RAs NUEVOS o MODIFICADOS en formato académico "
             f"universitario (código RA-XXX, verbo de Bloom, contenido medible y específico).\n\n"
             f"Responde ÚNICAMENTE en JSON con esta estructura exacta:\n"
             f'{{"ras_propuestos": [{{"codigo": "RA-001", "texto": "...", '
@@ -1617,6 +1618,24 @@ def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: l
             "ras_propuestos": [],
             "justificacion": f"Error al llamar a OpenAI: {exc}",
         }
+
+
+MAX_BRECHAS_PER_OPENAI_CALL: int = 4
+
+
+def _merge_ra_results(results: list[dict[str, Any]]) -> dict[str, Any]:
+    """Merge multiple OpenAI RA call results into one."""
+    merged_ras: list[dict[str, Any]] = []
+    justificaciones: list[str] = []
+    for r in results:
+        merged_ras.extend(r.get("ras_propuestos", []))
+        j = r.get("justificacion", "")
+        if j:
+            justificaciones.append(j)
+    return {
+        "ras_propuestos": merged_ras,
+        "justificacion":  " | ".join(justificaciones) if justificaciones else "",
+    }
 
 
 def _run_redesign(job_id: str, program_id: int) -> None:
@@ -1658,7 +1677,11 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         _update("running", current_step="Calculando brechas curriculares")
 
         analysis = _market_analysis_for_program(program_id, fetch_all)
-        brechas_criticas_data = analysis["brechas_criticas"]  # list[{skill, frecuencia_mercado}]
+        # Use ALL brechas ordered by frecuencia_mercado; criticas tracked for labeling
+        all_brechas_data = sorted(
+            analysis["brechas"], key=lambda x: -x.get("frecuencia_mercado", 0)
+        )
+        brechas_criticas_set = {b["skill"] for b in analysis["brechas_criticas"]}
         n_matches = analysis["n_matches"]
 
         logger.info(
@@ -1668,7 +1691,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             len(analysis["fortalezas"]) + len(analysis["brechas"]),
             len(analysis["skills_programa"]),
             len(analysis["brechas"]),
-            len(brechas_criticas_data),
+            len(analysis["brechas_criticas"]),
         )
 
         if analysis["evidencia_baja"]:
@@ -1686,101 +1709,125 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _update("done", result=result)
             return
 
-        brechas: list[str] = [b["skill"] for b in brechas_criticas_data]
-
-        if not brechas:
+        if not all_brechas_data:
             _update("done", result={
-                "program_id": program_id,
+                "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
-                "advertencia": "No se encontraron brechas curriculares críticas — el programa ya cubre las skills de alta demanda del mercado.",
-                "propuestas": [],
+                "brechas_totales":        0,
+                "brechas_criticas_count": 0,
+                "n_matches":              n_matches,
+                "advertencia": "No se encontraron brechas curriculares — el programa ya cubre las skills del mercado.",
+                "propuestas":             [],
+                "brechas_sin_asignatura": [],
             })
             _REDESIGN_CACHE[program_id] = _REDESIGN_JOBS[job_id].get("result", {})
             return
 
-        # 3. Score each asignatura by TF-IDF relevance to brechas
-        _update("running", current_step="Calculando relevancia de asignaturas")
+        # 3. Assign each brecha to the best-fit asignaturas
+        from api.redesign_assignment import assign_brechas as _assign_brechas, compute_confianza as _compute_confianza
+
+        _update("running", current_step="Asignando brechas a asignaturas")
+
+        mc_list = [
+            {
+                "id":         row["id"],
+                "asignatura": row.get("nombre") or row.get("asignatura"),
+                "nombre":     row.get("nombre") or row.get("asignatura"),
+                "clean_text": (row.get("clean_text") or "").strip(),
+            }
+            for row in mc_rows
+        ]
+        assignment = _assign_brechas(mc_list, all_brechas_data)
+        per_asignatura   = assignment["per_asignatura"]
+        brechas_sin_asig = assignment["brechas_sin_asignatura"]
+
+        # Mark is_critica on each assigned brecha
+        for item in per_asignatura.values():
+            for b in item["brechas_asignadas"]:
+                b["is_critica"] = b["skill"] in brechas_criticas_set
 
         logger.info(
-            "[REDESIGN-DEBUG] program_id=%s brechas=%d brechas=%s",
-            program_id, len(brechas), brechas,
+            "[REDESIGN-DEBUG] program_id=%s brechas_criticas=%d asignaturas_con_brechas=%d "
+            "brechas_sin_asignatura=%d",
+            program_id, len(brechas_criticas_data),
+            len(per_asignatura), len(brechas_sin_asig),
         )
 
-        scored: list[dict[str, Any]] = []
-        all_scores: list[dict[str, Any]] = []   # kept for debug regardless of threshold
-        for row in mc_rows:
-            text = (row["clean_text"] or "").strip()
-            # FIX 2: get per-skill scores so each subject gets its own ranked brechas
-            score, ranked_skills = _compute_tfidf_relevance(text, brechas)
-            asig_nombre = row["nombre"] or f"Asignatura {row['id']}"
-            logger.info(
-                "[REDESIGN-DEBUG] asignatura=%r clean_text_len=%d max_score=%.4f top_skills=%s",
-                asig_nombre, len(text), score, ranked_skills[:3],
-            )
-            confianza = "alta" if score > 0.08 else "media" if score > 0.03 else "baja"
-            # Top brechas specifically relevant to THIS asignatura
-            top_brechas_asig = [skill for skill, _ in ranked_skills[:6]] if ranked_skills else brechas[:5]
-            all_scores.append({
-                "nombre":          asig_nombre[:60],
-                "clean_text_len":  len(text),
-                "max_score":       round(score, 4),
-                "top_brechas":     top_brechas_asig[:4],
-            })
-            # Always include — no absolute threshold; ranking decides top 5
-            scored.append({
-                "mc_id":              row["id"],
-                "asignatura":         asig_nombre,
-                "clean_text":         text,
-                "relevancia_score":   round(score, 4),
-                "brechas_relevantes": top_brechas_asig,
-                "confianza":          confianza,
-            })
-
-        scored.sort(key=lambda x: x["relevancia_score"], reverse=True)
-        top = scored[:5]
-
-        # Debug block included in every response
         debug_info = {
-            "fix_version":            "v5-unified-market-analysis",
+            "fix_version":            "v7-all-brechas",
             "n_matches":              n_matches,
-            "brechas_criticas_count": len(brechas_criticas_data),
-            "brechas_count":          len(brechas),
-            "brechas_sample":         brechas[:10],
-            "umbral":                 "brechas_criticas (p66) · top-5 asignaturas por TF-IDF",
-            "asignaturas_scores":     sorted(all_scores, key=lambda x: x["max_score"], reverse=True),
+            "brechas_totales":        len(all_brechas_data),
+            "brechas_criticas_count": len(analysis["brechas_criticas"]),
+            "brechas_sin_asignatura": [b["skill"] for b in brechas_sin_asig],
+            "asignaturas_con_brechas": list(per_asignatura.keys()),
         }
 
-        if not top:
+        if not per_asignatura:
             result = {
                 "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
-                "advertencia": "Ninguna asignatura superó el umbral de relevancia. Los microcurrículos pueden tener texto insuficiente.",
+                "brechas_totales":        len(all_brechas_data),
+                "brechas_criticas_count": len(analysis["brechas_criticas"]),
+                "n_matches":              n_matches,
+                "advertencia": "Ninguna brecha pudo asignarse a una asignatura con encaje suficiente.",
                 "propuestas":             [],
+                "brechas_sin_asignatura": brechas_sin_asig,
                 "debug":                  debug_info,
             }
             _REDESIGN_CACHE[program_id] = result
             _update("done", result=result)
             return
 
-        # 4. Call OpenAI for each top asignatura
+        # 4. Call OpenAI only for asignaturas that have assigned brechas.
+        #    If >MAX_BRECHAS_PER_OPENAI_CALL brechas assigned, split into chunks
+        #    and merge results (no brecha is discarded).
         propuestas: list[dict[str, Any]] = []
-        for i, item in enumerate(top):
-            _update("running", current_step=f"Generando RAs con IA ({i+1}/{len(top)}): {item['asignatura'][:40]}")
-            ai_result = _call_openai_for_ras(
-                asignatura=item["asignatura"],
-                clean_text=item["clean_text"],
-                brechas_relevantes=item["brechas_relevantes"],
-            )
-            # Collect all skills_incorporadas from the proposed RAs
+        items_sorted = sorted(
+            per_asignatura.values(),
+            key=lambda x: (-max(b["score"] for b in x["brechas_asignadas"]), x["mc_id"]),
+        )
+        for i, item in enumerate(items_sorted):
+            _update("running", current_step=f"Generando RAs con IA ({i+1}/{len(items_sorted)}): {item['asignatura'][:40]}")
+            brechas_asig = [b["skill"] for b in item["brechas_asignadas"]]
+
+            if len(brechas_asig) > MAX_BRECHAS_PER_OPENAI_CALL:
+                chunks = [
+                    brechas_asig[j:j + MAX_BRECHAS_PER_OPENAI_CALL]
+                    for j in range(0, len(brechas_asig), MAX_BRECHAS_PER_OPENAI_CALL)
+                ]
+                chunk_results = [
+                    _call_openai_for_ras(
+                        asignatura=item["asignatura"],
+                        clean_text=item["clean_text"],
+                        brechas_relevantes=chunk,
+                    )
+                    for chunk in chunks
+                ]
+                ai_result = _merge_ra_results(chunk_results)
+            else:
+                ai_result = _call_openai_for_ras(
+                    asignatura=item["asignatura"],
+                    clean_text=item["clean_text"],
+                    brechas_relevantes=brechas_asig,
+                )
+
             all_skills: list[str] = []
             for ra in ai_result.get("ras_propuestos", []):
                 all_skills.extend(ra.get("skills_incorporadas", []))
 
+            # Annotate brechas_relevantes with ⚠ for critical brechas
+            brechas_relevantes_labeled = [
+                f"⚠ {b}" if b in brechas_criticas_set else b
+                for b in brechas_asig
+            ]
+
             propuestas.append({
                 "asignatura":          item["asignatura"],
-                "relevancia_score":    item["relevancia_score"],
-                "confianza":           item["confianza"],
-                "brechas_relevantes":  item["brechas_relevantes"],
+                "brechas_asignadas":   item["brechas_asignadas"],
+                "relevancia_score":    max(b["score"] for b in item["brechas_asignadas"]),
+                "confianza":           _compute_confianza(item["brechas_asignadas"]),
+                "brechas_relevantes":  brechas_asig,
+                "brechas_relevantes_labeled": brechas_relevantes_labeled,
                 "ras_actuales_texto":  item["clean_text"][:600],
                 "ras_propuestos":      ai_result.get("ras_propuestos", []),
                 "skills_incorporadas": list(set(all_skills)),
@@ -1790,8 +1837,11 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         result = {
             "program_id":             program_id,
             "asignaturas_analizadas": len(mc_rows),
-            "brechas_criticas_count": len(brechas_criticas_data),
+            "brechas_totales":        len(all_brechas_data),
+            "brechas_criticas_count": len(analysis["brechas_criticas"]),
+            "n_matches":              n_matches,
             "propuestas":             propuestas,
+            "brechas_sin_asignatura": brechas_sin_asig,
             "debug":                  debug_info,
         }
         _REDESIGN_CACHE[program_id] = result
@@ -1872,9 +1922,12 @@ def curriculum_redesign_download(program_id: int):
 
         from datetime import date
         doc.add_paragraph(f"Generado: {date.today().isoformat()} · Observatorio UNIR Colombia")
+        n_sin_asig = len(result.get("brechas_sin_asignatura", []))
         doc.add_paragraph(
-            f"Resumen: {len(propuestas)} asignaturas con propuestas de actualización · "
-            f"{result.get('brechas_totales', 0)} brechas identificadas en el mercado."
+            f"Resumen: {len(propuestas)} asignaturas con propuestas · "
+            f"{result.get('brechas_criticas_count', 0)} brechas críticas "
+            f"(de {result.get('brechas_totales', 0)} brechas) · "
+            f"{n_sin_asig} sin asignatura natural."
         )
         doc.add_paragraph("")
 
@@ -1882,8 +1935,10 @@ def curriculum_redesign_download(program_id: int):
         for prop in propuestas:
             doc.add_heading(prop["asignatura"], level=2)
             p = doc.add_paragraph()
-            p.add_run("Relevancia con brechas: ").bold = True
-            p.add_run(f"{prop['relevancia_score']:.2f} · Brechas relevantes: {', '.join(prop['brechas_relevantes'][:5])}")
+            confianza_label = prop.get("confianza") or "—"
+            p.add_run("Confianza: ").bold = True
+            labeled = prop.get("brechas_relevantes_labeled") or prop.get("brechas_relevantes", [])
+            p.add_run(f"{confianza_label} · Brechas: {', '.join(labeled[:5])}")
 
             # Comparison table
             table = doc.add_table(rows=1, cols=2)
@@ -1918,9 +1973,25 @@ def curriculum_redesign_download(program_id: int):
 
             doc.add_paragraph("")
 
+        # Brechas sin asignatura natural
+        brechas_sin_docx = result.get("brechas_sin_asignatura", [])
+        if brechas_sin_docx:
+            doc.add_heading("Brechas sin asignatura natural", level=2)
+            doc.add_paragraph(
+                "Las siguientes brechas del mercado no encontraron encaje suficiente "
+                "en ninguna asignatura existente. Se recomienda considerar una nueva "
+                "electiva o módulo transversal."
+            )
+            for b in brechas_sin_docx:
+                doc.add_paragraph(
+                    f"{b['skill']}  (demanda: {b.get('frecuencia_mercado', 0)} vacantes)"
+                )
+
         # Footer
+        n_matches_footer = result.get("n_matches", 0)
         doc.add_paragraph(
-            "Motor de Pertinencia Académica v2 · UNIR Colombia · Datos: mercado laboral activo Colombia 2024"
+            f"Motor de Pertinencia Académica v2 · UNIR Colombia · "
+            f"Datos: muestra de mercado laboral Colombia, n={n_matches_footer} vacantes"
         ).runs[0].font.color.rgb = RGBColor(0x9C, 0xA3, 0xAF)
 
         buf = io.BytesIO()
