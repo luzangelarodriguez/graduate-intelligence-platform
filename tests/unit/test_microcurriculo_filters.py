@@ -60,71 +60,78 @@ class TestEsFilaDePruebaPositivos:
     def test_asignatura_programa_acad_mixto(self):
         assert es_fila_de_prueba(None, "Programa Académico General")
 
-    def test_ruta_windows_con_test_microcurric_combinado(self):
-        # Fila id=1 real: ruta local Y contiene test_microcurric
+    def test_positivo_real_ids_1_10(self):
+        # Ids 1-10 reales: ruta Windows + asignatura "PROGRAMA ACADÉMICO"
         assert es_fila_de_prueba(
-            r"C:\Users\luzangela\storage\test_microcurriculos\prog13_v1.docx",
+            r"C:\Users\SoporteTI\Desktop\SOFTWARE\storage\test_microcurriculos\...",
             "PROGRAMA ACADÉMICO",
         )
 
+    def test_positivo_real_id_21(self):
+        # Id 21 real: ruta storage/test_microcurriculos con backslash
+        assert es_fila_de_prueba(
+            r"storage\test_microcurriculos\Especialización en Criminología\INFORMACIÓN ESP CRIMINOLOGIA - piloto app - v1 - 28may26.docx",
+            "INFORMACIÓN ESP. CRIMINOLOGÍA Y VICTIMOLOGIA.",
+        )
 
-# ── B. Casos negativos (9 microcurrículos V5 reales del programa 13) ─────────
+
+# ── B. Casos negativos — 9 microcurrículos V5 reales del programa 13 ─────────
 
 class TestEsFilaDePruebaNegativosV5:
-    """Microcurrículos reales que NO deben ser excluidos."""
+    """Microcurrículos V5 reales que NO deben ser excluidos."""
 
     def test_v5_analisis_datos(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Análisis de datos.docx",
+            "Microcurrículos V5_Análisis e interpretación de datos.docx",
             "Análisis e interpretación de datos",
         )
 
-    def test_v5_visualizacion(self):
+    def test_v5_fundamentos_tecnologicos(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Visualización.docx",
-            "Visualización y comunicación de datos",
+            "Microcurrículos V5_Fundamentos tecnológicos para el tratamiento de datos.docx",
+            "Fundamentos Tecnológicos par el Tratamiento de Datos",
         )
 
-    def test_v5_machine_learning(self):
+    def test_v5_gestion_proyectos(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_ML.docx",
-            "Machine Learning aplicado",
+            "Microcurrículos V5_Gestión de proyectos de inteligencia de negocio.docx",
+            "Gestión de proyectos de inteligencia de negocio",
         )
 
-    def test_v5_estadistica(self):
+    def test_v5_gobierno_dato(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Estadística.docx",
-            "Estadística para analítica",
+            "Microcurrículos V5_Gobierno del dato y toma de decisiones.docx",
+            "Gobierno del dato y toma de decisiones",
         )
 
-    def test_v5_programacion(self):
+    def test_v5_ingenieria_datos_masivos(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Programación.docx",
-            "Fundamentos de programación en Python",
+            "Microcurrículos V5_Ingeniería para el procesado masivo de datos.docx",
+            "Ingeniería para el procesado masivo de datos",
         )
 
-    def test_v5_bases_datos(self):
+    def test_v5_innovacion_tecnologica(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_BD.docx",
-            "Bases de datos y SQL",
+            "Microcurrículos V5_Electiva Innovación Tecnológica y Transformación ...",
+            "Innovación tecnológica y transformación digital en las empresas",
         )
 
-    def test_v5_inteligencia_negocios(self):
+    def test_v5_seguridad_bigdata(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_BI.docx",
-            "Inteligencia de negocios",
+            "Microcurrículos V5_Seguridad en Sistemas, Aplicaciones y el Big Data.docx",
+            "Seguridad en Sistemas, Aplicaciones y el Big Data",
         )
 
-    def test_v5_etica(self):
+    def test_v5_tecnicas_ia(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Ética.docx",
-            "Ética en ciencia de datos",
+            "Microcurrículos V5_Técnicas de Inteligencia Artificial.docx",
+            "Técnicas de Inteligencia Artificial",
         )
 
-    def test_v5_proyecto_final(self):
+    def test_v5_visualizacion_interactiva(self):
         assert not es_fila_de_prueba(
-            "Microcurrículos V5_Proyecto.docx",
-            "Proyecto integrador",
+            "Microcurrículos V5_Visualización Interactiva de la Información.docx",
+            "Visualización Interactiva de la Información",
         )
 
 

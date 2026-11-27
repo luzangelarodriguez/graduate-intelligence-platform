@@ -15,11 +15,15 @@ Uso:
 GARANTÍAS DE SEGURIDAD:
   - Aborta si los ids detectados no son exactamente {1..10, 21}.
   - En modo --apply:
-      1. Guarda un respaldo JSON completo en un directorio temporal del SO
-         (tempfile.mkdtemp()) ANTES de cualquier modificación.
-      2. Realiza TODOS los borrados en una única transacción; en caso de error
-         hace rollback automático y el respaldo queda intacto.
-  - En modo dry-run no abre transacción de escritura.
+      1. Muestra resumen (ids y conteos por tabla hija) y exige escribir
+         exactamente BORRAR por teclado; cualquier otra entrada aborta sin cambios.
+      2. Guarda un respaldo JSON completo (microcurriculos + todas las tablas hijas
+         descubiertas por information_schema) en un directorio temporal del SO
+         (tempfile.mkdtemp()) y lo verifica (existe y tiene tamaño > 0) ANTES
+         de abrir la transacción de borrado.
+      3. Realiza TODOS los borrados en una única transacción con una sola conexión;
+         en caso de error hace rollback automático y el respaldo queda intacto.
+  - En modo dry-run no abre transacción de escritura (conexión readonly).
 
 ADVERTENCIA: Esta operación es IRREVERSIBLE sin el respaldo generado.
 Revisa el dry-run y confirma los ids antes de usar --apply.
@@ -94,19 +98,22 @@ def _count_child_rows(cur, child_table: str, fk_col: str, ids: list[int]) -> int
     return int(cur.fetchone()[0])
 
 
-def _backup_data(cur, test_ids: list[int], backup_dir: str) -> str:
-    """Guarda respaldo JSON con todas las filas y sus skills en backup_dir."""
+def _backup_data(cur, test_ids: list[int], fk_tables: list[dict], backup_dir: str) -> str:
+    """Guarda respaldo JSON con microcurriculos y todas las tablas hijas en backup_dir."""
     micro_rows = _fetch(
         cur,
         "SELECT * FROM microcurriculos WHERE id = ANY(%s) ORDER BY id",
         (test_ids,),
     )
-    skills_rows = _fetch(
-        cur,
-        "SELECT * FROM microcurriculo_skills WHERE microcurriculo_id = ANY(%s) ORDER BY microcurriculo_id, id",
-        (test_ids,),
-    )
-    # Serializar; convierte tipos no-JSON (datetime, Decimal, etc.)
+
+    child_data: dict[str, list[dict]] = {}
+    for fk in fk_tables:
+        child_data[fk["child_table"]] = _fetch(
+            cur,
+            f"SELECT * FROM public.{fk['child_table']} WHERE {fk['fk_column']} = ANY(%s) ORDER BY {fk['fk_column']}",
+            (test_ids,),
+        )
+
     def _default(o):
         if hasattr(o, "isoformat"):
             return o.isoformat()
@@ -116,12 +123,17 @@ def _backup_data(cur, test_ids: list[int], backup_dir: str) -> str:
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "ids": test_ids,
         "microcurriculos": micro_rows,
-        "microcurriculo_skills": skills_rows,
+        "child_tables": child_data,
     }
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     backup_path = os.path.join(backup_dir, f"borrar_filas_prueba_backup_{ts}.json")
     with open(backup_path, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, ensure_ascii=False, indent=2, default=_default)
+
+    # Verificar que el archivo existe y tiene contenido
+    if not os.path.isfile(backup_path) or os.path.getsize(backup_path) == 0:
+        raise RuntimeError(f"El respaldo no se creó correctamente: {backup_path}")
+
     return backup_path
 
 
@@ -198,17 +210,31 @@ def main() -> None:
 
         # ── MODO APPLY ────────────────────────────────────────────────────────
 
-        # 6. Respaldo JSON en directorio temporal del SO
+        # 6. Resumen + confirmación manual
+        print("\n" + "="*60)
+        print("  RESUMEN DE LO QUE SE VA A BORRAR:")
+        print(f"    Ids: {test_ids}")
+        print(f"    microcurriculos: {len(test_ids)} filas")
+        for fk in fk_tables:
+            n = child_counts[fk["child_table"]]
+            if n:
+                print(f"    {fk['child_table']}: {n} filas")
+        print("="*60)
+        confirmacion = input("\n  Escribe exactamente BORRAR para confirmar (cualquier otra cosa aborta): ")
+        if confirmacion != "BORRAR":
+            print("  Abortado. No se realizó ningún cambio.")
+            conn.close()
+            sys.exit(0)
+
+        # 7. Respaldo JSON en directorio temporal del SO (antes de abrir la transacción)
         backup_dir = tempfile.mkdtemp(prefix="gip_borrar_prueba_")
         print(f"\nGuardando respaldo en: {backup_dir}")
-        backup_path = _backup_data(cur, test_ids, backup_dir)
-        print(f"  Respaldo: {backup_path}")
+        backup_path = _backup_data(cur, test_ids, fk_tables, backup_dir)
+        print(f"  Respaldo verificado: {backup_path}  ({os.path.getsize(backup_path):,} bytes)")
 
-        # 7. Borrado en una sola transacción
-        # Cerrar la sesión read-only y abrir una nueva con escritura
-        conn.close()
-        conn = psycopg2.connect(db_url)
-        conn.autocommit = False
+        # 8. Borrado en una sola transacción (misma conexión)
+        # Cerrar la transacción implícita de lecturas antes de comenzar la escritura
+        conn.rollback()
 
         try:
             with conn.cursor() as wcur:
