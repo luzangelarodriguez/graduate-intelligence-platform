@@ -3110,7 +3110,7 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
     },
     scales: {
       x: { title: { display: true, text: 'Demanda del mercado (percentil)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#E5E7EB', borderDash: [4, 4] }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
-      y: { title: { display: true, text: 'Cobertura en el currículo (%)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#F3F4F6' }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
+      y: { title: { display: true, text: 'Asignaturas que la cubren (n)', font: { size: 10 }, color: '#9CA3AF' }, grid: { color: '#F3F4F6' }, ticks: { font: { size: 10 }, color: '#9CA3AF' } },
     },
   };
 
@@ -3118,11 +3118,11 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
     <div>
       <div style={{ position: 'relative' }}>
         <div style={{ position: 'absolute', top: 4, left: '8%', zIndex: 1, pointerEvents: 'none' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Consolidar</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Revisar vigencia</div>
           <div style={{ fontSize: 9, color: '#9CA3AF' }}>Alta cobertura, baja demanda</div>
         </div>
         <div style={{ position: 'absolute', top: 4, left: '58%', zIndex: 1, pointerEvents: 'none' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Actualizar</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Mantener</div>
           <div style={{ fontSize: 9, color: '#9CA3AF' }}>Alta cobertura, alta demanda</div>
         </div>
         <div style={{ position: 'absolute', bottom: 28, left: '8%', zIndex: 1, pointerEvents: 'none' }}>
@@ -3130,7 +3130,7 @@ function BrechasScatter({ matriz, criticasSet }: { matriz: MatrizSkill[]; critic
           <div style={{ fontSize: 9, color: '#9CA3AF' }}>Baja cobertura, baja demanda</div>
         </div>
         <div style={{ position: 'absolute', bottom: 28, left: '58%', zIndex: 1, pointerEvents: 'none' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Diferenciar</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#374151', lineHeight: 1.2 }}>Incorporar</div>
           <div style={{ fontSize: 9, color: '#9CA3AF' }}>Baja cobertura, alta demanda</div>
         </div>
         <div style={{ height: 280 }}>
