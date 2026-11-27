@@ -39,6 +39,41 @@ GENERIC_TOKENS: frozenset[str] = frozenset({
     "herramienta", "basico", "avanzado", "general",
 })
 
+# Sinónimos de traducción: clave = canonical_key(brecha en inglés) → frases equivalentes en español.
+# Cada sinónimo cuenta como coincidencia de frase completa (score 2.0).
+# NO usar para modificar SKILL_ALIASES (cambiaría la cobertura de producción).
+TEXT_SYNONYMS: dict[str, list[str]] = {
+    "business intelligence": [
+        "inteligencia de negocio",
+        "inteligencia de negocios",
+        "inteligencia empresarial",
+    ],
+    "reporte": [
+        "informe",
+        "informes",
+    ],
+    "dashboard": [
+        "cuadro de mando",
+        "cuadros de mando",
+        "tablero de control",
+        "tableros de control",
+    ],
+    "analisis de datos": [
+        "analitica de datos",
+        "analisis de informacion",
+    ],
+    "machine learning": [
+        "aprendizaje automatico",
+    ],
+    "big data": [
+        "datos masivos",
+        "macrodatos",
+    ],
+    "visualizacion de datos": [
+        "data visualization",
+    ],
+}
+
 # ── Normalización ─────────────────────────────────────────────────────────────
 
 def _norm(s: str) -> str:
@@ -76,7 +111,13 @@ def score_brecha_vs_text(brecha_skill: str, clean_text: str) -> float:
     if re.search(phrase_pat, text_norm):
         return 2.0
 
-    # 2. All non-generic tokens present (word boundaries)
+    # 2. Synonym phrase match — Spanish equivalents of English skill names (score 2.0)
+    for syn in TEXT_SYNONYMS.get(brecha_norm, []):
+        syn_norm = _norm_text_tokenwise(syn)
+        if re.search(r"\b" + re.escape(syn_norm) + r"\b", text_norm):
+            return 2.0
+
+    # 3. All non-generic tokens present (word boundaries)
     tokens      = brecha_norm.split()
     non_generic = [t for t in tokens if t not in GENERIC_TOKENS and len(t) >= 3]
 
@@ -168,3 +209,13 @@ def assign_brechas(
         "per_asignatura":         per_asignatura,
         "brechas_sin_asignatura": brechas_sin_asignatura,
     }
+
+
+def compute_confianza(brechas_asignadas: list[dict[str, Any]]) -> str:
+    """
+    Returns 'alta' if any brecha was assigned by exact phrase or synonym match (score 2.0),
+    'media' if only by token overlap (score 1.0).
+    """
+    if any(b.get("score", 0) >= 2.0 for b in brechas_asignadas):
+        return "alta"
+    return "media"
