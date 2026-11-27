@@ -110,13 +110,16 @@ interface RAPropuesto {
   codigo: string; texto: string; tipo: 'nuevo' | 'modificado'; skills_incorporadas: string[];
 }
 interface RedisenioPropuesta {
-  asignatura: string; relevancia_score: number; confianza: 'alta' | 'media' | 'baja';
+  asignatura: string; relevancia_score: number; confianza?: 'alta' | 'media' | 'baja';
   brechas_relevantes: string[]; ras_actuales_texto: string;
   ras_propuestos: RAPropuesto[]; skills_incorporadas: string[]; justificacion?: string;
 }
 interface RediseniResult {
   program_id: number; asignaturas_analizadas: number;
-  propuestas: RedisenioPropuesta[]; advertencia?: string; evidencia_baja?: boolean; debug?: Record<string, unknown>;
+  brechas_totales?: number; brechas_criticas_count?: number;
+  propuestas: RedisenioPropuesta[];
+  brechas_sin_asignatura?: { skill: string; frecuencia_mercado: number }[];
+  advertencia?: string; evidencia_baja?: boolean; debug?: Record<string, unknown>;
 }
 interface RediseniJob {
   job_id: string; status: 'queued' | 'running' | 'done' | 'error';
@@ -480,7 +483,7 @@ function ProposalCard({ prop }: { prop: RedisenioPropuesta }) {
     media: { bg: '#FEF3C7', color: '#92400E', label: 'Confianza media' },
     baja:  { bg: '#F3F4F6', color: '#374151', label: 'Confianza baja'  },
   };
-  const conf = confStyle[prop.confianza] ?? confStyle.baja;
+  const conf = prop.confianza ? (confStyle[prop.confianza] ?? confStyle.baja) : null;
   const TRUNCATE = 300;
   const truncated = prop.ras_actuales_texto.length > TRUNCATE && !expanded;
   const displayText = truncated ? prop.ras_actuales_texto.slice(0, TRUNCATE) + '…' : prop.ras_actuales_texto;
@@ -488,7 +491,7 @@ function ProposalCard({ prop }: { prop: RedisenioPropuesta }) {
     <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 16, background: C.white }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: `1px solid ${C.border}`, background: '#F9FAFB' }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: C.navy, margin: 0 }}>{prop.asignatura}</p>
-        <span style={{ fontSize: 10, fontWeight: 700, background: conf.bg, color: conf.color, borderRadius: 20, padding: '2px 8px' }}>{conf.label}</span>
+        {conf && <span style={{ fontSize: 10, fontWeight: 700, background: conf.bg, color: conf.color, borderRadius: 20, padding: '2px 8px' }}>{conf.label}</span>}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         <div style={{ padding: '14px 16px', borderRight: `1px solid ${C.border}`, background: '#F9FAFB' }}>
@@ -3273,6 +3276,25 @@ function ViewRecomendaciones({
                 {result.advertencia && <span style={{ fontSize: 10, color: '#92400E', background: '#FEF3C7', borderRadius: 20, padding: '2px 8px', marginLeft: 8 }}>⚠ {result.advertencia}</span>}
               </p>
               {propuestas.map((prop, idx) => <ProposalCard key={idx} prop={prop} />)}
+              {/* Brechas sin asignatura natural — tolerates missing key (old results) */}
+              {(result.brechas_sin_asignatura ?? []).length > 0 && (
+                <div style={{ border: `1px solid #FCD34D`, borderRadius: 10, padding: '12px 16px', background: '#FFFBEB', marginBottom: 16 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#92400E', margin: '0 0 6px' }}>
+                    Brechas sin asignatura natural ({result.brechas_sin_asignatura!.length})
+                  </p>
+                  <p style={{ fontSize: 10, color: '#78350F', margin: '0 0 10px', lineHeight: 1.5 }}>
+                    Estas brechas del mercado no encontraron encaje suficiente en ninguna asignatura existente. Se recomienda considerar una nueva electiva o módulo transversal.
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {result.brechas_sin_asignatura!.map((b, bi) => (
+                      <span key={bi} style={{ fontSize: 10, background: '#FEF3C7', color: '#78350F', borderRadius: 20, padding: '3px 10px', fontWeight: 600 }}>
+                        {b.skill}
+                        {b.frecuencia_mercado > 0 && <span style={{ fontWeight: 400, color: '#92400E' }}> · {b.frecuencia_mercado} vac.</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                 <button onClick={onDownloadRedesign} style={{ background: C.navy, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   📥 Descargar (.docx)

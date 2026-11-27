@@ -1620,6 +1620,24 @@ def _call_openai_for_ras(asignatura: str, clean_text: str, brechas_relevantes: l
         }
 
 
+MAX_BRECHAS_PER_OPENAI_CALL: int = 4
+
+
+def _merge_ra_results(results: list[dict[str, Any]]) -> dict[str, Any]:
+    """Merge multiple OpenAI RA call results into one."""
+    merged_ras: list[dict[str, Any]] = []
+    justificaciones: list[str] = []
+    for r in results:
+        merged_ras.extend(r.get("ras_propuestos", []))
+        j = r.get("justificacion", "")
+        if j:
+            justificaciones.append(j)
+    return {
+        "ras_propuestos": merged_ras,
+        "justificacion":  " | ".join(justificaciones) if justificaciones else "",
+    }
+
+
 def _run_redesign(job_id: str, program_id: int) -> None:
     """Background task: analyze curriculum vs brechas and call OpenAI for each relevant subject."""
     job = _REDESIGN_JOBS[job_id]
@@ -1659,7 +1677,11 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         _update("running", current_step="Calculando brechas curriculares")
 
         analysis = _market_analysis_for_program(program_id, fetch_all)
-        brechas_criticas_data = analysis["brechas_criticas"]  # list[{skill, frecuencia_mercado}]
+        # Use ALL brechas ordered by frecuencia_mercado; criticas tracked for labeling
+        all_brechas_data = sorted(
+            analysis["brechas"], key=lambda x: -x.get("frecuencia_mercado", 0)
+        )
+        brechas_criticas_set = {b["skill"] for b in analysis["brechas_criticas"]}
         n_matches = analysis["n_matches"]
 
         logger.info(
@@ -1669,7 +1691,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             len(analysis["fortalezas"]) + len(analysis["brechas"]),
             len(analysis["skills_programa"]),
             len(analysis["brechas"]),
-            len(brechas_criticas_data),
+            len(analysis["brechas_criticas"]),
         )
 
         if analysis["evidencia_baja"]:
@@ -1687,14 +1709,14 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _update("done", result=result)
             return
 
-        if not brechas_criticas_data:
+        if not all_brechas_data:
             _update("done", result={
                 "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
-                "brechas_totales":        len(analysis["brechas"]),
+                "brechas_totales":        0,
                 "brechas_criticas_count": 0,
                 "n_matches":              n_matches,
-                "advertencia": "No se encontraron brechas curriculares críticas — el programa ya cubre las skills de alta demanda del mercado.",
+                "advertencia": "No se encontraron brechas curriculares — el programa ya cubre las skills del mercado.",
                 "propuestas":             [],
                 "brechas_sin_asignatura": [],
             })
@@ -1702,7 +1724,7 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             return
 
         # 3. Assign each brecha to the best-fit asignaturas
-        from api.redesign_assignment import assign_brechas as _assign_brechas
+        from api.redesign_assignment import assign_brechas as _assign_brechas, compute_confianza as _compute_confianza
 
         _update("running", current_step="Asignando brechas a asignaturas")
 
@@ -1715,9 +1737,14 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             }
             for row in mc_rows
         ]
-        assignment = _assign_brechas(mc_list, brechas_criticas_data)
-        per_asignatura  = assignment["per_asignatura"]
+        assignment = _assign_brechas(mc_list, all_brechas_data)
+        per_asignatura   = assignment["per_asignatura"]
         brechas_sin_asig = assignment["brechas_sin_asignatura"]
+
+        # Mark is_critica on each assigned brecha
+        for item in per_asignatura.values():
+            for b in item["brechas_asignadas"]:
+                b["is_critica"] = b["skill"] in brechas_criticas_set
 
         logger.info(
             "[REDESIGN-DEBUG] program_id=%s brechas_criticas=%d asignaturas_con_brechas=%d "
@@ -1727,9 +1754,10 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         )
 
         debug_info = {
-            "fix_version":            "v6-phrase-assignment",
+            "fix_version":            "v7-all-brechas",
             "n_matches":              n_matches,
-            "brechas_criticas_count": len(brechas_criticas_data),
+            "brechas_totales":        len(all_brechas_data),
+            "brechas_criticas_count": len(analysis["brechas_criticas"]),
             "brechas_sin_asignatura": [b["skill"] for b in brechas_sin_asig],
             "asignaturas_con_brechas": list(per_asignatura.keys()),
         }
@@ -1738,8 +1766,8 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             result = {
                 "program_id":             program_id,
                 "asignaturas_analizadas": len(mc_rows),
-                "brechas_totales":        len(analysis["brechas"]),
-                "brechas_criticas_count": len(brechas_criticas_data),
+                "brechas_totales":        len(all_brechas_data),
+                "brechas_criticas_count": len(analysis["brechas_criticas"]),
                 "n_matches":              n_matches,
                 "advertencia": "Ninguna brecha pudo asignarse a una asignatura con encaje suficiente.",
                 "propuestas":             [],
@@ -1750,7 +1778,9 @@ def _run_redesign(job_id: str, program_id: int) -> None:
             _update("done", result=result)
             return
 
-        # 4. Call OpenAI only for asignaturas that have assigned brechas
+        # 4. Call OpenAI only for asignaturas that have assigned brechas.
+        #    If >MAX_BRECHAS_PER_OPENAI_CALL brechas assigned, split into chunks
+        #    and merge results (no brecha is discarded).
         propuestas: list[dict[str, Any]] = []
         items_sorted = sorted(
             per_asignatura.values(),
@@ -1759,20 +1789,45 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         for i, item in enumerate(items_sorted):
             _update("running", current_step=f"Generando RAs con IA ({i+1}/{len(items_sorted)}): {item['asignatura'][:40]}")
             brechas_asig = [b["skill"] for b in item["brechas_asignadas"]]
-            ai_result = _call_openai_for_ras(
-                asignatura=item["asignatura"],
-                clean_text=item["clean_text"],
-                brechas_relevantes=brechas_asig,
-            )
+
+            if len(brechas_asig) > MAX_BRECHAS_PER_OPENAI_CALL:
+                chunks = [
+                    brechas_asig[j:j + MAX_BRECHAS_PER_OPENAI_CALL]
+                    for j in range(0, len(brechas_asig), MAX_BRECHAS_PER_OPENAI_CALL)
+                ]
+                chunk_results = [
+                    _call_openai_for_ras(
+                        asignatura=item["asignatura"],
+                        clean_text=item["clean_text"],
+                        brechas_relevantes=chunk,
+                    )
+                    for chunk in chunks
+                ]
+                ai_result = _merge_ra_results(chunk_results)
+            else:
+                ai_result = _call_openai_for_ras(
+                    asignatura=item["asignatura"],
+                    clean_text=item["clean_text"],
+                    brechas_relevantes=brechas_asig,
+                )
+
             all_skills: list[str] = []
             for ra in ai_result.get("ras_propuestos", []):
                 all_skills.extend(ra.get("skills_incorporadas", []))
+
+            # Annotate brechas_relevantes with ⚠ for critical brechas
+            brechas_relevantes_labeled = [
+                f"⚠ {b}" if b in brechas_criticas_set else b
+                for b in brechas_asig
+            ]
 
             propuestas.append({
                 "asignatura":          item["asignatura"],
                 "brechas_asignadas":   item["brechas_asignadas"],
                 "relevancia_score":    max(b["score"] for b in item["brechas_asignadas"]),
+                "confianza":           _compute_confianza(item["brechas_asignadas"]),
                 "brechas_relevantes":  brechas_asig,
+                "brechas_relevantes_labeled": brechas_relevantes_labeled,
                 "ras_actuales_texto":  item["clean_text"][:600],
                 "ras_propuestos":      ai_result.get("ras_propuestos", []),
                 "skills_incorporadas": list(set(all_skills)),
@@ -1782,8 +1837,8 @@ def _run_redesign(job_id: str, program_id: int) -> None:
         result = {
             "program_id":             program_id,
             "asignaturas_analizadas": len(mc_rows),
-            "brechas_totales":        len(analysis["brechas"]),
-            "brechas_criticas_count": len(brechas_criticas_data),
+            "brechas_totales":        len(all_brechas_data),
+            "brechas_criticas_count": len(analysis["brechas_criticas"]),
             "n_matches":              n_matches,
             "propuestas":             propuestas,
             "brechas_sin_asignatura": brechas_sin_asig,
@@ -1881,7 +1936,8 @@ def curriculum_redesign_download(program_id: int):
             doc.add_heading(prop["asignatura"], level=2)
             p = doc.add_paragraph()
             p.add_run("Relevancia con brechas: ").bold = True
-            p.add_run(f"{prop['relevancia_score']:.2f} · Brechas relevantes: {', '.join(prop['brechas_relevantes'][:5])}")
+            labeled = prop.get("brechas_relevantes_labeled") or prop.get("brechas_relevantes", [])
+            p.add_run(f"{prop['relevancia_score']:.2f} · Brechas: {', '.join(labeled[:5])}")
 
             # Comparison table
             table = doc.add_table(rows=1, cols=2)
@@ -2001,7 +2057,8 @@ def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
             )
             all_mkt.sort(key=lambda x: x["frecuencia"], reverse=True)
             market_ctx = {
-                "top_skills":      all_mkt[:25],
+                "top_skills":      all_mkt[:25],   # LLM context only (top 25)
+                "all_skills":      all_mkt,         # full list for evidencia_mercado cross-ref
                 "brechas_criticas": analysis_data.get("brechas_criticas", []),
                 "n_matches":       analysis_data.get("n_matches", 0),
             }
