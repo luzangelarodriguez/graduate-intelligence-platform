@@ -17,8 +17,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from api.redesign_assignment import (
     MIN_ASSIGNMENT_SCORE,
     MAX_ASIG_PER_BRECHA,
+    TEXT_SYNONYMS,
     score_brecha_vs_text,
     assign_brechas,
+    compute_confianza,
 )
 
 
@@ -348,3 +350,103 @@ class TestRegresionPrograma13:
             assert asig_count <= MAX_ASIG_PER_BRECHA, (
                 f"'{brecha['skill']}' asignada a {asig_count} asignaturas (máx {MAX_ASIG_PER_BRECHA})"
             )
+
+    def test_business_intelligence_usa_sinonimo_espanol(self):
+        """'business intelligence' asignado a id 37 vía sinónimo 'inteligencia de negocio'."""
+        item37 = self.pa.get(37)
+        assert item37 is not None, "id 37 no encontró ninguna brecha"
+        bi_brecha = next(
+            (b for b in item37["brechas_asignadas"] if b["skill"] == "business intelligence"),
+            None,
+        )
+        assert bi_brecha is not None
+        # Debe tener score 2.0 (synonym phrase match)
+        assert bi_brecha["score"] == 2.0
+
+    def test_tecnicas_ia_no_recibe_business_intelligence(self):
+        """'Técnicas de Inteligencia Artificial' (id 39) NO debe recibir 'business intelligence'."""
+        if 39 in self.pa:
+            asig_brechas = {b["skill"] for b in self.pa[39]["brechas_asignadas"]}
+            assert "business intelligence" not in asig_brechas
+
+
+# ── D. TEXT_SYNONYMS structure ────────────────────────────────────────────────
+
+class TestTextSynonyms:
+    def test_business_intelligence_sinonimos_incluidos(self):
+        assert "business intelligence" in TEXT_SYNONYMS
+        syns = TEXT_SYNONYMS["business intelligence"]
+        assert any("inteligencia de negocio" in s for s in syns)
+
+    def test_machine_learning_sinonimo(self):
+        assert "machine learning" in TEXT_SYNONYMS
+        assert "aprendizaje automatico" in TEXT_SYNONYMS["machine learning"]
+
+    def test_sinonimo_match_score_2(self):
+        """Texto en español con sinónimo debe devolver score 2.0."""
+        assert score_brecha_vs_text(
+            "business intelligence",
+            "El módulo cubre técnicas de inteligencia de negocios y analítica.",
+        ) == 2.0
+
+    def test_sinonimo_match_inteligencia_empresarial(self):
+        assert score_brecha_vs_text(
+            "business intelligence",
+            "Aplicaciones de inteligencia empresarial en la toma de decisiones.",
+        ) == 2.0
+
+    def test_sin_sinonimo_cero(self):
+        """Texto que no contiene ni la frase ni sinónimos → 0.0 (solo tokens genéricos)."""
+        assert score_brecha_vs_text(
+            "business intelligence",
+            "El estudiante aprenderá a gestionar sistemas de información básicos.",
+        ) == 0.0
+
+    def test_big_data_sinonimo_datos_masivos(self):
+        assert score_brecha_vs_text(
+            "big data",
+            "Procesamiento y almacenamiento de datos masivos en la nube.",
+        ) == 2.0
+
+    def test_dashboard_tablero_control(self):
+        assert score_brecha_vs_text(
+            "dashboard",
+            "Construcción de tableros de control interactivos con Power BI.",
+        ) == 2.0
+
+    def test_machine_learning_aprendizaje_automatico(self):
+        assert score_brecha_vs_text(
+            "machine learning",
+            "Fundamentos del aprendizaje automático y redes neuronales.",
+        ) == 2.0
+
+
+# ── E. compute_confianza ──────────────────────────────────────────────────────
+
+class TestComputeConfianza:
+    def test_score_2_da_alta(self):
+        brechas = [{"skill": "python", "score": 2.0, "frecuencia_mercado": 10}]
+        assert compute_confianza(brechas) == "alta"
+
+    def test_score_1_da_media(self):
+        brechas = [{"skill": "python", "score": 1.0, "frecuencia_mercado": 10}]
+        assert compute_confianza(brechas) == "media"
+
+    def test_mix_score_2_y_1_da_alta(self):
+        brechas = [
+            {"skill": "python",    "score": 2.0, "frecuencia_mercado": 10},
+            {"skill": "sql",       "score": 1.0, "frecuencia_mercado": 8},
+        ]
+        assert compute_confianza(brechas) == "alta"
+
+    def test_solo_score_1_da_media(self):
+        brechas = [
+            {"skill": "python", "score": 1.0, "frecuencia_mercado": 10},
+            {"skill": "sql",    "score": 1.0, "frecuencia_mercado": 8},
+        ]
+        assert compute_confianza(brechas) == "media"
+
+    def test_score_cero_da_media(self):
+        # score 0 means threshold wasn't met; compute_confianza still returns 'media'
+        brechas = [{"skill": "python", "score": 0.5, "frecuencia_mercado": 5}]
+        assert compute_confianza(brechas) == "media"
