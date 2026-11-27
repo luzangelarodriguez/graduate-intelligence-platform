@@ -222,6 +222,8 @@ def frequency_threshold(n_matches: int) -> int:
 
 def process_job_skill_rows(
     rows: list[dict],
+    min_freq: int | None = None,
+    hard_cap: int | None = HARD_CAP,
 ) -> tuple[list[dict], int]:
     """
     Given rows of {match_id, skill} from the per-job query:
@@ -229,12 +231,18 @@ def process_job_skill_rows(
       2. Apply subsunción within each job.
       3. Discard skills in RUIDO_SIEMPRE (e.g. "sas" / "s a s").
       4. Count per-skill frequencies (how many jobs mention the skill).
-      5. Apply frequency_threshold(n_matches) and HARD_CAP.
+      5. Apply min_freq (default: frequency_threshold(n_matches)) and hard_cap.
+
+    Parameters:
+        min_freq:  minimum frequency a skill must reach to be included.
+                   None → use frequency_threshold(n_matches) = max(2, ceil(0.15·n)).
+        hard_cap:  maximum number of skills returned.
+                   None → no cap.  Default: HARD_CAP (60).
 
     Returns:
         (skills_mercado_raw, n_matches)
     where skills_mercado_raw is a list of {skill, frecuencia} dicts,
-    sorted descending by frecuencia, len <= HARD_CAP.
+    sorted descending by frecuencia, len <= hard_cap (if set).
     """
     # Build per-job skill sets
     jobs: dict[str, list[str]] = {}
@@ -245,7 +253,7 @@ def process_job_skill_rows(
             jobs.setdefault(mid, []).append(skill)
 
     n_matches = len(jobs)
-    threshold = frequency_threshold(n_matches)
+    threshold = min_freq if min_freq is not None else frequency_threshold(n_matches)
 
     # Apply subsunción, alias dedup, noise filter per job; accumulate frequencies.
     # Each canonical key is counted at most once per vacancy (set-based dedup),
@@ -284,7 +292,7 @@ def process_job_skill_rows(
         if v >= threshold and k in display
     ]
     candidates.sort(key=lambda x: -x["frecuencia"])
-    return candidates[:HARD_CAP], n_matches
+    return (candidates[:hard_cap] if hard_cap is not None else candidates), n_matches
 
 
 # ── Cross analysis ─────────────────────────────────────────────────────────────
