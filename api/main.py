@@ -2044,7 +2044,29 @@ def generate_deep_analysis(program_id: int) -> _UnicodeJSONResponse:
     """Trigger a new LLM-based deep curriculum analysis and persist it."""
     try:
         from intelligence.curriculum_deep_analysis_engine import build_deep_analysis
-        result = build_deep_analysis(program_id, persist=True)
+        from api.database import fetch_all as _fa
+
+        # Compute market context best-effort; analysis still runs without it
+        market_ctx = None
+        try:
+            analysis_data = _market_analysis_for_program(program_id, _fa)
+            all_mkt = (
+                [{"skill": s["skill"], "frecuencia": s.get("frecuencia_mercado", 0)}
+                 for s in analysis_data.get("fortalezas", [])]
+                + [{"skill": b["skill"], "frecuencia": b.get("frecuencia_mercado", 0)}
+                   for b in analysis_data.get("brechas", [])]
+            )
+            all_mkt.sort(key=lambda x: x["frecuencia"], reverse=True)
+            market_ctx = {
+                "top_skills":      all_mkt[:25],   # LLM context only (top 25)
+                "all_skills":      all_mkt,         # full list for evidencia_mercado cross-ref
+                "brechas_criticas": analysis_data.get("brechas_criticas", []),
+                "n_matches":       analysis_data.get("n_matches", 0),
+            }
+        except Exception:
+            logger.warning("market context unavailable for deep-analysis program_id=%s", program_id)
+
+        result = build_deep_analysis(program_id, market_context=market_ctx, persist=True)
         return _UnicodeJSONResponse(result)  # type: ignore[name-defined]
     except ValueError as exc:
         return _UnicodeJSONResponse({"error": str(exc)}, status_code=404)  # type: ignore[name-defined]

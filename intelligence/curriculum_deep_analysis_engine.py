@@ -189,6 +189,19 @@ C. AUSENCIAS NOTABLES — checklist de dominio:
    impacto estimado. No importes ítems de otros dominios como brechas.
 
 ═══════════════════════════════════════════════════════════
+DATOS DE MERCADO (cuando estén presentes en el payload)
+═══════════════════════════════════════════════════════════
+Si el payload contiene una sección "DATOS DE MERCADO", úsala para:
+- Respaldar debilidades: si una ausencia coincide con una skill de mercado de alta
+  demanda, marca origen: "mercado" y pon los términos de skill en terminos_clave.
+- Si la debilidad proviene solo del checklist de dominio sin respaldo en los datos
+  de mercado recibidos, marca origen: "criterio_experto".
+Los ejemplos de las categorías (Tableau, Power BI, MLOps, etc.) son guía de
+clasificación, NO una lista de brechas a reportar por defecto. Solo reporta
+debilidades si hay evidencia en el texto de los microcurrículos o en los datos
+de mercado recibidos.
+
+═══════════════════════════════════════════════════════════
 REGLAS OBLIGATORIAS
 ═══════════════════════════════════════════════════════════
 1. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
@@ -234,7 +247,9 @@ SCHEMA EXACTO A DEVOLVER — no agregues ni quites claves:
     {
       "hallazgo": "string",
       "impacto": "alto|medio|bajo",
-      "recomendacion": "string"
+      "recomendacion": "string",
+      "origen": "mercado|criterio_experto",
+      "terminos_clave": ["string — 1 a 3 términos de skill para cruzar con datos de mercado"]
     }
   ],
   "perfil_ocupacional": [
@@ -256,14 +271,91 @@ SCHEMA EXACTO A DEVOLVER — no agregues ni quites claves:
 """
 
 
-def _build_user_payload(program_name: str, microcurriculos: list[dict[str, Any]]) -> str:
-    """Builds the user message: program name + concatenated asignatura texts."""
+def _build_user_payload(
+    program_name: str,
+    microcurriculos: list[dict[str, Any]],
+    market_context: dict[str, Any] | None = None,
+) -> str:
+    """Builds the user message: program name + optional market data + asignatura texts."""
     parts = [f"PROGRAMA: {program_name}\n", f"TOTAL ASIGNATURAS: {len(microcurriculos)}\n\n"]
+
+    if market_context:
+        n_matches = market_context.get("n_matches", 0)
+        parts.append(f"{'═'*55}\n")
+        parts.append(f"DATOS DE MERCADO (n={n_matches} vacantes analizadas)\n")
+        parts.append(f"{'═'*55}\n")
+        top = market_context.get("top_skills", [])
+        if top:
+            parts.append("Top skills demandadas en el mercado:\n")
+            for s in top[:25]:
+                parts.append(f"  · {s['skill']}  ({s['frecuencia']} vacantes)\n")
+        criticas = market_context.get("brechas_criticas", [])
+        if criticas:
+            parts.append("\nBrechas críticas (alta demanda, baja cobertura en el programa):\n")
+            for b in criticas:
+                parts.append(f"  ⚠ {b['skill']}  ({b['frecuencia_mercado']} vacantes)\n")
+        parts.append(f"{'═'*55}\n\n")
+
     for mc in microcurriculos:
         asig = mc.get("asignatura") or f"id={mc['id']}"
         text = (mc.get("clean_text") or "").strip()
         parts.append(f"=== ASIGNATURA: {asig} ===\n{text}\n\n")
     return "".join(parts)
+
+
+def _enrich_debilidades_with_market(
+    debilidades: list[dict[str, Any]],
+    market_context: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """
+    For each debilidad, cross terminos_clave with market skills via canonical_key.
+    Sets evidencia_mercado: {frecuencia, pct_vacantes, n_matches} or null.
+    Overrides origen based on whether market evidence was found.
+    """
+    if not market_context:
+        # No market data: keep LLM's origen or default to criterio_experto
+        return [
+            {**d, "evidencia_mercado": None, "origen": d.get("origen", "criterio_experto")}
+            for d in debilidades
+        ]
+
+    from api.skills_analysis_logic import canonical_key
+
+    n_matches = market_context.get("n_matches", 0) or 1  # avoid division by zero
+    # Prefer all_skills (complete list) over top_skills for cross-reference.
+    # top_skills is limited to 25 and would miss skills ranked >25.
+    skills_for_lookup = market_context.get("all_skills") or market_context.get("top_skills", [])
+    mkt_lookup: dict[str, int] = {}
+    for s in skills_for_lookup:
+        ck = canonical_key(s["skill"])
+        freq = s.get("frecuencia", 0)
+        if ck not in mkt_lookup or freq > mkt_lookup[ck]:
+            mkt_lookup[ck] = freq
+
+    enriched = []
+    for d in debilidades:
+        d = dict(d)
+        terminos = d.get("terminos_clave") or []
+        best_freq = 0
+        for t in terminos:
+            ck = canonical_key(t)
+            freq = mkt_lookup.get(ck, 0)
+            if freq > best_freq:
+                best_freq = freq
+
+        if best_freq > 0:
+            d["evidencia_mercado"] = {
+                "frecuencia":   best_freq,
+                "pct_vacantes": round(best_freq / n_matches * 100, 1),
+                "n_matches":    market_context.get("n_matches", 0),
+            }
+            d["origen"] = "mercado"
+        else:
+            d["evidencia_mercado"] = None
+            d["origen"] = "criterio_experto"
+        enriched.append(d)
+
+    return enriched
 
 
 # ── OpenAI caller (same pattern as executive_ai_service._openai_chat_json) ───
@@ -389,15 +481,20 @@ def build_deep_analysis(
     specialization_id: int,
     *,
     persist: bool = True,
+    market_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Generate a deep curriculum analysis for the given program.
 
-    Calls OpenAI with the full clean_text of all microcurriculos, parses
-    the structured JSON response, and optionally persists it.
+    Calls OpenAI with the full clean_text of all microcurriculos (plus optional
+    market data), parses the structured JSON response, enriches debilidades with
+    market evidence, and optionally persists the result.
 
     Args:
         specialization_id: ID from the especializaciones table.
         persist: If True (default), insert the result into program_deep_analysis.
+        market_context: Optional dict with keys:
+            top_skills [{skill, frecuencia}], brechas_criticas [{skill, frecuencia_mercado}],
+            n_matches (int). When None the analysis runs without market data.
 
     Returns:
         dict with keys: specialization_id, program_name, analysis, model_version,
@@ -413,12 +510,19 @@ def build_deep_analysis(
         )
 
     logger.info(
-        "[deep_analysis] specialization_id=%d program=%r asignaturas=%d",
+        "[deep_analysis] specialization_id=%d program=%r asignaturas=%d market=%s",
         specialization_id, program_name, len(microcurriculos),
+        f"n_matches={market_context['n_matches']}" if market_context else "none",
     )
 
-    user_text = _build_user_payload(program_name, microcurriculos)
+    user_text = _build_user_payload(program_name, microcurriculos, market_context)
     analysis = _call_openai(_SYSTEM_PROMPT, user_text)
+
+    # Enrich debilidades with deterministic market evidence
+    if "debilidades" in analysis:
+        analysis["debilidades"] = _enrich_debilidades_with_market(
+            analysis["debilidades"], market_context
+        )
 
     # Ensure top-level required fields exist
     analysis.setdefault("programa", program_name)

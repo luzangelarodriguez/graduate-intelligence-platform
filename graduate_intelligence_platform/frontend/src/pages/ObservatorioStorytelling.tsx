@@ -2195,6 +2195,14 @@ interface DeepDebilidad {
   hallazgo: string;
   impacto: 'alto' | 'medio' | 'bajo';
   recomendacion: string;
+  // Added in v2: enrichment fields (absent in rows persisted before this change)
+  origen?: 'mercado' | 'criterio_experto';
+  terminos_clave?: string[];
+  evidencia_mercado?: {
+    frecuencia: number;
+    pct_vacantes: number;
+    n_matches: number;
+  } | null;
 }
 
 interface DeepRecomendacion {
@@ -2590,6 +2598,31 @@ function ViewPrograma({ programaId, skills, coberturaPct }: ViewProps) {
                       {d.hallazgo}
                     </span>
                   </div>
+                  {/* Origin badge — only rendered when enrichment fields are present */}
+                  {(d.evidencia_mercado != null || d.origen != null) && (
+                    <div style={{ marginBottom: 5 }}>
+                      {d.evidencia_mercado
+                        ? (
+                          <span style={{
+                            display: 'inline-block', fontSize: 8.5, fontWeight: 700, letterSpacing: 0.2,
+                            padding: '2px 6px', borderRadius: 4,
+                            background: '#D1FAE5', color: '#065F46',
+                          }}>
+                            Respaldado por mercado · {d.evidencia_mercado.pct_vacantes}% de vacantes
+                          </span>
+                        )
+                        : (
+                          <span style={{
+                            display: 'inline-block', fontSize: 8.5, fontWeight: 600, letterSpacing: 0.2,
+                            padding: '2px 6px', borderRadius: 4,
+                            background: '#F3F4F6', color: '#6B7280',
+                          }}>
+                            Criterio experto (IA)
+                          </span>
+                        )
+                      }
+                    </div>
+                  )}
                   <p style={{ fontSize: 9.5, color: D.muted, margin: 0, lineHeight: 1.45 }}>
                     {d.recomendacion}
                   </p>
