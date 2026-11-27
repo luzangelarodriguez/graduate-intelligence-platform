@@ -1,31 +1,44 @@
 """
 Diagnóstico de cobertura de skills de mercado sin tope artificial.
 
-Ejecuta 4 variantes del procesamiento por programa:
-  A — parámetros actuales (frequency_threshold + HARD_CAP=60)
+Ejecuta 4 variantes del procesamiento por programa usando la misma lógica
+de producción (process_job_skill_rows + cross_analyze):
+  A — parámetros actuales (frequency_threshold + hard_cap=HARD_CAP=60)
   B — umbral 5% (ceil(0.05·n)), sin tope
   C — min_freq=2, sin tope
   D — min_freq=1, sin tope
 
 Programas analizados: 13, 146, 1, 9, 11, 20, 109, 108
 
-Chequeo de coherencia (valores esperados documentados):
-  Programa 13  → variante A: 36.4% cobertura, 4 brechas, 7 fortalezas, 3 skills sin asig.
-  Programa 146 → variante A: 77.8% cobertura, 14 brechas, 4 fortalezas, 2 skills sin asig.
+Coherencia esperada (variante A):
+  Programa 13  → 36.4% cobertura / 4 fortalezas / 7 brechas / 3 críticas
+  Programa 146 → 77.8% cobertura / 14 fortalezas / 4 brechas / 2 críticas
+Si la variante A no coincide, se imprime ADVERTENCIA y las otras variantes
+de ese programa se marcan como no comparables.
+
+Métricas reportadas:
+  n_skills_mkt  — skills de mercado tras el corte
+  n_matches     — vacantes únicas en la muestra
+  umbral        — frecuencia mínima aplicada
+  cob_simple    — cobertura_pct de cross_analyze (fortalezas / no-transversales)
+  cob_pond      — cobertura ponderada por demanda (ver cobertura_ponderada())
+  fortalezas    — len(cross["fortalezas"])
+  brechas       — len(cross["brechas"])
+  criticas      — len(cross["brechas_criticas"])
+  pct_menc_fuera — % menciones totales que el corte A deja fuera vs variante D
 
 Uso:
-    python scripts/diag/cobertura_sin_tope.py
-
-La contraseña de BD se solicita por getpass (nunca se imprime).
+    DATABASE_URL=postgres://user:pass@host/db python scripts/diag/cobertura_sin_tope.py
+    # o sin variable → pide la URL completa por getpass
 """
 from __future__ import annotations
 
 import getpass
 import math
+import os
 import sys
 from pathlib import Path
 
-# ── asegura que el root del proyecto esté en sys.path ─────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -34,50 +47,23 @@ try:
     import psycopg2
     import psycopg2.extras
 except ImportError:
-    print("psycopg2 no encontrado. Instala con: pip install psycopg2-binary")
+    print("psycopg2 no encontrado.  Instala con:  pip install psycopg2-binary")
     sys.exit(1)
 
+from api.market_sample import _MARKET_SAMPLE_CTE
+from api.microcurriculo_filters import SQL_FILTRO_NO_PRUEBA, SQL_FILTRO_NO_PRUEBA_PARAMS
 from api.skills_analysis_logic import (
     HARD_CAP,
+    cross_analyze,
     frequency_threshold,
     process_job_skill_rows,
 )
 
-# ── Programas a analizar ───────────────────────────────────────────────────────
+# ── Programas ──────────────────────────────────────────────────────────────────
 PROGRAM_IDS = [13, 146, 1, 9, 11, 20, 109, 108]
 
-# ── SQL copiado literalmente de api/market_sample.py y api/main.py ───────────
-_MARKET_SAMPLE_CTE = """
-    latest_runs AS (
-        SELECT especializacion_id, MAX(run_id) AS run_id
-        FROM ml_program_job_matches
-        GROUP BY especializacion_id
-    ),
-    ranked AS (
-        SELECT m.id               AS match_id,
-               m.especializacion_id,
-               m.empleo_id,
-               m.skills_empleo,
-               m.relevance_label,
-               RANK() OVER (
-                   PARTITION BY m.empleo_id
-                   ORDER BY m.role_alignment DESC
-               ) AS rnk
-        FROM ml_program_job_matches m
-        JOIN latest_runs lr
-          ON lr.especializacion_id = m.especializacion_id
-         AND lr.run_id = m.run_id
-        JOIN jobs j ON j.id::text = m.empleo_id
-        WHERE m.role_alignment IS NOT NULL
-          AND m.empleo_id IS NOT NULL
-          AND COALESCE(j.activo, TRUE) = TRUE
-    ),
-    market_sample AS (
-        SELECT * FROM ranked WHERE rnk = 1
-    )
-"""
-
-SQL_MARKET_SKILLS = f"""
+# ── SQL copiado literalmente de api/main.py (mismos f-strings de producción) ──
+_SQL_MARKET_SKILLS = f"""
     WITH {_MARKET_SAMPLE_CTE}
     SELECT ms.match_id,
            ms.empleo_id,
@@ -89,7 +75,7 @@ SQL_MARKET_SKILLS = f"""
       AND ms.skills_empleo != '[]'::jsonb
 """
 
-SQL_PROG_SKILLS = """
+_SQL_PROG_SKILLS = f"""
     SELECT COALESCE(ms.skill_normalized, ms.skill_original) AS skill_name,
            COUNT(*) AS cobertura,
            ARRAY_REMOVE(ARRAY_AGG(DISTINCT m.asignatura), NULL) AS asignaturas
@@ -97,92 +83,147 @@ SQL_PROG_SKILLS = """
     JOIN microcurriculos m ON m.id = ms.microcurriculo_id
     WHERE m.specialization_id = %s
       AND COALESCE(ms.skill_normalized, ms.skill_original) IS NOT NULL
-      AND NOT (
-            COALESCE(m.source_document, '') ~* '^[A-Za-z]:[/\\\\]'
-         OR COALESCE(m.source_document, '') ILIKE '%test_microcurric%'
-         OR COALESCE(m.asignatura,      '') ILIKE 'PROGRAMA ACAD%'
-      )
+      {SQL_FILTRO_NO_PRUEBA}
     GROUP BY COALESCE(ms.skill_normalized, ms.skill_original)
     ORDER BY cobertura DESC
 """
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# ── Función pura: cobertura ponderada por demanda ──────────────────────────────
+
+def cobertura_ponderada(fortalezas: list[dict], brechas: list[dict]) -> float:
+    """
+    Cobertura ponderada por demanda de mercado.
+
+    = suma(frecuencia_mercado de fortalezas) /
+      suma(frecuencia_mercado de fortalezas + brechas)  × 100
+
+    Refleja qué fracción de las MENCIONES totales del mercado el programa cubre,
+    no solo el recuento de skills distintas.
+    Returns 0.0 when both lists are empty.
+    """
+    total_fortalezas = sum(f.get("frecuencia_mercado", 0) for f in fortalezas)
+    total_brechas = sum(b.get("frecuencia_mercado", 0) for b in brechas)
+    total = total_fortalezas + total_brechas
+    if total == 0:
+        return 0.0
+    return round(total_fortalezas / total * 100, 1)
+
+
+def pct_menciones_fuera_del_corte(
+    skills_a: list[dict], skills_d: list[dict]
+) -> float:
+    """
+    Porcentaje de menciones totales (sum de frecuencias) que el corte A
+    deja fuera comparado con D (sin tope, min_freq=1).
+
+    = 1 − (sum frecuencias en A) / (sum frecuencias en D)  × 100
+
+    Cuando D está vacío devuelve 0.0.
+    """
+    sum_a = sum(s["frecuencia"] for s in skills_a)
+    sum_d = sum(s["frecuencia"] for s in skills_d)
+    if sum_d == 0:
+        return 0.0
+    return round((1 - sum_a / sum_d) * 100, 1)
+
+
+# ── Conexión ──────────────────────────────────────────────────────────────────
 
 def _connect() -> "psycopg2.extensions.connection":
-    db_host = input("DB host [localhost]: ").strip() or "localhost"
-    db_port = input("DB port [5432]: ").strip() or "5432"
-    db_name = input("DB name: ").strip()
-    db_user = input("DB user: ").strip()
-    db_pass = getpass.getpass("DB password: ")
-    return psycopg2.connect(
-        host=db_host,
-        port=int(db_port),
-        dbname=db_name,
-        user=db_user,
-        password=db_pass,
-        cursor_factory=psycopg2.extras.RealDictCursor,
+    db_url = os.environ.get("DATABASE_URL") or getpass.getpass(
+        "DATABASE_URL (postgres://user:pass@host/db): "
     )
+    conn = psycopg2.connect(db_url, cursor_factory=psycopg2.extras.RealDictCursor)
+    conn.set_session(readonly=True, autocommit=True)
+    return conn
 
 
 def _fetch_all(cur, sql: str, params: tuple) -> list[dict]:
     cur.execute(sql, params)
-    return cur.fetchall()
+    return [dict(r) for r in cur.fetchall()]
 
 
-def _program_skills_set(cur, program_id: int) -> set[str]:
-    """Canonical keys of skills present in the program's microcurrículos."""
-    from api.skills_analysis_logic import canonical_key
-    rows = _fetch_all(cur, SQL_PROG_SKILLS, (program_id,))
-    return {canonical_key(r["skill_name"]) for r in rows if r["skill_name"]}
+# ── Construcción de skills_programa igual que producción ─────────────────────
 
+def _build_prog_skills(cur, program_id: int) -> list[dict]:
+    rows = _fetch_all(cur, _SQL_PROG_SKILLS, (program_id,) + SQL_FILTRO_NO_PRUEBA_PARAMS)
+    result = []
+    for r in rows:
+        if not r["skill_name"]:
+            continue
+        asigs = list(r["asignaturas"]) if r["asignaturas"] else []
+        raw_count = int(r["cobertura"])
+        cobertura = len(asigs) if asigs else (1 if raw_count > 0 else 0)
+        result.append({
+            "skill":       r["skill_name"],
+            "asignaturas": asigs,
+            "cobertura":   cobertura,
+        })
+    return result
+
+
+# ── Variante única ────────────────────────────────────────────────────────────
 
 def _run_variant(
     rows: list[dict],
-    prog_skills: set[str],
+    prog_skills: list[dict],
     min_freq: int | None,
     hard_cap: int | None,
 ) -> dict:
-    skills, n_matches = process_job_skill_rows(rows, min_freq=min_freq, hard_cap=hard_cap)
-    from api.skills_analysis_logic import canonical_key
-    mkt_keys = {canonical_key(s["skill"]) for s in skills}
-    matched = mkt_keys & prog_skills
-    pct = round(100 * len(matched) / len(mkt_keys), 1) if mkt_keys else 0.0
-    brechas = mkt_keys - prog_skills
-    fortalezas = prog_skills & mkt_keys
-    sin_asig = brechas  # skills en mercado sin cobertura en microcurrículos
+    skills_mkt, n_matches = process_job_skill_rows(rows, min_freq=min_freq, hard_cap=hard_cap)
+    cross = cross_analyze(skills_mkt, prog_skills, n_matches)
     return {
-        "n_matches": n_matches,
-        "n_skills_mkt": len(skills),
-        "pct_cobertura": pct,
-        "n_brechas": len(brechas),
-        "n_fortalezas": len(fortalezas),
-        "n_sin_asig": len(sin_asig),
-        "threshold_used": min_freq if min_freq is not None else frequency_threshold(n_matches),
+        "skills_mkt":  skills_mkt,
+        "n_skills_mkt": len(skills_mkt),
+        "n_matches":   n_matches,
+        "threshold":   min_freq if min_freq is not None else frequency_threshold(n_matches),
+        "cob_simple":  cross["cobertura_pct"],
+        "cob_pond":    cobertura_ponderada(cross["fortalezas"], cross["brechas"]),
+        "fortalezas":  len(cross["fortalezas"]),
+        "brechas":     len(cross["brechas"]),
+        "criticas":    len(cross["brechas_criticas"]),
     }
 
 
-def _coherence_check(prog_id: int, variant_a: dict) -> None:
-    """Print coherence warnings for the two documented reference programs."""
-    expected = {
-        13:  {"pct_cobertura": 36.4, "n_brechas": 4, "n_fortalezas": 7, "n_sin_asig": 3},
-        146: {"pct_cobertura": 77.8, "n_brechas": 14, "n_fortalezas": 4, "n_sin_asig": 2},
-    }
-    if prog_id not in expected:
-        return
-    ref = expected[prog_id]
+# ── Coherencia ────────────────────────────────────────────────────────────────
+
+COHERENCIA_ESPERADA: dict[int, dict] = {
+    13:  {"cob_simple": 36.4, "fortalezas": 4, "brechas": 7, "criticas": 3},
+    146: {"cob_simple": 77.8, "fortalezas": 14, "brechas": 4, "criticas": 2},
+}
+
+
+def _coherence_ok(prog_id: int, va: dict) -> bool:
+    if prog_id not in COHERENCIA_ESPERADA:
+        return True
+    ref = COHERENCIA_ESPERADA[prog_id]
     mismatches = [
-        f"{k}: esperado {ref[k]}, obtenido {variant_a[k]}"
+        f"  {k}: esperado {ref[k]}, obtenido {va[k]}"
         for k in ref
-        if variant_a[k] != ref[k]
+        if va[k] != ref[k]
     ]
     if mismatches:
-        print(f"  ⚠ COHERENCIA [{prog_id}]: {'; '.join(mismatches)}")
-    else:
-        print(f"  ✓ coherencia OK [{prog_id}]")
+        print(f"  ⚠ ADVERTENCIA coherencia [{prog_id}] — variante A no coincide:")
+        for m in mismatches:
+            print(m)
+        print(f"  Las demás variantes de prog {prog_id} NO son comparables con producción.")
+        return False
+    print(f"  ✓ coherencia OK [{prog_id}]")
+    return True
 
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+# ── Cabecera de tabla ──────────────────────────────────────────────────────────
+
+_HDR = (
+    f"{'Prog':>5}  {'Var':>3}  {'n_mkt':>5}  {'n_vac':>5}  "
+    f"{'umbral':>6}  {'cob%':>6}  {'pond%':>6}  "
+    f"{'ftal':>4}  {'brec':>4}  {'crit':>4}  {'fuera%':>7}"
+)
+_SEP = "-" * len(_HDR)
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     print("=" * 70)
@@ -191,39 +232,41 @@ def main() -> None:
     conn = _connect()
     try:
         with conn.cursor() as cur:
-            header = (
-                f"{'Prog':>5}  {'Var':>3}  {'n_mkt':>6}  {'n_matches':>9}  "
-                f"{'umbral':>6}  {'cobertura%':>10}  {'brechas':>7}  "
-                f"{'fortalez':>8}  {'sin_asig':>8}"
-            )
             print()
-            print(header)
-            print("-" * len(header))
+            print(_HDR)
+            print(_SEP)
 
             for prog_id in PROGRAM_IDS:
-                rows = _fetch_all(cur, SQL_MARKET_SKILLS, (prog_id,))
-                prog_skills = _program_skills_set(cur, prog_id)
-                n_raw = len(rows)
+                rows = _fetch_all(cur, _SQL_MARKET_SKILLS, (prog_id,))
+                prog_skills = _build_prog_skills(cur, prog_id)
 
-                n_matches_approx = len({str(r["match_id"]) for r in rows})
-                thr_actual = frequency_threshold(n_matches_approx)
+                n_approx = len({str(r["match_id"]) for r in rows})
+                thr_b = math.ceil(0.05 * n_approx) if n_approx else 1
 
-                variants = {
-                    "A": _run_variant(rows, prog_skills, None, HARD_CAP),
-                    "B": _run_variant(rows, prog_skills, math.ceil(0.05 * n_matches_approx) if n_matches_approx else 1, None),
-                    "C": _run_variant(rows, prog_skills, 2, None),
-                    "D": _run_variant(rows, prog_skills, 1, None),
-                }
+                va = _run_variant(rows, prog_skills, None, HARD_CAP)
+                vb = _run_variant(rows, prog_skills, thr_b, None)
+                vc = _run_variant(rows, prog_skills, 2, None)
+                vd = _run_variant(rows, prog_skills, 1, None)
 
-                for var_name, v in variants.items():
+                fuera_a = pct_menciones_fuera_del_corte(va["skills_mkt"], vd["skills_mkt"])
+                fuera_b = pct_menciones_fuera_del_corte(vb["skills_mkt"], vd["skills_mkt"])
+                fuera_c = pct_menciones_fuera_del_corte(vc["skills_mkt"], vd["skills_mkt"])
+
+                for var_name, v, fuera in [
+                    ("A", va, fuera_a),
+                    ("B", vb, fuera_b),
+                    ("C", vc, fuera_c),
+                    ("D", vd, 0.0),
+                ]:
                     print(
-                        f"{prog_id:>5}  {var_name:>3}  {v['n_skills_mkt']:>6}  "
-                        f"{v['n_matches']:>9}  {v['threshold_used']:>6}  "
-                        f"{v['pct_cobertura']:>10.1f}  {v['n_brechas']:>7}  "
-                        f"{v['n_fortalezas']:>8}  {v['n_sin_asig']:>8}"
+                        f"{prog_id:>5}  {var_name:>3}  {v['n_skills_mkt']:>5}  "
+                        f"{v['n_matches']:>5}  {v['threshold']:>6}  "
+                        f"{v['cob_simple']:>6.1f}  {v['cob_pond']:>6.1f}  "
+                        f"{v['fortalezas']:>4}  {v['brechas']:>4}  "
+                        f"{v['criticas']:>4}  {fuera:>7.1f}"
                     )
 
-                _coherence_check(prog_id, variants["A"])
+                _coherence_ok(prog_id, va)
                 print()
     finally:
         conn.close()

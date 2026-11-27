@@ -1,4 +1,6 @@
-"""Tests para los nuevos parámetros min_freq y hard_cap de process_job_skill_rows."""
+"""Tests para los nuevos parámetros min_freq y hard_cap de process_job_skill_rows,
+y para las funciones puras cobertura_ponderada y pct_menciones_fuera_del_corte
+del script scripts/diag/cobertura_sin_tope.py."""
 from __future__ import annotations
 
 import sys
@@ -11,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from api.skills_analysis_logic import HARD_CAP, frequency_threshold, process_job_skill_rows
+from scripts.diag.cobertura_sin_tope import cobertura_ponderada, pct_menciones_fuera_del_corte
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -118,3 +121,74 @@ class TestHardCap:
         skills, _ = process_job_skill_rows(rows, min_freq=1, hard_cap=1)
         assert len(skills) == 1
         assert skills[0]["frecuencia"] == 20
+
+
+# ── D. cobertura_ponderada (función pura del script de diagnóstico) ───────────
+
+class TestCoberturaPonderada:
+    """Prueba la función pura cobertura_ponderada sin base de datos."""
+
+    def _f(self, skill: str, freq: int) -> dict:
+        return {"skill": skill, "frecuencia_mercado": freq}
+
+    def _b(self, skill: str, freq: int) -> dict:
+        return {"skill": skill, "frecuencia_mercado": freq}
+
+    def test_cobertura_total_100(self):
+        """Todas las menciones cubiertas → 100%."""
+        fortalezas = [self._f("python", 50), self._f("sql", 30)]
+        brechas: list[dict] = []
+        assert cobertura_ponderada(fortalezas, brechas) == 100.0
+
+    def test_cobertura_cero(self):
+        """Ninguna mención cubierta → 0%."""
+        fortalezas: list[dict] = []
+        brechas = [self._b("ml", 40), self._b("spark", 20)]
+        assert cobertura_ponderada(fortalezas, brechas) == 0.0
+
+    def test_cobertura_ponderada_difiere_de_simple(self):
+        """
+        Simple: 1 fortaleza / 2 skills = 50%.
+        Ponderada: si la fortaleza tiene más frecuencia → ponderada > 50%.
+        """
+        fortalezas = [self._f("python", 80)]
+        brechas = [self._b("ml", 20)]
+        pond = cobertura_ponderada(fortalezas, brechas)
+        assert pond == 80.0
+        assert pond != 50.0  # difiere de la cobertura simple (1/2)
+
+    def test_ambas_listas_vacias_devuelve_cero(self):
+        assert cobertura_ponderada([], []) == 0.0
+
+    def test_calculo_exacto(self):
+        """Cálculo manual: sum_fortalezas=30, sum_total=50 → 60.0%."""
+        fortalezas = [self._f("sql", 20), self._f("excel", 10)]
+        brechas = [self._b("ml", 15), self._b("spark", 5)]
+        assert cobertura_ponderada(fortalezas, brechas) == 60.0
+
+
+# ── E. pct_menciones_fuera_del_corte (función pura del script) ────────────────
+
+class TestPctMencionesFuera:
+    def _s(self, skill: str, freq: int) -> dict:
+        return {"skill": skill, "frecuencia": freq}
+
+    def test_sin_corte_fuera_es_cero(self):
+        """A == D → no se deja nada fuera."""
+        skills = [self._s("python", 50), self._s("sql", 30)]
+        assert pct_menciones_fuera_del_corte(skills, skills) == 0.0
+
+    def test_a_vacio_fuera_es_100(self):
+        """Corte A descarta todo → 100% fuera."""
+        d = [self._s("python", 50)]
+        assert pct_menciones_fuera_del_corte([], d) == 100.0
+
+    def test_d_vacio_devuelve_cero(self):
+        """D vacío → 0% (evita división por cero)."""
+        assert pct_menciones_fuera_del_corte([], []) == 0.0
+
+    def test_calculo_exacto(self):
+        """A cubre 60/100 de menciones → 40% fuera."""
+        a = [self._s("python", 60)]
+        d = [self._s("python", 60), self._s("ml", 40)]
+        assert pct_menciones_fuera_del_corte(a, d) == 40.0
