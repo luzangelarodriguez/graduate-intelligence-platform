@@ -48,10 +48,7 @@ TEXT_SYNONYMS: dict[str, list[str]] = {
         "inteligencia de negocios",
         "inteligencia empresarial",
     ],
-    "reporte": [
-        "informe",
-        "informes",
-    ],
+    "reporte": [],
     "dashboard": [
         "cuadro de mando",
         "cuadros de mando",
