@@ -450,3 +450,30 @@ class TestComputeConfianza:
         # score 0 means threshold wasn't met; compute_confianza still returns 'media'
         brechas = [{"skill": "python", "score": 0.5, "frecuencia_mercado": 5}]
         assert compute_confianza(brechas) == "media"
+
+
+# ── F. Regresión: "informe" no es sinónimo de "reporte" ──────────────────────
+
+class TestReporteInformeRegresion:
+    def test_informe_no_asigna_reporte(self):
+        """
+        'informe' NO debe ser sinónimo de 'reporte'.
+        Un texto sobre redes neuronales que menciona 'entregará un informe final'
+        no debe recibir la brecha 'reporte'.
+        """
+        assert score_brecha_vs_text(
+            "reporte",
+            "El estudiante entregará un informe final sobre redes neuronales.",
+        ) == 0.0
+
+    def test_reportes_en_texto_si_asigna_reporte(self):
+        """'reportes' en el texto SÍ coincide con la brecha 'reporte' por canonical_key (token match)."""
+        score = score_brecha_vs_text(
+            "reporte",
+            "Los estudiantes elaborarán reportes semanales de análisis.",
+        )
+        assert score > 0.0
+
+    def test_reporte_key_sin_sinonimos(self):
+        """TEXT_SYNONYMS['reporte'] debe estar vacío tras eliminar informe/informes."""
+        assert TEXT_SYNONYMS.get("reporte", []) == []

@@ -1935,9 +1935,10 @@ def curriculum_redesign_download(program_id: int):
         for prop in propuestas:
             doc.add_heading(prop["asignatura"], level=2)
             p = doc.add_paragraph()
-            p.add_run("Relevancia con brechas: ").bold = True
+            confianza_label = prop.get("confianza") or "—"
+            p.add_run("Confianza: ").bold = True
             labeled = prop.get("brechas_relevantes_labeled") or prop.get("brechas_relevantes", [])
-            p.add_run(f"{prop['relevancia_score']:.2f} · Brechas: {', '.join(labeled[:5])}")
+            p.add_run(f"{confianza_label} · Brechas: {', '.join(labeled[:5])}")
 
             # Comparison table
             table = doc.add_table(rows=1, cols=2)
